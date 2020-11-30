@@ -3,10 +3,6 @@ from utils.choices import Choices
 DEFAULT_CURRENCY = "USD"
 
 
-class IntegratedProviders(Choices):
-    DWOLLA = "DWOLLA"
-
-
 class TermsDocumentTypes(Choices):
     PRIVACY_POLICY = "PRIVACY_POLICY"
     TERMS_AND_CONDITIONS = "TERMS_AND_CONDITIONS"
@@ -14,7 +10,7 @@ class TermsDocumentTypes(Choices):
 
 
 class APIEnvironmentTypes(Choices):
-    DEMO = "DEMO"
+    SANDBOX = "SANDBOX"
     PRODUCTION = "PRODUCTION"
 
 

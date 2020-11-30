@@ -15,10 +15,10 @@ class UserAPIView(APIAccessLogView):
         exception_message = ""
         exception_class = NotAuthenticated
         user = request.user
-        
+
         if not user.is_authenticated:
             exception_message = "User not authenticated"
-            exception_class = NotAuthenticated        
+            exception_class = NotAuthenticated
 
         drf_request = super().initialize_request(request, *args, **kwargs)
         if exception_message:

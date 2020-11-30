@@ -37,7 +37,7 @@ class Login(ServiceBase):
                     }
                 )
 
-            if not user.userprofile.is_activated:
+            if user.is_disabled:
                 raise ValidationError(
                     {
                         "detail": ErrorDetail(

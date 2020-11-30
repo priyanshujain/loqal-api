@@ -1,7 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 
-from apps.account.views.user import UserSignupAPI
+from apps.account.views.consumer import ConsumerSignupAPI
 
 urlpatterns = [
-    url(r"^signup/?$", UserSignupAPI.as_view(), name="account_signup_api"),
+    path(
+        "consumer/signup/",
+        ConsumerSignupAPI.as_view(),
+        name="consumer_signup_api",
+    ),
 ]

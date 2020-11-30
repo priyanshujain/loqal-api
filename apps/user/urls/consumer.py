@@ -2,15 +2,15 @@ from django.conf.urls import url
 from django.urls import path
 
 from apps.user.views import (ApplyResetPasswordAPI, CheckTFAStausAPI,
-                                  DeleteSessionAPI, DisableTwoFactorAuthAPI,
-                                  EnableTwoFactorAuthAPI,
-                                  GetTwoFactorAuthQRCodeAPI, GetUserProfileAPI,
-                                  ListSessionsAPI, RequestResetPasswordAPI,
-                                  ResendEmailverificationAPI,
-                                  ResetPasswordTokenValidateAPI,
-                                  UpdateUserProfileAPI, UserChangePasswordAPI,
-                                  UserLoginAPI, UserLogoutAPI,
-                                  UsernameOrEmailCheckAPI, VerifyEmailAPI)
+                             DeleteSessionAPI, DisableTwoFactorAuthAPI,
+                             EnableTwoFactorAuthAPI, GetTwoFactorAuthQRCodeAPI,
+                             GetUserProfileAPI, ListSessionsAPI,
+                             RequestResetPasswordAPI,
+                             ResendEmailverificationAPI,
+                             ResetPasswordTokenValidateAPI,
+                             UpdateUserProfileAPI, UserChangePasswordAPI,
+                             UserLoginAPI, UserLogoutAPI,
+                             UsernameOrEmailCheckAPI, VerifyEmailAPI)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login_api"),

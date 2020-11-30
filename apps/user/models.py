@@ -12,6 +12,9 @@ from utils.shortcuts import rand_str
 class UserManager(models.Manager):
     use_in_migrations = True
 
+    def get_by_natural_key(self, username):
+        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": username})
+
     def find_by_username(self, username):
         queryset = self.get_queryset()
         return queryset.filter(username=username)
@@ -42,9 +45,7 @@ class User(Base, AbstractBaseUser):
     )
     email_verification_token_expire_time = models.DateTimeField(null=True)
     # One of UserType
-    user_type = models.CharField(
-        max_length=254, default=UserType.REGULAR_USER
-    )
+    user_type = models.CharField(max_length=254, default=UserType.REGULAR_USER)
     # SSO auth token
     auth_token = models.CharField(max_length=254, null=True)
     # Two facotor auth
@@ -72,12 +73,16 @@ class User(Base, AbstractBaseUser):
             UserType.ADMIN_STAFF,
         ]
 
+    def set_user_type(self, user_type):
+        self.user_type = user_type
+        self.save()
+
     def verify_email(self):
         self.email_verified = True
         self.email_verification_token_expire_time = now()
         self.save()
 
-    def request_email_verification(self):
+    def gen_email_verification_token(self):
         self.email_verification_token = rand_str()
         self.email_verification_token_expire_time = now() + timedelta(days=7)
         self.save()

@@ -10,7 +10,7 @@ from otpauth import OtpAuth
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
-from apps.account.services import SendVerifyEmail
+from apps.account.notifications import SendVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
 from apps.user.services import (ApplyResetPassword, ChangePassword,
@@ -64,7 +64,7 @@ class ResendEmailverificationAPI(LoggedInAPIView):
                 {"detail": ErrorDetail(_("Email has already verified."))}
             )
         if user.email_verification_token_expire_time < now():
-            user.request_email_verification()
+            user.gen_email_verification_token()
         SendVerifyEmail(user=user).send()
         return self.response()
 

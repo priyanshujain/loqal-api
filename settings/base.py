@@ -44,12 +44,7 @@ VENDOR_APPS = [
 ]
 
 
-LOCAL_APPS = [
-    "apps.user",
-    "apps.account",
-    "apps.tracking",
-    "apps.provider"
-]
+LOCAL_APPS = ["apps.user", "apps.account", "apps.tracking", "apps.provider"]
 
 INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
 
