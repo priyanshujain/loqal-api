@@ -1,0 +1,27 @@
+from utils.choices import Choices
+
+DEFAULT_CURRENCY = "USD"
+
+
+class IntegratedProviders(Choices):
+    DWOLLA = "DWOLLA"
+
+
+class TermsDocumentTypes(Choices):
+    PRIVACY_POLICY = "PRIVACY_POLICY"
+    TERMS_AND_CONDITIONS = "TERMS_AND_CONDITIONS"
+    TERMS_OF_USE = "TERMS_OF_USE"
+
+
+class APIEnvironmentTypes(Choices):
+    DEMO = "DEMO"
+    PRODUCTION = "PRODUCTION"
+
+
+class PaymentAccountStatus(Choices):
+    TERMS_ACCEPTED = "TERMS_ACCEPTED"
+    ONBOARDING_DATA_ERROR = "ONBOARDING_DATA_ERROR"
+    CLIENT_SUBMITTED = "CLIENT_SUBMITTED"
+    ONBOARDING_DATA_SENT = "ONBOARDING_DATA_SENT"
+    ADDITIONAL_DATA_NEEDED = "ADDITIONAL_DATA_NEEDED"
+    KEYS_PROVIDED = "KEYS_PROVIDED"

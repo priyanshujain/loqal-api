@@ -1,0 +1,98 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+.idea/
+
+# Django stuff:
+*.log
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+# Back up file
+*~
+
+#db file
+db.db
+
+#vim cache
+*swp
+*swo
+
+#redis dump
+*.rdb
+
+#*.out
+*.sqlite3
+.python-version
+.DS_Store
+build.txt
+tmp/
+custom_settings.py
+*.zip
+
+data/log/*
+!data/log/.gitkeep
+!data/ssl/.gitkeep
+data/public/*
+!data/public/avatar/default.png
+data/config/*
+!data/config/.gitkeep
+
+data/static/*
+http_locations.conf
+https_locations.conf
+
+.vscode/settings.json
+
+.env
+.env.production
+.env.staging
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
