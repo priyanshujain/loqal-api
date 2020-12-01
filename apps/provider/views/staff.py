@@ -3,7 +3,7 @@
 
 from django.db.utils import IntegrityError
 
-from api.views import AdminAPIView, validate_serializer
+from api.views import StaffAPIView, validate_serializer
 from apps.account.dbapi import get_account
 from apps.provider.dbapi import all_payment_accounts
 from apps.provider.models import (PaymentAccount, PaymentAccountOpeningConsent,
@@ -21,13 +21,10 @@ from apps.provider.serializers import (AccountProviderCredentialsSerializer,
                                        TermsDocumentSerializer,
                                        UpdatePaymentProviderSerializer)
 from apps.provider.shortcuts import validate_image_data
-from apps.provider.tasks import (OnboardingFileUploadTask,
-                                 SendOnboardingToProvidersTask)
 
 
-class CreatePaymentProviderAPI(AdminAPIView):
+class CreatePaymentProviderAPI(StaffAPIView):
     """Create new payment provider"""
-
     
     @validate_serializer(CreatePaymentProviderSerializer)
     def post(self, request):
@@ -41,9 +38,8 @@ class CreatePaymentProviderAPI(AdminAPIView):
         return self.response(dict(id=payment_provider.id))
 
 
-class UpdatePaymentProviderAPI(AdminAPIView):
+class UpdatePaymentProviderAPI(StaffAPIView):
     """Update new payment provider"""
-
     
     @validate_serializer(UpdatePaymentProviderSerializer)
     def put(self, request):
@@ -61,7 +57,7 @@ class UpdatePaymentProviderAPI(AdminAPIView):
         return self.response()
 
 
-class ProviderLogoUploadAPI(AdminAPIView):
+class ProviderLogoUploadAPI(StaffAPIView):
     """Upload new/change logo"""
 
     request_parsers = ()
@@ -89,7 +85,7 @@ class ProviderLogoUploadAPI(AdminAPIView):
         return self.response()
 
 
-class CreatePaymentProviderCredsAPI(AdminAPIView):
+class CreatePaymentProviderCredsAPI(StaffAPIView):
     """create payment provider creds"""
 
     
@@ -108,7 +104,7 @@ class CreatePaymentProviderCredsAPI(AdminAPIView):
         return self.response()
 
 
-class UpdatePaymentProviderCredsAPI(AdminAPIView):
+class UpdatePaymentProviderCredsAPI(StaffAPIView):
     """Update payment provider creds"""
 
     
@@ -122,7 +118,7 @@ class UpdatePaymentProviderCredsAPI(AdminAPIView):
         return self.response()
 
 
-class CreateTermDocumentAPI(AdminAPIView):
+class CreateTermDocumentAPI(StaffAPIView):
     """Upload new term document"""
 
     
@@ -147,7 +143,7 @@ class CreateTermDocumentAPI(AdminAPIView):
         return self.response()
 
 
-class RemoveTermDocumentAPI(AdminAPIView):
+class RemoveTermDocumentAPI(StaffAPIView):
     """Remove terms document if not being used"""
 
     
@@ -182,7 +178,7 @@ class RemoveTermDocumentAPI(AdminAPIView):
         return self.response()
 
 
-class ActivateTermsDocumentAPI(AdminAPIView):
+class ActivateTermsDocumentAPI(StaffAPIView):
     """Activate terms document, automatically deactivates all other ones"""
 
     
@@ -210,7 +206,7 @@ class ActivateTermsDocumentAPI(AdminAPIView):
         return self.response()
 
 
-class AccountProviderCredentialsAPI(AdminAPIView):
+class AccountProviderCredentialsAPI(StaffAPIView):
     
     @validate_serializer(AccountProviderCredentialsSerializer)
     def post(self, request):
@@ -235,7 +231,7 @@ class AccountProviderCredentialsAPI(AdminAPIView):
         return self.error("NOT_SUPPORTED")
 
 
-class ListClientAccountProviderAPI(AdminAPIView):
+class ListClientAccountProviderAPI(StaffAPIView):
     
     def post(self, request):
         account = request.account
@@ -245,7 +241,7 @@ class ListClientAccountProviderAPI(AdminAPIView):
         )
 
 
-class ListTermsAPI(AdminAPIView):
+class ListTermsAPI(StaffAPIView):
     
     def get(self, request):
         payment_provider_slug = request.GET.get("payment_provider_slug", None)
@@ -270,38 +266,13 @@ class ListTermsAPI(AdminAPIView):
         )
 
 
-class ListPaymentAccountsAPI(AdminAPIView):
+class ListPaymentAccountsAPI(StaffAPIView):
     def get(self, request):
         return self.response()
 
 
-class SubmitOnboardingFilesAPI(AdminAPIView):
-    def post(self, request, account_id):
-        account = get_account(account_id=account_id)
-        if not account:
-            return self.response(status=400)
-        self._run_services(account_id=account.id)
-        return self.response()
 
-    def _run_services(self, account_id):
-        task = OnboardingFileUploadTask()
-        task.delay(account_id=account_id)
-
-
-class SendOnboardingToProvidersAPI(AdminAPIView):
-    def post(self, request, account_id):
-        account = get_account(account_id=account_id)
-        if not account:
-            return self.response(status=400)
-        self._run_services(account_id=account.id)
-        return self.response()
-
-    def _run_services(self, account_id):
-        task = SendOnboardingToProvidersTask()
-        task.delay(account_id=account_id)
-
-
-class PaymentAccountStatusAPI(AdminAPIView):
+class PaymentAccountStatusAPI(StaffAPIView):
     def get(self, request, account_id):
         account = get_account(account_id=account_id)
         if not account:

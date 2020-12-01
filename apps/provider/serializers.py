@@ -3,11 +3,11 @@ import json
 from django import forms
 
 from api import serializers
-from apps.account.models import AccountSupportedCountries
 from apps.provider.models import (PaymentAccount, PaymentProvider,
                                   PaymentProviderCred, TermsDocument)
-from apps.provider.options import (APIEnvironmentTypes, IntegratedProviders,
+from apps.provider.options import (APIEnvironmentTypes,
                                    TermsDocumentTypes)
+from integrations.options import IntegratedProviders
 
 
 class CreatePaymentProviderSerializer(serializers.Serializer):
@@ -60,9 +60,7 @@ class CreateTermsDocumentSerializer(serializers.Serializer):
     )
     document_file = serializers.JSONField()
     is_active = serializers.BooleanField(default=True)
-    country = serializers.ChoiceField(
-        choices=AccountSupportedCountries.choices()
-    )
+    country = serializers.CharField(max_length=2)
 
 
 class RemoveTermDocumentSerializer(serializers.Serializer):

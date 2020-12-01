@@ -3,6 +3,7 @@ import logging
 import re
 import time
 import traceback
+import functools
 
 from django.conf import settings
 from django.db import connection
@@ -382,3 +383,24 @@ class LoggedInAPIView(APIAccessLogView):
         if exception_message:
             raise exception_class(detail=exception_message)
         return drf_request
+
+
+def validate_serializer(serializer):
+    def validate(view_method):
+        @functools.wraps(view_method)
+        def handle(*args, **kwargs):
+            self = args[0]
+            request = args[1]
+            s = serializer(data=self.request_data)
+            if s.is_valid():
+                # request.data = s.data
+                request.data.clear()
+                request.data.update(s.data)
+                request.serializer = s
+                return view_method(*args, **kwargs)
+            else:
+                return self.response(s.errors, status=400)
+
+        return handle
+
+    return validate

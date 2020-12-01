@@ -27,6 +27,7 @@ class Auth(Http):
                     "grant_type": "client_credentials",
                 },
                 custom_content_type="application/x-www-form-urlencoded",
+                api_type="token",
                 authenticated=False,
                 retry=True,
             )

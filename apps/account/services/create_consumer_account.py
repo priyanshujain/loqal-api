@@ -68,8 +68,8 @@ class CreateConsumerAccount(ServiceBase):
             "email": user.email,
             "ip_address": self.ip_address,
         }
-        psp_action = CreateConsumerAccountAPIAction(data=psp_req_data)
-        response = psp_action.create()
+        psp_action = CreateConsumerAccountAPIAction(account_id=account.id)
+        response = psp_action.create(data=psp_req_data)
         dwolla_customer_id = response["dwolla_customer_id"]
         account.add_dwolla_id(dwolla_id=dwolla_customer_id)
 

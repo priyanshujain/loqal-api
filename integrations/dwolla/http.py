@@ -26,7 +26,7 @@ class Http(HttpRequest):
         endpoint,
         query=None,
         authenticated=True,
-        api_type="partner",
+        api_type="api",
         version="v1",
         retry=False,
     ):
@@ -67,7 +67,7 @@ class Http(HttpRequest):
         custom_content_type="application/json",
         files=None,
         authenticated=True,
-        api_type="partner",
+        api_type="api",
         version="v1",
         retry=False,
     ):
@@ -122,10 +122,13 @@ class Http(HttpRequest):
         self,
         authenticated,
         method="get",
-        api_type="partner",
+        api_type="api",
         custom_content_type=None,
     ):
-        headers = {"Accept": "application/vnd.dwolla.v1.hal+json"}
+        headers = {}
+
+        if api_type == "api":
+            headers["Accept"] = "application/vnd.dwolla.v1.hal+json"
 
         if method == "post":
             headers["Content-Type"] = "application/vnd.dwolla.v1.hal+json"

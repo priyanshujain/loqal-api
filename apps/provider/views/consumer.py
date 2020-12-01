@@ -1,4 +1,4 @@
-from api.views import UserAPIView
+from api.views import LoggedInAPIView
 from apps.provider.dbapi import get_all_payment_providers
 from apps.provider.responses import PaymentProviderResponse
 

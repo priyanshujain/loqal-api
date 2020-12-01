@@ -11,6 +11,8 @@ from apps.views import WelcomeAPI, error404
 urlpatterns = [
     path("api/user/", include("apps.user.urls.consumer")),
     path("api/account/", include("apps.account.urls.consumer")),
+    path("api/provider/", include("apps.provider.urls.consumer")),
     path("api/staff/tracking/", include("apps.tracking.urls")),
+    path("api/staff/provider/", include("apps.provider.urls.staff")),
     path("", WelcomeAPI.as_view()),
 ]

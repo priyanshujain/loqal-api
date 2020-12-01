@@ -1,5 +1,5 @@
 """
-This module provides a the Client interface to the AFEX APIs.
+This module provides a the Client interface to the Dwolla APIs.
 """
 
 from integrations.dwolla.api import *
@@ -11,7 +11,7 @@ __all__ = "Client"
 
 class Client(object):
     """
-    The Client interfacing to the AFEX APIs.
+    The Client interfacing to the Dwolla APIs.
     """
 
     _auth_client = None

@@ -1,5 +1,5 @@
 """
-Handled exceptions raised by AFEX APIs.
+Handled exceptions raised by Dwolla APIs.
 """
 import json
 

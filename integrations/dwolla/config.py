@@ -85,7 +85,7 @@ class Config(object):
 
         self._auth_token = Auth(self).authenticate()["access_token"]
 
-    def environment_url(self, api_type="partner", version="v1"):
+    def environment_url(self, api_type="api", version="v1"):
         """
         Get API url for request type.
         """

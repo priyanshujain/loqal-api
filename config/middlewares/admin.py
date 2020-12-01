@@ -7,8 +7,8 @@ __all__ = ("AdminRoleRequiredMiddleware",)
 class AdminRoleRequiredMiddleware(MiddlewareMixin):
     def process_request(self, request):
         path = request.path_info
-        if path.startswith("/admin/") or path.startswith("/api/admin/"):
+        if path.startswith("/staff/") or path.startswith("/api/staff/"):
             if not (
-                request.user.is_authenticated and request.user.is_admin_role()
+                request.user.is_authenticated and request.user.is_staff()
             ):
                 raise NotAuthenticated(detail="Invalid request.")
