@@ -13,9 +13,11 @@ from api.views import APIView, LoggedInAPIView
 from apps.account.notifications import SendVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
-from apps.user.services import (ApplyResetPassword, ChangePassword,
-                                EmailVerification, Login, RequestResetPassword,
-                                ResetPasswordTokenValidate, Session)
+from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
+                                ChangePassword, EmailVerification, Login,
+                                RequestResetPassword,
+                                ResetPasswordTokenValidate, Session,
+                                VerifyPhoneNumber)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils.shortcuts import img2base64, rand_str
 
@@ -103,6 +105,26 @@ class UserLoginAPI(APIView):
 
     def _run_services(self, request):
         service = Login(request=request, data=self.request_data)
+        service.execute()
+
+
+class AddPhoneNumberAPI(LoggedInAPIView):
+    def post(self, request):
+        self._run_services(user=request.user)
+        return self.response()
+
+    def _run_services(self, user):
+        service = AddPhoneNumber(user=user, data=self.request_data)
+        service.execute()
+
+
+class VerifyPhoneNumberAPI(LoggedInAPIView):
+    def post(self, request):
+        self._run_services(user=request.user)
+        return self.response()
+
+    def _run_services(self, user):
+        service = VerifyPhoneNumber(user=user, data=self.request_data)
         service.execute()
 
 

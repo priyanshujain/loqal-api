@@ -9,6 +9,8 @@ __all__ = (
     "ResetPasswordTokenValidator",
     "ApplyResetPasswordValidator",
     "EmailVerificationValidator",
+    "PhoneNumberValidator",
+    "PhoneNumberCodeValidator",
 )
 
 
@@ -32,6 +34,16 @@ class UserLoginValidator(serializers.ValidationSerializer):
     password = serializers.CharField()
     tfa_code = serializers.CharField(required=False, allow_blank=True)
     ifconfig = serializers.DictField()
+
+
+class PhoneNumberValidator(serializers.ValidationSerializer):
+    # Add a contact_number validator
+    contact_number = serializers.CharField()
+
+
+class PhoneNumberCodeValidator(serializers.ValidationSerializer):
+    # Add a contact_number validator
+    code = serializers.CharField()
 
 
 class ForgotPasswordValidator(serializers.ValidationSerializer):

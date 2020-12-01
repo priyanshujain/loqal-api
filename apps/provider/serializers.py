@@ -5,8 +5,7 @@ from django import forms
 from api import serializers
 from apps.provider.models import (PaymentAccount, PaymentProvider,
                                   PaymentProviderCred, TermsDocument)
-from apps.provider.options import (APIEnvironmentTypes,
-                                   TermsDocumentTypes)
+from apps.provider.options import APIEnvironmentTypes, TermsDocumentTypes
 from integrations.options import IntegratedProviders
 
 

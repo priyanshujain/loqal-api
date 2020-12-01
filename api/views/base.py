@@ -1,9 +1,9 @@
+import functools
 import json
 import logging
 import re
 import time
 import traceback
-import functools
 
 from django.conf import settings
 from django.db import connection

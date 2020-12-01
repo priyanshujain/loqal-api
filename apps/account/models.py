@@ -17,9 +17,20 @@ class Account(AbstractBase):
     )
     dwolla_id = models.CharField(max_length=64, blank=True)
     is_active = models.BooleanField(default=True)
+    zip_code = models.CharField(max_length=5, blank=True)
 
     def add_dwolla_id(self, dwolla_id):
+        """
+        docstring
+        """
         self.dwolla_id = dwolla_id
+        self.save()
+    
+    def add_zip_code(self, zip_code):
+        """
+        docstring
+        """
+        self.zip_code = zip_code
         self.save()
 
     class Meta:

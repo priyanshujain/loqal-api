@@ -5,6 +5,7 @@ from apps.account.models import Account, ConsumerAccount
 __all__ = (
     "get_account",
     "create_consumer_account",
+    "get_consumer_account",
 )
 
 
@@ -21,4 +22,11 @@ def create_consumer_account(user_id):
         return ConsumerAccount.objects.create(account=account, user_id=user_id)
     except IntegrityError:
         account.delete()
+        return None
+
+
+def get_consumer_account(user_id):
+    try:
+        return ConsumerAccount.objects.get(user_id=user_id)
+    except ConsumerAccount.DoesNotExist:
         return None

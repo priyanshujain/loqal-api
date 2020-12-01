@@ -1,20 +1,26 @@
-from django.conf.urls import url
 from django.urls import path
 
-from apps.user.views import (ApplyResetPasswordAPI, CheckTFAStausAPI,
-                             DeleteSessionAPI, DisableTwoFactorAuthAPI,
-                             EnableTwoFactorAuthAPI, GetTwoFactorAuthQRCodeAPI,
-                             GetUserProfileAPI, ListSessionsAPI,
-                             RequestResetPasswordAPI,
+from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
+                             CheckTFAStausAPI, DeleteSessionAPI,
+                             DisableTwoFactorAuthAPI, EnableTwoFactorAuthAPI,
+                             GetTwoFactorAuthQRCodeAPI, GetUserProfileAPI,
+                             ListSessionsAPI, RequestResetPasswordAPI,
                              ResendEmailverificationAPI,
                              ResetPasswordTokenValidateAPI,
                              UpdateUserProfileAPI, UserChangePasswordAPI,
                              UserLoginAPI, UserLogoutAPI,
-                             UsernameOrEmailCheckAPI, VerifyEmailAPI)
+                             UsernameOrEmailCheckAPI, VerifyEmailAPI,
+                             VerifyPhoneNumberAPI)
 
 urlpatterns = [
-    path("login/", UserLoginAPI.as_view(), name="user_login_api"),
-    path("logout/", UserLogoutAPI.as_view(), name="user_logout_api"),
+    path("login/", UserLoginAPI.as_view(), name="user_login"),
+    path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
+    path(
+        "phone/verify/",
+        VerifyPhoneNumberAPI.as_view(),
+        name="verify_phone_number",
+    ),
+    path("logout/", UserLogoutAPI.as_view(), name="user_logout"),
     path(
         "change-password/",
         UserChangePasswordAPI.as_view(),

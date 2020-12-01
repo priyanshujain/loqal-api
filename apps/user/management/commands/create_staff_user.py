@@ -19,5 +19,3 @@ class Command(BaseCommand):
                 first_name="Spotlight",
                 last_name="Admin",
             )
-
-

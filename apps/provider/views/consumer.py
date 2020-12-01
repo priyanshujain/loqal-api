@@ -9,4 +9,3 @@ class ListPaymentProviderAPI(LoggedInAPIView):
         return self.response(
             PaymentProviderResponse(payment_providers, many=True).data
         )
-

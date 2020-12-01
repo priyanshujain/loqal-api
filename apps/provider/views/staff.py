@@ -25,7 +25,7 @@ from apps.provider.shortcuts import validate_image_data
 
 class CreatePaymentProviderAPI(StaffAPIView):
     """Create new payment provider"""
-    
+
     @validate_serializer(CreatePaymentProviderSerializer)
     def post(self, request):
         """Create new paymentprovider object"""
@@ -40,7 +40,7 @@ class CreatePaymentProviderAPI(StaffAPIView):
 
 class UpdatePaymentProviderAPI(StaffAPIView):
     """Update new payment provider"""
-    
+
     @validate_serializer(UpdatePaymentProviderSerializer)
     def put(self, request):
         """update paymentprovider object"""
@@ -62,7 +62,6 @@ class ProviderLogoUploadAPI(StaffAPIView):
 
     request_parsers = ()
 
-    
     def post(self, request):
         """upload/change logo"""
         form = ProviderLogoUploadForm(request.POST, request.FILES)
@@ -88,7 +87,6 @@ class ProviderLogoUploadAPI(StaffAPIView):
 class CreatePaymentProviderCredsAPI(StaffAPIView):
     """create payment provider creds"""
 
-    
     @validate_serializer(PaymentProviderCredSerializer)
     def post(self, request):
         """Create payment provider creds object"""
@@ -107,7 +105,6 @@ class CreatePaymentProviderCredsAPI(StaffAPIView):
 class UpdatePaymentProviderCredsAPI(StaffAPIView):
     """Update payment provider creds"""
 
-    
     @validate_serializer(PaymentProviderCredSerializer)
     def put(self, request):
         """update payment provider creds"""
@@ -121,7 +118,6 @@ class UpdatePaymentProviderCredsAPI(StaffAPIView):
 class CreateTermDocumentAPI(StaffAPIView):
     """Upload new term document"""
 
-    
     @validate_serializer(CreateTermsDocumentSerializer)
     def post(self, request):
         """Create a new terms documents"""
@@ -146,7 +142,6 @@ class CreateTermDocumentAPI(StaffAPIView):
 class RemoveTermDocumentAPI(StaffAPIView):
     """Remove terms document if not being used"""
 
-    
     @validate_serializer(RemoveTermDocumentSerializer)
     def post(self, request):
         """remove terms document object"""
@@ -181,7 +176,6 @@ class RemoveTermDocumentAPI(StaffAPIView):
 class ActivateTermsDocumentAPI(StaffAPIView):
     """Activate terms document, automatically deactivates all other ones"""
 
-    
     @validate_serializer(ActivateTermDocumentSerializer)
     def post(self, request):
         """Deactivate terms document"""
@@ -207,7 +201,6 @@ class ActivateTermsDocumentAPI(StaffAPIView):
 
 
 class AccountProviderCredentialsAPI(StaffAPIView):
-    
     @validate_serializer(AccountProviderCredentialsSerializer)
     def post(self, request):
         # TODO: Apply error conditions and checks per provider
@@ -232,7 +225,6 @@ class AccountProviderCredentialsAPI(StaffAPIView):
 
 
 class ListClientAccountProviderAPI(StaffAPIView):
-    
     def post(self, request):
         account = request.account
         account_providers = PaymentAccount.objects.filter(account=account)
@@ -242,7 +234,6 @@ class ListClientAccountProviderAPI(StaffAPIView):
 
 
 class ListTermsAPI(StaffAPIView):
-    
     def get(self, request):
         payment_provider_slug = request.GET.get("payment_provider_slug", None)
         if not payment_provider_slug:
@@ -269,7 +260,6 @@ class ListTermsAPI(StaffAPIView):
 class ListPaymentAccountsAPI(StaffAPIView):
     def get(self, request):
         return self.response()
-
 
 
 class PaymentAccountStatusAPI(StaffAPIView):
