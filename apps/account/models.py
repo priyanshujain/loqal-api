@@ -25,7 +25,7 @@ class Account(AbstractBase):
         """
         self.dwolla_id = dwolla_id
         self.save()
-    
+
     def add_zip_code(self, zip_code):
         """
         docstring

@@ -4,17 +4,11 @@
 from django.db.utils import IntegrityError
 
 from api.views import StaffAPIView, validate_serializer
-from apps.account.dbapi import get_account
-from apps.provider.dbapi import all_payment_accounts
-from apps.provider.models import (PaymentAccount, PaymentAccountOpeningConsent,
-                                  PaymentProvider, PaymentProviderCred,
+from apps.provider.models import (PaymentProvider, PaymentProviderCred,
                                   TermsDocument)
-from apps.provider.responses import PaymentAccountResponse
-from apps.provider.serializers import (AccountProviderCredentialsSerializer,
-                                       ActivateTermDocumentSerializer,
+from apps.provider.serializers import (ActivateTermDocumentSerializer,
                                        CreatePaymentProviderSerializer,
                                        CreateTermsDocumentSerializer,
-                                       ListPaymentAccountSerializer,
                                        PaymentProviderCredSerializer,
                                        ProviderLogoUploadForm,
                                        RemoveTermDocumentSerializer,
@@ -154,13 +148,6 @@ class RemoveTermDocumentAPI(StaffAPIView):
         except TermsDocument.DoesNotExist:
             return self.error("INVALID_TERM_DOCUMENT")
 
-        # check if term document is being used by a client
-        paymentaccount_consent_qs = PaymentAccountOpeningConsent.objects.filter(
-            terms=terms_document
-        )
-        if paymentaccount_consent_qs.exists():
-            return self.error("TERMS_BEING_USED")
-
         termdocument_qs = TermsDocument.objects.filter(
             country=terms_document.country,
             document_type=terms_document.document_type,
@@ -200,39 +187,6 @@ class ActivateTermsDocumentAPI(StaffAPIView):
         return self.response()
 
 
-class AccountProviderCredentialsAPI(StaffAPIView):
-    @validate_serializer(AccountProviderCredentialsSerializer)
-    def post(self, request):
-        # TODO: Apply error conditions and checks per provider
-        data = request.data
-        try:
-            account_provider = PaymentAccount.objects.get(
-                pk=data["account_provider_id"]
-            )
-        except PaymentAccount.DoesNotExist:
-            return self.error("DOES_NOT_EXIST")
-
-        account_provider.provider_account_id = data["provider_account_id"]
-        account_provider.api_key = data["api_key"]
-        account_provider.password = data["password"]
-        account_provider.login_id = data["login_id"]
-        account_provider.status = "KEYS_PROVIDED"
-        account_provider.save()
-        return self.response()
-
-    def put(self, request):
-        return self.error("NOT_SUPPORTED")
-
-
-class ListClientAccountProviderAPI(StaffAPIView):
-    def post(self, request):
-        account = request.account
-        account_providers = PaymentAccount.objects.filter(account=account)
-        return self.response(
-            ListPaymentAccountSerializer(account_providers, many=True).data
-        )
-
-
 class ListTermsAPI(StaffAPIView):
     def get(self, request):
         payment_provider_slug = request.GET.get("payment_provider_slug", None)
@@ -254,22 +208,6 @@ class ListTermsAPI(StaffAPIView):
 
         return self.response(
             TermsDocumentSerializer(terms_document_qs, many=True).data
-        )
-
-
-class ListPaymentAccountsAPI(StaffAPIView):
-    def get(self, request):
-        return self.response()
-
-
-class PaymentAccountStatusAPI(StaffAPIView):
-    def get(self, request, account_id):
-        account = get_account(account_id=account_id)
-        if not account:
-            return self.response(status=400)
-        payment_accounts = all_payment_accounts(account_id=account.id)
-        return self.response(
-            PaymentAccountResponse(payment_accounts, many=True).data
         )
 
 

@@ -1,8 +1,8 @@
 from django.urls import path
 
 from apps.account.views.consumer import (AddAccountZipCodeAPI,
-                                         ConsumerSignupAPI,
-                                         ConsumerAccountProfileAPI)
+                                         ConsumerAccountProfileAPI,
+                                         ConsumerSignupAPI)
 
 urlpatterns = [
     path(

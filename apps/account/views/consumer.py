@@ -3,14 +3,13 @@ from datetime import date
 from django.utils.translation import gettext as _
 
 from api.views import APIView, UserAPIView
-from apps.account.services import AddZipCode, CreateConsumerAccount
 from apps.account.responses import ConsumerAccountProfileResponse
-
+from apps.account.services import AddZipCode, CreateConsumerAccount
 
 __all__ = (
     "ConsumerSignupAPI",
     "AddAccountZipCodeAPI",
-    "ConsumerAccountProfileAPI"
+    "ConsumerAccountProfileAPI",
 )
 
 
@@ -35,9 +34,7 @@ class AddAccountZipCodeAPI(UserAPIView):
 
     def _run_services(self, account):
         data = self.request_data
-        service = AddZipCode(
-            data=self.request_data, account=account
-        )
+        service = AddZipCode(data=self.request_data, account=account)
         service.execute()
 
 

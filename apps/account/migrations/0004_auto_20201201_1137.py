@@ -6,17 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0003_consumeraccount_zip_code'),
+        ("account", "0003_consumeraccount_zip_code"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='consumeraccount',
-            name='zip_code',
-        ),
+        migrations.RemoveField(model_name="consumeraccount", name="zip_code",),
         migrations.AddField(
-            model_name='account',
-            name='zip_code',
+            model_name="account",
+            name="zip_code",
             field=models.CharField(blank=True, max_length=5),
         ),
     ]

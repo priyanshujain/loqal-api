@@ -3,9 +3,9 @@ import json
 from django import forms
 
 from api import serializers
-from apps.provider.models import (PaymentAccount, PaymentProvider,
-                                  PaymentProviderCred, TermsDocument)
-from apps.provider.options import APIEnvironmentTypes, TermsDocumentTypes
+from apps.provider.models import (PaymentProvider, PaymentProviderCred,
+                                  TermsDocument)
+from apps.provider.options import TermsDocumentTypes
 from integrations.options import IntegratedProviders
 
 
@@ -74,28 +74,6 @@ class ActivateTermDocumentSerializer(serializers.Serializer):
     termdocument_id = serializers.IntegerField()
 
 
-class AccountProviderCredentialsSerializer(serializers.Serializer):
-    account_provider_id = serializers.IntegerField()
-    api_key = serializers.CharField(max_length=64, required=False, default=" ")
-    login_id = serializers.CharField(max_length=64, required=False, default="")
-    password = serializers.CharField(max_length=64, required=False, default="")
-    provider_account_id = serializers.CharField(
-        max_length=64, required=False, default=""
-    )
-
-
-class PaymentAccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PaymentAccount
-        fields = "__all__"
-
-
-class ListPaymentAccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PaymentAccount
-        fields = ("account", "status", "provider", "id")
-
-
 class PaymentProviderSerializer(serializers.ModelSerializer):
     provider_slug = serializers.ChoiceField(
         choices=IntegratedProviders.choices()
@@ -116,15 +94,3 @@ class PaymentProviderCredModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentProviderCred
         fields = "__all__"
-
-
-class ProviderTermsAcceptSerializer(serializers.Serializer):
-    provider_id = serializers.IntegerField()
-    terms_list = serializers.ListField(child=serializers.IntegerField())
-
-
-class ProviderSubmitSerializer(serializers.Serializer):
-    accepted_terms = serializers.ListField(
-        child=ProviderTermsAcceptSerializer()
-    )
-    consent_timestamp = serializers.FloatField()

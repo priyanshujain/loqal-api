@@ -2,7 +2,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from api.exceptions import ErrorDetail, ValidationError
-from apps.provider.dbapi import get_payment_account_creds, get_provider_cred
+from apps.account.dbapi import get_account
+from apps.provider.dbapi import get_provider_cred
 from apps.provider.lib.client import APIClient
 from apps.tracking.clients import PspAPIRequestTracker
 from integrations.clients import CLIENT_CLASSES
@@ -63,18 +64,8 @@ class ProviderAPIActionBase(object):
 
     def _get_client_config(self):
         config = {}
-        payment_account_creds = get_payment_account_creds(
-            provider_slug=self.provider_slug, account_id=self.account_id
-        )
-        if not payment_account_creds:
-            return config
-
-        # Remove payment account id from the class and it;s usage in reponses
-        payment_account = payment_account_creds.payment_account
-        self.payment_account = payment_account
-
-        config["api_key"] = payment_account_creds.api_key
-        config["account_number"] = payment_account_creds.account_number
+        account = get_account(account_id=self.account_id)
+        config["customer_id"] = account.dwolla_id
         return config
 
     def _get_client(self):
@@ -102,17 +93,3 @@ class ProviderAPIActionBase(object):
         if self.payment_account:
             return self.payment_account.id
         return None
-
-
-class PlaidAPIActionBase(object):
-    """docstring for PlaidAPIActionBase"""
-
-    _client = None
-
-    def __init__(self):
-        client_class = CLIENT_CLASSES["PLAID"]
-        self._client = client_class()
-
-    @property
-    def client(self):
-        return self._client
