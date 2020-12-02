@@ -46,7 +46,7 @@ class Config(object):
         """
         self.client_secret = provider_config.get("api_password")
         self.client_id = provider_config.get("api_key")
-        self.client_api_key = client_config.get("api_key", None)
+        self.customer_id = client_config.get("customer_id", None)
         self.environment = provider_config.get("api_environment")
         self._auth_token = provider_config.get("auth_token", None)
         self.request_tracker = request_tracker
