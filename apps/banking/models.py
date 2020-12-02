@@ -21,6 +21,6 @@ class BankAccount(AbstractBase):
     def add_dwolla_id(self, dwolla_id):
         self.dwolla_id = dwolla_id
         self.save()
-    
+
     class Meta:
         db_table = "bank_account"

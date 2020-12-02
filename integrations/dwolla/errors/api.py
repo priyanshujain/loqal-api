@@ -1,6 +1,10 @@
 """
 Handled exceptions raised by Dwolla APIs.
 """
+
+# TODO: update error module using
+# https://github.com/Dwolla/dwolla-v2-python/blob/d9c529eda2c9e9829ccde4bdbacbcdd41d1b074b/dwollav2/error.py
+
 import json
 
 import yaml

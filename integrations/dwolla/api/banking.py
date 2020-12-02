@@ -1,6 +1,6 @@
 """
 This module provides a class for funding bank account 
-creation related calls to the afex API.
+creation related calls to the dwolla API.
 """
 
 from integrations.dwolla.http import Http
@@ -11,7 +11,7 @@ __all__ = "Banking"
 
 class Banking(Http):
     """
-    This class provides an interface to the Customers endpoints of the afex API.
+    This class provides an interface to the Customers endpoints of the dwolla API.
     """
 
     def create_bank_account(self, data):

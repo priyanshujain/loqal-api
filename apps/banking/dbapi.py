@@ -1,7 +1,7 @@
-from apps.provider.lib.api import account
 from django.db import IntegrityError
 
 from apps.banking.models import BankAccount
+from apps.provider.lib.api import account
 
 
 def create_bank_account(

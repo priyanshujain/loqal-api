@@ -1,5 +1,4 @@
-from apps.provider.lib.api.banking import Banking
-from apps.provider.lib.api import Account, Banking
+from apps.provider.lib.api import Account, Banking, Payment
 
 
 class APIClient(object):
@@ -13,3 +12,4 @@ class APIClient(object):
         # Mirror the HTTP API hierarchy
         self.account = Account(psp_client=self.psp_client)
         self.banking = Banking(psp_client=self.psp_client)
+        self.payment = Payment(psp_client=self.psp_client)

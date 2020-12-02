@@ -1,5 +1,5 @@
 """
-This module provides a class for authentication related calls to the afex API.
+This module provides a class for authentication related calls to the dwolla API.
 """
 
 from integrations.dwolla.errors import BadRequestError
@@ -11,7 +11,7 @@ __all__ = "Auth"
 
 class Auth(Http):
     """
-    This class provides an interface to the Authentication endpoints of the afex API.
+    This class provides an interface to the Authentication endpoints of the dwolla API.
     """
 
     def authenticate(self):
