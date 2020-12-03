@@ -1,7 +1,14 @@
+"""
+DB operations related to bank accounts
+"""
 from django.db import IntegrityError
 
 from apps.banking.models import BankAccount
-from apps.provider.lib.api import account
+
+__all__ = (
+    "create_bank_account",
+    "get_bank_account",
+)
 
 
 def create_bank_account(
@@ -13,6 +20,9 @@ def create_bank_account(
     bank_logo_base64,
     name,
 ):
+    """
+    dbapi to create a bank account instance.
+    """
     try:
         return BankAccount.objects.create(
             account_id=account_id,
@@ -24,4 +34,14 @@ def create_bank_account(
             name=name,
         )
     except IntegrityError:
+        return None
+
+
+def get_bank_account(account_id):
+    """
+    dbapi to get bank account for a given account
+    """
+    try:
+        return BankAccount.objects.get(account_id=account_id, is_primary=True,)
+    except BankAccount.DoesNotExist:
         return None

@@ -1,35 +1,31 @@
 from django.utils.translation import gettext as _
-
+import decimal
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
-from apps.account.options import AccountSupportedCurrencies
 
 
-class CreatePaymentRequestSerializer(serializers.ValidationSerializer):
-    beneficiary_id = serializers.IntegerField()
-    target_amount = serializers.FloatField(min_value=0)
-    source_currency = serializers.ChoiceField(
-        choices=AccountSupportedCurrencies.choices()
-    )
-    ref_document = serializers.JSONField(default={})
-    payment_reference = serializers.CharField(
-        max_length=255, required=False, default=""
-    )
-    purpose_of_payment = serializers.CharField(max_length=255)
-    purpose_of_payment_code = serializers.CharField(max_length=255)
-    approver_ids = serializers.ListField(
-        child=serializers.IntegerField(), default=[]
-    )
+class CreatePaymentValidator(serializers.ValidationSerializer):
+    merchant_id = serializers.IntegerField()
+    amount = serializers.FloatField(min_value=0)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        target_amount = attrs.get("target_amount")
+        amount = attrs.get("amount")
 
-        if target_amount <= 0:
+        if amount < 1.00:
             raise ValidationError(
                 {
-                    "target_amount": [
-                        ErrorDetail(_("Amount should be greater than zero."))
+                    "amount": [
+                        ErrorDetail(_("Amount should be greater than a dollar."))
+                    ]
+                }
+            )
+        amount_decimal = decimal.Decimal(str(amount))
+        if amount_decimal.as_tuple().exponent > 2:
+             raise ValidationError(
+                {
+                    "amount": [
+                        ErrorDetail(_("Amount can only have two digits after decimal."))
                     ]
                 }
             )

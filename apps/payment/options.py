@@ -1,13 +1,12 @@
 from utils.choices import Choices
+from apps.provider.options import DEFAULT_CURRENCY
 
-
-class PaymentRequestStatuses(Choices):
-    APPROVAL_PENDING = "APPROVAL_PENDING"
-    REJECTED = "REJECTED"
-    EXECUTED = "EXECUTED"
-    DEFAULT = "DEFAULT"
-
+FACILITATION_FEES_PERCENTAGE = 1.5 
+FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
 
 class TransactionStatus(Choices):
-    IN_PROCESS = "IN_PROCESS"
+    NOT_SENT = "NOT_SENT" 
+    PENDING = "PENDING"
     PROCESSED = "PROCESSED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"

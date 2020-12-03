@@ -14,6 +14,8 @@ class Payment(Http):
     """
     This class provides an interface to the Transfers endpoints of the dwolla API.
     """
+    # TODO: Integrate achDetails and addenda object
+    # TODO: Integrate clearing JSON object
 
     def funding_source_url(self, bank_account_dwolla_id):
         """
@@ -76,5 +78,5 @@ class Payment(Http):
 
         response_headers = response.headers
         location = response_headers["location"]
-        dwolla_funding_source_id = location.split("/").pop()
-        return {"dwolla_funding_source_id": dwolla_funding_source_id}
+        dwolla_transfer_id = location.split("/").pop()
+        return {"dwolla_transfer_id": dwolla_transfer_id}

@@ -1,5 +1,7 @@
+from apps.provider.lib.api import account
 from datetime import date
 from io import SEEK_CUR
+from django.db.models.fields import CommaSeparatedIntegerField
 
 from django.utils.translation import gettext as _
 
@@ -7,6 +9,7 @@ from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import create_consumer_account
+from apps.payment.dbapi import create_payment_register
 from apps.account.notifications import SendVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
@@ -28,9 +31,7 @@ class CreateConsumerAccount(ServiceBase):
         self._create_dwolla_account(consumer_account=consumer_account)
 
     def _validate_data(self):
-        data = run_validator(
-            validator=CreateConsumerAccountValidator, data=self.data
-        )
+        data = run_validator(validator=CreateConsumerAccountValidator, data=self.data)
         self._first_name = data["first_name"]
         self._last_name = data["last_name"]
         self._email = data["email"]
@@ -39,16 +40,17 @@ class CreateConsumerAccount(ServiceBase):
         user = get_user_by_email(email=self._email)
         if user:
             raise ValidationError(
-                {
-                    "email": [
-                        ErrorDetail(_("User with this email already exists."))
-                    ]
-                }
+                {"email": [ErrorDetail(_("User with this email already exists."))]}
             )
 
     def _factory_account(self, user):
         # TODO: Store spotlight terms and condition consent record
-        return create_consumer_account(user_id=user.id)
+        consumer_account = create_consumer_account(user_id=user.id)
+        self._factory_payment_register(account_id=consumer_account.account.id)
+        return consumer_account
+
+    def _factory_payment_register(self, account_id):
+        create_payment_register(account_id=account_id)
 
     def _factory_user(self):
         return create_user(

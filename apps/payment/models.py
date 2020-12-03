@@ -1,104 +1,78 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.account.models import Account
-from apps.beneficiary.models import Beneficiary
-from apps.provider.models import PaymentAccount
+from apps.banking.models import BankAccount
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models.abstract import AbstractBase
-from db.postgres.fields import JSONField
 
-from .options import PaymentRequestStatuses, TransactionStatus
-
-
-class RateQuote(AbstractBase):
-    payment_account = models.ForeignKey(
-        PaymentAccount, on_delete=models.CASCADE
-    )
-    beneficiary = models.ForeignKey(
-        Beneficiary, on_delete=models.DO_NOTHING, null=True, blank=True
-    )
-    provider_quote_id = models.CharField(max_length=1024)
-    fee_value = models.FloatField(default=0.0)
-    fee_currency = models.CharField(max_length=3, default="USD")
-    rate = models.FloatField()
-    expires_at = models.DateTimeField()
-    quote_request_time = models.DateTimeField()
-    quote_response_time = models.DateTimeField()
-    target_amount = models.FloatField()
-    rate_type = models.CharField(default="FIXED", max_length=5)
-    source_currency = models.CharField(max_length=3)
-    target_currency = models.CharField(max_length=3)
-    expected_transaction_date = models.DateField()
-
-    class Meta:
-        db_table = "rate_quote"
+from apps.payment.options import TransactionStatus
+from utils.shortcuts import generate_uuid_hex
 
 
-class PaymentRequest(AbstractBase):
+class PaymentRegister(AbstractBase):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
-    # TODO: remove null from apps.payment.request bene
-    beneficiary = models.ForeignKey(
-        Beneficiary, on_delete=models.DO_NOTHING, null=True, blank=True
-    )
-    target_amount = models.FloatField()
-    source_currency = models.CharField(max_length=3)
-    ref_document = JSONField(null=True, blank=True)
-    payment_reference = models.CharField(max_length=255, blank=True)
-    purpose_of_payment = models.CharField(max_length=255)
-    purpose_of_payment_code = models.CharField(max_length=512, blank=True)
-    status = models.CharField(
-        max_length=128, default=PaymentRequestStatuses.DEFAULT
-    )
+    currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    daily_send_limit = models.FloatField(default=500.0)
+    weekly_send_limit = models.FloatField(default=5000.0)
+    daily_usage = models.FloatField(default=0.0)
+    daily_usage_start_time = models.DateTimeField(default=timezone.now)
+    weekly_usage = models.FloatField(default=0.0)
+    weekly_usage_start_time = models.DateTimeField(default=timezone.now)
+    passcode_required_minimum = models.FloatField(default=100.0)
 
-    def set_status(self, status):
-        self.status = status
+    def update_usage(self, amount):
+        if timezone.now() > self.daily_usage_start_time + timedelta(hours=24):
+            self.daily_usage_start_time = timezone.now()
+            self.daily_usage = amount
+        else:
+            self.daily_usage += amount
+
+        if timezone.now() > self.weekly_usage_start_time + timedelta(days=7):
+            self.weekly_usage_start_time = timezone.now()
+            self.weekly_usage = amount
+        else:
+            self.weekly_usage += amount
         self.save()
 
-    def set_approval_pending(self):
-        self.set_status(PaymentRequestStatuses.APPROVAL_PENDING)
+    def set_daily_limit(self, value):
+        self.daily_send_limit = value
+        self.save()
 
-    def set_executed(self):
-        self.set_status(PaymentRequestStatuses.EXECUTED)
+    def set_weekly_limit(self, value):
+        self.weekly_send_limit = value
+        self.save()
 
-    def set_rejected(self):
-        self.status = PaymentRequestStatuses.REJECTED
+    def set_passcode_threshold(self, value):
+        self.passcode_required_minimum = value
         self.save()
 
     class Meta:
-        db_table = "payment_request"
+        db_table = "payment_account"
 
 
 class Transaction(AbstractBase):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
-    # TODO: remove null from apps.payment.request bene
-    payment_request = models.OneToOneField(
-        PaymentRequest, on_delete=models.CASCADE
+    sender = models.ForeignKey(
+        BankAccount, on_delete=models.DO_NOTHING, related_name="sender_bank_account"
     )
-    quote = models.ForeignKey(RateQuote, on_delete=models.CASCADE)
-    provider_transaction_id = models.CharField(max_length=255)
+    recipient = models.ForeignKey(
+        BankAccount, on_delete=models.DO_NOTHING, related_name="recipient_bank_account"
+    )
+    payment_amount = models.FloatField()
+    payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_value = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    status = models.CharField(
-        max_length=128, default=TransactionStatus.IN_PROCESS
+    status = models.CharField(max_length=128, default=TransactionStatus.NOT_SENT)
+    correlation_id = models.CharField(
+        default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
-    transaction_confirmation_file = JSONField(null=True, blank=True)
+    dwolla_id = models.CharField(max_length=255, blank=True)
 
-    def add_transaction_confirmation(self, file_data):
-        self.transaction_confirmation_file = file_data
-        self.save()
-
-    def processed(self):
-        self.status = TransactionStatus.PROCESSED
+    def add_dwolla_id(self, dwolla_id):
+        self.dwolla_id = dwolla_id
         self.save()
 
     class Meta:
         db_table = "transaction"
-
-
-class TransactionCancellationRequest(AbstractBase):
-    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
-    transaction = models.ForeignKey(Transaction, on_delete=models.DO_NOTHING)
-    reason = models.TextField()
-
-    class Meta:
-        db_table = "transaction_cancellation_request"

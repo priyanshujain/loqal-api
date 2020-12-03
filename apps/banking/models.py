@@ -16,6 +16,7 @@ class BankAccount(AbstractBase):
     bank_logo_base64 = models.TextField()
     currency = models.CharField(max_length=3, default="USD")
     is_disabled = models.BooleanField(default=False)
+    is_primary = models.BooleanField(default=True)
     dwolla_id = models.CharField(max_length=255, blank=True)
 
     def add_dwolla_id(self, dwolla_id):
