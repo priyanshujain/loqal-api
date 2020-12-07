@@ -103,7 +103,7 @@ class ApplyResetPassword(ResetPasswordTokenValidate):
         self.user = request.user
 
     def _check_if_old_password_used(self, email, password):
-        user = auth.authenticate(username=email, password=password)
+        user = auth.authenticate(email=email, password=password)
         if user:
             raise ValidationError(
                 {

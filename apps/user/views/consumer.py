@@ -112,7 +112,7 @@ class UserLoginAPI(APIView):
 
 class SmsOtpAuthAPI(APIView):
     """
-    Validate sms otp after username and password verification
+    Validate sms otp after email and password verification
     """
     def post(self, request):
         user = auth.get_pending_2fa_user(request)
@@ -190,7 +190,7 @@ class GetTwoFactorAuthQRCodeAPI(LoggedInAPIView):
         token = rand_str()
         user.set_tfa_token(token=token)
 
-        label = f"{user.username}"
+        label = f"{user.email}"
         image = qrcode.make(
             OtpAuth(token).to_uri("totp", label, settings.APP_NAME)
         )

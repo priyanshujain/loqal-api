@@ -24,12 +24,8 @@ from utils.shortcuts import rand_str
 class UserManager(models.Manager):
     use_in_migrations = True
 
-    def get_by_natural_key(self, username):
-        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": username})
-
-    def find_by_username(self, username):
-        queryset = self.get_queryset()
-        return queryset.filter(username=username)
+    def get_by_natural_key(self, email):
+        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": email})
 
     def create_user(self, *arg, **kwargs):
         """Create and return a `User` with an email, username and password."""
@@ -46,7 +42,7 @@ class UserManager(models.Manager):
 
 class User(BaseModel, AbstractBaseUser):
     username = models.CharField(max_length=254, unique=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(
         max_length=254, default=rand_str
@@ -79,7 +75,7 @@ class User(BaseModel, AbstractBaseUser):
         ),
     )
 
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()

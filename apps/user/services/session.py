@@ -68,6 +68,7 @@ class Session(object):
         )
 
     def list_sessions(self):
+        # FIX: current session is causing error it's always showing false
         user = self.user
         request_session = self.request.session
 

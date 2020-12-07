@@ -79,7 +79,7 @@ class LoginRequest(ServiceBase):
         data = self.data
         self._validate_data(data=data)
         user = auth.authenticate(
-            username=data["email"], password=data["password"]
+            email=data["email"], password=data["password"]
         )
 
         if user:
@@ -114,7 +114,7 @@ class LoginRequest(ServiceBase):
                 )
         else:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid username or password."))}
+                {"detail": ErrorDetail(_("Invalid email or password."))}
             )
 
     def _auth_login(self, user):
