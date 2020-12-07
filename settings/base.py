@@ -260,7 +260,7 @@ def redis_config(db):
 CACHES = {"default": redis_config(db=1)}
 
 
-CSRF_COOKIE_NAME = "lc"
+# CSRF_COOKIE_NAME = "lc"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_CACHE_ALIAS = "default"

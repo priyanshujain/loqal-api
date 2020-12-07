@@ -1,10 +1,13 @@
 from django.conf import settings
+from django.http import request
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.user.validators import PhoneNumberCodeValidator, PhoneNumberValidator
+from apps.user.models import Authenticator
+
 
 __all__ = (
     "AddPhoneNumber",
@@ -13,31 +16,57 @@ __all__ = (
 
 
 class AddPhoneNumber(ServiceBase):
-    def __init__(self, user, data):
+    def __init__(self, request, data):
+        self.request = request
         self.data = data
-        self.user = user
+        self.user = request.user
 
     def execute(self):
         data = self.data
         data = self._validate_data(data=data)
 
-        contact_number = data["contact_number"]
-        self.user.add_contact_number(contact_number=contact_number)
-        self._send_sms()
+        phone_number = data["phone_number"]
+        self.user.add_contact_number(phone_number=phone_number)
+        EnrollSmsAuthenticator(request=self.request, user=self.user).enroll()
 
     def _validate_data(self, data):
-        if self.user.contact_number:
-            raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Phone number has already been added.")
-                    )
-                }
-            )
+        # if self.user.phone_number:
+        #     raise ValidationError(
+        #         {
+        #             "detail": ErrorDetail(
+        #                 _("Phone number has already been added.")
+        #             )
+        #         }
+        #     )
         return run_validator(validator=PhoneNumberValidator, data=data)
 
-    def _send_sms(self):
-        pass
+
+class EnrollSmsAuthenticator(object):
+    def __init__(self, request, user):
+        self.request = request
+        self.user = user
+
+    def get_interface(self):
+        return Authenticator.objects.get_interface(self.user, "sms")
+    
+    def enroll(self):
+        interface = self.get_interface()
+        if interface.is_enrolled():
+            raise ValidationError({
+                "detail": ErrorDetail(_("User has already enrolled in sms auth."))
+            })
+        
+        phone_number = getattr(self.user, "phone_number", None)
+        if phone_number:
+            interface.phone_number = phone_number
+            interface.enroll(self.user)
+            if interface.send_text(for_enrollment=True, request=self.request):
+                return True
+            else:
+                # TODO: Add error check for SMS service failed ,500 error
+                return False
+        else:
+            False
 
 
 class VerifyPhoneNumber(ServiceBase):

@@ -4,11 +4,11 @@ from django.db import models
 
 from apps.account.models import Account
 from apps.provider.models import PaymentProvider
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import upload_to
 
 
-class APIAccessLog(AbstractBase):
+class APIAccessLog(AbstractBaseModel):
     """ Logs API requests """
 
     user = models.ForeignKey(
@@ -42,7 +42,7 @@ class APIAccessLog(AbstractBase):
         db_table = "api_request_log"
 
 
-class RawPspApiResponse(AbstractBase):
+class RawPspApiResponse(AbstractBaseModel):
     request_time_taken = models.FloatField(null=True)
     status_code = models.PositiveIntegerField(null=True, blank=True)
     headers = models.JSONField()
@@ -52,7 +52,7 @@ class RawPspApiResponse(AbstractBase):
         db_table = "raw_psp_api_response"
 
 
-class RawPspApiRequest(AbstractBase):
+class RawPspApiRequest(AbstractBaseModel):
     origin = models.CharField(max_length=512)
     endpoint = models.CharField(max_length=512)
     query_params = models.CharField(max_length=512, blank=True)
@@ -78,7 +78,7 @@ class RawPspApiRequest(AbstractBase):
         db_table = "raw_psp_api_request"
 
 
-class PspApiRequestStorage(AbstractBase):
+class PspApiRequestStorage(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     psp = models.ForeignKey(PaymentProvider, on_delete=models.DO_NOTHING)
     request = models.OneToOneField(RawPspApiRequest, on_delete=models.CASCADE,)

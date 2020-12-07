@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.user.models import User
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
 
 __all__ = (
@@ -11,7 +11,7 @@ __all__ = (
 )
 
 
-class Account(AbstractBase):
+class Account(AbstractBaseModel):
     dwolla_correlation_id = models.CharField(
         max_length=40, default=generate_uuid_hex, editable=False, unique=True
     )
@@ -37,7 +37,7 @@ class Account(AbstractBase):
         db_table = "account"
 
 
-class ConsumerAccount(AbstractBase):
+class ConsumerAccount(AbstractBaseModel):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -49,7 +49,7 @@ class ConsumerAccount(AbstractBase):
         db_table = "consumer_account"
 
 
-class MerchantAccount(AbstractBase):
+class MerchantAccount(AbstractBaseModel):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=256)
     website = models.URLField(max_length=255, null=True, blank=True,)

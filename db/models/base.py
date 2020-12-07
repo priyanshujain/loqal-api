@@ -4,8 +4,11 @@ import uuid
 # Django imports
 from django.db import models
 
+__all__ = (
+    "BaseModel",
+)
 
-class Base(models.Model):
+class BaseModel(models.Model):
     # A unique id as string but not PK as we dont't want to expose PK's
     u_id = models.UUIDField(
         primary_key=False, default=uuid.uuid4, editable=False

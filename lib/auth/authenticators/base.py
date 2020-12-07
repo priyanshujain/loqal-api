@@ -101,7 +101,7 @@ class AuthenticatorInterface(object):
         """Invoked to enroll a user for this interface.  If already enrolled
         an error is raised.
         """
-        from sentry.models import Authenticator
+        from apps.user.models import Authenticator
 
         if self.authenticator is None:
             self.authenticator = Authenticator.objects.create(

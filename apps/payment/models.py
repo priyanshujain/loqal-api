@@ -7,11 +7,11 @@ from apps.account.models import Account
 from apps.banking.models import BankAccount
 from apps.payment.options import TransactionStatus
 from apps.provider.options import DEFAULT_CURRENCY
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
 
 
-class PaymentRegister(AbstractBase):
+class PaymentRegister(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     daily_send_limit = models.FloatField(default=500.0)
@@ -49,10 +49,10 @@ class PaymentRegister(AbstractBase):
         self.save()
 
     class Meta:
-        db_table = "payment_account"
+        db_table = "payment_register"
 
 
-class Transaction(AbstractBase):
+class Transaction(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     sender = models.ForeignKey(
         BankAccount,

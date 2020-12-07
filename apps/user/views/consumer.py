@@ -1,6 +1,6 @@
+from api import serializers
 import qrcode
 from django.conf import settings
-from django.contrib import auth
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -15,11 +15,13 @@ from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
 from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
                                 ChangePassword, EmailVerification, Login,
+                                OtpAuth,
                                 RequestResetPassword,
                                 ResetPasswordTokenValidate, Session,
                                 VerifyPhoneNumber)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils.shortcuts import img2base64, rand_str
+from utils import auth
 
 
 class GetUserProfileAPI(APIView):
@@ -36,8 +38,7 @@ class GetUserProfileAPI(APIView):
         if not user.is_authenticated:
             return self.response()
 
-        user_profile = user.userprofile
-        return self.response(UserProfileResponse(user_profile).data)
+        return self.response(UserProfileResponse(user).data)
 
 
 class UpdateUserProfileAPI(LoggedInAPIView):
@@ -52,7 +53,7 @@ class UpdateUserProfileAPI(LoggedInAPIView):
             user_profile=user_profile,
             first_name=data["first_name"],
             last_name=data["last_name"],
-            contact_number=data["contact_number"],
+            phone_number=data["phone_number"],
             position=data["position"],
         )
         return self.response(status=204)
@@ -108,13 +109,31 @@ class UserLoginAPI(APIView):
         service.execute()
 
 
-class AddPhoneNumberAPI(LoggedInAPIView):
+class SmsOtpAuthAPI(APIView):
+    """
+    Validate sms otp after username and password verification
+    """
     def post(self, request):
-        self._run_services(user=request.user)
+        user = auth.get_pending_2fa_user(request)
+
+        if not user:
+            raise ValidationError({
+                "detail": ErrorDetail(_("User not found, please go to login page."))
+            })
+        self._run_services(user=user)
         return self.response()
 
     def _run_services(self, user):
-        service = AddPhoneNumber(user=user, data=self.request_data)
+        OtpAuth(user=user, request=self.request, data=self.request_data).validate_otp()
+
+
+class AddPhoneNumberAPI(LoggedInAPIView):
+    def post(self, request):
+        self._run_services()
+        return self.response()
+
+    def _run_services(self):
+        service = AddPhoneNumber(request=self.request, data=self.request_data)
         service.execute()
 
 
@@ -126,6 +145,7 @@ class VerifyPhoneNumberAPI(LoggedInAPIView):
     def _run_services(self, user):
         service = VerifyPhoneNumber(user=user, data=self.request_data)
         service.execute()
+
 
 
 class ListSessionsAPI(LoggedInAPIView):

@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from apps.payment.models import PaymentRegister, Transaction
 
 
-def create_payment_register(self, account_id):
+def create_payment_register(account_id):
     """
     dbapi for creating default payment register.
     """

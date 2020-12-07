@@ -1,3 +1,4 @@
+from django.http.multipartparser import parse_header
 from django.urls import path
 
 from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
@@ -10,10 +11,12 @@ from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                              UpdateUserProfileAPI, UserChangePasswordAPI,
                              UserLoginAPI, UserLogoutAPI,
                              UsernameOrEmailCheckAPI, VerifyEmailAPI,
-                             VerifyPhoneNumberAPI)
+                             VerifyPhoneNumberAPI,
+                             SmsOtpAuthAPI)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login"),
+    path("auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
     path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
     path(
         "phone/verify/",

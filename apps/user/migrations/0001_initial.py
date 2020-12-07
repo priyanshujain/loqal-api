@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                     models.EmailField(blank=True, max_length=255),
                 ),
                 (
-                    "contact_number",
+                    "phone_number",
                     models.CharField(blank=True, max_length=255),
                 ),
                 ("email_verified", models.BooleanField(default=False)),

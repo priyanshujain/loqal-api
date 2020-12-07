@@ -1,16 +1,68 @@
-from django.contrib import auth
-from utils import auth as custom_auth
+from utils import auth 
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
+from django.conf import settings
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.user.dbapi import create_session
 from apps.user.notifications import SendLoginAlert
-from apps.user.validators import UserLoginValidator
+from apps.user.validators import UserLoginValidator, OtpAuthValidator
+from apps.user.models import Authenticator
 
-__all__ = ("Login",)
+__all__ = ("Login", "OtpAuth",)
+
+
+class OtpAuth(object):
+    def __init__(self, user, request, data={}):
+        self.user = user
+        self.request = request
+        self.data = data
+    
+    def _validate_interface(self, raise_error=True):
+        try:
+            self.interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
+        except Exception:
+            if raise_error:
+                raise ValidationError({
+                    "detail": ErrorDetail(_("Phone number has not been verified."))
+                })
+    
+    def _validate_data(self, raise_error=True):
+        try:
+            self.interface = run_validator(validator=OtpAuthValidator, data=self.data)
+        except Exception:
+            if raise_error:
+                raise ValidationError({
+                    "detail": ErrorDetail(_("Phone number has not been verified."))
+                })
+        
+    def send_otp(self):
+        self._validate_interface(raise_error=False)
+        activation = self.interface.activate(request=self.request)
+        return True
+    
+
+    def validate_otp(self, raise_error=True):
+        self._validate_interface()
+        otp = self.data["otp"]
+        
+        # If dev environment validate otp by 222222
+        if settings.APP_ENV == "developement":
+            if otp == "222222":
+               self.perform_login()
+               return 
+
+        if self.interface.validate_otp(otp):
+            self.perform_login()
+        elif raise_error:
+            raise ValidationError({
+                "otp": ErrorDetail(_("Invalid confirmation code. Try again."))
+            })
+    
+    def perform_login(self):
+        auth.login(request=self.request, user=self.user, passed_2fa=True)
+        self.interface.authenticator.mark_used()
 
 
 class Login(ServiceBase):
@@ -65,49 +117,8 @@ class Login(ServiceBase):
 
     def _auth_login(self, user):
         request = self.request
-        custom_auth.login(request, user)
-        self._factory_session(user=user)
-        service = SendLoginAlert(user=user, session=request.session)
-        service.send()
-
-    def _factory_session(self, user):
-        # TODO: Combine cache based session and models based session so that
-        #       we have a record of expired sessions.
-        data = self.data
-        session = self.request.session
-        ifconfig = data["ifconfig"]
-
-        # from cache based session
-        user_agent = session["user_agent"]
-        ip_address = session["ip"]
-        is_ip_routable = session["is_ip_routable"]
-        last_activity = session["last_activity"]
-        ip_country_iso = session["cf_ip_country"]
-
-        # from maxmind ifconfig
-        country_iso = ifconfig.get("country_iso", "")
-        region = ifconfig.get("region", "")
-        region_code = ifconfig.get("region_code", "")
-        latitude = ifconfig.get("latitude", "")
-        longitude = ifconfig.get("longitude", "")
-        timezone = ifconfig.get("timezone", "")
-        asn = ifconfig.get("asn_org", "")
-        asn_code = ifconfig.get("asn", "")
-
-        create_session(
-            user_id=user.id,
-            session_key=session.session_key,
-            user_agent=user_agent,
-            ip_address=ip_address,
-            is_ip_routable=is_ip_routable,
-            last_activity=last_activity,
-            ip_country_iso=ip_country_iso,
-            country_iso=country_iso,
-            region=region,
-            region_code=region_code,
-            latitude=latitude,
-            longitude=longitude,
-            timezone=timezone,
-            asn=asn,
-            asn_code=asn_code,
-        )
+        if auth.login(request, user):
+            SendLoginAlert(user=user, session=request.session).send()
+        else:
+            OtpAuth(user=user, request=self.request).send_otp()
+        

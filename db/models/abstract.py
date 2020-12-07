@@ -4,13 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 
 from apps.user.models import User
 from config.middlewares.user import local
-from db.models.base import Base
+from db.models.base import BaseModel
 from db.models.manager import BaseManager
 
-__all__ = ("AbstractBase",)
+__all__ = ("AbstractBaseModel",)
 
 
-class AbstractBase(Base):
+class AbstractBaseModel(BaseModel):
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

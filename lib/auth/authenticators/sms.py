@@ -85,10 +85,12 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
                 "authentication."
             )
         else:
-            text = _("%(code)s is your Sentry authentication code.")
+            text = _("%(code)s is your Loqal authentication code.")
 
         if request is not None:
             text = u"%s\n\n%s" % (text, _("Requested from %(ip)s"))
-            ctx["ip"] = request.META["REMOTE_ADDR"]
+            ctx["ip"] = request.ip
+
+            print(text % ctx)
 
         return send_sms(text % ctx, to=self.phone_number)

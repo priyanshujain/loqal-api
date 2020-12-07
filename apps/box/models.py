@@ -4,11 +4,11 @@ from django.db import models
 from django.utils.timezone import now
 
 from apps.account.models import Account
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import upload_to
 
 
-class BoxFile(AbstractBase):
+class BoxFile(AbstractBaseModel):
     account = models.ForeignKey(
         Account, on_delete=models.CASCADE, blank=True, null=True
     )

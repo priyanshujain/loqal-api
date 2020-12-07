@@ -3,10 +3,10 @@ from os import name
 from django.db import models
 
 from apps.account.models import Account
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 
 
-class BankAccount(AbstractBase):
+class BankAccount(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     plaid_access_token = models.CharField(max_length=255)
     plaid_account_id = models.CharField(max_length=255)

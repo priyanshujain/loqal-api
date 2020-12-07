@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-
+# TODO: implement sms feature
 def sms_available():
     return True
 
