@@ -2,8 +2,9 @@
 Payments relted db operations.
 """
 
-from apps.payment.models import Transaction, PaymentRegister
 from django.db.utils import IntegrityError
+
+from apps.payment.models import PaymentRegister, Transaction
 
 
 def create_payment_register(self, account_id):

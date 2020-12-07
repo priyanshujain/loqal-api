@@ -14,6 +14,7 @@ class Payment(Http):
     """
     This class provides an interface to the Transfers endpoints of the dwolla API.
     """
+
     # TODO: Integrate achDetails and addenda object
     # TODO: Integrate clearing JSON object
 

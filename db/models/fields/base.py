@@ -1,17 +1,11 @@
-# Python
-import logging
 import re
 import urllib.parse as urlparse
 
-# Django
 from django.core.validators import URLValidator, _lazy_re_compile
 from django.utils.translation import ugettext_lazy as _
-# Django REST Framework
 from rest_framework.fields import (BooleanField, CharField, ChoiceField,
                                    DateTimeField, DictField, EmailField,
                                    IntegerField, ListField)
-
-logger = logging.getLogger("db.models.fields")
 
 # Use DRF fields to convert/validate settings:
 # - to_representation(obj) should convert a native Python object to a primitive
@@ -19,6 +13,19 @@ logger = logging.getLogger("db.models.fields")
 #   and stored in the JSON field in the datbase.
 # - to_internal_value(data) should convert the primitive type back into the
 #   appropriate Python type to be used in settings.
+
+__all__ = (
+    "BooleanField",
+    "ChoiceField",
+    "DateTimeField",
+    "DictField",
+    "EmailField",
+    "ListField",
+    "CharField",
+    "IntegerField",
+    "StringListField",
+    "URLField",
+)
 
 
 class BooleanField(BooleanField):

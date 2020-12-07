@@ -259,8 +259,13 @@ def redis_config(db):
 
 CACHES = {"default": redis_config(db=1)}
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+CSRF_COOKIE_NAME = "lc"
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_CACHE_ALIAS = "default"
+SESSION_COOKIE_NAME = "session"
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
 
 # Celery config
@@ -346,3 +351,8 @@ MANAGERS = (("Priyanshu Jain", "priyanshu@spotlightandcompany.com"),)
 ADMINS = MANAGERS
 
 APP_NAME = env("APP_NAME", default="Spotlight")
+
+
+USE_CUSTOM_BIG_INTS = False
+
+SENTRY_ENCRYPTION_SCHEMES = ()

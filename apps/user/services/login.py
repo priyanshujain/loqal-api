@@ -1,4 +1,5 @@
 from django.contrib import auth
+from utils import auth as custom_auth
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
@@ -64,7 +65,7 @@ class Login(ServiceBase):
 
     def _auth_login(self, user):
         request = self.request
-        auth.login(request, user)
+        custom_auth.login(request, user)
         self._factory_session(user=user)
         service = SendLoginAlert(user=user, session=request.session)
         service.send()

@@ -1,12 +1,22 @@
 from datetime import timedelta
 
+import six
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 from django.db.models.query_utils import select_related_descend
+from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 from apps.user.options import UserType
 from db.models.base import Base
+from db.models.fields import (BoundedPositiveIntegerField,
+                              EncryptedPickledObjectField)
+from lib.auth.authenticators import (AUTHENTICATOR_CHOICES,
+                                     AUTHENTICATOR_INTERFACES,
+                                     AUTHENTICATOR_INTERFACES_BY_TYPE,
+                                     available_authenticators)
 from utils.shortcuts import rand_str
 
 
@@ -169,3 +179,124 @@ class UserPasswordReset(Base):
 
     class Meta:
         db_table = "user_password_reset"
+
+
+
+
+
+
+class AuthenticatorManager(models.Manager):
+    def all_interfaces_for_user(
+        self, user, return_missing=False, ignore_backup=False
+    ):
+        """Returns a correctly sorted list of all interfaces the user
+        has enabled.  If `return_missing` is set to `True` then all
+        interfaces are returned even if not enabled.
+        """
+
+        def _sort(x):
+            return sorted(x, key=lambda x: (x.type == 0, x.type))
+
+        # Collect interfaces user is enrolled in
+        ifaces = [
+            x.interface
+            for x in Authenticator.objects.filter(
+                user=user,
+                type__in=[
+                    a.type
+                    for a in available_authenticators(
+                        ignore_backup=ignore_backup
+                    )
+                ],
+            )
+        ]
+
+        if return_missing:
+            # Collect additional interfaces that the user
+            # is not enrolled in
+            rvm = dict(AUTHENTICATOR_INTERFACES)
+            for iface in ifaces:
+                rvm.pop(iface.interface_id, None)
+            for iface_cls in six.itervalues(rvm):
+                if iface_cls.is_available:
+                    ifaces.append(iface_cls())
+
+        return _sort(ifaces)
+
+    def get_interface(self, user, interface_id):
+        """Looks up an interface by interface ID for a user.  If the
+        interface is not available but configured a
+        `Authenticator.DoesNotExist` will be raised just as if the
+        authenticator was not configured at all.
+        """
+        interface = AUTHENTICATOR_INTERFACES.get(interface_id)
+        if interface is None or not interface.is_available:
+            raise LookupError("No such interface %r" % interface_id)
+        try:
+            return Authenticator.objects.get(
+                user=user, type=interface.type
+            ).interface
+        except Authenticator.DoesNotExist:
+            return interface()
+
+    def user_has_2fa(self, user):
+        """Checks if the user has any 2FA configured.
+        """
+        return Authenticator.objects.filter(
+            user=user,
+            type__in=[
+                a.type for a in available_authenticators(ignore_backup=True)
+            ],
+        ).exists()
+
+    def bulk_users_have_2fa(self, user_ids):
+        """Checks if a list of user ids have 2FA configured.
+        Returns a dict of {<id>: <has_2fa>}
+        """
+        authenticators = set(
+            Authenticator.objects.filter(
+                user__in=user_ids,
+                type__in=[
+                    a.type
+                    for a in available_authenticators(ignore_backup=True)
+                ],
+            )
+            .distinct()
+            .values_list("user_id", flat=True)
+        )
+        return {id: id in authenticators for id in user_ids}
+
+
+class Authenticator(Base):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, db_index=True)
+    type = BoundedPositiveIntegerField(choices=AUTHENTICATOR_CHOICES)
+    config = EncryptedPickledObjectField()
+
+    objects = AuthenticatorManager()
+
+    class AlreadyEnrolled(Exception):
+        pass
+
+    class Meta:
+        db_table = "auth_authenticator"
+        verbose_name = _("authenticator")
+        verbose_name_plural = _("authenticators")
+        unique_together = (("user", "type"),)
+
+    @cached_property
+    def interface(self):
+        return AUTHENTICATOR_INTERFACES_BY_TYPE[self.type](self)
+
+    def mark_used(self, save=True):
+        self.last_used_at = timezone.now()
+        if save:
+            self.save()
+
+    def reset_fields(self, save=True):
+        self.created_at = timezone.now()
+        self.last_used_at = None
+        if save:
+            self.save()
+
+
