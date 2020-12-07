@@ -12,11 +12,13 @@ from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                              UserLoginAPI, UserLogoutAPI,
                              UsernameOrEmailCheckAPI, VerifyEmailAPI,
                              VerifyPhoneNumberAPI,
-                             SmsOtpAuthAPI)
+                             SmsOtpAuthAPI,
+                             UserAvatarAPI,)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login"),
     path("auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
+    path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
     path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
     path(
         "phone/verify/",

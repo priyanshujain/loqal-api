@@ -18,7 +18,8 @@ from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
                                 OtpAuth,
                                 RequestResetPassword,
                                 ResetPasswordTokenValidate, Session,
-                                VerifyPhoneNumber)
+                                VerifyPhoneNumber,
+                                AddChangeUserAvatar,)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils.shortcuts import img2base64, rand_str
 from utils import auth
@@ -318,3 +319,12 @@ class VerifyEmailAPI(APIView):
     def _run_services(self):
         service = EmailVerification(data=self.request_data)
         service.execute()
+
+
+class UserAvatarAPI(LoggedInAPIView):
+    def post(self, request):
+        self._run_services()
+        return self.response()
+
+    def _run_services(self):
+        AddChangeUserAvatar(user=self.request.user, data=self.request_data).handle()

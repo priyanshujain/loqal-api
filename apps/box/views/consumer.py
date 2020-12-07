@@ -3,7 +3,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import LoggedInAPIView
 from apps.box.models import BoxFile
-from apps.box.serializers import BoxFileForm, BoxFileSerializer
+from apps.box.validators import BoxFileForm
+from apps.box.responses import BoxFileResponse
 from apps.box.shortcut import validate_file_format
 from apps.box.tasks import get_file_from_gcs, store_file_to_gcs
 
@@ -37,7 +38,6 @@ class CreateFileAPI(FileAPI):
         )
 
         boxfile = BoxFile.objects.create(
-            account=request.account,
             file_name=source_file.name,
             file_path=gcs_file["file_name"],
             content_type=gcs_file["content_type"],
@@ -50,7 +50,6 @@ class CreateFileAPI(FileAPI):
 class FetchFileUrlAPI(LoggedInAPIView):
     def get(self, request):
         # TODO: replace id with u_id
-        # TODO: apply file permission check for account
         box_id = request.GET.get("box_id", None)
         if not box_id:
             raise ValidationError(
@@ -71,7 +70,7 @@ class FetchFileUrlAPI(LoggedInAPIView):
                 {"box_id": [ErrorDetail(_("Invalid box_id."))]}
             )
 
-        box_file_data = BoxFileSerializer(box_file).data
+        box_file_data = BoxFileResponse(box_file).data
         box_file_data["signed_url"] = get_file_from_gcs(box_file_data)
         del box_file_data["encryption_key"]
         return self.response(box_file_data)

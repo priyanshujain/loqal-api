@@ -10,6 +10,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from apps.user.options import UserType
+from apps.box.models import BoxFile
 from db.models.base import BaseModel
 from db.models.fields import (BoundedPositiveIntegerField,
                               EncryptedPickledObjectField)
@@ -57,6 +58,9 @@ class User(BaseModel, AbstractBaseUser):
     secondary_email = models.EmailField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=255, blank=True)
     contact_number_verified = models.BooleanField(default=False)
+
+    # Avatar
+    avatar_file = models.ForeignKey(BoxFile, on_delete=models.CASCADE, blank=True, null=True)
 
     # One of UserType
     user_type = models.CharField(max_length=254, default=UserType.REGULAR_USER)
@@ -128,6 +132,11 @@ class User(BaseModel, AbstractBaseUser):
     def disable_tfa(self):
         self.two_factor_auth = False
         self.save()
+
+    def change_avatar(self, boxfile):
+        self.avatar_file = boxfile
+        self.save()
+
 
     class Meta:
         db_table = "user"

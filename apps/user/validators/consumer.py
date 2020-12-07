@@ -12,6 +12,7 @@ __all__ = (
     "PhoneNumberValidator",
     "PhoneNumberCodeValidator",
     "OtpAuthValidator",
+    "AvatarValidator",
 )
 
 
@@ -68,5 +69,9 @@ class ApplyResetPasswordValidator(serializers.ValidationSerializer):
     password = serializers.CharField()
 
 
-class EmailVerificationValidator(serializers.Serializer):
+class EmailVerificationValidator(serializers.ValidationSerializer):
     token = serializers.CharField()
+
+
+class AvatarValidator(serializers.ValidationSerializer):
+    avatar_file_id = serializers.IntegerField()

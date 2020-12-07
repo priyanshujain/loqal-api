@@ -1,8 +1,18 @@
+from django.contrib.auth import models
 from api import serializers
 from apps.user.models import User
+from apps.box.models import BoxFile
 
 __all__ = ("UserProfileResponse",)
 
+
+class AvatarFileResponse(serializers.ModelSerializer):
+    class Meta:
+        model = BoxFile
+        fields = (
+            "id",
+            "file_name",            
+        )
 
 class UserProfileResponse(serializers.ModelSerializer):
     email_verified = serializers.BooleanField(
@@ -15,6 +25,7 @@ class UserProfileResponse(serializers.ModelSerializer):
     position = serializers.CharField(
         source="accountmember.position", read_only=True
     )
+    avatar_file = AvatarFileResponse()
 
     class Meta:
         model = User
@@ -26,4 +37,5 @@ class UserProfileResponse(serializers.ModelSerializer):
             "two_factor_auth",
             "phone_number",
             "position",
+            "avatar_file",
         )

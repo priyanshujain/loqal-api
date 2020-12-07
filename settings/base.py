@@ -356,3 +356,7 @@ APP_NAME = env("APP_NAME", default="Spotlight")
 USE_CUSTOM_BIG_INTS = False
 
 SENTRY_ENCRYPTION_SCHEMES = ()
+
+
+# Max file size for avatar photo uploads
+MAX_AVATAR_SIZE = 5000000

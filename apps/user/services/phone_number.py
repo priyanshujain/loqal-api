@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.http import request
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -30,14 +29,14 @@ class AddPhoneNumber(ServiceBase):
         EnrollSmsAuthenticator(request=self.request, user=self.user).enroll()
 
     def _validate_data(self, data):
-        # if self.user.phone_number:
-        #     raise ValidationError(
-        #         {
-        #             "detail": ErrorDetail(
-        #                 _("Phone number has already been added.")
-        #             )
-        #         }
-        #     )
+        if self.user.phone_number:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Phone number has already been added.")
+                    )
+                }
+            )
         return run_validator(validator=PhoneNumberValidator, data=data)
 
 

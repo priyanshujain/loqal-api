@@ -4,3 +4,4 @@ from .login import *
 from .phone_number import *
 from .reset_password import *
 from .session import *
+from .avatar import *
