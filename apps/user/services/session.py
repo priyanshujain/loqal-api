@@ -87,7 +87,6 @@ class Session(object):
                 {
                     "is_current_session": request_session.session_key
                     == local_session.session_key,
-                    "session_key": local_session.session_key,
                     "user_agent": local_session.user_agent,
                     "ip_address": local_session.ip_address,
                     "is_ip_routable": local_session.is_ip_routable,

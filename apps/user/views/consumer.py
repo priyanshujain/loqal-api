@@ -14,7 +14,7 @@ from apps.account.notifications import SendVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
 from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
-                                ChangePassword, EmailVerification, Login,
+                                ChangePassword, EmailVerification, LoginRequest,
                                 OtpAuth,
                                 RequestResetPassword,
                                 ResetPasswordTokenValidate, Session,
@@ -105,7 +105,7 @@ class UserLoginAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = Login(request=request, data=self.request_data)
+        service = LoginRequest(request=request, data=self.request_data)
         service.execute()
 
 

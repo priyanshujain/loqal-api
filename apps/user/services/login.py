@@ -9,8 +9,9 @@ from api.services import ServiceBase
 from apps.user.notifications import SendLoginAlert
 from apps.user.validators import UserLoginValidator, OtpAuthValidator
 from apps.user.models import Authenticator
+from .session import Session
 
-__all__ = ("Login", "OtpAuth",)
+__all__ = ("LoginRequest", "OtpAuth",)
 
 
 class OtpAuth(object):
@@ -63,9 +64,10 @@ class OtpAuth(object):
     def perform_login(self):
         auth.login(request=self.request, user=self.user, passed_2fa=True)
         self.interface.authenticator.mark_used()
+        AfterLogin(request=self.request, user=self.user).handle()
 
 
-class Login(ServiceBase):
+class LoginRequest(ServiceBase):
     def __init__(self, request, data):
         self.request = request
         self.data = data
@@ -118,7 +120,17 @@ class Login(ServiceBase):
     def _auth_login(self, user):
         request = self.request
         if auth.login(request, user):
-            SendLoginAlert(user=user, session=request.session).send()
-        else:
+            AfterLogin(request=request, user=user).handle()
+        else:    
             OtpAuth(user=user, request=self.request).send_otp()
         
+
+
+class AfterLogin(object):
+    def __init__(self, request, user):
+        self.user = user
+        self.request  = request
+    
+    def handle(self):
+        Session(request=self.request).create_session(user=self.user)
+        SendLoginAlert(user=self.user, session=self.request.session).send()
