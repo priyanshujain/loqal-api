@@ -80,9 +80,7 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
 
         if for_enrollment:
             text = _(
-                "%(code)s is your Sentry two-factor enrollment code. "
-                "You are about to set up text message based two-factor "
-                "authentication."
+                "%(code)s is your Loqal phone number enrollment code. "
             )
         else:
             text = _("%(code)s is your Loqal authentication code.")
@@ -90,7 +88,5 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
         if request is not None:
             text = u"%s\n\n%s" % (text, _("Requested from %(ip)s"))
             ctx["ip"] = request.ip
-
-            print(text % ctx)
 
         return send_sms(text % ctx, to=self.phone_number)

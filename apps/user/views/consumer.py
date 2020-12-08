@@ -15,11 +15,13 @@ from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
 from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
                                 ChangePassword, EmailVerification, LoginRequest,
-                                OtpAuth,
+                                SmsOtpAuth,
                                 RequestResetPassword,
                                 ResetPasswordTokenValidate, Session,
                                 VerifyPhoneNumber,
-                                AddChangeUserAvatar,)
+                                AddChangeUserAvatar,
+                                ResendPhoneNumberOtp,
+                                ResendSmsOtpAuth,)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils.shortcuts import img2base64, rand_str
 from utils import auth
@@ -125,7 +127,33 @@ class SmsOtpAuthAPI(APIView):
         return self.response()
 
     def _run_services(self, user):
-        OtpAuth(user=user, request=self.request, data=self.request_data).validate_otp()
+        SmsOtpAuth(user=user, request=self.request, data=self.request_data).validate_otp()
+
+
+class ResendSmsOtpAuthAPI(APIView):
+    """
+    Resend sms otp after email and password verification
+    """
+    def post(self, request):
+        self._run_services()
+        return self.response()
+
+    def _run_services(self, user):
+        ResendSmsOtpAuth(request=self.request).handle()
+
+
+class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
+    """
+    Resend sms otp for phone number verification
+    """
+    def post(self, request):
+        user = request.user
+        self._run_services(user=user)
+        return self.response()
+
+    def _run_services(self, user):
+        ResendPhoneNumberOtp(user=user, request=self.request).handle()
+
 
 
 class AddPhoneNumberAPI(LoggedInAPIView):
@@ -144,7 +172,7 @@ class VerifyPhoneNumberAPI(LoggedInAPIView):
         return self.response()
 
     def _run_services(self, user):
-        service = VerifyPhoneNumber(user=user, data=self.request_data)
+        service = VerifyPhoneNumber(user=user, request=self.request, data=self.request_data)
         service.execute()
 
 

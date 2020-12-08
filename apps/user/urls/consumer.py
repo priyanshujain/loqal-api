@@ -13,17 +13,25 @@ from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                              UsernameOrEmailCheckAPI, VerifyEmailAPI,
                              VerifyPhoneNumberAPI,
                              SmsOtpAuthAPI,
-                             UserAvatarAPI,)
+                             UserAvatarAPI,
+                             ResendPhoneNumberVerifyOtpAPI,
+                             ResendSmsOtpAuthAPI,)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login"),
     path("auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
+    path("auth/otp/resend/", ResendSmsOtpAuthAPI.as_view(), name="otp_auth_resend"),
     path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
     path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
     path(
         "phone/verify/",
         VerifyPhoneNumberAPI.as_view(),
         name="verify_phone_number",
+    ),
+    path(
+        "phone/verify/resend/",
+        ResendPhoneNumberVerifyOtpAPI.as_view(),
+        name="verify_phone_number_resend",
     ),
     path("logout/", UserLogoutAPI.as_view(), name="user_logout"),
     path(

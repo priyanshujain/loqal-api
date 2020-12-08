@@ -53,7 +53,7 @@ class User(BaseModel, AbstractBaseUser):
     last_name = models.CharField(max_length=155, blank=True)
     secondary_email = models.EmailField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=255, blank=True)
-    contact_number_verified = models.BooleanField(default=False)
+    phone_number_verified = models.BooleanField(default=False)
 
     # Avatar
     avatar_file = models.ForeignKey(BoxFile, on_delete=models.CASCADE, blank=True, null=True)
@@ -109,12 +109,12 @@ class User(BaseModel, AbstractBaseUser):
         self.email_verification_token_expire_time = now() + timedelta(days=7)
         self.save()
 
-    def add_contact_number(self, phone_number):
+    def add_phone_number(self, phone_number):
         self.phone_number = phone_number
         self.save()
 
-    def verify_contact_number(self):
-        self.contact_number_verified = True
+    def verify_phone_number(self):
+        self.phone_number_verified = True
         self.save()
 
     def set_tfa_token(self, token):

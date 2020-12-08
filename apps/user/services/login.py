@@ -11,52 +11,47 @@ from apps.user.validators import UserLoginValidator, OtpAuthValidator
 from apps.user.models import Authenticator
 from .session import Session
 
-__all__ = ("LoginRequest", "OtpAuth",)
+__all__ = ("LoginRequest", "SmsOtpAuth", "ResendSmsOtpAuth",)
 
 
-class OtpAuth(object):
+class SmsOtpAuth(object):
     def __init__(self, user, request, data={}):
         self.user = user
         self.request = request
         self.data = data
     
-    def _validate_interface(self, raise_error=True):
-        try:
-            self.interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
-        except Exception:
-            if raise_error:
-                raise ValidationError({
-                    "detail": ErrorDetail(_("Phone number has not been verified."))
-                })
-    
-    def _validate_data(self, raise_error=True):
-        try:
-            self.interface = run_validator(validator=OtpAuthValidator, data=self.data)
-        except Exception:
-            if raise_error:
-                raise ValidationError({
-                    "detail": ErrorDetail(_("Phone number has not been verified."))
-                })
+    def _validate_interface(self, ):
+        interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
+        if not interface.is_enrolled():
+            raise ValidationError({
+                "detail": ErrorDetail(_("Phone number has not been verified."))
+            })
+        return interface
         
     def send_otp(self):
-        self._validate_interface(raise_error=False)
-        activation = self.interface.activate(request=self.request)
-        return True
-    
+        interface = self._validate_interface()
+        interface.send_text(for_enrollment=False, request=self.request)    
 
-    def validate_otp(self, raise_error=True):
-        self._validate_interface()
+    def validate_otp(self):
+        data = run_validator(validator=OtpAuthValidator, data=self.data)
         otp = self.data["otp"]
-        
+
+        interface = self._validate_interface()
+        error = False
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "developement":
             if otp == "222222":
                self.perform_login()
                return 
+            else:
+                error = True
 
         if self.interface.validate_otp(otp):
             self.perform_login()
-        elif raise_error:
+        else:
+            error = True
+        
+        if error:
             raise ValidationError({
                 "otp": ErrorDetail(_("Invalid confirmation code. Try again."))
             })
@@ -121,9 +116,22 @@ class LoginRequest(ServiceBase):
         request = self.request
         if auth.login(request, user):
             AfterLogin(request=request, user=user).handle()
-        else:    
-            OtpAuth(user=user, request=self.request).send_otp()
-        
+        else:
+            SmsOtpAuth(user=user, request=self.request).send_otp()
+
+
+class ResendSmsOtpAuth(object):
+    def __init__(self, request):
+        self.request = request
+
+    def handle(self):
+        user = auth.get_pending_2fa_user(self.request)
+        if not user:
+            raise ValidationError({
+                "detail": ErrorDetail(_("User not found, please go to login page."))
+            })
+
+        SmsOtpAuth(user=user, request=self.request).send_otp()
 
 
 class AfterLogin(object):
@@ -134,3 +142,4 @@ class AfterLogin(object):
     def handle(self):
         Session(request=self.request).create_session(user=self.user)
         SendLoginAlert(user=self.user, session=self.request.session).send()
+

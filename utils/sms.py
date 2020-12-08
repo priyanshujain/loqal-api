@@ -6,4 +6,5 @@ def sms_available():
 
 
 def send_sms(body, to, from_=None):
+    print(body, to, from_)
     return True

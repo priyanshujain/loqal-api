@@ -10,7 +10,6 @@ __all__ = (
     "ApplyResetPasswordValidator",
     "EmailVerificationValidator",
     "PhoneNumberValidator",
-    "PhoneNumberCodeValidator",
     "OtpAuthValidator",
     "AvatarValidator",
 )
@@ -45,10 +44,6 @@ class PhoneNumberValidator(serializers.ValidationSerializer):
     # Add a phone_number validator
     phone_number = serializers.CharField()
 
-
-class PhoneNumberCodeValidator(serializers.ValidationSerializer):
-    # Add a phone_number validator
-    code = serializers.CharField()
 
 
 class ForgotPasswordValidator(serializers.ValidationSerializer):
