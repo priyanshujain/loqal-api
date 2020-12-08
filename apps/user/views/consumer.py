@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from otpauth import OtpAuth
 
-from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
@@ -108,7 +107,7 @@ class UserLoginAPI(APIView):
 
     def _run_services(self, request):
         service = LoginRequest(request=request, data=self.request_data)
-        service.execute()
+        return service.execute()
 
 
 class SmsOtpAuthAPI(APIView):
@@ -142,10 +141,15 @@ class ResendSmsOtpAuthAPI(APIView):
     """
 
     def post(self, request):
+        user = request.user
+        if user.is_authenticated:
+            raise ValidationError({
+                "detail": ErrorDetail(_("User is already authenticated."))
+            })
         self._run_services()
         return self.response()
 
-    def _run_services(self, user):
+    def _run_services(self):
         ResendSmsOtpAuth(request=self.request).handle()
 
 

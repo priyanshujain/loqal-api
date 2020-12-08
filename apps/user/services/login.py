@@ -54,13 +54,13 @@ class SmsOtpAuth(object):
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "developement":
             if otp == "222222":
-                self.perform_login()
+                self.perform_login(interface=interface)
                 return
             else:
                 error = True
 
-        if self.interface.validate_otp(otp):
-            self.perform_login()
+        if interface.validate_otp(otp):
+            self.perform_login(interface=interface)
         else:
             error = True
 
@@ -73,9 +73,9 @@ class SmsOtpAuth(object):
                 }
             )
 
-    def perform_login(self):
+    def perform_login(self, interface):
         auth.login(request=self.request, user=self.user, passed_2fa=True)
-        self.interface.authenticator.mark_used()
+        interface.authenticator.mark_used()
         AfterLogin(request=self.request, user=self.user).handle()
 
 

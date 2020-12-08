@@ -8,6 +8,7 @@ import traceback
 from django.conf import settings
 from django.db import connection
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
