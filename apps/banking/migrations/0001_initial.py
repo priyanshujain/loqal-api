@@ -78,6 +78,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "bank_account",},
+            options={
+                "db_table": "bank_account",
+            },
         ),
     ]

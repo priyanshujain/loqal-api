@@ -1,4 +1,5 @@
 from re import error
+
 from django.conf import settings
 from django.utils.translation import gettext as _
 from rest_framework.utils.serializer_helpers import ReturnDict
@@ -6,9 +7,8 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.user.validators import PhoneNumberValidator, OtpAuthValidator
 from apps.user.models import Authenticator
-
+from apps.user.validators import OtpAuthValidator, PhoneNumberValidator
 
 __all__ = (
     "AddPhoneNumber",
@@ -36,7 +36,9 @@ class AddPhoneNumber(ServiceBase):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
-                        _("Phone number can not be changed as it has already been verifed.")
+                        _(
+                            "Phone number can not be changed as it has already been verifed."
+                        )
                     )
                 }
             )
@@ -53,7 +55,9 @@ class VerifyPhoneNumber(ServiceBase):
         data = self._validate_data(data=self.data)
         otp = data["otp"]
 
-        if EnrollSmsAuthenticator(request=self.request, user=self.user).validate_otp(otp):
+        if EnrollSmsAuthenticator(
+            request=self.request, user=self.user
+        ).validate_otp(otp):
             self.user.verify_phone_number()
         else:
             raise ValidationError(
@@ -76,9 +80,11 @@ class ResendPhoneNumberOtp(object):
     def __init__(self, user, request):
         self.user = user
         self.request = request
-    
+
     def handle(self):
-        return EnrollSmsAuthenticator(request=self.request, user=self.user).send_otp()
+        return EnrollSmsAuthenticator(
+            request=self.request, user=self.user
+        ).send_otp()
 
 
 class EnrollSmsAuthenticator(object):
@@ -86,20 +92,26 @@ class EnrollSmsAuthenticator(object):
         self.user = user
         self.request = request
         self.data = data
-    
+
     def _validate_interface(self):
-        interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
+        interface = Authenticator.objects.get_interface(
+            user=self.user, interface_id="sms"
+        )
         phone_number = self.user.phone_number
         if not phone_number:
-            raise ValidationError({
-                "detail": ErrorDetail(_("Phone number has not been added."))
-            })
-        
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Phone number has not been added."))}
+            )
+
         if interface.is_enrolled():
-            raise ValidationError({
-                "detail": ErrorDetail(_("Phone number has already been verified."))
-            })
-        
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Phone number has already been verified.")
+                    )
+                }
+            )
+
         interface.phone_number = phone_number
         return interface
 
@@ -110,7 +122,7 @@ class EnrollSmsAuthenticator(object):
         else:
             # TODO: Add error check for SMS service failed ,500 error
             return False
-    
+
     def validate_otp(self, otp):
         interface = self._validate_interface()
 
@@ -118,8 +130,8 @@ class EnrollSmsAuthenticator(object):
         error = False
         if settings.APP_ENV == "developement":
             if otp == "222222":
-               self.activate_interface(interface=interface)
-               return 
+                self.activate_interface(interface=interface)
+                return
             else:
                 error = True
 
@@ -127,11 +139,15 @@ class EnrollSmsAuthenticator(object):
             self.activate_interface(interface=interface)
         else:
             error = True
-        
+
         if error:
-            raise ValidationError({
-                "otp": ErrorDetail(_("Invalid confirmation code. Try again."))
-            })
+            raise ValidationError(
+                {
+                    "otp": ErrorDetail(
+                        _("Invalid confirmation code. Try again.")
+                    )
+                }
+            )
 
     def activate_interface(self, interface):
         interface.enroll(self.user)

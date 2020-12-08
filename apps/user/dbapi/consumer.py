@@ -21,7 +21,11 @@ __all__ = (
 
 
 def create_user(
-    first_name, last_name, email, password, email_verified=False,
+    first_name,
+    last_name,
+    email,
+    password,
+    email_verified=False,
 ):
     user = User.objects.create(
         username=email,
@@ -120,7 +124,9 @@ def gen_reset_password_token(user_id):
     token = rand_str()
     token_expire_time = now() + timedelta(hours=24)
     return UserPasswordReset.objects.create(
-        user_id=user_id, token=token, token_expire_time=token_expire_time,
+        user_id=user_id,
+        token=token,
+        token_expire_time=token_expire_time,
     )
 
 

@@ -1,7 +1,8 @@
 from django.contrib.auth import models
+
 from api import serializers
-from apps.user.models import User
 from apps.box.models import BoxFile
+from apps.user.models import User
 
 __all__ = ("UserProfileResponse",)
 
@@ -11,8 +12,9 @@ class AvatarFileResponse(serializers.ModelSerializer):
         model = BoxFile
         fields = (
             "id",
-            "file_name",            
+            "file_name",
         )
+
 
 class UserProfileResponse(serializers.ModelSerializer):
     email_verified = serializers.BooleanField(

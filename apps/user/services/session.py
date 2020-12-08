@@ -8,9 +8,8 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from apps.user.dbapi import get_active_sessions, get_all_sessions, get_session
 from apps.user.dbapi import create_session as _create_session
-
+from apps.user.dbapi import get_active_sessions, get_all_sessions, get_session
 
 __all__ = ("Session",)
 
@@ -28,7 +27,7 @@ class Session(object):
         # TODO: Combine cache based session and models based session so that
         #       we have a record of expired sessions.
         session = self.request.session
-        
+
         # TODO: get ifconfig from IP address, need to implment maxmind geodb service
         ifconfig = {}
 

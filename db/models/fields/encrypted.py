@@ -17,8 +17,6 @@ __all__ = (
 )
 
 
-
-
 class EncryptedCharField(CharField):
     def contribute_to_class(self, cls, name):
         """

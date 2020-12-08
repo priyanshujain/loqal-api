@@ -1,4 +1,3 @@
-from api import serializers
 import qrcode
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -7,24 +6,22 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from otpauth import OtpAuth
 
+from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
 from apps.account.notifications import SendVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
-from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
-                                ChangePassword, EmailVerification, LoginRequest,
-                                SmsOtpAuth,
-                                RequestResetPassword,
-                                ResetPasswordTokenValidate, Session,
-                                VerifyPhoneNumber,
-                                AddChangeUserAvatar,
-                                ResendPhoneNumberOtp,
-                                ResendSmsOtpAuth,)
+from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
+                                ApplyResetPassword, ChangePassword,
+                                EmailVerification, LoginRequest,
+                                RequestResetPassword, ResendPhoneNumberOtp,
+                                ResendSmsOtpAuth, ResetPasswordTokenValidate,
+                                Session, SmsOtpAuth, VerifyPhoneNumber)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
-from utils.shortcuts import img2base64, rand_str
 from utils import auth
+from utils.shortcuts import img2base64, rand_str
 
 
 class GetUserProfileAPI(APIView):
@@ -104,7 +101,9 @@ class UserLoginAPI(APIView):
         if session:
             session.set_expiry(settings.SESSION_INACTIVITY_EXPIRATION_DURATION)
 
-        self._run_services(request=request)
+        service_response = self._run_services(request=request)
+        if service_response:
+            return self.response(service_response)
         return self.response()
 
     def _run_services(self, request):
@@ -116,24 +115,32 @@ class SmsOtpAuthAPI(APIView):
     """
     Validate sms otp after email and password verification
     """
+
     def post(self, request):
         user = auth.get_pending_2fa_user(request)
 
         if not user:
-            raise ValidationError({
-                "detail": ErrorDetail(_("User not found, please go to login page."))
-            })
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("User not found, please go to login page.")
+                    )
+                }
+            )
         self._run_services(user=user)
         return self.response()
 
     def _run_services(self, user):
-        SmsOtpAuth(user=user, request=self.request, data=self.request_data).validate_otp()
+        SmsOtpAuth(
+            user=user, request=self.request, data=self.request_data
+        ).validate_otp()
 
 
 class ResendSmsOtpAuthAPI(APIView):
     """
     Resend sms otp after email and password verification
     """
+
     def post(self, request):
         self._run_services()
         return self.response()
@@ -146,6 +153,7 @@ class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
     """
     Resend sms otp for phone number verification
     """
+
     def post(self, request):
         user = request.user
         self._run_services(user=user)
@@ -153,7 +161,6 @@ class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
 
     def _run_services(self, user):
         ResendPhoneNumberOtp(user=user, request=self.request).handle()
-
 
 
 class AddPhoneNumberAPI(LoggedInAPIView):
@@ -172,9 +179,10 @@ class VerifyPhoneNumberAPI(LoggedInAPIView):
         return self.response()
 
     def _run_services(self, user):
-        service = VerifyPhoneNumber(user=user, request=self.request, data=self.request_data)
+        service = VerifyPhoneNumber(
+            user=user, request=self.request, data=self.request_data
+        )
         service.execute()
-
 
 
 class ListSessionsAPI(LoggedInAPIView):
@@ -355,4 +363,6 @@ class UserAvatarAPI(LoggedInAPIView):
         return self.response()
 
     def _run_services(self):
-        AddChangeUserAvatar(user=self.request.user, data=self.request_data).handle()
+        AddChangeUserAvatar(
+            user=self.request.user, data=self.request_data
+        ).handle()

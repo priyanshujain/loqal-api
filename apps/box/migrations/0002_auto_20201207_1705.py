@@ -6,28 +6,28 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('box', '0001_initial'),
+        ("box", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='boxfile',
-            options={'ordering': ['-created_at', '-updated_at']},
+            name="boxfile",
+            options={"ordering": ["-created_at", "-updated_at"]},
         ),
         migrations.RemoveField(
-            model_name='boxfile',
-            name='account',
+            model_name="boxfile",
+            name="account",
         ),
         migrations.RemoveField(
-            model_name='boxfile',
-            name='created_by',
+            model_name="boxfile",
+            name="created_by",
         ),
         migrations.RemoveField(
-            model_name='boxfile',
-            name='deleted_by',
+            model_name="boxfile",
+            name="deleted_by",
         ),
         migrations.RemoveField(
-            model_name='boxfile',
-            name='updated_by',
+            model_name="boxfile",
+            name="updated_by",
         ),
     ]

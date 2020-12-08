@@ -93,12 +93,14 @@ class PlaidPlugin(object):
 
     def get_institution(self, institution_id):
         """
-        Get institution name and logo for given institution_id 
+        Get institution name and logo for given institution_id
         """
         institution = self._client.Institutions.get_by_id(
             institution_id=institution_id,
             _options={"include_optional_metadata": True},
-        ).get("institution",)
+        ).get(
+            "institution",
+        )
 
         return {
             "id": institution_id,

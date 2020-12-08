@@ -116,7 +116,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "transaction",},
+            options={
+                "db_table": "transaction",
+            },
         ),
         migrations.CreateModel(
             name="PaymentRegister",
@@ -190,6 +192,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "payment_account",},
+            options={
+                "db_table": "payment_account",
+            },
         ),
     ]

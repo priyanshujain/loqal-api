@@ -3,10 +3,10 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import LoggedInAPIView
 from apps.box.models import BoxFile
-from apps.box.validators import BoxFileForm
 from apps.box.responses import BoxFileResponse
 from apps.box.shortcut import validate_file_format
 from apps.box.tasks import get_file_from_gcs, store_file_to_gcs
+from apps.box.validators import BoxFileForm
 
 
 class FileAPI(LoggedInAPIView):

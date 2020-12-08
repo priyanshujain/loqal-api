@@ -20,9 +20,7 @@ class ChangePassword(ServiceBase):
         request = self.request
         data = run_validator(validator=ForgotPasswordValidator, data=self.data)
         email = request.user.email
-        user = auth.authenticate(
-            email=email, password=data["old_password"]
-        )
+        user = auth.authenticate(email=email, password=data["old_password"])
         if not user:
             raise ValidationError(
                 {

@@ -79,9 +79,7 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
         ctx = {"code": self.make_otp().generate_otp()}
 
         if for_enrollment:
-            text = _(
-                "%(code)s is your Loqal phone number enrollment code. "
-            )
+            text = _("%(code)s is your Loqal phone number enrollment code. ")
         else:
             text = _("%(code)s is your Loqal authentication code.")
 

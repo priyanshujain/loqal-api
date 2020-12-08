@@ -43,7 +43,9 @@ class ApiError(APIException):
                 "verb": str(self.verb),
                 "url": self.route,
             },
-            "response": {"status_code": self.status_code,},
+            "response": {
+                "status_code": self.status_code,
+            },
             "errors": self.errors,
         }
 

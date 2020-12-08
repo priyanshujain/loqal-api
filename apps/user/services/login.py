@@ -1,17 +1,22 @@
-from utils import auth 
+from django.conf import settings
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
-from django.conf import settings
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.user.notifications import SendLoginAlert
-from apps.user.validators import UserLoginValidator, OtpAuthValidator
 from apps.user.models import Authenticator
+from apps.user.notifications import SendLoginAlert
+from apps.user.validators import OtpAuthValidator, UserLoginValidator
+from utils import auth
+
 from .session import Session
 
-__all__ = ("LoginRequest", "SmsOtpAuth", "ResendSmsOtpAuth",)
+__all__ = (
+    "LoginRequest",
+    "SmsOtpAuth",
+    "ResendSmsOtpAuth",
+)
 
 
 class SmsOtpAuth(object):
@@ -19,18 +24,26 @@ class SmsOtpAuth(object):
         self.user = user
         self.request = request
         self.data = data
-    
-    def _validate_interface(self, ):
-        interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
+
+    def _validate_interface(
+        self,
+    ):
+        interface = Authenticator.objects.get_interface(
+            user=self.user, interface_id="sms"
+        )
         if not interface.is_enrolled():
-            raise ValidationError({
-                "detail": ErrorDetail(_("Phone number has not been verified."))
-            })
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Phone number has not been verified.")
+                    )
+                }
+            )
         return interface
-        
+
     def send_otp(self):
         interface = self._validate_interface()
-        interface.send_text(for_enrollment=False, request=self.request)    
+        interface.send_text(for_enrollment=False, request=self.request)
 
     def validate_otp(self):
         data = run_validator(validator=OtpAuthValidator, data=self.data)
@@ -41,8 +54,8 @@ class SmsOtpAuth(object):
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "developement":
             if otp == "222222":
-               self.perform_login()
-               return 
+                self.perform_login()
+                return
             else:
                 error = True
 
@@ -50,12 +63,16 @@ class SmsOtpAuth(object):
             self.perform_login()
         else:
             error = True
-        
+
         if error:
-            raise ValidationError({
-                "otp": ErrorDetail(_("Invalid confirmation code. Try again."))
-            })
-    
+            raise ValidationError(
+                {
+                    "otp": ErrorDetail(
+                        _("Invalid confirmation code. Try again.")
+                    )
+                }
+            )
+
     def perform_login(self):
         auth.login(request=self.request, user=self.user, passed_2fa=True)
         self.interface.authenticator.mark_used()
@@ -118,6 +135,7 @@ class LoginRequest(ServiceBase):
             AfterLogin(request=request, user=user).handle()
         else:
             SmsOtpAuth(user=user, request=self.request).send_otp()
+            return {"otp_pending": True}
 
 
 class ResendSmsOtpAuth(object):
@@ -127,9 +145,13 @@ class ResendSmsOtpAuth(object):
     def handle(self):
         user = auth.get_pending_2fa_user(self.request)
         if not user:
-            raise ValidationError({
-                "detail": ErrorDetail(_("User not found, please go to login page."))
-            })
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("User not found, please go to login page.")
+                    )
+                }
+            )
 
         SmsOtpAuth(user=user, request=self.request).send_otp()
 
@@ -137,9 +159,8 @@ class ResendSmsOtpAuth(object):
 class AfterLogin(object):
     def __init__(self, request, user):
         self.user = user
-        self.request  = request
-    
+        self.request = request
+
     def handle(self):
         Session(request=self.request).create_session(user=self.user)
         SendLoginAlert(user=self.user, session=self.request.session).send()
-

@@ -45,7 +45,6 @@ class PhoneNumberValidator(serializers.ValidationSerializer):
     phone_number = serializers.CharField()
 
 
-
 class ForgotPasswordValidator(serializers.ValidationSerializer):
     old_password = serializers.CharField()
     new_password = serializers.CharField()

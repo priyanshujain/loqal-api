@@ -7,20 +7,22 @@ from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                              GetTwoFactorAuthQRCodeAPI, GetUserProfileAPI,
                              ListSessionsAPI, RequestResetPasswordAPI,
                              ResendEmailverificationAPI,
-                             ResetPasswordTokenValidateAPI,
-                             UpdateUserProfileAPI, UserChangePasswordAPI,
-                             UserLoginAPI, UserLogoutAPI,
-                             UsernameOrEmailCheckAPI, VerifyEmailAPI,
-                             VerifyPhoneNumberAPI,
-                             SmsOtpAuthAPI,
-                             UserAvatarAPI,
                              ResendPhoneNumberVerifyOtpAPI,
-                             ResendSmsOtpAuthAPI,)
+                             ResendSmsOtpAuthAPI,
+                             ResetPasswordTokenValidateAPI, SmsOtpAuthAPI,
+                             UpdateUserProfileAPI, UserAvatarAPI,
+                             UserChangePasswordAPI, UserLoginAPI,
+                             UserLogoutAPI, UsernameOrEmailCheckAPI,
+                             VerifyEmailAPI, VerifyPhoneNumberAPI)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login"),
     path("auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
-    path("auth/otp/resend/", ResendSmsOtpAuthAPI.as_view(), name="otp_auth_resend"),
+    path(
+        "auth/otp/resend/",
+        ResendSmsOtpAuthAPI.as_view(),
+        name="otp_auth_resend",
+    ),
     path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
     path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
     path(
@@ -65,7 +67,11 @@ urlpatterns = [
         UpdateUserProfileAPI.as_view(),
         name="update_user_profile",
     ),
-    path("tfa/status/", CheckTFAStausAPI.as_view(), name="tfa_status",),
+    path(
+        "tfa/status/",
+        CheckTFAStausAPI.as_view(),
+        name="tfa_status",
+    ),
     path(
         "tfa/qrcode/",
         GetTwoFactorAuthQRCodeAPI.as_view(),
@@ -81,9 +87,15 @@ urlpatterns = [
         DisableTwoFactorAuthAPI.as_view(),
         name="disable_two_factor_auth",
     ),
-    path("sessions/", ListSessionsAPI.as_view(), name="list_sessions",),
     path(
-        "sessions/delete/", DeleteSessionAPI.as_view(), name="delete_session",
+        "sessions/",
+        ListSessionsAPI.as_view(),
+        name="list_sessions",
+    ),
+    path(
+        "sessions/delete/",
+        DeleteSessionAPI.as_view(),
+        name="delete_session",
     ),
     path(
         "email-verification/apply/",

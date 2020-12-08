@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0003_authenticator'),
+        ("user", "0003_authenticator"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='is_password_expired',
-            field=models.BooleanField(default=False, help_text='If set to true then the user needs to change the password on next sign in.', verbose_name='password expired'),
+            model_name="user",
+            name="is_password_expired",
+            field=models.BooleanField(
+                default=False,
+                help_text="If set to true then the user needs to change the password on next sign in.",
+                verbose_name="password expired",
+            ),
         ),
     ]

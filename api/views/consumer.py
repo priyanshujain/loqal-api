@@ -19,7 +19,7 @@ class UserAPIView(APIAccessLogView):
 
         if not user.is_authenticated:
             exception_message = "User is not authenticated."
-        
+
         if not user.phone_number_verified:
             exception_message = "User phone number is not verified."
             exception_class = PermissionDenied

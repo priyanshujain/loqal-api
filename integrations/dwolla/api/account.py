@@ -24,7 +24,10 @@ class Account(Http):
             "ipAddress": data["ip_address"],
         }
         response = self.post(
-            "/customers", data=request_data, authenticated=True, retry=False,
+            "/customers",
+            data=request_data,
+            authenticated=True,
+            retry=False,
         )
         response_headers = response.headers
         location = response_headers["location"]

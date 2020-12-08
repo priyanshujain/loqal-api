@@ -22,10 +22,16 @@ class APIAccessLog(AbstractBaseModel):
     time_elapsed = models.FloatField(default=0.0)
     request_path = models.CharField(max_length=1024, db_index=True)
     api_view = models.CharField(
-        max_length=254, null=True, blank=True, db_index=True,
+        max_length=254,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     view_method = models.CharField(
-        max_length=32, null=True, blank=True, db_index=True,
+        max_length=32,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     remote_addr = models.GenericIPAddressField()
     host = models.URLField()
@@ -67,7 +73,10 @@ class RawPspApiRequest(AbstractBaseModel):
     )
     request_errors = models.TextField(null=True, blank=True)
     response = models.OneToOneField(
-        RawPspApiResponse, on_delete=models.DO_NOTHING, null=True, blank=True,
+        RawPspApiResponse,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
     )
 
     def set_response(self, response):
@@ -81,7 +90,10 @@ class RawPspApiRequest(AbstractBaseModel):
 class PspApiRequestStorage(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     psp = models.ForeignKey(PaymentProvider, on_delete=models.DO_NOTHING)
-    request = models.OneToOneField(RawPspApiRequest, on_delete=models.CASCADE,)
+    request = models.OneToOneField(
+        RawPspApiRequest,
+        on_delete=models.CASCADE,
+    )
     api_errors = models.TextField(null=True, blank=True)
     exception_traceback = models.TextField(null=True, blank=True)
 

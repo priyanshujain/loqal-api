@@ -1,14 +1,14 @@
 from __future__ import absolute_import
 
-import six
-
-from django.conf import settings
-from django.contrib.auth import login as _login
-from django.contrib.auth import authenticate, logout
 from time import time
 
-from apps.user.models import User, Authenticator
+import six
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as _login
+from django.contrib.auth import logout
 
+from apps.user.models import Authenticator, User
 
 MFA_SESSION_KEY = "mfa"
 
@@ -37,8 +37,14 @@ def has_pending_2fa(request):
     return request.session.get("_pending_2fa") is not None
 
 
-
-def login(request, user, passed_2fa=None, after_2fa=None, organization_id=None, source=None):
+def login(
+    request,
+    user,
+    passed_2fa=None,
+    after_2fa=None,
+    organization_id=None,
+    source=None,
+):
     """
     This logs a user in for the session and current request.
 
@@ -56,7 +62,9 @@ def login(request, user, passed_2fa=None, after_2fa=None, organization_id=None, 
     """
     has_2fa = Authenticator.objects.user_has_2fa(user)
     if passed_2fa is None:
-        passed_2fa = request.session.get(MFA_SESSION_KEY, "") == six.text_type(user.id)
+        passed_2fa = request.session.get(MFA_SESSION_KEY, "") == six.text_type(
+            user.id
+        )
 
     if has_2fa and not passed_2fa:
         request.session["_pending_2fa"] = [user.id, time(), organization_id]
@@ -84,7 +92,6 @@ def login(request, user, passed_2fa=None, after_2fa=None, organization_id=None, 
     if user.is_password_expired:
         raise AuthUserPasswordExpired(user)
 
-
     # If there is no authentication backend, just attach the first
     # one and hope it goes through.  This apparently is a thing we
     # have been doing for a long time, just moved it to a more
@@ -93,4 +100,3 @@ def login(request, user, passed_2fa=None, after_2fa=None, organization_id=None, 
         user.backend = settings.AUTHENTICATION_BACKENDS[0]
     _login(request, user)
     return True
-

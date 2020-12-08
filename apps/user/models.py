@@ -9,8 +9,8 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from apps.user.options import UserType
 from apps.box.models import BoxFile
+from apps.user.options import UserType
 from db.models.base import BaseModel
 from db.models.fields import (BoundedPositiveIntegerField,
                               EncryptedPickledObjectField)
@@ -56,7 +56,9 @@ class User(BaseModel, AbstractBaseUser):
     phone_number_verified = models.BooleanField(default=False)
 
     # Avatar
-    avatar_file = models.ForeignKey(BoxFile, on_delete=models.CASCADE, blank=True, null=True)
+    avatar_file = models.ForeignKey(
+        BoxFile, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     # One of UserType
     user_type = models.CharField(max_length=254, default=UserType.REGULAR_USER)
@@ -71,7 +73,8 @@ class User(BaseModel, AbstractBaseUser):
         _("password expired"),
         default=False,
         help_text=_(
-            "If set to true then the user needs to change the " "password on next sign in."
+            "If set to true then the user needs to change the "
+            "password on next sign in."
         ),
     )
 
@@ -133,10 +136,8 @@ class User(BaseModel, AbstractBaseUser):
         self.avatar_file = boxfile
         self.save()
 
-
     class Meta:
         db_table = "user"
-
 
 
 class AuthenticatorManager(models.Manager):
@@ -194,8 +195,7 @@ class AuthenticatorManager(models.Manager):
             return interface()
 
     def user_has_2fa(self, user):
-        """Checks if the user has any 2FA configured.
-        """
+        """Checks if the user has any 2FA configured."""
         return Authenticator.objects.filter(
             user=user,
             type__in=[

@@ -91,8 +91,6 @@ class CreatePayment(ServiceBase):
         return api_response["dwolla_transfer_id"]
 
 
-
-
 class CreateTransferAPIAction(ProviderAPIActionBase):
     def create(self, data):
         response = self.client.payment.create_new_payment(data=data)

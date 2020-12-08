@@ -10,7 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="consumeraccount", name="zip_code",),
+        migrations.RemoveField(
+            model_name="consumeraccount",
+            name="zip_code",
+        ),
         migrations.AddField(
             model_name="account",
             name="zip_code",

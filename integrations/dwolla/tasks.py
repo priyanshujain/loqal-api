@@ -10,7 +10,7 @@ __all__ = "store_auth_token"
 # TODO: Genralize this according to multiple providers
 def store_auth_token(auth_data):
     """
-    Store auth token into DB 
+    Store auth token into DB
     """
     provider_obj = PaymentProvider.objects.get(provider_slug="DWOLLA")
     expires_in = int(auth_data["expires_in"]) - 30

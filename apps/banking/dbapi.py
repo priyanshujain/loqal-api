@@ -42,6 +42,9 @@ def get_bank_account(account_id):
     dbapi to get bank account for a given account
     """
     try:
-        return BankAccount.objects.get(account_id=account_id, is_primary=True,)
+        return BankAccount.objects.get(
+            account_id=account_id,
+            is_primary=True,
+        )
     except BankAccount.DoesNotExist:
         return None

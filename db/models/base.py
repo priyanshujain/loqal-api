@@ -4,9 +4,8 @@ import uuid
 # Django imports
 from django.db import models
 
-__all__ = (
-    "BaseModel",
-)
+__all__ = ("BaseModel",)
+
 
 class BaseModel(models.Model):
     # A unique id as string but not PK as we dont't want to expose PK's

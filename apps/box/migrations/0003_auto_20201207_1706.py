@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('box', '0002_auto_20201207_1705'),
+        ("box", "0002_auto_20201207_1705"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='boxfile',
+            name="boxfile",
             options={},
         ),
         migrations.AlterModelTable(
-            name='boxfile',
-            table='boxfile',
+            name="boxfile",
+            table="boxfile",
         ),
     ]

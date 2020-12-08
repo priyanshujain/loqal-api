@@ -52,7 +52,11 @@ class ConsumerAccount(AbstractBaseModel):
 class MerchantAccount(AbstractBaseModel):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=256)
-    website = models.URLField(max_length=255, null=True, blank=True,)
+    website = models.URLField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     company_email = models.CharField(max_length=255)
     business_contact_number = models.CharField(max_length=20)
 

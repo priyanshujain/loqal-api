@@ -74,7 +74,10 @@ class Payment(Http):
         }
 
         response = self.post(
-            f"/transfers", data=request_data, authenticated=True, retry=False,
+            f"/transfers",
+            data=request_data,
+            authenticated=True,
+            retry=False,
         )
 
         response_headers = response.headers
