@@ -1,4 +1,5 @@
 from datetime import date
+from api.exceptions import ValidationError, ErrorDetail
 
 from django.utils.translation import gettext as _
 
@@ -15,6 +16,11 @@ __all__ = (
 
 class ConsumerSignupAPI(APIView):
     def post(self, request):
+        if request.user.is_authenticated:
+            raise ValidationError({
+                "details": ErrorDetail(_("User has aleady logged in."))
+            })
+        
         self._run_services(ip_address=request.ip)
         return self.response(status=201)
 
