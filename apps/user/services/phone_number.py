@@ -131,12 +131,13 @@ class EnrollSmsAuthenticator(object):
         if settings.APP_ENV == "development":
             if otp == "222222":
                 self.activate_interface(interface=interface)
-                return
+                return True
             else:
                 error = True
 
         if interface.validate_otp(otp):
             self.activate_interface(interface=interface)
+            return True
         else:
             error = True
 

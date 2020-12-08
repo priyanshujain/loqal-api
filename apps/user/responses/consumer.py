@@ -38,6 +38,7 @@ class UserProfileResponse(serializers.ModelSerializer):
             "email_verified",
             "two_factor_auth",
             "phone_number",
+            "phone_number_verified",
             "position",
             "avatar_file",
         )
