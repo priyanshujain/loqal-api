@@ -17,16 +17,6 @@ class AvatarFileResponse(serializers.ModelSerializer):
 
 
 class UserProfileResponse(serializers.ModelSerializer):
-    email_verified = serializers.BooleanField(
-        source="user.email_verified", read_only=True
-    )
-    two_factor_auth = serializers.BooleanField(
-        source="user.two_factor_auth", read_only=True
-    )
-    email = serializers.CharField(source="user.email", read_only=True)
-    position = serializers.CharField(
-        source="accountmember.position", read_only=True
-    )
     avatar_file = AvatarFileResponse()
 
     class Meta:
@@ -35,10 +25,9 @@ class UserProfileResponse(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "email_verified",
+            "username",
             "two_factor_auth",
             "phone_number",
             "phone_number_verified",
-            "position",
             "avatar_file",
         )
