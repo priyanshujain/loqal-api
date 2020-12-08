@@ -32,6 +32,30 @@ class PlaidPlugin(object):
     def client(self):
         return self._client
 
+    def create_link_token(self, user_account_id):
+        """
+        Exchange access_token with short lived public_token
+
+        Args:
+            - public_token: token returned by plaidLink after auth
+
+        Returns:
+            - access_token: access_token will be stored into DB and will
+                            use for further auth purpose
+        """
+        try:
+            self._link_token = self._client.LinkToken.create(
+                {
+                    "client_user_id": user_account_id,
+                    "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
+                    "country_codes": ["US"],
+                    "language": "en",
+                }
+            ).get("link_token")
+        except InvalidInputError:
+            return None
+        return self._link_token
+    
     def exchange_public_token(self, public_token):
         """
         Exchange access_token with short lived public_token
