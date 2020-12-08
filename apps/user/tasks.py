@@ -9,7 +9,6 @@ from utils.email import send_email_async
 
 def send_forgot_password_email(user):
     render_data = {
-        "username": user.username,
         "website_name": settings.APP_BASE_URL,
         "path": f"{settings.APP_BASE_URL}/user/forgot/key/{user.reset_password_token}",
     }

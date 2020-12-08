@@ -1,6 +1,6 @@
 from api.views import UserAPIView
-from apps.payment.services import CreatePayment
 from apps.payment.responses import TransactionResponse
+from apps.payment.services import CreatePayment
 
 
 class CreatePaymentAPI(UserAPIView):
@@ -13,4 +13,3 @@ class CreatePaymentAPI(UserAPIView):
         return CreatePayment(
             account_id=account_id, data=self.request_data
         ).execute()
-

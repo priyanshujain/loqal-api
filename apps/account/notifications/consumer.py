@@ -18,6 +18,6 @@ class SendVerifyEmail:
         token = user.email_verification_token
         key_path = f"/user/email-verification?key={token}"
         path = f"{settings.APP_BASE_URL}{key_path}"
-        render_data = {"path": path, "username": user.username}
+        render_data = {"path": path}
         email_html = render_to_string("user_welcome_email.html", render_data)
         send_email_async((user.email), "Confirm your email", email_html)

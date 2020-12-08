@@ -107,7 +107,6 @@ class SendResetPasswordEmail:
         token = self.token
 
         render_data = {
-            "username": user.username,
             "website_name": settings.APP_BASE_URL,
             "path": f"{settings.APP_BASE_URL}/user/forgot/key/{token}",
         }

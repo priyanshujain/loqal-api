@@ -1,17 +1,17 @@
+from datetime import timedelta
+
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.provider.options import DEFAULT_CURRENCY
-from db.models.abstract import AbstractBase
-
 from apps.payment.options import TransactionStatus
+from apps.provider.options import DEFAULT_CURRENCY
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
 
 
-class PaymentRegister(AbstractBase):
+class PaymentRegister(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     daily_send_limit = models.FloatField(default=500.0)
@@ -49,22 +49,28 @@ class PaymentRegister(AbstractBase):
         self.save()
 
     class Meta:
-        db_table = "payment_account"
+        db_table = "payment_register"
 
 
-class Transaction(AbstractBase):
+class Transaction(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     sender = models.ForeignKey(
-        BankAccount, on_delete=models.DO_NOTHING, related_name="sender_bank_account"
+        BankAccount,
+        on_delete=models.DO_NOTHING,
+        related_name="sender_bank_account",
     )
     recipient = models.ForeignKey(
-        BankAccount, on_delete=models.DO_NOTHING, related_name="recipient_bank_account"
+        BankAccount,
+        on_delete=models.DO_NOTHING,
+        related_name="recipient_bank_account",
     )
     payment_amount = models.FloatField()
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_value = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    status = models.CharField(max_length=128, default=TransactionStatus.NOT_SENT)
+    status = models.CharField(
+        max_length=128, default=TransactionStatus.NOT_SENT
+    )
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )

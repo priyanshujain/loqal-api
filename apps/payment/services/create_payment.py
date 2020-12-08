@@ -1,18 +1,18 @@
 import re
+
 from django.http import request
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ValidationError
+from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.payment.dbapi import create_transaction
 from apps.account.dbapi import get_merchant_account
 from apps.banking.dbapi import get_bank_account
+from apps.payment.dbapi import create_transaction
+from apps.payment.options import (FACILITATION_FEES_CURRENCY,
+                                  FACILITATION_FEES_PERCENTAGE)
 from apps.payment.validators import CreatePaymentValidator
-from apps.payment.options import (
-    FACILITATION_FEES_PERCENTAGE,
-    FACILITATION_FEES_CURRENCY,
-)
+from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
 
 
@@ -49,7 +49,11 @@ class CreatePayment(ServiceBase):
         merchant_account = get_merchant_account(account_id=merchant_id)
         if not merchant_account:
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Given merchant does not exist."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Given merchant does not exist.")
+                    )
+                }
             )
         return {
             "merchant_account": merchant_account,
@@ -85,11 +89,9 @@ class CreatePayment(ServiceBase):
         }
         api_response = api_action.create(data=psp_request_data)
         return api_response["dwolla_transfer_id"]
-        
- 
 
-from apps.provider.lib.actions import ProviderAPIActionBase
-from api.exceptions import ProviderAPIException
+
+
 
 class CreateTransferAPIAction(ProviderAPIActionBase):
     def create(self, data):
@@ -108,7 +110,5 @@ class CreateTransferAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
-            "dwolla_transfer_id": response["data"][
-                "dwolla_transfer_id"
-            ],
+            "dwolla_transfer_id": response["data"]["dwolla_transfer_id"],
         }

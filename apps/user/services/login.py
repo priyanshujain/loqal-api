@@ -1,18 +1,68 @@
-from django.contrib import auth
+from utils import auth 
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
+from django.conf import settings
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.user.dbapi import create_session
 from apps.user.notifications import SendLoginAlert
-from apps.user.validators import UserLoginValidator
+from apps.user.validators import UserLoginValidator, OtpAuthValidator
+from apps.user.models import Authenticator
+from .session import Session
 
-__all__ = ("Login",)
+__all__ = ("LoginRequest", "SmsOtpAuth", "ResendSmsOtpAuth",)
 
 
-class Login(ServiceBase):
+class SmsOtpAuth(object):
+    def __init__(self, user, request, data={}):
+        self.user = user
+        self.request = request
+        self.data = data
+    
+    def _validate_interface(self, ):
+        interface = Authenticator.objects.get_interface(user=self.user, interface_id="sms")
+        if not interface.is_enrolled():
+            raise ValidationError({
+                "detail": ErrorDetail(_("Phone number has not been verified."))
+            })
+        return interface
+        
+    def send_otp(self):
+        interface = self._validate_interface()
+        interface.send_text(for_enrollment=False, request=self.request)    
+
+    def validate_otp(self):
+        data = run_validator(validator=OtpAuthValidator, data=self.data)
+        otp = self.data["otp"]
+
+        interface = self._validate_interface()
+        error = False
+        # If dev environment validate otp by 222222
+        if settings.APP_ENV == "developement":
+            if otp == "222222":
+               self.perform_login()
+               return 
+            else:
+                error = True
+
+        if self.interface.validate_otp(otp):
+            self.perform_login()
+        else:
+            error = True
+        
+        if error:
+            raise ValidationError({
+                "otp": ErrorDetail(_("Invalid confirmation code. Try again."))
+            })
+    
+    def perform_login(self):
+        auth.login(request=self.request, user=self.user, passed_2fa=True)
+        self.interface.authenticator.mark_used()
+        AfterLogin(request=self.request, user=self.user).handle()
+
+
+class LoginRequest(ServiceBase):
     def __init__(self, request, data):
         self.request = request
         self.data = data
@@ -24,7 +74,7 @@ class Login(ServiceBase):
         data = self.data
         self._validate_data(data=data)
         user = auth.authenticate(
-            username=data["email"], password=data["password"]
+            email=data["email"], password=data["password"]
         )
 
         if user:
@@ -59,54 +109,37 @@ class Login(ServiceBase):
                 )
         else:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid username or password."))}
+                {"detail": ErrorDetail(_("Invalid email or password."))}
             )
 
     def _auth_login(self, user):
         request = self.request
-        auth.login(request, user)
-        self._factory_session(user=user)
-        service = SendLoginAlert(user=user, session=request.session)
-        service.send()
+        if auth.login(request, user):
+            AfterLogin(request=request, user=user).handle()
+        else:
+            SmsOtpAuth(user=user, request=self.request).send_otp()
 
-    def _factory_session(self, user):
-        # TODO: Combine cache based session and models based session so that
-        #       we have a record of expired sessions.
-        data = self.data
-        session = self.request.session
-        ifconfig = data["ifconfig"]
 
-        # from cache based session
-        user_agent = session["user_agent"]
-        ip_address = session["ip"]
-        is_ip_routable = session["is_ip_routable"]
-        last_activity = session["last_activity"]
-        ip_country_iso = session["cf_ip_country"]
+class ResendSmsOtpAuth(object):
+    def __init__(self, request):
+        self.request = request
 
-        # from maxmind ifconfig
-        country_iso = ifconfig.get("country_iso", "")
-        region = ifconfig.get("region", "")
-        region_code = ifconfig.get("region_code", "")
-        latitude = ifconfig.get("latitude", "")
-        longitude = ifconfig.get("longitude", "")
-        timezone = ifconfig.get("timezone", "")
-        asn = ifconfig.get("asn_org", "")
-        asn_code = ifconfig.get("asn", "")
+    def handle(self):
+        user = auth.get_pending_2fa_user(self.request)
+        if not user:
+            raise ValidationError({
+                "detail": ErrorDetail(_("User not found, please go to login page."))
+            })
 
-        create_session(
-            user_id=user.id,
-            session_key=session.session_key,
-            user_agent=user_agent,
-            ip_address=ip_address,
-            is_ip_routable=is_ip_routable,
-            last_activity=last_activity,
-            ip_country_iso=ip_country_iso,
-            country_iso=country_iso,
-            region=region,
-            region_code=region_code,
-            latitude=latitude,
-            longitude=longitude,
-            timezone=timezone,
-            asn=asn,
-            asn_code=asn_code,
-        )
+        SmsOtpAuth(user=user, request=self.request).send_otp()
+
+
+class AfterLogin(object):
+    def __init__(self, request, user):
+        self.user = user
+        self.request  = request
+    
+    def handle(self):
+        Session(request=self.request).create_session(user=self.user)
+        SendLoginAlert(user=self.user, session=self.request.session).send()
+

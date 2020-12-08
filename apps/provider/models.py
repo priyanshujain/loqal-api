@@ -5,12 +5,12 @@ from django.utils.timezone import now
 
 from apps.account.models import Account
 from apps.provider.options import PaymentAccountStatus
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from db.postgres.fields import JSONField
 from utils.shortcuts import upload_to
 
 
-class PaymentProvider(AbstractBase):
+class PaymentProvider(AbstractBaseModel):
     provider_slug = models.CharField(max_length=255, unique=True)
     display_name = models.CharField(max_length=255)
     website = models.URLField(max_length=255, unique=True)
@@ -22,7 +22,7 @@ class PaymentProvider(AbstractBase):
         db_table = "payment_provider"
 
 
-class PaymentProviderCred(AbstractBase):
+class PaymentProviderCred(AbstractBaseModel):
     provider = models.ForeignKey(PaymentProvider, on_delete=models.CASCADE)
     api_environment = models.CharField(max_length=255)
     api_password = models.CharField(max_length=255, blank=True)
@@ -37,7 +37,7 @@ class PaymentProviderCred(AbstractBase):
         )
 
 
-class PaymentProviderAuth(AbstractBase):
+class PaymentProviderAuth(AbstractBaseModel):
     provider = models.OneToOneField(PaymentProvider, on_delete=models.CASCADE)
     auth_token = models.CharField(max_length=1024)
     expires_at = models.DateTimeField()
@@ -56,7 +56,7 @@ class PaymentProviderAuth(AbstractBase):
         return self.expires_at < now()
 
 
-class TermsDocument(AbstractBase):
+class TermsDocument(AbstractBaseModel):
     provider = models.ForeignKey(
         PaymentProvider, on_delete=models.CASCADE, editable=False
     )

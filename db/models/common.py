@@ -1,12 +1,11 @@
 from django.db import models
 
 from db.postgres.fields import JSONField
-from utils.shortcuts import upload_to
 
-from .base import Base
+from .base import BaseModel
 
 
-class BankAccountBase(models.Model):
+class BankAccountBaseModel(BaseModel):
     bank_account_country = models.CharField(max_length=50)
     currency = models.CharField(max_length=50)
     account_type = models.CharField(max_length=50, blank=True)
@@ -29,13 +28,13 @@ class BankAccountBase(models.Model):
         abstract = True
 
 
-class IndividualBase(models.Model):
+class IndividualBaseModel(BaseModel):
     first_name = models.CharField(max_length=512, blank=True)
     last_name = models.CharField(max_length=512, blank=True)
     middle_name = models.CharField(max_length=512, blank=True)
     dob = models.DateField(null=True)
     email = models.EmailField(blank=True, null=True)
-    contact_number = models.CharField(max_length=20, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
     id_type = models.CharField(max_length=128, blank=True)
     id_number = models.CharField(max_length=128, blank=True)
     id_expiration = models.DateField(null=True)
