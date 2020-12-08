@@ -28,6 +28,7 @@ class CreateConsumerAccount(ServiceBase):
         consumer_account = self._factory_account(user=user)
         self._send_verfication_email(user=user)
         self._create_dwolla_account(consumer_account=consumer_account)
+        return consumer_account
 
     def _validate_data(self):
         data = run_validator(
