@@ -6,7 +6,7 @@ from apps.user.models import User, UserPasswordReset, UserSession
 from utils.shortcuts import rand_str
 
 __all__ = (
-    "create_user_profile",
+    "create_user",
     "update_user_profile",
     "get_user_by_email",
     "create_session",
@@ -20,13 +20,8 @@ __all__ = (
 )
 
 
-def create_user_profile(
-    first_name,
-    last_name,
-    email,
-    contact_number,
-    password,
-    email_verified=False,
+def create_user(
+    first_name, last_name, email, password, email_verified=False,
 ):
     user = User.objects.create(
         username=email,
@@ -34,14 +29,15 @@ def create_user_profile(
         email_verified=email_verified,
         first_name=first_name,
         last_name=last_name,
-        contact_number=contact_number,
     )
     user.set_password(password)
-    user.request_email_verification()
+    user.gen_email_verification_token()
     return user
 
 
-def update_user_profile(user_profile, first_name, last_name, contact_number, position):
+def update_user_profile(
+    user_profile, first_name, last_name, contact_number, position
+):
     """
     User user profile dbapi
     """
@@ -124,9 +120,7 @@ def gen_reset_password_token(user_id):
     token = rand_str()
     token_expire_time = now() + timedelta(hours=24)
     return UserPasswordReset.objects.create(
-        user_id=user_id,
-        token=token,
-        token_expire_time=token_expire_time,
+        user_id=user_id, token=token, token_expire_time=token_expire_time,
     )
 
 

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
+from django.db.models.query_utils import select_related_descend
 from django.utils.timezone import now
 
 from apps.user.options import UserType
@@ -11,6 +12,9 @@ from utils.shortcuts import rand_str
 
 class UserManager(models.Manager):
     use_in_migrations = True
+
+    def get_by_natural_key(self, username):
+        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": username})
 
     def find_by_username(self, username):
         queryset = self.get_queryset()
@@ -32,19 +36,20 @@ class UserManager(models.Manager):
 class User(Base, AbstractBaseUser):
     username = models.CharField(max_length=254, unique=True)
     email = models.EmailField()
-    first_name = models.CharField(max_length=155, blank=True)
-    last_name = models.CharField(max_length=155, blank=True)
-    secondary_email = models.EmailField(max_length=255, blank=True)
-    contact_number = models.CharField(max_length=255, blank=True)
     email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(
         max_length=254, default=rand_str
     )
     email_verification_token_expire_time = models.DateTimeField(null=True)
+
+    first_name = models.CharField(max_length=155, blank=True)
+    last_name = models.CharField(max_length=155, blank=True)
+    secondary_email = models.EmailField(max_length=255, blank=True)
+    contact_number = models.CharField(max_length=255, blank=True)
+    contact_number_verified = models.BooleanField(default=False)
+
     # One of UserType
-    user_type = models.CharField(
-        max_length=254, default=UserType.REGULAR_USER
-    )
+    user_type = models.CharField(max_length=254, default=UserType.REGULAR_USER)
     # SSO auth token
     auth_token = models.CharField(max_length=254, null=True)
     # Two facotor auth
@@ -72,14 +77,26 @@ class User(Base, AbstractBaseUser):
             UserType.ADMIN_STAFF,
         ]
 
+    def set_user_type(self, user_type):
+        self.user_type = user_type
+        self.save()
+
     def verify_email(self):
         self.email_verified = True
         self.email_verification_token_expire_time = now()
         self.save()
 
-    def request_email_verification(self):
+    def gen_email_verification_token(self):
         self.email_verification_token = rand_str()
         self.email_verification_token_expire_time = now() + timedelta(days=7)
+        self.save()
+
+    def add_contact_number(self, contact_number):
+        self.contact_number = contact_number
+        self.save()
+
+    def verify_contact_number(self):
+        self.contact_number_verified = True
         self.save()
 
     def set_tfa_token(self, token):

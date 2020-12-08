@@ -108,3 +108,7 @@ def generate_encryption_key():
     """
     key = Fernet.generate_key()
     return base64.b64encode(key).decode("utf-8")
+
+
+def generate_uuid_hex():
+    return uuid.uuid4().hex

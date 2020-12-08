@@ -37,17 +37,6 @@ class Login(ServiceBase):
                     }
                 )
 
-            if not user.userprofile.is_activated:
-                raise ValidationError(
-                    {
-                        "detail": ErrorDetail(
-                            _(
-                                "Your account has been disabled by Account Admin."
-                            )
-                        )
-                    }
-                )
-
             if not user.two_factor_auth:
                 return self._auth_login(user)
 

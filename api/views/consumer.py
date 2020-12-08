@@ -1,4 +1,5 @@
-from api.exceptions import APIException, NotAuthenticated, PermissionDenied
+from api.exceptions import NotAuthenticated
+from apps.account.dbapi import get_consumer_account
 
 from .base import APIAccessLogView
 
@@ -15,10 +16,16 @@ class UserAPIView(APIAccessLogView):
         exception_message = ""
         exception_class = NotAuthenticated
         user = request.user
-        
+
         if not user.is_authenticated:
             exception_message = "User not authenticated"
-            exception_class = NotAuthenticated        
+
+        consumer_account = get_consumer_account(user_id=user.id)
+        if not consumer_account:
+            exception_message = "User is not valid"
+        else:
+            request.account = consumer_account.account
+            request.consumer_account = consumer_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
         if exception_message:

@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ["*"]
 
 
 # vendor API env
-API_ENV = APIEnvironmentTypes.DEMO
+API_ENV = APIEnvironmentTypes.SANDBOX
 from .base import *  # isort:skip
 
 APP_NAME = "Spotlight Development"

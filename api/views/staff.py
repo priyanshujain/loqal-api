@@ -14,12 +14,13 @@ class StaffAPIView(APIAccessLogView):
         """
         exception_message = ""
         exception_class = APIException
-        
+
         user = request.user
+        print(user)
         if not user.is_authenticated:
             exception_message = "User not authenticated"
             exception_class = NotAuthenticated
-        elif not user.is_admin_role():
+        elif not user.is_staff():
             exception_message = "You do not have permission to this API"
             exception_class = PermissionDenied
 
