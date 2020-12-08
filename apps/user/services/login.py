@@ -52,7 +52,7 @@ class SmsOtpAuth(object):
         interface = self._validate_interface()
         error = False
         # If dev environment validate otp by 222222
-        if settings.APP_ENV == "developement":
+        if settings.APP_ENV == "development":
             if otp == "222222":
                 self.perform_login(interface=interface)
                 return
