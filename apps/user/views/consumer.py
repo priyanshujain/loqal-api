@@ -116,8 +116,12 @@ class SmsOtpAuthAPI(APIView):
     """
 
     def post(self, request):
-        user = auth.get_pending_2fa_user(request)
+        if request.user.is_authenticated:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("You are already logged in."))}
+            )
 
+        user = auth.get_pending_2fa_user(request)
         if not user:
             raise ValidationError(
                 {
@@ -141,10 +145,9 @@ class ResendSmsOtpAuthAPI(APIView):
     """
 
     def post(self, request):
-        user = request.user
-        if user.is_authenticated:
+        if request.user.is_authenticated:
             raise ValidationError({
-                "detail": ErrorDetail(_("User is already authenticated."))
+                "detail": ErrorDetail(_("You are already logged in."))
             })
         self._run_services()
         return self.response()
