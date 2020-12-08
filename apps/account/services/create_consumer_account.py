@@ -1,7 +1,6 @@
 from datetime import date
 from io import SEEK_CUR
 
-from django.db.models.fields import CommaSeparatedIntegerField
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError

@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from api.views import APIView, UserAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import AddZipCode, CreateConsumerAccount
+from utils.auth import login
 
 __all__ = (
     "ConsumerSignupAPI",
@@ -29,7 +30,10 @@ class ConsumerSignupAPI(APIView):
         service = CreateConsumerAccount(
             data=self.request_data, ip_address=ip_address
         )
-        service.execute()
+        consumer_account = service.execute()
+        user = consumer_account.user
+        login(request=self.request ,user=user)
+
 
 
 class AddAccountZipCodeAPI(UserAPIView):
