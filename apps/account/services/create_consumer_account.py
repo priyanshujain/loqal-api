@@ -1,5 +1,4 @@
 from datetime import date
-from io import SEEK_CUR
 
 from django.utils.translation import gettext as _
 
@@ -11,7 +10,6 @@ from apps.account.notifications import SendVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
-from apps.provider.lib.api import account
 from apps.user.dbapi import create_user, get_user_by_email
 
 __all__ = ("CreateConsumerAccount",)

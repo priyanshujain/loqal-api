@@ -1,10 +1,10 @@
 from api.exceptions import NotAuthenticated, PermissionDenied
-from apps.account.dbapi import get_consumer_account
+from apps.account.dbapi import get_merchant_account
 
 from .base import APIAccessLogView
 
 
-class ConsumerAPIView(APIAccessLogView):
+class MerchantAPIView(APIAccessLogView):
     """
     ConsumerAPIView
     """
@@ -20,16 +20,13 @@ class ConsumerAPIView(APIAccessLogView):
         if not user.is_authenticated:
             exception_message = "User is not authenticated."
 
-        if not user.phone_number_verified:
-            exception_message = "User phone number is not verified."
-            exception_class = PermissionDenied
 
-        consumer_account = get_consumer_account(user_id=user.id)
-        if not consumer_account:
+        merchant_account = get_merchant_account(user_id=user.id)
+        if not merchant_account:
             exception_message = "User is not valid"
         else:
-            request.account = consumer_account.account
-            request.consumer_account = consumer_account
+            request.account = merchant_account.account
+            request.merchant_account = merchant_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
         if exception_message:

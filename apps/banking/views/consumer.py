@@ -1,10 +1,10 @@
-from api.views import UserAPIView
+from api.views import ConsumerAPIView
 from apps.banking.response import BankAccountResponse
 from apps.banking.services import CreateBankAccount, PlaidLink
 from apps.banking.dbapi import get_bank_account
 
 
-class CreateBankAccountAPI(UserAPIView):
+class CreateBankAccountAPI(ConsumerAPIView):
     def post(self, request):
         account = request.account
         bank_account = self._run_services(account_id=account.id)
@@ -19,7 +19,7 @@ class CreateBankAccountAPI(UserAPIView):
         return service.execute()
 
 
-class GetBankAccountAPI(UserAPIView):
+class GetBankAccountAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
         bank_account = get_bank_account(account_id=account.id)
@@ -28,7 +28,7 @@ class GetBankAccountAPI(UserAPIView):
         )
 
 
-class PlaidLinkTokenAPI(UserAPIView):
+class PlaidLinkTokenAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
         token = PlaidLink(account_uid=account.u_id).token

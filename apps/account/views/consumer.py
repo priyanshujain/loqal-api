@@ -3,7 +3,7 @@ from api.exceptions import ValidationError, ErrorDetail
 
 from django.utils.translation import gettext as _
 
-from api.views import APIView, UserAPIView
+from api.views import APIView, ConsumerAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import AddZipCode, CreateConsumerAccount
 from utils.auth import login
@@ -36,7 +36,7 @@ class ConsumerSignupAPI(APIView):
 
 
 
-class AddAccountZipCodeAPI(UserAPIView):
+class AddAccountZipCodeAPI(ConsumerAPIView):
     def post(self, request):
         account = request.account
         self._run_services(account=account)
@@ -48,7 +48,7 @@ class AddAccountZipCodeAPI(UserAPIView):
         service.execute()
 
 
-class ConsumerAccountProfileAPI(UserAPIView):
+class ConsumerAccountProfileAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
         return self.response(ConsumerAccountProfileResponse(account).data)

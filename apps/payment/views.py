@@ -1,9 +1,9 @@
-from api.views import UserAPIView
+from api.views import ConsumerAPIView
 from apps.payment.responses import TransactionResponse
 from apps.payment.services import CreatePayment
 
 
-class CreatePaymentAPI(UserAPIView):
+class CreatePaymentAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
         service_response = self._run_services(account_id=account_id)

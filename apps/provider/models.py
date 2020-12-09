@@ -6,7 +6,6 @@ from django.utils.timezone import now
 from apps.account.models import Account
 from apps.provider.options import PaymentAccountStatus
 from db.models.abstract import AbstractBaseModel
-from db.postgres.fields import JSONField
 from utils.shortcuts import upload_to
 
 
@@ -61,7 +60,7 @@ class TermsDocument(AbstractBaseModel):
         PaymentProvider, on_delete=models.CASCADE, editable=False
     )
     document_type = models.CharField(max_length=255, editable=False)
-    document_file = JSONField()
+    document_file = models.JSONField()
     is_active = models.BooleanField(default=True)
     country = models.CharField(max_length=2, editable=False)
 
