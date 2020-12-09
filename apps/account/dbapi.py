@@ -38,3 +38,4 @@ def get_merchant_account(account_id):
         return MerchantAccount.objects.get(account_id=account_id)
     except MerchantAccount.DoesNotExist:
         return None
+

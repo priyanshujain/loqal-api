@@ -4,7 +4,6 @@ creation related calls to the dwolla API.
 """
 
 from integrations.dwolla.http import Http
-from integrations.internal import requests
 
 __all__ = "Banking"
 

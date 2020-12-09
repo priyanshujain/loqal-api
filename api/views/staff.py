@@ -16,7 +16,6 @@ class StaffAPIView(APIAccessLogView):
         exception_class = APIException
 
         user = request.user
-        print(user)
         if not user.is_authenticated:
             exception_message = "User not authenticated"
             exception_class = NotAuthenticated

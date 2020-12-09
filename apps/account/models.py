@@ -1,8 +1,11 @@
 from django.db import models
-
+from django.utils.translation import gettext as _
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
+from db.models.fields import ChoiceEnumField
+from apps.account.options import MerchantAccountStatus
+
 
 __all__ = (
     "Account",
@@ -52,13 +55,12 @@ class ConsumerAccount(AbstractBaseModel):
 class MerchantAccount(AbstractBaseModel):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=256)
-    website = models.URLField(
-        max_length=255,
-        null=True,
-        blank=True,
-    )
     company_email = models.CharField(max_length=255)
-    business_contact_number = models.CharField(max_length=20)
+    account_status = ChoiceEnumField(
+        enum_type=MerchantAccountStatus,
+        default=MerchantAccountStatus.PENDING,
+        help_text=_("Status for the merchant account with dwolla."),
+    )
 
     class Meta:
         db_table = "account_settings"

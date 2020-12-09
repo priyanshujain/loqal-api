@@ -6,3 +6,4 @@ from .account import Account
 from .auth import Auth
 from .banking import Banking
 from .payment import Payment
+from .reference import Reference

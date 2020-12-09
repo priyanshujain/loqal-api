@@ -1,3 +1,3 @@
 from django.contrib.postgres.fields import CIEmailField  # NOQA
 # FIX: update to models import
-from django.db.models import JSONField
+from django.contrib.postgres.fields import ArrayField

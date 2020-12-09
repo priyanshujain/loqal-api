@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 
 import six
-from django.db.models import CharField, TextField
+from django.db.models import CharField, TextField, JSONField
 from picklefield.fields import (PickledObject, PickledObjectField,
                                 _ObjectWrapper, dbsafe_decode)
 
 from db.models.utils import Creator
-from db.postgres.fields import JSONField
 from utils.encryption import decrypt, encrypt
 
 __all__ = (
