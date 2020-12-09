@@ -27,6 +27,7 @@ class PlaidLink(object):
                     )
                 }
             )
+        return link_token
 
     @property
     def token(self):

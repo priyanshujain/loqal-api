@@ -23,15 +23,17 @@ class GetBankAccountAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
         bank_account = get_bank_account(account_id=account.id)
-        return self.response(
-            BankAccountResponse(bank_account).data, status=201
-        )
+        if bank_account:
+            return self.response(
+                BankAccountResponse(bank_account).data
+            )
+        return self.response()
 
 
 class PlaidLinkTokenAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
-        token = PlaidLink(account_uid=account.u_id).token
+        token = PlaidLink(account_uid=account.u_id.hex).token
         return self.response({
             "token": token    
         })

@@ -24,7 +24,6 @@ class PlaidPlugin(object):
         self._client = Client(
             client_id=settings.PLAID_CLIENT_ID,
             secret=settings.PLAID_SECRET,
-            public_key=settings.PLAID_PUBLIC_KEY,
             environment=settings.PLAID_ENV,
         )
 
@@ -46,7 +45,10 @@ class PlaidPlugin(object):
         try:
             self._link_token = self._client.LinkToken.create(
                 {
-                    "client_user_id": user_account_id,
+                    "user": {
+                        "client_user_id": user_account_id,
+                    },
+                    "products": ["auth"],
                     "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
                     "country_codes": ["US"],
                     "language": "en",
