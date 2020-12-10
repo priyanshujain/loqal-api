@@ -17,8 +17,8 @@ __all__ = (
 
 
 class UpdateMemberRole(ServiceBase):
-    def __init__(self, account_id, data):
-        self.account_id = account_id
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
         self.data = data
 
     def _validate_data(self):
@@ -29,7 +29,7 @@ class UpdateMemberRole(ServiceBase):
         role_id = data["role_id"]
         member_id = data["member_id"]
         role = get_feature_access_role_by_id(
-            role_id=role_id, account_id=self.account_id
+            role_id=role_id, merchant_id=self.merchant_id
         )
         if not role:
             raise ValidationError(
@@ -37,7 +37,7 @@ class UpdateMemberRole(ServiceBase):
             )
 
         account_member = get_account_member_by_id(
-            member_id=member_id, account_id=self.account_id
+            member_id=member_id, merchant_id=self.merchant_id
         )
         if not account_member:
             raise ValidationError(
@@ -47,7 +47,7 @@ class UpdateMemberRole(ServiceBase):
         self.role = role
         self.account_member = account_member
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
 
         account_member = self.account_member
@@ -56,8 +56,8 @@ class UpdateMemberRole(ServiceBase):
 
 
 class MemberActivationBase(ServiceBase):
-    def __init__(self, account_id, data):
-        self.account_id = account_id
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
         self.data = data
 
     def _validate_data(self):
@@ -65,7 +65,7 @@ class MemberActivationBase(ServiceBase):
 
         member_id = data["member_id"]
         member = get_account_member_by_id(
-            member_id=member_id, account_id=self.account_id
+            member_id=member_id, merchant_id=self.merchant_id
         )
         if not member:
             raise ValidationError(
@@ -73,18 +73,18 @@ class MemberActivationBase(ServiceBase):
             )
         self.member = member
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         self.member.disable_member()
 
 
 class DisableMember(MemberActivationBase):
-    def execute(self):
+    def handle(self):
         self._validate_data()
         self.member.disable_member()
 
 
 class EnableMember(MemberActivationBase):
-    def execute(self):
+    def handle(self):
         self._validate_data()
         self.member.enable_member()

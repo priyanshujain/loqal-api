@@ -19,8 +19,8 @@ def create_merchant_account(company_name, company_email):
         return None
 
 
-def get_merchant_account(account_id):
+def get_merchant_account(merchant_id):
     try:
-        return MerchantAccount.objects.get(account_id=account_id)
+        return MerchantAccount.objects.get(id=merchant_id)
     except MerchantAccount.DoesNotExist:
         return None

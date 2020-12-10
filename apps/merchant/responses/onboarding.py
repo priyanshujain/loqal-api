@@ -27,10 +27,11 @@ class BeneficialOwnerResponse(serializers.ModelSerializer):
 
 
 class OnboardingDataResponse(serializers.ModelSerializer):
+    account_status = serializers.CharField(source="account_status.label", read_only=True)
     incorporation_details = IncorporationDetailsResponse(
         source="incorporationdetails", read_only=True
     )
-    account_usage = ControllerDetailsResponse(
+    controller_details = ControllerDetailsResponse(
         source="controllerdetails", read_only=True
     )
     beneficial_owners = BeneficialOwnerResponse(

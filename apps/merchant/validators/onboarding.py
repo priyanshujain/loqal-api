@@ -7,7 +7,6 @@ from apps.merchant.options import BusinessTypes
 __all__ = (
     "IncorporationDetailsValidator",
     "ControllerValidator",
-    'UpdateControllerValidator',
     'BeneficialOwnerValidator',
     'UpdateBeneficialOwnerValidator',
     'RemoveBeneficialOwnerValidator',    
@@ -32,10 +31,6 @@ class ControllerValidator(serializers.ModelSerializer):
         exclude = (
             "merchant",
         )
-
-
-class UpdateControllerValidator(ControllerValidator):
-    id = serializers.IntegerField()
 
 
 class BeneficialOwnerValidator(serializers.ModelSerializer):

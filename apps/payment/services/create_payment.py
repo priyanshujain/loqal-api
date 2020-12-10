@@ -46,7 +46,7 @@ class CreatePayment(ServiceBase):
         data = run_validator(CreatePaymentValidator, self.data)
         merchant_id = data["merchant_id"]
 
-        merchant_account = get_merchant_account(account_id=merchant_id)
+        merchant_account = get_merchant_account(merchant_id=merchant_id)
         if not merchant_account:
             raise ValidationError(
                 {

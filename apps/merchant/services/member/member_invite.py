@@ -21,8 +21,8 @@ __all__ = (
 
 
 class CreateMemberInvite(ServiceBase):
-    def __init__(self, account_id, data):
-        self.account_id = account_id
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
         self.data = data
 
     def _validate_data(self):
@@ -47,18 +47,18 @@ class CreateMemberInvite(ServiceBase):
             )
 
         role = get_feature_access_role_by_id(
-            role_id=role_id, account_id=self.account_id
+            role_id=role_id, merchant_id=self.merchant_id
         )
         if not role:
             raise ValidationError(
                 {"role_id": [ErrorDetail(_("Invalid role_id."))]}
             )
-        if role.account.id != self.account_id:
+        if role.account.id != self.merchant_id:
             raise ValidationError(
                 {"role_id": [ErrorDetail(_("Invalid role_id."))]}
             )
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         data = self.data
         first_name = data["first_name"]
@@ -67,7 +67,7 @@ class CreateMemberInvite(ServiceBase):
         position = data["position"]
         role_id = data["role_id"]
         invite = create_member_invite(
-            account_id=self.account_id,
+            merchant_id=self.merchant_id,
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -79,8 +79,8 @@ class CreateMemberInvite(ServiceBase):
 
 
 class MemberSignupInviteEmailResend(ServiceBase):
-    def __init__(self, account_id, data):
-        self.account_id = account_id
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
         self.data = data
 
     def _validate_data(self):
@@ -91,7 +91,7 @@ class MemberSignupInviteEmailResend(ServiceBase):
                 {"invite_id": [ErrorDetail(_("This field is required."))]}
             )
         invite = get_member_invite_by_id(
-            invite_id=invite_id, account_id=self.account_id
+            invite_id=invite_id, merchant_id=self.merchant_id
         )
         if not invite:
             raise ValidationError(
@@ -104,15 +104,15 @@ class MemberSignupInviteEmailResend(ServiceBase):
 
         self.invite = invite
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         invite = self.invite
         MemberSignupInviteEmail(invite=invite).send()
 
 
 class UpdateMemberInvite(ServiceBase):
-    def __init__(self, account_id, data):
-        self.account_id = account_id
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
         self.data = data
 
     def _validate_data(self):
@@ -123,7 +123,7 @@ class UpdateMemberInvite(ServiceBase):
         role_id = data["role_id"]
 
         invite = get_member_invite_by_id(
-            invite_id=invite_id, account_id=self.account_id
+            invite_id=invite_id, merchant_id=self.merchant_id
         )
         if not invite:
             raise ValidationError(
@@ -135,7 +135,7 @@ class UpdateMemberInvite(ServiceBase):
             )
 
         role = get_feature_access_role_by_id(
-            role_id=role_id, account_id=self.account_id
+            role_id=role_id, merchant_id=self.merchant_id
         )
         if not role:
             raise ValidationError(
@@ -144,7 +144,7 @@ class UpdateMemberInvite(ServiceBase):
         self.invite = invite
         self.role = role
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         data = self.data
         invite = self.invite

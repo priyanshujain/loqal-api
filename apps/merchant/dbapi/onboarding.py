@@ -27,10 +27,7 @@ def get_incorporation_details(merchant_id):
         return None
 
 
-def create_incorporation_details(
-    merchant_id,
-    **kwargs
-):
+def create_incorporation_details(merchant_id, **kwargs):
     try:
         return IncorporationDetails.objects.create(
             merchant_id=merchant_id,
@@ -53,10 +50,7 @@ def get_incorporation_details(merchant_id):
         return None
 
 
-def create_incorporation_details(
-    merchant_id,
-    **kwargs
-):
+def create_incorporation_details(merchant_id, **kwargs):
     try:
         return IncorporationDetails.objects.create(
             merchant_id=merchant_id,
@@ -79,10 +73,7 @@ def get_controller_details(merchant_id):
         return None
 
 
-def create_controller_details(
-    merchant_id,
-    **kwargs
-):
+def create_controller_details(merchant_id, **kwargs):
     try:
         return ControllerDetails.objects.create(
             merchant_id=merchant_id,
@@ -92,23 +83,20 @@ def create_controller_details(
         return None
 
 
-def update_controller_details(merchant_id, controller_id, **kwargs):
-    return ControllerDetails.objects.filter(id=controller_id, merchant_id=merchant_id).update(
-        **kwargs
-    )
+def update_controller_details(merchant_id, **kwargs):
+    return ControllerDetails.objects.filter(merchant_id=merchant_id).update(**kwargs)
 
 
 def get_beneficial_owner(merchant_id, beneficial_owner_id):
     try:
-        return BeneficialOwner.objects.get(merchant_id=merchant_id, id=beneficial_owner_id)
+        return BeneficialOwner.objects.get(
+            merchant_id=merchant_id, id=beneficial_owner_id
+        )
     except BeneficialOwner.DoesNotExist:
         return None
 
 
-def create_beneficial_owner(
-    merchant_id,
-    **kwargs
-):
+def create_beneficial_owner(merchant_id, **kwargs):
     try:
         return BeneficialOwner.objects.create(
             merchant_id=merchant_id,
@@ -119,13 +107,15 @@ def create_beneficial_owner(
 
 
 def update_beneficial_owner(merchant_id, beneficial_owner_id, **kwargs):
-    return ControllerDetails.objects.filter(id=beneficial_owner_id, merchant_id=merchant_id).update(
-        **kwargs
-    )
+    return ControllerDetails.objects.filter(
+        id=beneficial_owner_id, merchant_id=merchant_id
+    ).update(**kwargs)
 
 
 def delete_beneficial_owner(merchant_id, beneficial_owner_id):
-    beneficial_owner = get_beneficial_owner(merchant_id=merchant_id, id=beneficial_owner_id)
+    beneficial_owner = get_beneficial_owner(
+        merchant_id=merchant_id, beneficial_owner_id=beneficial_owner_id
+    )
     if beneficial_owner:
         return beneficial_owner.delete()
     else:

@@ -78,7 +78,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         required=False,
         default={},
     )
-    direct_debit_accounts = serializers.ListField(
+    banking = serializers.ListField(
         child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
         allow_empty=True,
         required=False,

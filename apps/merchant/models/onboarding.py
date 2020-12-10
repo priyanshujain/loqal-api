@@ -51,7 +51,7 @@ class IndividualBase(AbstractBaseModel):
     dob = models.DateField()
     address = models.JSONField()
     passport_country = models.CharField(max_length=2, blank=True)
-    passport_number = models.CharField(max_length=32)
+    passport_number = models.CharField(max_length=32, blank=True)
     verification_document_type = models.CharField(max_length=32, blank=True)
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True

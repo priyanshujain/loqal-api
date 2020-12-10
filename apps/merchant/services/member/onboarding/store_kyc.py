@@ -20,7 +20,6 @@ from apps.merchant.dbapi import (
 from apps.merchant.validators import (
     IncorporationDetailsValidator,
     ControllerValidator,
-    UpdateControllerValidator,
     BeneficialOwnerValidator,
     UpdateBeneficialOwnerValidator,
     RemoveBeneficialOwnerValidator,
@@ -140,7 +139,7 @@ class UpdateControllerDetails(CreateControllerDetails):
 
     def handle(self):
         assert self._validate_data()
-        self._update_incorporation_details()
+        self._update_controller_details()
 
     def _validate_data(self):
         controller_details = get_controller_details(merchant_id=self.merchant_id)
@@ -148,14 +147,12 @@ class UpdateControllerDetails(CreateControllerDetails):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Controller details did not found."))}
             )
-        self.controller_details = controller_details
 
-        self.data = run_validator(UpdateControllerValidator, self.data)
+        self.data = run_validator(ControllerValidator, self.data)
         return True
 
     def _update_controller_details(self):
         update_controller_details(
-            controller_id=self.controller_details.id,
             merchant_id=self.merchant_id,
             **self.data
         )
@@ -196,7 +193,7 @@ class UpdateBeneficialOwner(CreateBeneficialOwner):
 
     def handle(self):
         assert self._validate_data(validator=UpdateBeneficialOwnerValidator)
-        self._update_incorporation_details()
+        self._update_benficial_owner()
 
     def _validate_data(self, validator):
         data = run_validator(validator=validator, data=self.data)

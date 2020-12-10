@@ -33,19 +33,19 @@ class CreateMerchantAccount(ServiceBase):
         self._contact_number = phone_number
         self._password = password
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
-        account = self._factory_account()
-        user_profile = self._factory_user_profile()
-        self._factory_default_roles(account_id=account.id)
+        merchant_account = self._factory_merchant_account()
+        user = self._factory_user()
+        self._factory_default_roles(merchant_id=merchant_account.id)
 
-        admin_role = get_super_admin_role(account_id=account.id)
+        admin_role = get_super_admin_role(merchant_id=merchant_account.id)
         create_account_member_on_reg(
-            profile_id=user_profile.id,
-            account_id=account.id,
+            user_id=user.id,
+            merchant_id=merchant_account.id,
             member_role_id=admin_role.id,
         )
-        self._send_verfication_email(user=user_profile.user)
+        self._send_verfication_email(user=user)
 
     def _validate_data(self):
         user = get_user_by_email(email=self._email)
@@ -54,12 +54,12 @@ class CreateMerchantAccount(ServiceBase):
                 {"email": [ErrorDetail(_("User email already exists."))]}
             )
 
-    def _factory_account(self):
+    def _factory_merchant_account(self):
         return create_merchant_account(
             company_name=self._company_name, company_email=self._email
         )
 
-    def _factory_user_profile(self):
+    def _factory_user(self):
         return create_user(
             first_name=self._first_name,
             last_name=self._last_name,
@@ -68,9 +68,9 @@ class CreateMerchantAccount(ServiceBase):
             password=self._password,
         )
 
-    def _factory_default_roles(self, account_id):
-        service = CreateDefaultRoles(account_id=account_id)
-        service.execute()
+    def _factory_default_roles(self, merchant_id):
+        service = CreateDefaultRoles(merchant_id=merchant_id)
+        service.handle()
 
 
     def _send_verfication_email(self, user):

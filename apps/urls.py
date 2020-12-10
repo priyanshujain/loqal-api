@@ -10,7 +10,7 @@ from apps.views import WelcomeAPI, error404
 
 urlpatterns = [
     path("api/user/", include("apps.user.urls.consumer")),
-    path("api/account/", include("apps.account.urls.consumer")),
+    path("api/account/", include("apps.account.urls")),
     path("api/banking/", include("apps.banking.urls.consumer")),
     path("api/box/", include("apps.box.urls.consumer")),
     path("api/merchant/", include("apps.merchant.urls")),

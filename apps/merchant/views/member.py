@@ -41,7 +41,7 @@ class CreateMemberInviteAPI(MerchantAPIView):
 
     def _run_services(self, merchant_id):
         service = CreateMemberInvite(merchant_id=merchant_id, data=self.request_data)
-        return service.execute()
+        return service.handle()
 
 
 class GetMemberInvitesAPI(MerchantAPIView):
@@ -88,7 +88,7 @@ class ResendMemberInviteEmailAPI(MerchantAPIView):
     def _run_services(self, merchant_id):
         MemberSignupInviteEmailResend(
             merchant_id=merchant_id, data=self.request_data
-        ).execute()
+        ).handle()
 
 
 class UpdateMemberInviteAPI(MerchantAPIView):
@@ -104,7 +104,7 @@ class UpdateMemberInviteAPI(MerchantAPIView):
     def _run_services(self, merchant_id):
         return UpdateMemberInvite(
             merchant_id=merchant_id, data=self.request_data
-        ).execute()
+        ).handle()
 
 
 class MemberSignupAPI(APIView):
@@ -117,7 +117,7 @@ class MemberSignupAPI(APIView):
         return self.response(status=201)
 
     def _run_services(self):
-        MemberSignup(data=self.request_data).execute()
+        MemberSignup(data=self.request_data).handle()
 
 
 class UpdateMemberRoleAPI(MerchantAPIView):
@@ -127,7 +127,7 @@ class UpdateMemberRoleAPI(MerchantAPIView):
         return self.response(status=204)
 
     def _run_services(self, merchant_id):
-        UpdateMemberRole(merchant_id=merchant_id, data=self.request_data).execute()
+        UpdateMemberRole(merchant_id=merchant_id, data=self.request_data).handle()
 
 
 class ListMembersAPI(MerchantAPIView):
@@ -144,7 +144,7 @@ class DisableMemberAPI(MerchantAPIView):
         return self.response()
 
     def _run_services(self, merchant_id):
-        DisableMember(merchant_id=merchant_id, data=self.request_data).execute()
+        DisableMember(merchant_id=merchant_id, data=self.request_data).handle()
 
 
 class EnableMemberAPI(MerchantAPIView):
@@ -154,7 +154,7 @@ class EnableMemberAPI(MerchantAPIView):
         return self.response()
 
     def _run_services(self, merchant_id):
-        EnableMember(merchant_id=merchant_id, data=self.request_data).execute()
+        EnableMember(merchant_id=merchant_id, data=self.request_data).handle()
 
 
 class ListFeatureAccessRolesAPI(MerchantAPIView):
@@ -182,7 +182,7 @@ class CreateFeatureAccessRoleAPI(MerchantAPIView):
     def _run_services(self, merchant_id):
         return CreateFeatureAccessRole(
             merchant_id=merchant_id, data=self.request_data
-        ).execute()
+        ).handle()
 
 
 class UpdateFeatureAccessRoleAPI(MerchantAPIView):
@@ -194,7 +194,7 @@ class UpdateFeatureAccessRoleAPI(MerchantAPIView):
     def _run_services(self, merchant_id):
         UpdateFeatureAccessRole(
             merchant_id=merchant_id, data=self.request_data
-        ).execute()
+        ).handle()
 
 
 class MemberFeatureAcessAPI(MerchantAPIView):
@@ -215,4 +215,4 @@ class DeleteFeatureAccessRoleAPI(MerchantAPIView):
     def _run_services(self, merchant_id):
         DeleteFeatureAccessRole(
             merchant_id=merchant_id, data=self.request_data
-        ).execute()
+        ).handle()

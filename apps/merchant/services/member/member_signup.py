@@ -27,7 +27,7 @@ class MemberSignup(ServiceBase):
         self.invite = invite
         self.data = data
 
-    def execute(self):
+    def handle(self):
         self.validate_data()
 
         invite = self.invite
