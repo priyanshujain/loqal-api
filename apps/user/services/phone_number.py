@@ -23,7 +23,7 @@ class AddPhoneNumber(ServiceBase):
         self.data = data
         self.user = request.user
 
-    def execute(self):
+    def handle(self):
         data = self.data
         data = self._validate_data(data=data)
 
@@ -51,7 +51,7 @@ class VerifyPhoneNumber(ServiceBase):
         self.request = request
         self.data = data
 
-    def execute(self):
+    def handle(self):
         data = self._validate_data(data=self.data)
         otp = data["otp"]
 

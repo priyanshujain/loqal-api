@@ -30,7 +30,7 @@ class ConsumerSignupAPI(APIView):
         service = CreateConsumerAccount(
             data=self.request_data, ip_address=ip_address
         )
-        consumer_account = service.execute()
+        consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request ,user=user)
 
@@ -45,7 +45,7 @@ class AddAccountZipCodeAPI(ConsumerAPIView):
     def _run_services(self, account):
         data = self.request_data
         service = AddZipCode(data=self.request_data, account=account)
-        service.execute()
+        service.handle()
 
 
 class ConsumerAccountProfileAPI(ConsumerAPIView):

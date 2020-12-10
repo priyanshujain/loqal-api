@@ -1,141 +1,144 @@
-from api.views import UserAPIView
+from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
-from apps.onboarding.responses import (OnboardingDataResponse,
-                                       OnboardingRecordReponse)
-from apps.onboarding.services import (CreateAuthorizedSignatory,
-                                      CreateCompanyOfficer,
-                                      CreateIncorporationDetails,
-                                      CreatePaymentAccountUsage,
-                                      RemoveCompanyOfficer,
-                                      UpdateAuthorisedSignatory,
-                                      UpdateCompanyOfficer,
-                                      UpdateIncorporationDetails,
-                                      UpdatePaymentAccountUsage)
+from apps.merchant.responses import OnboardingDataResponse
+from apps.merchant.services import (
+    CreateIncorporationDetails,
+    UpdateIncorporationDetails,
+    CreateControllerDetails,
+    UpdateControllerDetails,
+    CreateBeneficialOwner,
+    UpdateBeneficialOwner,
+    RemoveBeneficialOwner,
+)
 
 
-class CreateIncorporationDetailsAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+__all__ = (
+    "CreateIncorporationDetailsAPI",
+    "UpdateIncorporationDetailsAPI",
+    "CreateControllerAPI",
+    "UpdateControllerAPI",
+    "CreateBeneficialOwnerAPI",
+    "UpdateBeneficialOwnerAPI",
+    "RemoveBeneficialOwnerAPI",
+    "OnboardingDataAPI",
+)
+
+
+class CreateIncorporationDetailsAPI(MerchantAPIView):
+    """
+    add business entity's incorporation related data as part of the first step for
+    merchant onboarding process.
+    """
+
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def post(self, request):
+        merchant_id = request.merchant_account.id
         data = self.request_data
-        account_id = request.account.id
-
-        incorporation_details = self._run_services(account_id, data)
+        incorporation_details = CreateIncorporationDetails(
+            merchant_id=merchant_id, data=data
+        ).handle()
         return self.response({"id": incorporation_details.id}, status=201)
 
-    def _run_services(self, account_id, data):
-        service = CreateIncorporationDetails(account_id, data)
-        return service.execute()
 
+class UpdateIncorporationDetailsAPI(MerchantAPIView):
+    """
+    changes to incorporation related data API
+    """
 
-class UpdateIncorporationDetailsAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def put(self, request):
+        merchant_id = request.merchant_account.id
         data = self.request_data
-        account_id = request.account.id
-        self._run_services(account_id, data)
+        UpdateIncorporationDetails(merchant_id=merchant_id, data=data).handle()
         return self.response(status=204)
 
-    def _run_services(self, account_id, data):
-        service = UpdateIncorporationDetails(account_id, data)
-        return service.execute()
 
+class CreateControllerAPI(MerchantAPIView):
+    """
+    Create merchant account controller data API
+    A controller is any natural individual who holds significant
+    responsibilities to control, manage, or direct a company or other
+    corporate entity (i.e. CEO, CFO, General Partner, President, etc).
+    A company may have more than one controller, but only one
+    controller’s information must be collected. A controller may be a
+    non-US person.
+    """
 
-class CreateControllerAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
-
-    def post(self, request):
-        data = self.request_data
-        account_id = request.account.id
-
-        authorised_signatory = self._run_services(account_id, data)
-        return self.response({"id": authorised_signatory.id}, status=201)
-
-    def _run_services(self, account_id, data):
-        service = CreateAuthorizedSignatory(account_id, data)
-        return service.execute()
-
-
-class UpdateControllerAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
-
-    def put(self, request):
-        data = self.request_data
-        account_id = request.account.id
-
-        self._run_services(account_id, data)
-        return self.response()
-
-    def _run_services(self, account_id, data):
-        service = UpdateAuthorisedSignatory(account_id, data)
-        return service.execute()
-
-
-class CreateCompanyOfficerAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def post(self, request):
+        merchant_id = request.merchant_account.id
         data = self.request_data
-        account_id = request.account.id
-
-        company_officer = self._run_services(account_id, data)
-        return self.response({"id": company_officer.id}, status=201)
-
-    def _run_services(self, account_id, data):
-        service = CreateCompanyOfficer(account_id, data)
-        return service.execute()
+        controller_details = CreateControllerDetails(
+            merchant_id=merchant_id, data=data
+        ).handle()
+        return self.response({"id": controller_details.id}, status=201)
 
 
-class UpdateCompanyOfficerAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+class UpdateControllerAPI(MerchantAPIView):
+    """
+    changes to controller data API
+    """
+
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def put(self, request):
+        merchant_id = request.merchant_account.id
         data = self.request_data
-        account_id = request.account.id
-
-        self._run_services(account_id, data)
+        UpdateControllerDetails(merchant_id=merchant_id, data=data).handle()
         return self.response(status=204)
 
-    def _run_services(self, account_id, data):
-        service = UpdateCompanyOfficer(account_id, data)
-        return service.execute()
+
+class CreateBeneficialOwnerAPI(MerchantAPIView):
+    """
+    Add an owner's data API
+    """
+
+    permission_classes = (IsMerchantAccountPendingPermission,)
+
+    def post(self, request):
+        merchant_id = request.merchant_account.id
+        data = self.request_data
+        beneficial_owner = CreateBeneficialOwner(
+            merchant_id=merchant_id, data=data
+        ).handle()
+        return self.response({"id": beneficial_owner.id}, status=201)
 
 
-class RemoveCompanyOfficerAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+class UpdateBeneficialOwnerAPI(MerchantAPIView):
+    """
+    changes to beneficial owner data API
+    """
+
+    permission_classes = (IsMerchantAccountPendingPermission,)
+
+    def put(self, request):
+        merchant_id = request.merchant_account.id
+        data = self.request_data
+        UpdateBeneficialOwner(merchant_id=merchant_id, data=data).handle()
+        return self.response(status=204)
+
+
+class RemoveBeneficialOwnerAPI(MerchantAPIView):
+    """
+    remove beneficial owner API
+    """
+
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def delete(self, request):
+        merchant_id = request.merchant_account.id
         data = self.request_data
-        account_id = request.account.id
-
-        self._run_services(account_id, data)
+        RemoveBeneficialOwner(merchant_id=merchant_id, data=data).handle()
         return self.response(status=204)
 
-    def _run_services(self, account_id, data):
-        service = RemoveCompanyOfficer(account_id, data)
-        return service.execute()
 
-
-class OnboardingDataAPI(UserAPIView):
-    permission_classes = (
-        IsMerchantAccountPendingPermission,
-    )
+class OnboardingDataAPI(MerchantAPIView):
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def get(self, request):
-        data = OnboardingDataResponse(request.account).data
+        merchant_account = request.merchant_account
+        data = OnboardingDataResponse(merchant_account).data
         return self.response(data)

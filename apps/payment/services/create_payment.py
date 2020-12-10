@@ -21,7 +21,7 @@ class CreatePayment(ServiceBase):
         self.data = data
         self.account_id = account_id
 
-    def execute(self):
+    def handle(self):
         payment_data = self._validate_data()
         merchant_account = payment_data["merchant_account"]
         payment_amount = payment_data["payment_amount"]

@@ -12,4 +12,4 @@ class CreatePaymentAPI(ConsumerAPIView):
     def _run_services(self, account_id):
         return CreatePayment(
             account_id=account_id, data=self.request_data
-        ).execute()
+        ).handle()

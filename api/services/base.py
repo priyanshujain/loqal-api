@@ -5,5 +5,5 @@ class ServiceBase(metaclass=abc.ABCMeta):
     errors = {}
 
     @abc.abstractmethod
-    def execute(self):
+    def handle(self):
         pass

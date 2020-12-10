@@ -3,10 +3,10 @@ from django.template.loader import render_to_string
 
 from utils.email import send_email_async
 
-__all__ = ("SendVerifyEmail",)
+__all__ = ("SendAccountVerifyEmail",)
 
 
-class SendVerifyEmail:
+class SendAccountVerifyEmail:
     def __init__(self, user):
         self.user = user
 

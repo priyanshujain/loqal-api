@@ -48,7 +48,7 @@ class RequestResetPassword(ServiceBase):
             )
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         user = self.user
         reset_password_object = gen_reset_password_token(user_id=user.id)
@@ -92,7 +92,7 @@ class ResetPasswordTokenValidate(ServiceBase):
         token_object = self._validate_token(token=token)
         return token_object
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
 
 
@@ -127,7 +127,7 @@ class ApplyResetPassword(ResetPasswordTokenValidate):
         )
         return token_object
 
-    def execute(self):
+    def handle(self):
         token_object = self._validate_data()
 
         user = token_object.user

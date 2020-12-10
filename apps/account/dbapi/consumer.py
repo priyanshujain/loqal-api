@@ -1,12 +1,11 @@
 from django.db.utils import IntegrityError
 
-from apps.account.models import Account, ConsumerAccount, MerchantAccount
+from apps.account.models import Account, ConsumerAccount
 
 __all__ = (
     "get_account",
     "create_consumer_account",
     "get_consumer_account",
-    "get_merchant_account",
 )
 
 
@@ -31,11 +30,3 @@ def get_consumer_account(user_id):
         return ConsumerAccount.objects.get(user_id=user_id)
     except ConsumerAccount.DoesNotExist:
         return None
-
-
-def get_merchant_account(account_id):
-    try:
-        return MerchantAccount.objects.get(account_id=account_id)
-    except MerchantAccount.DoesNotExist:
-        return None
-

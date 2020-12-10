@@ -150,6 +150,7 @@ class IncorporationConsent(AbstractBaseModel):
 class IndividualBase(AbstractBaseModel):
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256)
+    is_us_citizen = models.BooleanField()
     ssn = models.CharField(max_length=9, blank=True)
     dob = models.DateField()
     address = models.JSONField()

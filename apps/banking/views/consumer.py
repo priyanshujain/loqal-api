@@ -16,7 +16,7 @@ class CreateBankAccountAPI(ConsumerAPIView):
         service = CreateBankAccount(
             account_id=account_id, data=self.request_data
         )
-        return service.execute()
+        return service.handle()
 
 
 class GetBankAccountAPI(ConsumerAPIView):

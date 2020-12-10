@@ -45,3 +45,20 @@ class ValidationSerializer(BaseSerializer):
 
 class ModelSerializer(BaseSerializer, ModelSerializer):
     pass
+
+
+class AddressSerializer(BaseSerializer):
+    address1 = CharField(max_length=1024)
+    address2 = CharField(
+        max_length=1024,
+        default="",
+        allow_blank=True,
+        allow_null=True,
+        required=False,
+    )
+    country = CharField(max_length=2)
+    state = CharField(max_length=3)
+    city = CharField(max_length=255, required=False)
+    zip_code = CharField(max_length=10)
+    latitude = FloatField(required=False)
+    longitude = FloatField(required=False)

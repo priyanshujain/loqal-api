@@ -25,6 +25,7 @@ def create_user(
     last_name,
     email,
     password,
+    phone_number="",
     email_verified=False,
 ):
     user = User.objects.create(
@@ -33,6 +34,7 @@ def create_user(
         email_verified=email_verified,
         first_name=first_name,
         last_name=last_name,
+        phone_number=phone_number,
     )
     user.set_password(password)
     user.gen_email_verification_token()

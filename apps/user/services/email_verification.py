@@ -45,7 +45,7 @@ class EmailVerification(ServiceBase):
 
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
 
         user = self.user

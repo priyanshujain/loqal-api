@@ -9,7 +9,7 @@ from otpauth import OtpAuth
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
-from apps.account.notifications import SendVerifyEmail
+from apps.account.notifications import SendAccountVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
 from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
@@ -107,7 +107,7 @@ class UserLoginAPI(APIView):
 
     def _run_services(self, request):
         service = LoginRequest(request=request, data=self.request_data)
-        return service.execute()
+        return service.handle()
 
 
 class SmsOtpAuthAPI(APIView):
@@ -177,7 +177,7 @@ class AddPhoneNumberAPI(LoggedInAPIView):
 
     def _run_services(self):
         service = AddPhoneNumber(request=self.request, data=self.request_data)
-        service.execute()
+        service.handle()
 
 
 class VerifyPhoneNumberAPI(LoggedInAPIView):
@@ -189,7 +189,7 @@ class VerifyPhoneNumberAPI(LoggedInAPIView):
         service = VerifyPhoneNumber(
             user=user, request=self.request, data=self.request_data
         )
-        service.execute()
+        service.handle()
 
 
 class ListSessionsAPI(LoggedInAPIView):
@@ -319,7 +319,7 @@ class UserChangePasswordAPI(LoggedInAPIView):
 
     def _run_services(self, request):
         service = ChangePassword(request=request, data=self.request_data)
-        service.execute()
+        service.handle()
 
 
 class RequestResetPasswordAPI(APIView):
@@ -329,7 +329,7 @@ class RequestResetPasswordAPI(APIView):
 
     def _run_services(self, request):
         service = RequestResetPassword(request=request, data=self.request_data)
-        service.execute()
+        service.handle()
 
 
 class ResetPasswordTokenValidateAPI(APIView):
@@ -341,7 +341,7 @@ class ResetPasswordTokenValidateAPI(APIView):
         service = ResetPasswordTokenValidate(
             request=request, data=self.request_data
         )
-        service.execute()
+        service.handle()
 
 
 class ApplyResetPasswordAPI(APIView):
@@ -351,7 +351,7 @@ class ApplyResetPasswordAPI(APIView):
 
     def _run_services(self, request):
         service = ApplyResetPassword(request=request, data=self.request_data)
-        service.execute()
+        service.handle()
 
 
 class VerifyEmailAPI(APIView):
@@ -361,7 +361,7 @@ class VerifyEmailAPI(APIView):
 
     def _run_services(self):
         service = EmailVerification(data=self.request_data)
-        service.execute()
+        service.handle()
 
 
 class UserAvatarAPI(LoggedInAPIView):

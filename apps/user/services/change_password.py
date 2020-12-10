@@ -41,7 +41,7 @@ class ChangePassword(ServiceBase):
 
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         session = self.request.session
         data = self.data

@@ -10,7 +10,7 @@ class AddZipCode(ServiceBase):
         self.data = data
         self.account = account
 
-    def execute(self):
+    def handle(self):
         data = self._validate_data()
         zip_code = data["zip_code"]
         self.account.add_zip_code(zip_code=zip_code)

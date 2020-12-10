@@ -22,6 +22,7 @@ __all__ = (
     "UnsupportedMediaType",
     "Throttled",
     "NotFound",
+    "InternalDBError",
 )
 
 
@@ -31,6 +32,13 @@ class APIException(APIException):
     """
 
     pass
+
+
+class InternalDBError(APIException):
+    """
+    Status: HTTP_500_INTERNAL_SERVER_ERROR
+    """
+    default_detail = "The Object creation failed please try again."
 
 
 class ResourceDoesNotExist(APIException):

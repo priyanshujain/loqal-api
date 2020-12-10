@@ -87,7 +87,7 @@ class LoginRequest(ServiceBase):
     def _validate_data(self, data):
         data = run_validator(validator=UserLoginValidator, data=data)
 
-    def execute(self):
+    def handle(self):
         data = self.data
         self._validate_data(data=data)
         user = auth.authenticate(
