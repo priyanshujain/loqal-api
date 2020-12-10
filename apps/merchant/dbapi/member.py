@@ -27,7 +27,7 @@ def create_account_member_on_reg(user_id, merchant_id, member_role_id):
         return None
 
 
-def get_account_member_by_profile(user_id):
+def get_account_member_by_user_id(user_id):
     try:
         return AccountMember.objects.get(user_id=user_id)
     except AccountMember.DoesNotExist:
@@ -99,46 +99,6 @@ def get_super_admin_role(merchant_id):
             merchant_id=merchant_id, is_super_admin=True
         )
     except FeatureAccessRole.DoesNotExist:
-        return None
-
-
-def get_active_account_access_by_account(merchant_id):
-    try:
-        return AdminMemberAccountAccess.objects.get(
-            merchant_id=merchant_id, access_expired_time=None
-        )
-    except AdminMemberAccountAccess.DoesNotExist:
-        return None
-
-
-def get_active_account_access_by_profile(profile_id):
-    try:
-        return AdminMemberAccountAccess.objects.get(
-            member__profile_id=profile_id, access_expired_time=None
-        )
-    except AdminMemberAccountAccess.DoesNotExist:
-        return None
-
-
-def active_admin_account_access():
-    return AdminMemberAccountAccess.objects.filter(access_expired_time=None)
-
-
-def create_admin_account_access(merchant_id, member_id):
-    try:
-        return AdminMemberAccountAccess.objects.create(
-            merchant_id=merchant_id, member_id=member_id
-        )
-    except IntegrityError:
-        return None
-
-
-def get_admin_account_access_by_id(account_access_id):
-    try:
-        return AdminMemberAccountAccess.objects.get(
-            id=account_access_id, access_expired_time=None
-        )
-    except AdminMemberAccountAccess.DoesNotExist:
         return None
 
 

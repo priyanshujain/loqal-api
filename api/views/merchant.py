@@ -1,5 +1,5 @@
 from api.exceptions import NotAuthenticated, PermissionDenied
-from apps.account.dbapi import get_merchant_account
+from apps.merchant.dbapi import get_account_member_by_user_id
 
 from .base import APIAccessLogView
 
@@ -21,12 +21,13 @@ class MerchantAPIView(APIAccessLogView):
             exception_message = "User is not authenticated."
 
 
-        merchant_account = get_merchant_account(user_id=user.id)
-        if not merchant_account:
-            exception_message = "User is not valid"
+        merchant_account_member = get_account_member_by_user_id(user_id=user.id)
+        if not merchant_account_member:
+            exception_message = "Merchant is not valid"
         else:
-            request.account = merchant_account.account
-            request.merchant_account = merchant_account
+            request.merchant_account_member = merchant_account_member
+            request.merchant_account = merchant_account_member.merchant
+            request.account = request.merchant_account.account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
         if exception_message:
