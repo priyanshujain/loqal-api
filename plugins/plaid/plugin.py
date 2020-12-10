@@ -94,9 +94,12 @@ class PlaidPlugin(object):
         # response = self._client.Auth.get(access_token, account_ids=[account_id])[
         #     "numbers"
         # ]
-        auth_data = self._client.Auth.get(
-            access_token, account_ids=[account_id]
-        )
+        try:
+            auth_data = self._client.Auth.get(
+                access_token, account_ids=[account_id]
+            )
+        except InvalidInputError:
+            return None
         accounts = auth_data["accounts"]
         if not accounts:
             return {}
@@ -123,6 +126,7 @@ class PlaidPlugin(object):
         """
         institution = self._client.Institutions.get_by_id(
             institution_id=institution_id,
+            country_codes=["US"],
             _options={"include_optional_metadata": True},
         ).get(
             "institution",
