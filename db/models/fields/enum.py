@@ -4,10 +4,10 @@
 """
 
 import enum
+
 from django.db import models
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-
 
 __all__ = (
     "ChoiceEnum",
@@ -32,7 +32,9 @@ class ChoiceEnumMeta(enum.EnumMeta):
                 try:
                     val, labels[key] = source_value
                 except ValueError:
-                    raise ValueError("Invalid ChoiceEnum member '{}'".format(key))
+                    raise ValueError(
+                        "Invalid ChoiceEnum member '{}'".format(key)
+                    )
             else:
                 val = source_value
                 labels[key] = key.replace("_", " ").title()
@@ -71,6 +73,7 @@ class ChoiceEnum(enum.Enum, metaclass=ChoiceEnumMeta):
         default=Color.default,
     )
     """
+
     def __str__(self):
         return force_str(self.label)
 
@@ -79,21 +82,23 @@ class ChoiceEnumField(models.PositiveSmallIntegerField):
     description = _("Customer recognition state")
 
     def __init__(self, *args, **kwargs):
-        self.enum_type = kwargs.pop('enum_type', ChoiceEnum)  # fallback is required form migrations
+        self.enum_type = kwargs.pop(
+            "enum_type", ChoiceEnum
+        )  # fallback is required form migrations
         if not issubclass(self.enum_type, ChoiceEnum):
             raise ValueError("enum_type must be a subclass of `ChoiceEnum`.")
         kwargs.update(choices=self.enum_type.choices)
-        kwargs.setdefault('default', self.enum_type.default)
+        kwargs.setdefault("default", self.enum_type.default)
         super().__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        if 'choices' in kwargs:
-            del kwargs['choices']
-        if kwargs['default'] is self.enum_type.default:
-            del kwargs['default']
-        elif isinstance(kwargs['default'], self.enum_type):
-            kwargs['default'] = kwargs['default'].value
+        if "choices" in kwargs:
+            del kwargs["choices"]
+        if kwargs["default"] is self.enum_type.default:
+            del kwargs["default"]
+        elif isinstance(kwargs["default"], self.enum_type):
+            kwargs["default"] = kwargs["default"].value
         return name, path, args, kwargs
 
     def from_db_value(self, value, expression, connection):

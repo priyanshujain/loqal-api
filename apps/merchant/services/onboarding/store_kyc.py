@@ -1,39 +1,33 @@
 import re
+
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ValidationError, InternalDBError
+from api.exceptions import ErrorDetail, InternalDBError, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (
-    create_incorporation_details,
-    get_incorporation_details,
-    update_incorporation_details,
-    get_controller_details,
-    create_controller_details,
-    update_controller_details,
-    get_beneficial_owner,
-    create_beneficial_owner,
-    update_beneficial_owner,
-    delete_beneficial_owner,
-)
-
-from apps.merchant.validators import (
-    IncorporationDetailsValidator,
-    ControllerValidator,
-    BeneficialOwnerValidator,
-    UpdateBeneficialOwnerValidator,
-    RemoveBeneficialOwnerValidator,
-)
-
+from apps.merchant.dbapi import (create_beneficial_owner,
+                                 create_controller_details,
+                                 create_incorporation_details,
+                                 delete_beneficial_owner, get_beneficial_owner,
+                                 get_controller_details,
+                                 get_incorporation_details,
+                                 update_beneficial_owner,
+                                 update_controller_details,
+                                 update_incorporation_details)
+from apps.merchant.validators import (BeneficialOwnerValidator,
+                                      ControllerValidator,
+                                      IncorporationDetailsValidator,
+                                      RemoveBeneficialOwnerValidator,
+                                      UpdateBeneficialOwnerValidator)
 
 __all__ = (
     "CreateIncorporationDetails",
-    'UpdateIncorporationDetails',
-    'CreateControllerDetails',
-    'UpdateControllerDetails',
-    'CreateBeneficialOwner',
-    'UpdateBeneficialOwner',
-    'RemoveBeneficialOwner',
+    "UpdateIncorporationDetails",
+    "CreateControllerDetails",
+    "UpdateControllerDetails",
+    "CreateBeneficialOwner",
+    "UpdateBeneficialOwner",
+    "RemoveBeneficialOwner",
 )
 
 
@@ -50,7 +44,11 @@ class CreateIncorporationDetails(ServiceBase):
     def _validate_data(self):
         if get_incorporation_details(merchant_id=self.merchant_id):
             raise ValidationError(
-                {"detail": ErrorDetail(_("Incorporation details already exists."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Incorporation details already exists.")
+                    )
+                }
             )
 
         self.data = run_validator(IncorporationDetailsValidator, self.data)
@@ -66,7 +64,9 @@ class CreateIncorporationDetails(ServiceBase):
         raise InternalDBError(
             {
                 "detail": ErrorDetail(
-                    _("Incorporation details creation failed, please try again.")
+                    _(
+                        "Incorporation details creation failed, please try again."
+                    )
                 )
             }
         )
@@ -81,10 +81,16 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
         self._update_incorporation_details()
 
     def _validate_data(self):
-        incorporation_details = get_incorporation_details(merchant_id=self.merchant_id)
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant_id
+        )
         if not incorporation_details:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Incorporation details did not found."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Incorporation details did not found.")
+                    )
+                }
             )
         self.incorporation_details = incorporation_details
 
@@ -111,7 +117,11 @@ class CreateControllerDetails(ServiceBase):
     def _validate_data(self):
         if get_controller_details(merchant_id=self.merchant_id):
             raise ValidationError(
-                {"detail": ErrorDetail(_("Controller details already exists."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Controller details already exists.")
+                    )
+                }
             )
 
         self.data = run_validator(ControllerValidator, self.data)
@@ -142,7 +152,9 @@ class UpdateControllerDetails(CreateControllerDetails):
         self._update_controller_details()
 
     def _validate_data(self):
-        controller_details = get_controller_details(merchant_id=self.merchant_id)
+        controller_details = get_controller_details(
+            merchant_id=self.merchant_id
+        )
         if not controller_details:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Controller details did not found."))}
@@ -152,10 +164,7 @@ class UpdateControllerDetails(CreateControllerDetails):
         return True
 
     def _update_controller_details(self):
-        update_controller_details(
-            merchant_id=self.merchant_id,
-            **self.data
-        )
+        update_controller_details(merchant_id=self.merchant_id, **self.data)
 
 
 class CreateBeneficialOwner(ServiceBase):
@@ -199,7 +208,8 @@ class UpdateBeneficialOwner(CreateBeneficialOwner):
         data = run_validator(validator=validator, data=self.data)
         beneficial_owner_id = data["id"]
         beneficial_owner = get_beneficial_owner(
-            merchant_id=self.merchant_id, beneficial_owner_id=beneficial_owner_id
+            merchant_id=self.merchant_id,
+            beneficial_owner_id=beneficial_owner_id,
         )
         if not beneficial_owner:
             raise ValidationError(

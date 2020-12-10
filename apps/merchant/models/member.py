@@ -1,11 +1,12 @@
-from apps.user.models import User
 from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.timezone import now
 
 from apps.account.models import MerchantAccount
+from apps.user.models import User
 from db.models import AbstractBaseModel
 from utils.shortcuts import rand_str
 
@@ -46,7 +47,9 @@ class FeatureAccessRole(AbstractBaseModel):
 
 class AccountMember(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
     position = models.CharField(max_length=256, blank=True)
     account_active = models.BooleanField(default=False)
     role = models.ForeignKey(
@@ -79,8 +82,7 @@ class AccountMember(AbstractBaseModel):
         db_table = "merchant_account_member"
 
 
-
-class MemberInvite(AbstractBaseModel):    
+class MemberInvite(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, blank=True)
@@ -88,9 +90,7 @@ class MemberInvite(AbstractBaseModel):
     position = models.CharField(max_length=256, blank=True)
     role = models.ForeignKey(FeatureAccessRole, on_delete=models.CASCADE)
     token = models.CharField(max_length=512, blank=True)
-    token_expires_at = models.DateTimeField(
-        default=None, null=True
-    )
+    token_expires_at = models.DateTimeField(default=None, null=True)
 
     @property
     def is_expired(self):

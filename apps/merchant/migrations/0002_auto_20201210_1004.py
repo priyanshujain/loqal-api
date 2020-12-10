@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0001_initial'),
+        ("merchant", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='beneficialowner',
-            name='is_us_citizen',
+            model_name="beneficialowner",
+            name="is_us_citizen",
             field=models.BooleanField(default=True),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='controllerdetails',
-            name='is_us_citizen',
+            model_name="controllerdetails",
+            name="is_us_citizen",
             field=models.BooleanField(default=True),
             preserve_default=False,
         ),

@@ -1,3 +1,3 @@
 from .create_consumer_account import CreateConsumerAccount
-from .zip_code import AddZipCode
 from .create_merchant_account import CreateMerchantAccount
+from .zip_code import AddZipCode

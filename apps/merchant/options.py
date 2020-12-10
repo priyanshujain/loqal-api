@@ -1,6 +1,6 @@
 from django.utils.translation import gettext as _
-from db.models.fields import ChoiceEnum
 
+from db.models.fields import ChoiceEnum
 
 __all__ = (
     "BusinessTypes",

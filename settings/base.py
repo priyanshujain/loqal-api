@@ -338,7 +338,10 @@ PLAID_ENV = env("PLAID_ENV")
 PLAID_PUBLIC_KEY = env("PLAID_PUBLIC_KEY")
 PLAID_SECRET = env("PLAID_SECRET")
 PLAID_APP_NAME = "Loqal"
-PLAID_PRODUCTS =  ["auth", "balance",]
+PLAID_PRODUCTS = [
+    "auth",
+    "balance",
+]
 
 
 PROXY_IP_ALLOWED_LIST = []

@@ -146,9 +146,9 @@ class ResendSmsOtpAuthAPI(APIView):
 
     def post(self, request):
         if request.user.is_authenticated:
-            raise ValidationError({
-                "detail": ErrorDetail(_("You are already logged in."))
-            })
+            raise ValidationError(
+                {"detail": ErrorDetail(_("You are already logged in."))}
+            )
         self._run_services()
         return self.response()
 

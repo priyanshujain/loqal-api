@@ -6,6 +6,6 @@ urlpatterns = [
     path(
         "reference/business-classifications/",
         BusinessClassificationsAPI.as_view(),
-        name="business_classfications"
+        name="business_classfications",
     ),
 ]

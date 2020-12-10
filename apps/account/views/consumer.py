@@ -1,8 +1,8 @@
 from datetime import date
-from api.exceptions import ValidationError, ErrorDetail
 
 from django.utils.translation import gettext as _
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.views import APIView, ConsumerAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import AddZipCode, CreateConsumerAccount
@@ -18,10 +18,10 @@ __all__ = (
 class ConsumerSignupAPI(APIView):
     def post(self, request):
         if request.user.is_authenticated:
-            raise ValidationError({
-                "details": ErrorDetail(_("User has aleady logged in."))
-            })
-        
+            raise ValidationError(
+                {"details": ErrorDetail(_("User has aleady logged in."))}
+            )
+
         self._run_services(ip_address=request.ip)
         return self.response(status=201)
 
@@ -32,8 +32,7 @@ class ConsumerSignupAPI(APIView):
         )
         consumer_account = service.handle()
         user = consumer_account.user
-        login(request=self.request ,user=user)
-
+        login(request=self.request, user=user)
 
 
 class AddAccountZipCodeAPI(ConsumerAPIView):

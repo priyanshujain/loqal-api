@@ -1,23 +1,19 @@
 from django.urls import path
 
-from apps.merchant.views.member import (
-    CreateFeatureAccessRoleAPI,
-    CreateMemberInviteAPI,
-    DeleteFeatureAccessRoleAPI,
-    DisableMemberAPI,
-    EnableMemberAPI,
-    FeatureAccessRolesDetailsAPI,
-    GetMemberInvitesAPI,
-    ListFeatureAccessRolesAPI,
-    ListMembersAPI,
-    MemberFeatureAcessAPI,
-    MemberSignupAPI,
-    ResendMemberInviteEmailAPI,
-    UpdateFeatureAccessRoleAPI,
-    UpdateMemberInviteAPI,
-    UpdateMemberRoleAPI,
-    VerifyMemberInviteAPI,
-)
+from apps.merchant.views.member import (CreateFeatureAccessRoleAPI,
+                                        CreateMemberInviteAPI,
+                                        DeleteFeatureAccessRoleAPI,
+                                        DisableMemberAPI, EnableMemberAPI,
+                                        FeatureAccessRolesDetailsAPI,
+                                        GetMemberInvitesAPI,
+                                        ListFeatureAccessRolesAPI,
+                                        ListMembersAPI, MemberFeatureAcessAPI,
+                                        MemberSignupAPI,
+                                        ResendMemberInviteEmailAPI,
+                                        UpdateFeatureAccessRoleAPI,
+                                        UpdateMemberInviteAPI,
+                                        UpdateMemberRoleAPI,
+                                        VerifyMemberInviteAPI)
 
 urlpatterns = [
     path(
@@ -51,9 +47,13 @@ urlpatterns = [
         name="create_member_invite_api",
     ),
     path(
-        "member/invite/", GetMemberInvitesAPI.as_view(), name="get_member_invites_api"
+        "member/invite/",
+        GetMemberInvitesAPI.as_view(),
+        name="get_member_invites_api",
     ),
-    path("member/signup/", MemberSignupAPI.as_view(), name="member_signup_api"),
+    path(
+        "member/signup/", MemberSignupAPI.as_view(), name="member_signup_api"
+    ),
     path(
         "member/roles/<int:role_id>/",
         FeatureAccessRolesDetailsAPI.as_view(),

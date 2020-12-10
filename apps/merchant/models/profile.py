@@ -1,13 +1,13 @@
-from django.utils.translation import gettext as _
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
+from django.utils.translation import gettext as _
 
+from apps.account.models import MerchantAccount
+from apps.box.models import BoxFile
 from db.models import AbstractBaseModel
 from db.postgres.fields import ArrayField
-from apps.box.models import BoxFile
-from apps.account.models import MerchantAccount
-from .reference import MerchantCategory
 
+from .reference import MerchantCategory
 
 __all__ = (
     "MerchantProfile",
@@ -29,9 +29,7 @@ class MerchantProfile(AbstractBaseModel):
     neighborhood = models.CharField(
         max_length=128,
         blank=True,
-        help_text=_(
-            "Ex. Navy Yard"
-        ),
+        help_text=_("Ex. Navy Yard"),
     )
     website = models.URLField(blank=True)
     facebook_page = models.URLField(blank=True)
@@ -49,16 +47,12 @@ class MerchantProfile(AbstractBaseModel):
     dress_code = models.CharField(
         max_length=1024,
         blank=True,
-        help_text=_(
-            "Ex. Smart Casual"
-        ),
+        help_text=_("Ex. Smart Casual"),
     )
-    dining_styles =  models.CharField(
+    dining_styles = models.CharField(
         max_length=1024,
         blank=True,
-        help_text=_(
-            "Ex. Casual Dining"
-        ),
+        help_text=_("Ex. Casual Dining"),
     )
     cuisines = ArrayField(
         models.CharField(max_length=64), default=list, blank=True

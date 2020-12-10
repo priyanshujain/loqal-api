@@ -1,12 +1,9 @@
 from django.db import models
 
-from db.models import AbstractBaseModel
 from apps.box.models import BoxFile
+from db.models import AbstractBaseModel
 
-
-__all__ = (
-    "MerchantCategory",
-)
+__all__ = ("MerchantCategory",)
 
 
 class MerchantCategory(AbstractBaseModel):

@@ -2,9 +2,8 @@ import re
 
 from django.db.utils import IntegrityError
 
-from apps.user.dbapi import create_user
-
 from apps.merchant.models import AccountMember, FeatureAccessRole, MemberInvite
+from apps.user.dbapi import create_user
 
 
 def get_account_member_by_id(member_id, merchant_id):
@@ -130,7 +129,9 @@ def get_account_invites(merchant_id):
     return MemberInvite.account_invites(merchant_id=merchant_id)
 
 
-def create_member_invite(merchant_id, first_name, last_name, email, role_id, position):
+def create_member_invite(
+    merchant_id, first_name, last_name, email, role_id, position
+):
     invite = MemberInvite.objects.create(
         merchant_id=merchant_id,
         first_name=first_name,
@@ -159,7 +160,9 @@ def get_member_invite_by_id(invite_id, merchant_id):
 
 def get_feature_access_role_by_id(role_id, merchant_id):
     try:
-        return FeatureAccessRole.objects.get(id=role_id, merchant_id=merchant_id)
+        return FeatureAccessRole.objects.get(
+            id=role_id, merchant_id=merchant_id
+        )
     except FeatureAccessRole.DoesNotExist:
         return None
 
@@ -175,7 +178,9 @@ def get_member_invite_by_token(token):
         return None
 
 
-def update_member_invite(invite, first_name, last_name, email, position, role_id):
+def update_member_invite(
+    invite, first_name, last_name, email, position, role_id
+):
     invite.first_name = first_name
     invite.last_name = last_name
     invite.email = email

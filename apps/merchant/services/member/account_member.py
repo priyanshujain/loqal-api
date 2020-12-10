@@ -4,10 +4,9 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import (get_account_member_by_id,
-                               get_feature_access_role_by_id)
+                                 get_feature_access_role_by_id)
 from apps.merchant.validators import (DisableMemberValidator,
-                                    UpdateMemberRoleValidator)
-
+                                      UpdateMemberRoleValidator)
 
 __all__ = (
     "UpdateMemberRole",

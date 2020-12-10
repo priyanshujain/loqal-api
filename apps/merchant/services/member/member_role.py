@@ -5,14 +5,14 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.constants import DEFAULT_ROLES
 from apps.merchant.dbapi import (check_if_roles_exists_by_name,
-                               check_invites_exists_by_role,
-                               check_members_exists_by_role,
-                               create_feature_access_role,
-                               get_feature_access_role_by_id,
-                               update_feature_access_role)
+                                 check_invites_exists_by_role,
+                                 check_members_exists_by_role,
+                                 create_feature_access_role,
+                                 get_feature_access_role_by_id,
+                                 update_feature_access_role)
 from apps.merchant.validators import (CreateFeatureAccessRoleValidator,
-                                         DeleteFeatureAccessRoleValidator,
-                                         UpdateFeatureAccessRoleValidator)
+                                      DeleteFeatureAccessRoleValidator,
+                                      UpdateFeatureAccessRoleValidator)
 
 __all__ = (
     "CreateFeatureAccessRole",

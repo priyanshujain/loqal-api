@@ -38,6 +38,7 @@ class InternalDBError(APIException):
     """
     Status: HTTP_500_INTERNAL_SERVER_ERROR
     """
+
     default_detail = "The Object creation failed please try again."
 
 

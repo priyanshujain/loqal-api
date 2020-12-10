@@ -1,15 +1,13 @@
 from django.urls import path
 
-from apps.merchant.views.onboarding import (
-    CreateIncorporationDetailsAPI,
-    UpdateIncorporationDetailsAPI,
-    CreateControllerAPI,
-    UpdateControllerAPI,
-    CreateBeneficialOwnerAPI,
-    UpdateBeneficialOwnerAPI,
-    RemoveBeneficialOwnerAPI,
-    OnboardingDataAPI,
-)
+from apps.merchant.views.onboarding import (CreateBeneficialOwnerAPI,
+                                            CreateControllerAPI,
+                                            CreateIncorporationDetailsAPI,
+                                            OnboardingDataAPI,
+                                            RemoveBeneficialOwnerAPI,
+                                            UpdateBeneficialOwnerAPI,
+                                            UpdateControllerAPI,
+                                            UpdateIncorporationDetailsAPI)
 
 urlpatterns = [
     path(

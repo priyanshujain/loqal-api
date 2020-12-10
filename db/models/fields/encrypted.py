@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import six
-from django.db.models import CharField, TextField, JSONField
+from django.db.models import CharField, JSONField, TextField
 from picklefield.fields import (PickledObject, PickledObjectField,
                                 _ObjectWrapper, dbsafe_decode)
 

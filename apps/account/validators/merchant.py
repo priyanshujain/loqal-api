@@ -1,8 +1,7 @@
 from api import serializers
 
-__all__ = (
-    "CreateMerchantAccountValidator",
-)
+__all__ = ("CreateMerchantAccountValidator",)
+
 
 class CreateMerchantAccountValidator(serializers.ValidationSerializer):
     first_name = serializers.CharField(max_length=512)

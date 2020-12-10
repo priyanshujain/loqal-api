@@ -20,8 +20,9 @@ class MerchantAPIView(APIAccessLogView):
         if not user.is_authenticated:
             exception_message = "User is not authenticated."
 
-
-        merchant_account_member = get_account_member_by_user_id(user_id=user.id)
+        merchant_account_member = get_account_member_by_user_id(
+            user_id=user.id
+        )
         if not merchant_account_member:
             exception_message = "Merchant is not valid"
         else:

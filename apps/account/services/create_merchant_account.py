@@ -2,14 +2,10 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
-from apps.account.notifications import SendAccountVerifyEmail
-
-
-from api.exceptions import ErrorDetail, ValidationError
-from api.services import ServiceBase
 from apps.account.dbapi import create_merchant_account
+from apps.account.notifications import SendAccountVerifyEmail
 from apps.merchant.dbapi import (create_account_member_on_reg,
-                               get_super_admin_role)
+                                 get_super_admin_role)
 from apps.merchant.services import CreateDefaultRoles
 from apps.user.dbapi import create_user, get_user_by_email
 
@@ -72,8 +68,5 @@ class CreateMerchantAccount(ServiceBase):
         service = CreateDefaultRoles(merchant_id=merchant_id)
         service.handle()
 
-
     def _send_verfication_email(self, user):
         SendAccountVerifyEmail(user=user).send()
-
-

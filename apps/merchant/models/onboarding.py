@@ -1,17 +1,18 @@
-from django.utils.translation import gettext as _
 from django.db import models
+from django.utils.translation import gettext as _
 
-from db.models import AbstractBaseModel
-from apps.box.models import BoxFile
 from apps.account.models import MerchantAccount
+from apps.box.models import BoxFile
+from db.models import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
 
 __all__ = (
-    'IncorporationConsent',
-    'IncorporationDetails',
-    'ControllerDetails',
+    "IncorporationConsent",
+    "IncorporationDetails",
+    "ControllerDetails",
     "BeneficialOwner",
 )
+
 
 class IncorporationDetails(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)

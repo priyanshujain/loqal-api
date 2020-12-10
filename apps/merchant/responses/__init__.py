@@ -1,2 +1,2 @@
-from .onboarding import *
 from .member import *
+from .onboarding import *

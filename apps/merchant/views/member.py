@@ -2,31 +2,22 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import APIView, MerchantAPIView
-from apps.merchant.dbapi import (
-    get_account_invites,
-    get_feature_access_role_by_id,
-    get_feature_access_roles_by_account,
-    get_member_invite_by_token,
-    get_members_by_account,
-)
-from apps.merchant.responses import (
-    MemberInviteResponse,
-    AccountMemberResponse,
-    FeatureAccessRoleResponse,
-    MemberInviteDetailsResponse,
-)
-from apps.merchant.services import (
-    CreateFeatureAccessRole,
-    CreateMemberInvite,
-    DeleteFeatureAccessRole,
-    DisableMember,
-    EnableMember,
-    MemberSignup,
-    MemberSignupInviteEmailResend,
-    UpdateFeatureAccessRole,
-    UpdateMemberInvite,
-    UpdateMemberRole,
-)
+from apps.merchant.dbapi import (get_account_invites,
+                                 get_feature_access_role_by_id,
+                                 get_feature_access_roles_by_account,
+                                 get_member_invite_by_token,
+                                 get_members_by_account)
+from apps.merchant.responses import (AccountMemberResponse,
+                                     FeatureAccessRoleResponse,
+                                     MemberInviteDetailsResponse,
+                                     MemberInviteResponse)
+from apps.merchant.services import (CreateFeatureAccessRole,
+                                    CreateMemberInvite,
+                                    DeleteFeatureAccessRole, DisableMember,
+                                    EnableMember, MemberSignup,
+                                    MemberSignupInviteEmailResend,
+                                    UpdateFeatureAccessRole,
+                                    UpdateMemberInvite, UpdateMemberRole)
 
 
 class CreateMemberInviteAPI(MerchantAPIView):
@@ -40,7 +31,9 @@ class CreateMemberInviteAPI(MerchantAPIView):
         return self.response(status=201, data={"id": invite.id})
 
     def _run_services(self, merchant_id):
-        service = CreateMemberInvite(merchant_id=merchant_id, data=self.request_data)
+        service = CreateMemberInvite(
+            merchant_id=merchant_id, data=self.request_data
+        )
         return service.handle()
 
 
@@ -63,7 +56,9 @@ class VerifyMemberInviteAPI(APIView):
     def get(self, request):
         token = request.GET.get("key", None)
         if not token:
-            raise ValidationError({"key": [ErrorDetail(_("Key is required."))]})
+            raise ValidationError(
+                {"key": [ErrorDetail(_("Key is required."))]}
+            )
 
         invite = get_member_invite_by_token(token=token)
         if not invite:
@@ -127,7 +122,9 @@ class UpdateMemberRoleAPI(MerchantAPIView):
         return self.response(status=204)
 
     def _run_services(self, merchant_id):
-        UpdateMemberRole(merchant_id=merchant_id, data=self.request_data).handle()
+        UpdateMemberRole(
+            merchant_id=merchant_id, data=self.request_data
+        ).handle()
 
 
 class ListMembersAPI(MerchantAPIView):
@@ -167,9 +164,13 @@ class ListFeatureAccessRolesAPI(MerchantAPIView):
 class FeatureAccessRolesDetailsAPI(MerchantAPIView):
     def get(self, request, role_id):
         merchant_id = request.merchant_account.id
-        role = get_feature_access_role_by_id(role_id=role_id, merchant_id=merchant_id)
+        role = get_feature_access_role_by_id(
+            role_id=role_id, merchant_id=merchant_id
+        )
         if not role:
-            raise ValidationError({"role_id": [ErrorDetail(_("Invalid role_id."))]})
+            raise ValidationError(
+                {"role_id": [ErrorDetail(_("Invalid role_id."))]}
+            )
         return self.response(FeatureAccessRoleResponse(role).data)
 
 

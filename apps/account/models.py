@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext as _
+
+from apps.account.options import MerchantAccountStatus
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel
-from utils.shortcuts import generate_uuid_hex
 from db.models.fields import ChoiceEnumField
-from apps.account.options import MerchantAccountStatus
-
+from utils.shortcuts import generate_uuid_hex
 
 __all__ = (
     "Account",

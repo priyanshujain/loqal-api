@@ -1,11 +1,9 @@
 from api import serializers
 from apps.account.models import MerchantAccount
-from apps.merchant.models import IncorporationDetails, ControllerDetails, BeneficialOwner
+from apps.merchant.models import (BeneficialOwner, ControllerDetails,
+                                  IncorporationDetails)
 
-
-__all__ = (
-    "OnboardingDataResponse",
-)
+__all__ = ("OnboardingDataResponse",)
 
 
 class IncorporationDetailsResponse(serializers.ModelSerializer):
@@ -27,7 +25,9 @@ class BeneficialOwnerResponse(serializers.ModelSerializer):
 
 
 class OnboardingDataResponse(serializers.ModelSerializer):
-    account_status = serializers.CharField(source="account_status.label", read_only=True)
+    account_status = serializers.CharField(
+        source="account_status.label", read_only=True
+    )
     incorporation_details = IncorporationDetailsResponse(
         source="incorporationdetails", read_only=True
     )
@@ -35,7 +35,9 @@ class OnboardingDataResponse(serializers.ModelSerializer):
         source="controllerdetails", read_only=True
     )
     beneficial_owners = BeneficialOwnerResponse(
-        source="beneficialowner_set", many=True, read_only=True,
+        source="beneficialowner_set",
+        many=True,
+        read_only=True,
     )
 
     class Meta:

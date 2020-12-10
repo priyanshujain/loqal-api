@@ -11,7 +11,9 @@ class BusinessClassifications(object):
         self.account_id = account_id
 
     def get(self):
-        psp_response = ProviderAPIAction(account_id=self.account_id).get_business_classifcations()
+        psp_response = ProviderAPIAction(
+            account_id=self.account_id
+        ).get_business_classifcations()
         return psp_response["data"]
 
 

@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.banking.views.consumer import (CreateBankAccountAPI, PlaidLinkTokenAPI, GetBankAccountAPI,)
+from apps.banking.views.consumer import (CreateBankAccountAPI,
+                                         GetBankAccountAPI, PlaidLinkTokenAPI)
 
 urlpatterns = [
     path(

@@ -4,14 +4,13 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import (create_member_invite,
-                               get_feature_access_role_by_id,
-                               get_member_invite_by_email,
-                               get_member_invite_by_id, update_member_invite)
+                                 get_feature_access_role_by_id,
+                                 get_member_invite_by_email,
+                                 get_member_invite_by_id, update_member_invite)
 from apps.merchant.notifications import MemberSignupInviteEmail
-from apps.merchant.validators import MemberInviteValidator
-from apps.merchant.validators import UpdateMemberInviteValidator
+from apps.merchant.validators import (MemberInviteValidator,
+                                      UpdateMemberInviteValidator)
 from apps.user.dbapi import get_user_by_email
-
 
 __all__ = (
     "CreateMemberInvite",

@@ -12,7 +12,9 @@ def create_merchant_account(company_name, company_email):
     account = Account.objects.create()
     try:
         return MerchantAccount.objects.create(
-            account=account, company_name=company_name, company_email=company_email
+            account=account,
+            company_name=company_name,
+            company_email=company_email,
         )
     except IntegrityError:
         account.delete()

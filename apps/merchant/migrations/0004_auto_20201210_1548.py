@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0003_accountmember_featureaccessrole_memberinvite'),
+        ("merchant", "0003_accountmember_featureaccessrole_memberinvite"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='beneficialowner',
-            name='passport_number',
+            model_name="beneficialowner",
+            name="passport_number",
             field=models.CharField(blank=True, max_length=32),
         ),
         migrations.AlterField(
-            model_name='controllerdetails',
-            name='passport_number',
+            model_name="controllerdetails",
+            name="passport_number",
             field=models.CharField(blank=True, max_length=32),
         ),
     ]

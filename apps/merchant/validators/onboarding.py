@@ -1,15 +1,15 @@
 from api import serializers
 from apps.box.validators import BoxFileIdSerializer
-from apps.merchant.models import IncorporationDetails, ControllerDetails, BeneficialOwner
+from apps.merchant.models import (BeneficialOwner, ControllerDetails,
+                                  IncorporationDetails)
 from apps.merchant.options import BusinessTypes
-
 
 __all__ = (
     "IncorporationDetailsValidator",
     "ControllerValidator",
-    'BeneficialOwnerValidator',
-    'UpdateBeneficialOwnerValidator',
-    'RemoveBeneficialOwnerValidator',    
+    "BeneficialOwnerValidator",
+    "UpdateBeneficialOwnerValidator",
+    "RemoveBeneficialOwnerValidator",
 )
 
 
@@ -19,7 +19,11 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
 
     class Meta:
         model = IncorporationDetails
-        exclude = ("merchant", "verification_document_type", "verification_document_file",)
+        exclude = (
+            "merchant",
+            "verification_document_type",
+            "verification_document_file",
+        )
 
 
 class ControllerValidator(serializers.ModelSerializer):
@@ -28,9 +32,7 @@ class ControllerValidator(serializers.ModelSerializer):
 
     class Meta:
         model = ControllerDetails
-        exclude = (
-            "merchant",
-        )
+        exclude = ("merchant",)
 
 
 class BeneficialOwnerValidator(serializers.ModelSerializer):
@@ -39,9 +41,7 @@ class BeneficialOwnerValidator(serializers.ModelSerializer):
 
     class Meta:
         model = BeneficialOwner
-        exclude = (
-            "merchant",
-        )
+        exclude = ("merchant",)
 
 
 class UpdateBeneficialOwnerValidator(BeneficialOwnerValidator):

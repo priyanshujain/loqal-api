@@ -15,7 +15,7 @@ class IsMerchantAccountPendingPermission(BasePermission):
             merchant_account = request.merchant_account
         except AttributeError:
             return False
-        
+
         if merchant_account.account_status != MerchantAccountStatus.PENDING:
             return False
 

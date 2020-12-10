@@ -5,7 +5,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import (create_account_member_from_team_invite,
-                               get_member_invite_by_token)
+                                 get_member_invite_by_token)
 from apps.merchant.validators import MemberSignupValidator
 
 __all__ = ("MemberSignup",)

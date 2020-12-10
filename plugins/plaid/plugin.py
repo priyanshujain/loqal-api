@@ -49,7 +49,9 @@ class PlaidPlugin(object):
                         "client_user_id": user_account_id,
                     },
                     "products": ["auth"],
-                    "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
+                    "client_name": getattr(
+                        settings, "PLAID_APP_NAME", "Loqal"
+                    ),
                     "country_codes": ["US"],
                     "language": "en",
                 }
@@ -57,7 +59,7 @@ class PlaidPlugin(object):
         except InvalidInputError:
             return None
         return self._link_token
-    
+
     def exchange_public_token(self, public_token):
         """
         Exchange access_token with short lived public_token

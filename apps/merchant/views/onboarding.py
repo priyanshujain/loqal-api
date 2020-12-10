@@ -1,16 +1,13 @@
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
 from apps.merchant.responses import OnboardingDataResponse
-from apps.merchant.services import (
-    CreateIncorporationDetails,
-    UpdateIncorporationDetails,
-    CreateControllerDetails,
-    UpdateControllerDetails,
-    CreateBeneficialOwner,
-    UpdateBeneficialOwner,
-    RemoveBeneficialOwner,
-)
-
+from apps.merchant.services import (CreateBeneficialOwner,
+                                    CreateControllerDetails,
+                                    CreateIncorporationDetails,
+                                    RemoveBeneficialOwner,
+                                    UpdateBeneficialOwner,
+                                    UpdateControllerDetails,
+                                    UpdateIncorporationDetails)
 
 __all__ = (
     "CreateIncorporationDetailsAPI",

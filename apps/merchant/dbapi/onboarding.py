@@ -1,10 +1,7 @@
 from django.db import IntegrityError
 
-from apps.merchant.models import (
-    IncorporationDetails,
-    ControllerDetails,
-    BeneficialOwner,
-)
+from apps.merchant.models import (BeneficialOwner, ControllerDetails,
+                                  IncorporationDetails)
 
 __all__ = (
     "get_incorporation_details",
@@ -38,9 +35,9 @@ def create_incorporation_details(merchant_id, **kwargs):
 
 
 def update_incorporation_details(incorporation_details_id, **kwargs):
-    return IncorporationDetails.objects.filter(id=incorporation_details_id).update(
-        **kwargs
-    )
+    return IncorporationDetails.objects.filter(
+        id=incorporation_details_id
+    ).update(**kwargs)
 
 
 def get_incorporation_details(merchant_id):
@@ -61,9 +58,9 @@ def create_incorporation_details(merchant_id, **kwargs):
 
 
 def update_incorporation_details(incorporation_details_id, **kwargs):
-    return IncorporationDetails.objects.filter(id=incorporation_details_id).update(
-        **kwargs
-    )
+    return IncorporationDetails.objects.filter(
+        id=incorporation_details_id
+    ).update(**kwargs)
 
 
 def get_controller_details(merchant_id):
@@ -84,7 +81,9 @@ def create_controller_details(merchant_id, **kwargs):
 
 
 def update_controller_details(merchant_id, **kwargs):
-    return ControllerDetails.objects.filter(merchant_id=merchant_id).update(**kwargs)
+    return ControllerDetails.objects.filter(merchant_id=merchant_id).update(
+        **kwargs
+    )
 
 
 def get_beneficial_owner(merchant_id, beneficial_owner_id):
