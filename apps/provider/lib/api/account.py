@@ -11,3 +11,9 @@ class Account(API):
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )
+    
+    def create_merchant_account(self, **kwargs):
+        request_method = self.psp_client.account.create_merchant_account
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )

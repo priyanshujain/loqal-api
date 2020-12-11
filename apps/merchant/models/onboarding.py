@@ -21,6 +21,7 @@ class IncorporationDetails(AbstractBaseModel):
     registered_address = models.JSONField()
     business_type = models.CharField(max_length=32)
     business_classification = models.CharField(max_length=64)
+    business_classification_id = models.CharField(max_length=64)
     verification_document_type = models.CharField(max_length=32, blank=True)
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True

@@ -1,5 +1,3 @@
-import re
-
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, InternalDBError, ValidationError

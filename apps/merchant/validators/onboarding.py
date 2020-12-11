@@ -1,8 +1,13 @@
+from api.exceptions import ErrorDetail, ValidationError
 from api import serializers
-from apps.box.validators import BoxFileIdSerializer
-from apps.merchant.models import (BeneficialOwner, ControllerDetails,
-                                  IncorporationDetails)
+from apps.merchant.models import (
+    BeneficialOwner,
+    ControllerDetails,
+    IncorporationDetails,
+)
 from apps.merchant.options import BusinessTypes
+from apps.account.models import MerchantAccount
+from django.utils.translation import gettext as _
 
 __all__ = (
     "IncorporationDetailsValidator",
@@ -10,6 +15,7 @@ __all__ = (
     "BeneficialOwnerValidator",
     "UpdateBeneficialOwnerValidator",
     "RemoveBeneficialOwnerValidator",
+    "OnboardingDataValidator",
 )
 
 
@@ -34,6 +40,9 @@ class ControllerValidator(serializers.ModelSerializer):
         model = ControllerDetails
         exclude = ("merchant",)
 
+    # def validate(attr):
+    # TODO: Add other validators for the controller
+
 
 class BeneficialOwnerValidator(serializers.ModelSerializer):
     dob = serializers.DateField(format="%Y-%m-%d")
@@ -50,3 +59,35 @@ class UpdateBeneficialOwnerValidator(BeneficialOwnerValidator):
 
 class RemoveBeneficialOwnerValidator(serializers.ValidationSerializer):
     id = serializers.IntegerField()
+
+
+class OnboardingDataValidator(serializers.ModelSerializer):
+    incorporation_details = IncorporationDetailsValidator()
+    controller_details = ControllerValidator()
+
+    class Meta:
+        model = MerchantAccount
+        fields = (
+            "incorporation_details",
+            "controller_details",
+        )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        incorporation_details = attrs.get("incorporation_details")
+        controller_details = attrs.get("controller_details")
+        business_type = incorporation_details["business_type"]
+        if (
+            business_type != BusinessTypes.SOLE_PROPRIETORSHIP.value
+            and not controller_details["title"]
+        ):
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Controller title is required if you are a llp or a corporation."
+                        )
+                    )
+                }
+            )
+        return attrs

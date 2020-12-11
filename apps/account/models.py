@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
-from apps.account.options import MerchantAccountStatus
+from apps.account.options import AccountStatus
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceEnumField
@@ -57,10 +57,15 @@ class MerchantAccount(AbstractBaseModel):
     company_name = models.CharField(max_length=256)
     company_email = models.CharField(max_length=255)
     account_status = ChoiceEnumField(
-        enum_type=MerchantAccountStatus,
-        default=MerchantAccountStatus.PENDING,
+        enum_type=AccountStatus,
+        default=AccountStatus.PENDING,
         help_text=_("Status for the merchant account with dwolla."),
     )
+
+    def update_status(self, status):
+        status = getattr(AccountStatus, status)
+        self.account_status = status
+        self.save()
 
     class Meta:
         db_table = "account_settings"

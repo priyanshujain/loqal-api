@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from apps.account.options import MerchantAccountStatus
+from apps.account.options import AccountStatus
 
 
 class IsMerchantAccountPendingPermission(BasePermission):
@@ -16,7 +16,7 @@ class IsMerchantAccountPendingPermission(BasePermission):
         except AttributeError:
             return False
 
-        if merchant_account.account_status != MerchantAccountStatus.PENDING:
+        if merchant_account.account_status != AccountStatus.PENDING:
             return False
 
         return True

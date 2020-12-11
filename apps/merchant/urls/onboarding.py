@@ -7,7 +7,8 @@ from apps.merchant.views.onboarding import (CreateBeneficialOwnerAPI,
                                             RemoveBeneficialOwnerAPI,
                                             UpdateBeneficialOwnerAPI,
                                             UpdateControllerAPI,
-                                            UpdateIncorporationDetailsAPI)
+                                            UpdateIncorporationDetailsAPI,
+                                            SubmitKycDataAPI,)
 
 urlpatterns = [
     path(
@@ -49,5 +50,10 @@ urlpatterns = [
         "onboarding/data/",
         OnboardingDataAPI.as_view(),
         name="view_onboarding_data",
+    ),
+    path(
+        "onboarding/submit-kyc/",
+        SubmitKycDataAPI.as_view(),
+        name="submit_kyc_data",
     ),
 ]
