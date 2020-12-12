@@ -2,11 +2,11 @@ from re import error
 
 from django.conf import settings
 from django.utils.translation import gettext as _
-from rest_framework.utils.serializer_helpers import ReturnDict
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
+from apps.user.dbapi import get_user_by_phone
 from apps.user.models import Authenticator
 from apps.user.validators import OtpAuthValidator, PhoneNumberValidator
 
@@ -42,7 +42,20 @@ class AddPhoneNumber(ServiceBase):
                     )
                 }
             )
-        return run_validator(validator=PhoneNumberValidator, data=data)
+        data = run_validator(validator=PhoneNumberValidator, data=data)
+        phone_number = data["phone_number"]
+        phone_user = get_user_by_phone(phone_number=phone_number)
+        if phone_user and phone_user.id != self.user.id:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "User with this phone number already exist please use a different phone number."
+                        )
+                    )
+                }
+            )
+        return data
 
 
 class VerifyPhoneNumber(ServiceBase):
@@ -98,12 +111,14 @@ class EnrollSmsAuthenticator(object):
             user=self.user, interface_id="sms"
         )
         phone_number = self.user.phone_number
+        phone_number_verified = self.user.phone_number_verified
+
         if not phone_number:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Phone number has not been added."))}
             )
 
-        if interface.is_enrolled():
+        if phone_number_verified:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -111,6 +126,9 @@ class EnrollSmsAuthenticator(object):
                     )
                 }
             )
+
+        if not interface.is_enrolled():
+            self._enroll_interface(interface)
 
         interface.phone_number = phone_number
         return interface
@@ -127,28 +145,14 @@ class EnrollSmsAuthenticator(object):
         interface = self._validate_interface()
 
         # If dev environment validate otp by 222222
-        error = False
         if settings.APP_ENV == "development":
             if otp == "222222":
                 self.activate_interface(interface=interface)
                 return True
             else:
-                error = True
+                return False
 
-        if interface.validate_otp(otp):
-            self.activate_interface(interface=interface)
-            return True
-        else:
-            error = True
+        return interface.validate_otp(otp)
 
-        if error:
-            raise ValidationError(
-                {
-                    "otp": ErrorDetail(
-                        _("Invalid confirmation code. Try again.")
-                    )
-                }
-            )
-
-    def activate_interface(self, interface):
+    def _enroll_interface(self, interface):
         interface.enroll(self.user)
