@@ -22,14 +22,18 @@ class Payment(Http):
         Dwolla endpoint for founding-sources.
         """
 
-        return f"{self.config.environment_url()}/funding-sources/{bank_account_dwolla_id}"
+        return {
+            "href": f"{self.config.environment_url()}/funding-sources/{bank_account_dwolla_id}"
+        }
 
     def cusotmer_url(self, account_dwolla_id):
         """
         Dwolla endpoint for cusotmers.
         """
 
-        return f"{self.config.environment_url()}/customers/{account_dwolla_id}"
+        return {
+            "href": f"{self.config.environment_url()}/customers/{account_dwolla_id}"
+        }
 
     def create_new_payment(self, data):
         """

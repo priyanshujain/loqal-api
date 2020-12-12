@@ -1,21 +1,20 @@
-from django.utils.translation import gettext as _
 from django.conf import settings
+from django.utils.translation import gettext as _
+
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
+from apps.account.options import AccountStatus
 from apps.banking.dbapi import get_bank_account
 from apps.payment.dbapi import create_transaction
-from apps.payment.options import (
-    FACILITATION_FEES_CURRENCY,
-    FACILITATION_FEES_PERCENTAGE,
-)
+from apps.payment.options import (FACILITATION_FEES_CURRENCY,
+                                  FACILITATION_FEES_PERCENTAGE)
 from apps.payment.validators import CreatePaymentValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
 from integrations.utils.options import RequestStatusTypes
 from plugins.plaid import PlaidPlugin
-
 
 __all__ = ("CreatePayment",)
 
@@ -36,12 +35,25 @@ class CreatePayment(ServiceBase):
         recipient_bank_account = get_bank_account(
             account_id=merchant_account.account.id
         )
+        if not recipient_bank_account:
+            raise ValidationError(
+                {"detail": ErrorDetail("Merchant account is not active yet.")}
+            )
+
         balance = self._check_balance(bank_account=sender_bank_account)
-        min_required_balance = payment_amount + tip_amount + settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+        min_required_balance = (
+            payment_amount
+            + tip_amount
+            + settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+        )
         if balance < min_required_balance:
-            raise ValidationError({
-                "detail": ErrorDetail("You need minimum $100 excess of given amount to make a payment.")
-            })
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "You need minimum $100 excess of given amount to make a payment."
+                    )
+                }
+            )
 
         transaction = self._factory_transaction(
             sender_id=sender_bank_account.id,
@@ -58,11 +70,27 @@ class CreatePayment(ServiceBase):
         data = run_validator(CreatePaymentValidator, self.data)
         merchant_id = data["merchant_id"]
 
-        merchant_account = get_merchant_account_by_uid(merchant_uid=merchant_id)
+        merchant_account = get_merchant_account_by_uid(
+            merchant_uid=merchant_id
+        )
         if not merchant_account:
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Given merchant does not exist."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Given merchant does not exist.")
+                    )
+                }
             )
+
+        if merchant_account.account_status != AccountStatus.VERIFIED:
+            raise ValidationError(
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Merchant account is not active yet.")
+                    )
+                }
+            )
+
         return {
             "merchant_account": merchant_account,
             "payment_amount": data["payment_amount"],
@@ -77,14 +105,22 @@ class CreatePayment(ServiceBase):
             account_id=bank_account.plaid_account_id,
         )
         if not balance:
-            raise ValidationError({
-                "detail": ErrorDetail(_("Balance check failed, please try again."))
-            })
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Balance check failed, please try again.")
+                    )
+                }
+            )
         return balance
-        
 
     def _factory_transaction(
-        self, sender_id, recipient_id, payment_amount, tip_amount, payment_currency
+        self,
+        sender_id,
+        recipient_id,
+        payment_amount,
+        tip_amount,
+        payment_currency,
     ):
         fee_amount = payment_amount * FACILITATION_FEES_PERCENTAGE / 100
         fee_amount = round(fee_amount, 2)

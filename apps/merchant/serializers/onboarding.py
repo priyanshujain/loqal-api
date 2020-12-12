@@ -17,6 +17,7 @@ class ControllerDetailsSerializer(serializers.ModelSerializer):
         model = ControllerDetails
         fields = "__all__"
 
+
 class OnboardingDataSerializer(serializers.ModelSerializer):
     incorporation_details = IncorporationDetailsSerializer(
         source="incorporationdetails", read_only=True

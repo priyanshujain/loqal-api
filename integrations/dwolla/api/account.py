@@ -3,12 +3,12 @@ This module provides a class for account creation related calls to the dwolla AP
 """
 
 from rest_framework.exceptions import bad_request
-from integrations.dwolla.http import Http
-from integrations.dwolla.adapters.kyc import get_adapted_kyc_data
-from apps.account.options import AccountStatus
-from integrations.dwolla.errors import BadRequestError
-from integrations.utils.options import RequestStatusTypes
 
+from apps.account.options import AccountStatus
+from integrations.dwolla.adapters.kyc import get_adapted_kyc_data
+from integrations.dwolla.errors import BadRequestError
+from integrations.dwolla.http import Http
+from integrations.utils.options import RequestStatusTypes
 
 __all__ = "Account"
 
@@ -37,7 +37,9 @@ class Account(Http):
             retry=False,
         )
         response = response.json()
-        return {"status": getattr(MerchantAccountStatusMap, response["status"])}
+        return {
+            "status": getattr(MerchantAccountStatusMap, response["status"])
+        }
 
     def create_consumer_account(self, data):
         """
@@ -79,10 +81,13 @@ class Account(Http):
                 "status": RequestStatusTypes.ERROR,
                 "errors": err.errors,
             }
-        
+
         response_headers = response.headers
         location = response_headers["location"]
         dwolla_customer_id = location.split("/").pop()
 
         account = self.get_account(customer_id=dwolla_customer_id)
-        return {"dwolla_customer_id": dwolla_customer_id, "status": account["status"]}
+        return {
+            "dwolla_customer_id": dwolla_customer_id,
+            "status": account["status"],
+        }

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0006_auto_20201211_1541'),
+        ("account", "0006_auto_20201211_1541"),
     ]
 
     operations = [
         migrations.AlterModelTable(
-            name='merchantaccount',
-            table='merchant_account',
+            name="merchantaccount",
+            table="merchant_account",
         ),
     ]

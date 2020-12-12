@@ -4,6 +4,7 @@ from django.conf import settings
 from plaid import Client
 from plaid.api import accounts, institutions
 from plaid.errors import InvalidInputError
+from rest_framework.exceptions import ErrorDetail
 
 from integrations.exceptions import IntegrationAPIError
 
@@ -139,3 +140,17 @@ class PlaidPlugin(object):
             "name": institution["name"],
             "logo_base64": institution["logo"],
         }
+
+    def get_balance(self, access_token, account_id):
+        """
+        Get institution name and logo for given institution_id
+        """
+        accounts = self._client.Accounts.balance.get(
+            access_token=access_token,
+            account_ids=[account_id],
+        ).get(
+            "accounts",
+        )
+        if accounts and len(accounts) > 0:
+            return float(accounts[0]["balances"]["available"])
+        return None

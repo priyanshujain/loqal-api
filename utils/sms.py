@@ -7,5 +7,5 @@ def sms_available():
 
 
 def send_sms(body, to, from_=None):
-    print(body, to, from_)
+    print(body)
     return True

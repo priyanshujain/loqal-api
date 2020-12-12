@@ -368,3 +368,7 @@ SENTRY_ENCRYPTION_SCHEMES = ()
 
 # Max file size for avatar photo uploads
 MAX_AVATAR_SIZE = 5000000
+
+
+# Transaction settings
+MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00

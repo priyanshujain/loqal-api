@@ -1,13 +1,11 @@
-from api.exceptions import ErrorDetail, ValidationError
-from api import serializers
-from apps.merchant.models import (
-    BeneficialOwner,
-    ControllerDetails,
-    IncorporationDetails,
-)
-from apps.merchant.options import BusinessTypes
-from apps.account.models import MerchantAccount
 from django.utils.translation import gettext as _
+
+from api import serializers
+from api.exceptions import ErrorDetail, ValidationError
+from apps.account.models import MerchantAccount
+from apps.merchant.models import (BeneficialOwner, ControllerDetails,
+                                  IncorporationDetails)
+from apps.merchant.options import BusinessTypes
 
 __all__ = (
     "IncorporationDetailsValidator",

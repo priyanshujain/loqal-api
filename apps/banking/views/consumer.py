@@ -1,8 +1,8 @@
 from api.views import ConsumerAPIView
-from apps.banking.response import BankAccountResponse
-from apps.banking.services import CreateBankAccount
 from apps.banking.dbapi import get_bank_account
-from apps.banking.services import PlaidLink
+from apps.banking.response import BankAccountResponse
+from apps.banking.services import CreateBankAccount, PlaidLink
+
 
 class CreateBankAccountAPI(ConsumerAPIView):
     def post(self, request):

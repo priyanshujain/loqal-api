@@ -1,16 +1,14 @@
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
 from apps.merchant.responses import OnboardingDataResponse
-from apps.merchant.services import (
-    CreateBeneficialOwner,
-    CreateControllerDetails,
-    CreateIncorporationDetails,
-    RemoveBeneficialOwner,
-    UpdateBeneficialOwner,
-    UpdateControllerDetails,
-    UpdateIncorporationDetails,
-    CreateDwollaMerchantAccount,
-)
+from apps.merchant.services import (CreateBeneficialOwner,
+                                    CreateControllerDetails,
+                                    CreateDwollaMerchantAccount,
+                                    CreateIncorporationDetails,
+                                    RemoveBeneficialOwner,
+                                    UpdateBeneficialOwner,
+                                    UpdateControllerDetails,
+                                    UpdateIncorporationDetails)
 
 __all__ = (
     "CreateIncorporationDetailsAPI",
@@ -152,6 +150,8 @@ class SubmitKycDataAPI(MerchantAPIView):
         user = request.user
         ip_address = request.ip
         res_data = CreateDwollaMerchantAccount(
-            merchant_id=merchant_account.id, user_id=user.id, ip_address=ip_address
+            merchant_id=merchant_account.id,
+            user_id=user.id,
+            ip_address=ip_address,
         ).handle()
         return self.response(res_data)

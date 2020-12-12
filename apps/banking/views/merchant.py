@@ -1,9 +1,10 @@
 import re
+
 from api.views import MerchantAPIView
-from apps.banking.response import BankAccountResponse
-from apps.banking.services import CreateBankAccount
 from apps.banking.dbapi import get_bank_account
-from apps.banking.services import PlaidLink
+from apps.banking.response import BankAccountResponse
+from apps.banking.services import CreateBankAccount, PlaidLink
+
 
 class CreateBankAccountAPI(MerchantAPIView):
     # TODO: add permission classes
@@ -16,11 +17,16 @@ class CreateBankAccountAPI(MerchantAPIView):
             return self.response(BankAccountResponse(bank_account).data)
 
         bank_account = self._run_services(account_id=account.id)
-        return self.response(BankAccountResponse(bank_account).data, status=201)
+        return self.response(
+            BankAccountResponse(bank_account).data, status=201
+        )
 
     def _run_services(self, account_id):
-        service = CreateBankAccount(account_id=account_id, data=self.request_data)
+        service = CreateBankAccount(
+            account_id=account_id, data=self.request_data
+        )
         return service.handle()
+
 
 class GetBankAccountAPI(MerchantAPIView):
     def get(self, request):

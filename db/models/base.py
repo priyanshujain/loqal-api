@@ -10,7 +10,7 @@ __all__ = ("BaseModel",)
 class BaseModel(models.Model):
     # A unique id as string but not PK as we dont't want to expose PK's
     u_id = models.UUIDField(
-        primary_key=False, default=uuid.uuid4, editable=False
+        primary_key=False, default=uuid.uuid4, unique=True, editable=False
     )
 
     # A timestamp representing when this object was created.

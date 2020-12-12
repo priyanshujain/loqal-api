@@ -5,10 +5,10 @@ from apps.merchant.views.onboarding import (CreateBeneficialOwnerAPI,
                                             CreateIncorporationDetailsAPI,
                                             OnboardingDataAPI,
                                             RemoveBeneficialOwnerAPI,
+                                            SubmitKycDataAPI,
                                             UpdateBeneficialOwnerAPI,
                                             UpdateControllerAPI,
-                                            UpdateIncorporationDetailsAPI,
-                                            SubmitKycDataAPI,)
+                                            UpdateIncorporationDetailsAPI)
 
 urlpatterns = [
     path(
