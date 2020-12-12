@@ -12,6 +12,7 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
     account_status = serializers.CharField(
         source="account_status.label", read_only=True
     )
+    uid = serializers.UUIDField(source="u_id", read_only=True)
 
     class Meta:
         model = MerchantAccount
@@ -22,6 +23,7 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             "company_name",
             "company_email",
             "account_status",
+            "uid",
         )
 
 
@@ -31,4 +33,5 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
         fields = (
             "id",
             "company_name",
+            "uid",
         )
