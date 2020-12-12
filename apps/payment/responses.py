@@ -5,7 +5,7 @@ __all__ = ("TransactionResponse",)
 
 
 class TransactionResponse(serializers.ModelSerializer):
-    recipient_id = models.IntegerField(source="recipient", read_only=True)
+    recipient_id = serializers.IntegerField(source="recipient.id", read_only=True)
 
     class Meta:
         model = Transaction

@@ -1,25 +1,26 @@
 from django.urls import path
 
-from apps.banking.views.consumer import (
+from apps.banking.views.merchant import (
     CreateBankAccountAPI,
     GetBankAccountAPI,
     PlaidLinkTokenAPI,
 )
 
+
 urlpatterns = [
     path(
-        "consumer/accounts/create/",
+        "merchant/accounts/create/",
         CreateBankAccountAPI.as_view(),
-        name="create_consumer_bank_account",
+        name="create_merchant_bank_account",
     ),
     path(
-        "consumer/accounts/plaid-token/",
+        "merchant/plaid-token/",
         PlaidLinkTokenAPI.as_view(),
-        name="create_consumer_plaid_token",
+        name="create_merchant_plaid_token",
     ),
     path(
-        "consumer/accounts/",
+        "merchant/accounts/",
         GetBankAccountAPI.as_view(),
-        name="view_consumer_bank_account",
+        name="view_merchant_bank_account",
     ),
 ]

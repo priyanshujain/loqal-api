@@ -22,8 +22,9 @@ def create_transaction(
     sender_id,
     recipient_id,
     payment_amount,
+    tip_amount,
     payment_currency,
-    fee_value,
+    fee_amount,
     fee_currency,
 ):
     """
@@ -35,8 +36,9 @@ def create_transaction(
             sender_id=sender_id,
             recipient_id=recipient_id,
             payment_amount=payment_amount,
+            tip_amount=tip_amount,
             payment_currency=payment_currency,
-            fee_value=fee_value,
+            fee_amount=fee_amount,
             fee_currency=fee_currency,
         )
     except IntegrityError:

@@ -7,30 +7,35 @@ from api.exceptions import ErrorDetail, ValidationError
 
 
 class CreatePaymentValidator(serializers.ValidationSerializer):
-    merchant_id = serializers.IntegerField()
-    amount = serializers.FloatField(min_value=0)
+    merchant_id = serializers.UUIDField()
+    payment_amount = serializers.FloatField(min_value=0)
+    tip_amount = serializers.FloatField(min_value=0)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        amount = attrs.get("amount")
+        payment_amount = attrs.get("payment_amount")
+        tip_amount = attrs.get("tip_amount")
 
-        if amount < 1.00:
+        if payment_amount < 1.00:
+            raise ValidationError(
+                {"amount": [ErrorDetail(_("Amount should be greater than a dollar."))]}
+            )
+        payment_amount_decimal = decimal.Decimal(str(payment_amount))
+        if payment_amount_decimal.as_tuple().exponent > 2:
             raise ValidationError(
                 {
-                    "amount": [
-                        ErrorDetail(
-                            _("Amount should be greater than a dollar.")
-                        )
+                    "payment_amount": [
+                        ErrorDetail(_("Amount can only have two digits after decimal."))
                     ]
                 }
             )
-        amount_decimal = decimal.Decimal(str(amount))
-        if amount_decimal.as_tuple().exponent > 2:
+        tip_amount_decimal = decimal.Decimal(str(tip_amount))
+        if tip_amount_decimal.as_tuple().exponent > 2:
             raise ValidationError(
                 {
-                    "amount": [
+                    "tip_amount": [
                         ErrorDetail(
-                            _("Amount can only have two digits after decimal.")
+                            _("Tip amount can only have two digits after decimal.")
                         )
                     ]
                 }

@@ -1,4 +1,5 @@
 from datetime import timedelta
+import re
 
 from django.utils.timezone import now
 
@@ -17,6 +18,7 @@ __all__ = (
     "gen_reset_password_token",
     "get_reset_password_object_by_token",
     "get_user_by_email_token",
+    "get_user_by_phone",
 )
 
 
@@ -143,4 +145,11 @@ def get_user_by_email_token(token):
     qs = User.objects.filter(email_verification_token=token)
     if qs.exists():
         return qs.first()
+    return None
+
+
+def get_user_by_phone(phone_number):
+    user_qs = User.objects.filter(phone_number=phone_number)
+    if user_qs.exists():
+        return user_qs.first()
     return None

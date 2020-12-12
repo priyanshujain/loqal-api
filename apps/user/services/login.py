@@ -47,31 +47,21 @@ class SmsOtpAuth(object):
 
     def validate_otp(self):
         data = run_validator(validator=OtpAuthValidator, data=self.data)
-        otp = self.data["otp"]
+        otp = data["otp"]
 
         interface = self._validate_interface()
-        error = False
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "development":
             if otp == "222222":
                 self.perform_login(interface=interface)
                 return
             else:
-                error = True
+                return False
 
         if interface.validate_otp(otp):
             self.perform_login(interface=interface)
         else:
-            error = True
-
-        if error:
-            raise ValidationError(
-                {
-                    "otp": ErrorDetail(
-                        _("Invalid confirmation code. Try again.")
-                    )
-                }
-            )
+            return False
 
     def perform_login(self, interface):
         auth.login(request=self.request, user=self.user, passed_2fa=True)

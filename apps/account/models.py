@@ -68,4 +68,4 @@ class MerchantAccount(AbstractBaseModel):
         self.save()
 
     class Meta:
-        db_table = "account_settings"
+        db_table = "merchant_account"

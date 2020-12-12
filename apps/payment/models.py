@@ -65,8 +65,9 @@ class Transaction(AbstractBaseModel):
         related_name="recipient_bank_account",
     )
     payment_amount = models.FloatField()
+    tip_amount = models.FloatField(default=0)
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    fee_value = models.FloatField(default=0.0)
+    fee_amount = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     status = models.CharField(
         max_length=128, default=TransactionStatus.NOT_SENT
@@ -78,6 +79,7 @@ class Transaction(AbstractBaseModel):
 
     def add_dwolla_id(self, dwolla_id):
         self.dwolla_id = dwolla_id
+        self.status = TransactionStatus.PENDING
         self.save()
 
     class Meta:
