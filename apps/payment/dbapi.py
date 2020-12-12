@@ -43,3 +43,15 @@ def create_transaction(
         )
     except IntegrityError:
         return None
+
+
+def get_transactions(account_id):
+    """
+    get transactions for an account.
+    """
+    try:
+        return Transaction.objects.filter(
+            account_id=account_id,
+        )
+    except IntegrityError:
+        return None

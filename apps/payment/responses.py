@@ -1,20 +1,22 @@
 from api import serializers
+from apps.account.responses import MerchantDetailsResponse
 from apps.payment.models import Transaction, models
 
 __all__ = ("TransactionResponse",)
 
 
 class TransactionResponse(serializers.ModelSerializer):
-    recipient_id = serializers.IntegerField(
-        source="recipient.id", read_only=True
+    merchant = MerchantDetailsResponse(
+        source="recipient.account.merchantaccount", read_only=True
     )
 
     class Meta:
         model = Transaction
         fields = (
             "id",
-            "recipient_id",
+            "merchant",
             "payment_amount",
+            "tip_amount",
             "payment_currency",
             "status",
         )

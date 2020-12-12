@@ -1,7 +1,10 @@
 from api import serializers
 from apps.account.models import MerchantAccount
 
-__all__ = ("MerchantAccountProfileResponse",)
+__all__ = (
+    "MerchantAccountProfileResponse",
+    "MerchantDetailsResponse",
+)
 
 
 class MerchantAccountProfileResponse(serializers.ModelSerializer):
@@ -19,4 +22,13 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             "company_name",
             "company_email",
             "account_status",
+        )
+
+
+class MerchantDetailsResponse(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantAccount
+        fields = (
+            "id",
+            "company_name",
         )
