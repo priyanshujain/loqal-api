@@ -33,5 +33,4 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
         fields = (
             "id",
             "company_name",
-            "uid",
         )
