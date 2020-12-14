@@ -17,7 +17,8 @@ from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
                                 EmailVerification, LoginRequest,
                                 RequestResetPassword, ResendPhoneNumberOtp,
                                 ResendSmsOtpAuth, ResetPasswordTokenValidate,
-                                Session, SmsOtpAuth, VerifyPhoneNumber)
+                                Session, SmsOtpAuth, VerifyPhoneNumber,
+                                StartSmsAuthEnrollment,)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils import auth
 from utils.shortcuts import img2base64, rand_str
@@ -167,7 +168,7 @@ class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
         return self.response()
 
     def _run_services(self, user):
-        ResendPhoneNumberOtp(user=user, request=self.request).handle()
+        ResendPhoneNumberOtp(user=user, request=self.request, data=self.request_data).handle()
 
 
 class AddPhoneNumberAPI(LoggedInAPIView):
@@ -178,6 +179,20 @@ class AddPhoneNumberAPI(LoggedInAPIView):
     def _run_services(self):
         service = AddPhoneNumber(request=self.request, data=self.request_data)
         service.handle()
+
+
+class StartSmsAuthEnrollmentAPI(LoggedInAPIView):
+    def post(self, request):
+        enrollment_secret = self._run_services()
+        return self.response(
+            {
+                "secret": enrollment_secret
+            }
+        )
+
+    def _run_services(self):
+        service = StartSmsAuthEnrollment(request=self.request)
+        return service.handle()
 
 
 class VerifyPhoneNumberAPI(LoggedInAPIView):

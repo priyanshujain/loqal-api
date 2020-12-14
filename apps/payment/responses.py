@@ -14,6 +14,7 @@ class TransactionResponse(serializers.ModelSerializer):
         model = Transaction
         fields = (
             "id",
+            "created_at",
             "merchant",
             "payment_amount",
             "tip_amount",

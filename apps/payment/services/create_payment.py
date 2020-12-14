@@ -32,6 +32,12 @@ class CreatePayment(ServiceBase):
         payment_currency = payment_data["payment_currency"]
 
         sender_bank_account = get_bank_account(account_id=self.account_id)
+
+        if not sender_bank_account:
+            raise ValidationError(
+                {"detail": ErrorDetail("Please add the bank account before making payment.")}
+            )
+
         recipient_bank_account = get_bank_account(
             account_id=merchant_account.account.id
         )

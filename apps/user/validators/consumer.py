@@ -12,6 +12,8 @@ __all__ = (
     "PhoneNumberValidator",
     "OtpAuthValidator",
     "AvatarValidator",
+    "VerifyPhoneNumberOtpValidator",
+    "ResendPhoneNumberOtpValidator",
 )
 
 
@@ -43,6 +45,16 @@ class OtpAuthValidator(serializers.ValidationSerializer):
 class PhoneNumberValidator(serializers.ValidationSerializer):
     # Add a phone_number validator
     phone_number = serializers.CharField()
+    secret = serializers.CharField()
+
+
+class VerifyPhoneNumberOtpValidator(serializers.ValidationSerializer):
+    otp = serializers.CharField(required=False, max_length=6)
+    secret = serializers.CharField()
+
+
+class ResendPhoneNumberOtpValidator(serializers.ValidationSerializer):
+    secret = serializers.CharField()
 
 
 class ForgotPasswordValidator(serializers.ValidationSerializer):

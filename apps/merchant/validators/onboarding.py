@@ -7,6 +7,9 @@ from apps.merchant.models import (BeneficialOwner, ControllerDetails,
                                   IncorporationDetails)
 from apps.merchant.options import BusinessTypes
 
+# from stdnum import ein
+
+
 __all__ = (
     "IncorporationDetailsValidator",
     "ControllerValidator",
@@ -28,6 +31,9 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
             "verification_document_type",
             "verification_document_file",
         )
+    
+    def validate_ein_number(self, ein_number):
+        pass
 
 
 class ControllerValidator(serializers.ModelSerializer):

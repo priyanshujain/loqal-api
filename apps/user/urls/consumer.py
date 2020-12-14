@@ -13,7 +13,8 @@ from apps.user.views import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                              UpdateUserProfileAPI, UserAvatarAPI,
                              UserChangePasswordAPI, UserLoginAPI,
                              UserLogoutAPI, UsernameOrEmailCheckAPI,
-                             VerifyEmailAPI, VerifyPhoneNumberAPI)
+                             VerifyEmailAPI, VerifyPhoneNumberAPI,
+                             StartSmsAuthEnrollmentAPI,)
 
 urlpatterns = [
     path("login/", UserLoginAPI.as_view(), name="user_login"),
@@ -24,6 +25,7 @@ urlpatterns = [
         name="otp_auth_resend",
     ),
     path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
+    path("auth/otp/enrollment/", StartSmsAuthEnrollmentAPI.as_view(), name="start_otp_enrollment"),
     path("phone/add/", AddPhoneNumberAPI.as_view(), name="add_phone_number"),
     path(
         "phone/verify/",
