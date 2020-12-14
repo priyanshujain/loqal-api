@@ -9,11 +9,13 @@ class TransactionResponse(serializers.ModelSerializer):
     merchant = MerchantDetailsResponse(
         source="recipient.account.merchantaccount", read_only=True
     )
+    uid = serializers.CharField(source="u_id.hex", read_only=True)
 
     class Meta:
         model = Transaction
         fields = (
             "id",
+            "uid",
             "created_at",
             "merchant",
             "payment_amount",
