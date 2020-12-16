@@ -4,8 +4,11 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi import create_merchant_account
 from apps.account.notifications import SendAccountVerifyEmail
-from apps.merchant.dbapi import (create_account_member_on_reg,
-                                 get_super_admin_role)
+from apps.merchant.dbapi import (
+    create_account_member_on_reg,
+    get_super_admin_role,
+    create_merchant_profile,
+)
 from apps.merchant.services import CreateDefaultRoles
 from apps.user.dbapi import create_user, get_user_by_email
 
@@ -13,21 +16,16 @@ __all__ = ("CreateMerchantAccount",)
 
 
 class CreateMerchantAccount(ServiceBase):
-    def __init__(
-        self,
-        first_name,
-        last_name,
-        email,
-        company_name,
-        phone_number,
-        password,
-    ):
-        self._first_name = first_name
-        self._last_name = last_name
-        self._email = email
-        self._company_name = company_name
-        self._contact_number = phone_number
-        self._password = password
+    def __init__(self, data):
+        self._first_name = data["first_name"]
+        self._last_name = data["last_name"]
+        self._email = data["email"]
+        self._company_name = data["company_name"]
+        self._contact_number = data["phone_number"]
+        self._password = data["password"]
+        self._address = data["address"]
+        self._category = data["category"]
+        self._sub_category = data["sub_category"]
 
     def handle(self):
         self._validate_data()
@@ -51,9 +49,16 @@ class CreateMerchantAccount(ServiceBase):
             )
 
     def _factory_merchant_account(self):
-        return create_merchant_account(
-            company_name=self._company_name, company_email=self._email
+        merchant_account = create_merchant_account(company_email=self._email)
+        create_merchant_profile(
+            merchant_id=merchant_account.id,
+            name=self._company_name,
+            address=self._address,
+            category=self._category,
+            sub_category=self._sub_category,
+            phone_number=self._contact_number,
         )
+        return merchant_account
 
     def _factory_user(self):
         return create_user(

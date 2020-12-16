@@ -20,7 +20,6 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             "created_at",
             "id",
             "zip_code",
-            "company_name",
             "company_email",
             "account_status",
             "uid",

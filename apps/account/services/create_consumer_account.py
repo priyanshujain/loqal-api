@@ -1,5 +1,6 @@
 from datetime import date
-
+from random import randint
+from apps.account.dbapi import check_account_username
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
@@ -12,7 +13,7 @@ from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_user_by_email
 
-__all__ = ("CreateConsumerAccount",)
+__all__ = ("CreateConsumerAccount", "GenerateUsername",)
 
 
 class CreateConsumerAccount(ServiceBase):
@@ -49,7 +50,8 @@ class CreateConsumerAccount(ServiceBase):
 
     def _factory_account(self, user):
         # TODO: Store spotlight terms and condition consent record
-        consumer_account = create_consumer_account(user_id=user.id)
+        username = GenerateUsername(user=user).handle()
+        consumer_account = create_consumer_account(user_id=user.id, username=username)
         self._factory_payment_register(account_id=consumer_account.account.id)
         return consumer_account
 
@@ -101,3 +103,20 @@ class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
             "status": response["data"].get("status"),
             "dwolla_customer_id": response["data"]["dwolla_customer_id"],
         }
+
+
+class GenerateUsername(object):
+    def __init__(self, user):
+        self.user = user
+    
+    def generate(self):
+        number = randint(11111, 99999)
+        first_name_i = self.user.first_name[0].lower()
+        last_name_i = self.user.last_name[1].lower()
+        return f"{number}@{first_name_i}{last_name_i}"
+
+    def handle(self):
+        username = self.generate()
+        while check_account_username(username=username):
+                   username = self.generate()
+        return username

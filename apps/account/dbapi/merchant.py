@@ -9,12 +9,11 @@ __all__ = (
 )
 
 
-def create_merchant_account(company_name, company_email):
+def create_merchant_account(company_email):
     account = Account.objects.create()
     try:
         return MerchantAccount.objects.create(
             account=account,
-            company_name=company_name,
             company_email=company_email,
         )
     except IntegrityError:

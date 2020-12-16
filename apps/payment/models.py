@@ -1,13 +1,14 @@
 from datetime import timedelta
 
 from django.db import models
+from db.models.fields import ChoiceEnumField
 from django.utils import timezone
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import TransactionStatus
+from apps.payment.options import TransactionStatus, PaymentRequestStatus
 from apps.provider.options import DEFAULT_CURRENCY
-from db.models.abstract import AbstractBaseModel
+from db.models import AbstractBaseModel
 from utils.shortcuts import generate_uuid_hex
 
 
@@ -69,8 +70,8 @@ class Transaction(AbstractBaseModel):
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_amount = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    status = models.CharField(
-        max_length=128, default=TransactionStatus.NOT_SENT
+    status = ChoiceEnumField(
+        default=TransactionStatus.NOT_SENT
     )
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
@@ -84,3 +85,29 @@ class Transaction(AbstractBaseModel):
 
     class Meta:
         db_table = "transaction"
+
+
+class PaymentRequest(AbstractBaseModel):
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    requested_to = models.ForeignKey(
+        Account,
+        on_delete=models.DO_NOTHING,
+        related_name="requested_to_account",
+    )
+    payment_amount = models.FloatField()
+    tip_amount = models.FloatField(default=0)
+    payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    fee_amount = models.FloatField(default=0.0)
+    fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    status = ChoiceEnumField(
+        default=PaymentRequestStatus.REQUEST_SENT
+    )
+    transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, null=True, blank=True)
+
+    def add_transaction(self, transaction, save=True):
+        self.transaction = transaction
+        if save:
+            self.save()
+
+    class Meta:
+        db_table = "payment_request"

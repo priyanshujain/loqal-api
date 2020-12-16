@@ -52,7 +52,8 @@ class User(BaseModel, AbstractBaseUser):
     first_name = models.CharField(max_length=155, blank=True)
     last_name = models.CharField(max_length=155, blank=True)
     secondary_email = models.EmailField(max_length=255, blank=True)
-    phone_number = models.CharField(max_length=255, blank=True)
+    phone_number = models.CharField(max_length=10, default=None, null=True, unique=True)
+    phone_number_country = models.CharField(max_length=2, default="US")
     phone_number_verified = models.BooleanField(default=False)
 
     # Avatar

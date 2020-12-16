@@ -6,6 +6,7 @@ from api import serializers
 __all__ = (
     "CreateConsumerAccountValidator",
     "ConsumerZipCodeValidator",
+    "ConsumerUsernameValidator",
 )
 
 
@@ -22,8 +23,17 @@ class CreateConsumerAccountValidator(serializers.ValidationSerializer):
 
 class ConsumerZipCodeValidator(serializers.ValidationSerializer):
     """
-    Validate consumer account
+    Validate consumer account zipcode
     """
 
     # TODO: Add a validator for 5 digit code
     zip_code = serializers.CharField(max_length=5)
+
+
+
+class ConsumerUsernameValidator(serializers.ValidationSerializer):
+    """
+    check consumer account username
+    """
+
+    username = serializers.CharField(max_length=32)

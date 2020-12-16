@@ -7,7 +7,8 @@ from apps.box.models import BoxFile
 from db.models import AbstractBaseModel
 from db.postgres.fields import ArrayField
 
-from .reference import MerchantCategory
+from apps.merchant.constants import MERCHANT_CATEGORIES
+
 
 __all__ = (
     "MerchantProfile",
@@ -21,8 +22,9 @@ class MerchantProfile(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=256)
     about = models.TextField(blank=True)
-    category = models.ForeignKey(MerchantCategory, on_delete=DO_NOTHING)
-    logo = models.ForeignKey(
+    category = models.CharField(max_length=64, default=MERCHANT_CATEGORIES[0]["category_slug"])
+    sub_category = models.CharField(max_length=64, default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"])
+    hero_image = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )
     address = models.JSONField()
@@ -33,7 +35,7 @@ class MerchantProfile(AbstractBaseModel):
     )
     website = models.URLField(blank=True)
     facebook_page = models.URLField(blank=True)
-    istagram_page = models.URLField(blank=True)
+    instagram_page = models.URLField(blank=True)
     youtube_page = models.URLField(blank=True)
     yelp_page = models.URLField(blank=True)
     phone_number = models.CharField(max_length=15)

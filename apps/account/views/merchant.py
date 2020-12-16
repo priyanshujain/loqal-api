@@ -19,14 +19,7 @@ class MerchantSignupAPI(APIView):
         return self.response(status=201)
 
     def _run_services(self, data):
-        service = CreateMerchantAccount(
-            first_name=data["first_name"],
-            last_name=data["last_name"],
-            email=data["email"],
-            company_name=data["company_name"],
-            phone_number=data["phone_number"],
-            password=data["password"],
-        )
+        service = CreateMerchantAccount(data=data)
         service.handle()
 
 
