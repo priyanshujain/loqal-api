@@ -63,7 +63,7 @@ class IncorporationDetailsAdapter(Adapter):
         source="business_type", format_callback=format_business_type
     )
     businessClassification = Field(source="business_classification_id")
-    ein = Field(source="ein_number")
+    ein = Field(source="ein_number", required=False)
 
 
 def get_adapted_kyc_data(data):
