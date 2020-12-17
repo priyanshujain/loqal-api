@@ -21,7 +21,7 @@ class EditProfileValidator(serializers.ValidationSerializer):
     first_name = serializers.CharField(max_length=64)
     last_name = serializers.CharField(max_length=64, required=False)
     phone_number = serializers.CharField(
-        max_length=20, allow_blank=True, required=False
+        max_length=10, allow_blank=True, required=False
     )
     position = serializers.CharField(
         max_length=255, allow_blank=True, required=False
@@ -44,7 +44,7 @@ class OtpAuthValidator(serializers.ValidationSerializer):
 
 class PhoneNumberValidator(serializers.ValidationSerializer):
     # Add a phone_number validator
-    phone_number = serializers.CharField()
+    phone_number = serializers.CharField(max_length=10)
     secret = serializers.CharField()
 
 
