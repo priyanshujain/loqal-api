@@ -23,9 +23,8 @@ class PaymentHistoryAPI(ConsumerAPIView):
         account_id = request.account.id
         transactions = get_transactions(account_id=account_id)
         return self.response(
-            TransactionResponse(transactions, many=True).data, status=201
+            TransactionResponse(transactions, many=True).data
         )
-
 
 
 class CreatePaymentRequestAPI(MerchantAPIView):
@@ -35,20 +34,17 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         return self.response(PaymentRequestResponse(payment_request).data, status=201)
 
 
-
 class ListMerchantPaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
         payment_requests = get_merchant_payment_reqeust(account_id=account_id)
-        return self.response(PaymentRequestResponse(payment_requests).data, status=201)
-
-
+        return self.response(PaymentRequestResponse(payment_requests).data)
 
 
 class ListConsumerPaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
         payment_requests = get_consumer_payment_reqeust(account_id=account_id)
-        return self.response(ConsumerPaymentRequestResponse(payment_requests).data, status=201)
+        return self.response(ConsumerPaymentRequestResponse(payment_requests).data)
 
 
