@@ -1,4 +1,3 @@
-from datetime import date
 from random import randint
 from apps.account.dbapi import check_account_username
 from django.utils.translation import gettext as _

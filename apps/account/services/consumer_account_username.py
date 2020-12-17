@@ -1,17 +1,9 @@
-from datetime import date
-from random import randint
 from apps.account.dbapi import check_account_username
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
+from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
-from api.services import ServiceBase
-from apps.account.dbapi import create_consumer_account
-from apps.account.notifications import SendAccountVerifyEmail
 from apps.account.validators import ConsumerUsernameValidator
-from apps.payment.dbapi import create_payment_register
-from apps.provider.lib.actions import ProviderAPIActionBase
-from apps.user.dbapi import create_user, get_user_by_email
 
 __all__ = (
     "ChangeAccountUsername",

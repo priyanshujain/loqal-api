@@ -18,22 +18,14 @@ class CreatePaymentValidator(serializers.ValidationSerializer):
 
         if payment_amount < 1.00:
             raise ValidationError(
-                {
-                    "amount": [
-                        ErrorDetail(
-                            _("Amount should be greater than a dollar.")
-                        )
-                    ]
-                }
+                {"amount": [ErrorDetail(_("Amount should be greater than a dollar."))]}
             )
         payment_amount_decimal = decimal.Decimal(str(payment_amount))
         if payment_amount_decimal.as_tuple().exponent > 2:
             raise ValidationError(
                 {
                     "payment_amount": [
-                        ErrorDetail(
-                            _("Amount can only have two digits after decimal.")
-                        )
+                        ErrorDetail(_("Amount can only have two digits after decimal."))
                     ]
                 }
             )
@@ -43,11 +35,17 @@ class CreatePaymentValidator(serializers.ValidationSerializer):
                 {
                     "tip_amount": [
                         ErrorDetail(
-                            _(
-                                "Tip amount can only have two digits after decimal."
-                            )
+                            _("Tip amount can only have two digits after decimal.")
                         )
                     ]
                 }
             )
         return attrs
+
+
+class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
+    qrcode_id = serializers.CharField(max_length=6)
+    cashier_id = serializers.IntegerField()
+
+    def validate(self, attr):
+        return attr
