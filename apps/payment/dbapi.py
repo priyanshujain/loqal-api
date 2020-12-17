@@ -104,7 +104,7 @@ def get_merchant_qrcodes(merchant_id):
         return qrcode_qs
     return None       
 
-def get_merchant_qrcodes(merchant_id, cashier_id):
+def get_cashier_qrcode(merchant_id, cashier_id):
     """
     Get QR code for a cashier
     """

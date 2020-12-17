@@ -1,6 +1,6 @@
 from api import serializers
 from apps.account.responses import MerchantDetailsResponse
-from apps.payment.models import Transaction, models
+from apps.payment.models import Transaction
 
 __all__ = ("TransactionResponse",)
 

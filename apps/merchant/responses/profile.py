@@ -10,3 +10,5 @@ class MerchantProfileResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantProfile
         exclude = ("merchant",)
+
+

@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
+from apps.payment.dbapi import get_payment_qrcode
 
 
 class CreatePaymentValidator(serializers.ValidationSerializer):
@@ -47,5 +48,18 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
     qrcode_id = serializers.CharField(max_length=6)
     cashier_id = serializers.IntegerField()
 
-    def validate(self, attr):
-        return attr
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        qrcode_id = attrs.get("qrcode_id")
+        qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
+        if not qrcode:
+            raise ValidationError(
+                {
+                    "qrcode_id": [
+                        ErrorDetail(
+                            _("Provided QR Code is not valid.")
+                        )
+                    ]
+                }
+            )
+        return attrs

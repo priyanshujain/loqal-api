@@ -1,10 +1,8 @@
-from django.utils.translation import gettext as _
-
-from api.exceptions import ErrorDetail, ValidationError
-from api.views import MerchantAPIView
+from api.views import APIView, MerchantAPIView
 from apps.merchant.services import BusinessClassifications
+from apps.merchant.constants import MERCHANT_CATEGORIES
 
-__all__ = ("BusinessClassificationsAPI",)
+__all__ = ("BusinessClassificationsAPI", "MerchantCategoriesAPI",)
 
 
 class BusinessClassificationsAPI(MerchantAPIView):
@@ -12,3 +10,8 @@ class BusinessClassificationsAPI(MerchantAPIView):
         account = request.account
         categories = BusinessClassifications(account_id=account.id).get()
         return self.response(categories)
+
+
+class MerchantCategoriesAPI(APIView):
+    def get(self, request):
+        return self.response(MERCHANT_CATEGORIES)
