@@ -5,10 +5,14 @@ from django.utils.translation import gettext as _
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from apps.payment.dbapi import get_payment_qrcode
+from apps.user.dbapi import get_user_by_phone
+from apps.account.dbapi import (
+    get_consumer_account_by_username,
+    get_consumer_account_by_phone_number,
+)
 
 
-class CreatePaymentValidator(serializers.ValidationSerializer):
-    merchant_id = serializers.UUIDField()
+class PaymentValidatorBase(serializers.ValidationSerializer):
     payment_amount = serializers.FloatField(min_value=0)
     tip_amount = serializers.FloatField(min_value=0)
 
@@ -22,7 +26,7 @@ class CreatePaymentValidator(serializers.ValidationSerializer):
                 {"amount": [ErrorDetail(_("Amount should be greater than a dollar."))]}
             )
         payment_amount_decimal = decimal.Decimal(str(payment_amount))
-        if payment_amount_decimal.as_tuple().exponent > 2:
+        if abs(payment_amount_decimal.as_tuple().exponent) > 2:
             raise ValidationError(
                 {
                     "payment_amount": [
@@ -31,7 +35,7 @@ class CreatePaymentValidator(serializers.ValidationSerializer):
                 }
             )
         tip_amount_decimal = decimal.Decimal(str(tip_amount))
-        if tip_amount_decimal.as_tuple().exponent > 2:
+        if abs(tip_amount_decimal.as_tuple().exponent) > 2:
             raise ValidationError(
                 {
                     "tip_amount": [
@@ -41,6 +45,66 @@ class CreatePaymentValidator(serializers.ValidationSerializer):
                     ]
                 }
             )
+        return attrs
+
+
+class CreatePaymentValidator(PaymentValidatorBase):
+    merchant_id = serializers.UUIDField()
+
+
+class CreatePaymentRequestValidator(PaymentValidatorBase):
+    requested_to_loqal_id = serializers.CharField(required=False)
+    request_to_phone_number = serializers.CharField(required=False)
+    is_phone_number_based = serializers.BooleanField()
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        is_phone_number_based = attrs.get("is_phone_number_based")
+        loqal_id = attrs.get("requested_to_loqal_id")
+        phone_number = attrs.get("request_to_phone_number")
+
+        if is_phone_number_based:
+            if not phone_number:
+                raise ValidationError(
+                    {
+                        "phone_number": [
+                            ErrorDetail(
+                                _(
+                                    "Phone number can not be empty if you want to create phone number based payment request."
+                                )
+                            )
+                        ]
+                    }
+                )
+            consumer_account = get_consumer_account_by_phone_number(
+                phone_number=phone_number
+            )
+            if not consumer_account:
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            _("No user exists with given phone number.")
+                        )
+                    }
+                )
+        else:
+            if not loqal_id:
+                raise ValidationError(
+                    {
+                        "requested_to_loqal_id": [
+                            ErrorDetail(
+                                _(
+                                    "Loqal ID can not be empty if you want to create Loqal ID based payment request."
+                                )
+                            )
+                        ]
+                    }
+                )
+            consumer_account = get_consumer_account_by_username(username=loqal_id)
+            if not consumer_account:
+                raise ValidationError(
+                    {"detail": ErrorDetail(_("No user exists with given Loqal ID."))}
+                )
         return attrs
 
 
@@ -54,12 +118,6 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
         qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
         if not qrcode:
             raise ValidationError(
-                {
-                    "qrcode_id": [
-                        ErrorDetail(
-                            _("Provided QR Code is not valid.")
-                        )
-                    ]
-                }
+                {"qrcode_id": [ErrorDetail(_("Provided QR Code is not valid."))]}
             )
         return attrs

@@ -7,6 +7,8 @@ __all__ = (
     "create_consumer_account",
     "get_consumer_account",
     "check_account_username",
+    "get_consumer_account_by_username",
+    "get_consumer_account_by_phone_number",
 )
 
 
@@ -31,6 +33,21 @@ def get_consumer_account(user_id):
         return ConsumerAccount.objects.get(user_id=user_id)
     except ConsumerAccount.DoesNotExist:
         return None
+
+
+def get_consumer_account_by_username(username):
+    try:
+        return ConsumerAccount.objects.get(username=username)
+    except ConsumerAccount.DoesNotExist:
+        return None
+
+
+def get_consumer_account_by_phone_number(phone_number):
+    try:
+        return ConsumerAccount.objects.get(user__phone_number=phone_number)
+    except ConsumerAccount.DoesNotExist:
+        return None
+
 
 
 def check_account_username(username):

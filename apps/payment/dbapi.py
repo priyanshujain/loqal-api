@@ -2,6 +2,8 @@
 Payments relted db operations.
 """
 
+from rest_framework import request
+from apps.payment.responses import payment
 import re
 from django.db.utils import IntegrityError
 
@@ -30,8 +32,6 @@ def create_transaction(
     payment_amount,
     tip_amount,
     payment_currency,
-    fee_amount,
-    fee_currency,
     payment_qrcode=None,
 ):
     """
@@ -119,3 +119,34 @@ def get_empty_qrcodes():
     """
     return PaymentQrCode.objects.filter(merchant_id=None, cashier_id=None)
     
+
+
+def create_payment_request(
+    account_id,
+    requested_to_id,
+    payment_amount,
+    tip_amount,
+    payment_currency,
+):
+    """
+    dbapi for creating new payment request.
+    """
+    try:
+        return PaymentRequest.objects.create(
+            account_id=account_id,
+            requested_to_id=requested_to_id,
+            payment_amount=payment_amount,
+            tip_amount=tip_amount,
+            payment_currency=payment_currency,
+        )
+    except IntegrityError as err:
+        raise err
+        return None
+
+
+def get_merchant_payment_reqeust(account_id):
+    return PaymentRequest.objects.filter(account_id=account_id)
+
+
+def get_consumer_payment_reqeust(account_id):
+    return PaymentRequest.objects.filter(requested_to_id=account_id)

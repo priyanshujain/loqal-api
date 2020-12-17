@@ -117,8 +117,6 @@ class PaymentRequest(AbstractBaseModel):
     payment_amount = models.FloatField()
     tip_amount = models.FloatField(default=0)
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    fee_amount = models.FloatField(default=0.0)
-    fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     status = ChoiceEnumField(default=PaymentRequestStatus.REQUEST_SENT)
     transaction = models.OneToOneField(
         Transaction, on_delete=models.CASCADE, null=True, blank=True
