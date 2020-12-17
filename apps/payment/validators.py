@@ -13,8 +13,7 @@ from apps.account.dbapi import (
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
     payment_amount = serializers.FloatField(min_value=0)
-    tip_amount = serializers.FloatField(min_value=0)
-
+    
     def validate(self, attrs):
         attrs = super().validate(attrs)
         payment_amount = attrs.get("payment_amount")
@@ -33,6 +32,18 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
                     ]
                 }
             )
+        return attrs
+
+
+class CreatePaymentValidator(PaymentValidatorBase):
+    merchant_id = serializers.UUIDField()
+    qrcode_id = serializers.CharField(required=False)
+    tip_amount = serializers.FloatField(min_value=0)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        tip_amount = attrs.get("tip_amount")
+
         tip_amount_decimal = decimal.Decimal(str(tip_amount))
         if abs(tip_amount_decimal.as_tuple().exponent) > 2:
             raise ValidationError(
@@ -47,21 +58,16 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
         return attrs
 
 
-class CreatePaymentValidator(PaymentValidatorBase):
-    merchant_id = serializers.UUIDField()
-    qrcode_id = serializers.CharField(required=False)
-
-
 class CreatePaymentRequestValidator(PaymentValidatorBase):
     requested_to_loqal_id = serializers.CharField(required=False)
-    request_to_phone_number = serializers.CharField(required=False)
+    requested_to_phone_number = serializers.CharField(required=False)
     is_phone_number_based = serializers.BooleanField()
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
         is_phone_number_based = attrs.get("is_phone_number_based")
         loqal_id = attrs.get("requested_to_loqal_id")
-        phone_number = attrs.get("request_to_phone_number")
+        phone_number = attrs.get("requested_to_phone_number")
 
         if is_phone_number_based:
             if not phone_number:
@@ -121,3 +127,30 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
                 {"qrcode_id": [ErrorDetail(_("Provided QR Code is not valid."))]}
             )
         return attrs
+
+
+class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
+    payment_request_id = serializers.IntegerField()
+    tip_amount = serializers.FloatField(min_value=0)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        tip_amount = attrs.get("tip_amount")
+
+        tip_amount_decimal = decimal.Decimal(str(tip_amount))
+        if abs(tip_amount_decimal.as_tuple().exponent) > 2:
+            raise ValidationError(
+                {
+                    "tip_amount": [
+                        ErrorDetail(
+                            _("Tip amount can only have two digits after decimal.")
+                        )
+                    ]
+                }
+            )
+        return attrs
+
+
+class RejectPaymentRequestValidator(serializers.ValidationSerializer):
+    payment_request_id = serializers.IntegerField()
+    

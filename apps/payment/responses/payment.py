@@ -76,7 +76,6 @@ class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
             "created_at",
             "merchant",
             "payment_amount",
-            "tip_amount",
             "payment_currency",
             "status",
         )
@@ -111,7 +110,6 @@ class PaymentRequestResponse(serializers.ModelSerializer):
             "requested_to",
             "created_at",
             "payment_amount",
-            "tip_amount",
             "payment_currency",
             "status",
         )

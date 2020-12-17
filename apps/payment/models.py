@@ -115,7 +115,6 @@ class PaymentRequest(AbstractBaseModel):
         related_name="requested_to_account",
     )
     payment_amount = models.FloatField()
-    tip_amount = models.FloatField(default=0)
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     status = ChoiceEnumField(default=PaymentRequestStatus.REQUEST_SENT)
     transaction = models.OneToOneField(
@@ -124,6 +123,12 @@ class PaymentRequest(AbstractBaseModel):
 
     def add_transaction(self, transaction, save=True):
         self.transaction = transaction
+        self.status = PaymentRequestStatus.PROCESSED
+        if save:
+            self.save()
+    
+    def reject(self, save=True):
+        self.status = PaymentRequestStatus.REJECTED
         if save:
             self.save()
 

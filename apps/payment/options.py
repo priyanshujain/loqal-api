@@ -19,4 +19,4 @@ class TransactionStatus(ChoiceEnum):
 class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
     PROCESSED = 1, _("Request Processed")
-    CANCELLED = 2, _("Request Cancelled")
+    REJECTED = 2, _("Request Rejected")

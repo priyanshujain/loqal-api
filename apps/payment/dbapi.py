@@ -127,7 +127,6 @@ def create_payment_request(
     account_id,
     requested_to_id,
     payment_amount,
-    tip_amount,
     payment_currency,
 ):
     """
@@ -138,7 +137,6 @@ def create_payment_request(
             account_id=account_id,
             requested_to_id=requested_to_id,
             payment_amount=payment_amount,
-            tip_amount=tip_amount,
             payment_currency=payment_currency,
         )
     except IntegrityError as err:
@@ -152,3 +150,10 @@ def get_merchant_payment_reqeust(account_id):
 
 def get_consumer_payment_reqeust(account_id):
     return PaymentRequest.objects.filter(requested_to_id=account_id)
+
+
+def get_payment_reqeust_by_id(payment_request_id, requested_to_id):
+    try:
+        return PaymentRequest.objects.get(id=payment_request_id, requested_to_id=requested_to_id)
+    except PaymentRequest.DoesNotExist:
+        return None

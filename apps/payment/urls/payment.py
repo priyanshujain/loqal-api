@@ -6,6 +6,8 @@ from apps.payment.views.payment import (
     CreatePaymentRequestAPI,
     ListMerchantPaymentRequestAPI,
     ListConsumerPaymentRequestAPI,
+    ApprovePaymentRequestAPI,
+    RejectPaymentRequestAPI,
 )
 
 urlpatterns = [
@@ -15,6 +17,16 @@ urlpatterns = [
         "request/create/",
         CreatePaymentRequestAPI.as_view(),
         name="create_payment_request",
+    ),
+    path(
+        "request/approve/",
+        ApprovePaymentRequestAPI.as_view(),
+        name="approve_payment_request",
+    ),
+    path(
+        "request/reject/",
+        RejectPaymentRequestAPI.as_view(),
+        name="reject_payment_request",
     ),
     path(
         "request/consumer/",

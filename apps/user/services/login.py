@@ -125,7 +125,7 @@ class LoginRequest(ServiceBase):
             AfterLogin(request=request, user=user).handle()
         else:
             SmsOtpAuth(user=user, request=self.request).send_otp()
-            return {"otp_pending": True}
+            return {"otp_pending": True, "phone_number": user.phone_number[-4:]}
 
 
 class ResendSmsOtpAuth(object):
