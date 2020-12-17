@@ -27,10 +27,15 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
 
 
 class MerchantDetailsResponse(serializers.ModelSerializer):
+    uid = serializers.CharField(source="u_id", read_only=True)
     full_name = serializers.CharField(source="merchantprofile.full_name", read_only=True)
+    category = serializers.CharField(source="merchantprofile.category", read_only=True)
+    sub_category = serializers.CharField(source="merchantprofile.sub_category", read_only=True)
     class Meta:
         model = MerchantAccount
         fields = (
-            "id",
+            "uid",
             "full_name",
+            "category",
+            "sub_category",
         )

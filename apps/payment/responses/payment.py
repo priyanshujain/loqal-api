@@ -10,7 +10,7 @@ class TransactionResponse(serializers.ModelSerializer):
     merchant = MerchantDetailsResponse(
         source="recipient.account.merchantaccount", read_only=True
     )
-    uid = serializers.CharField(source="u_id.hex", read_only=True)
+    uid = serializers.CharField(source="u_id", read_only=True)
     status = serializers.CharField(
         source="status.label", read_only=True
     )
