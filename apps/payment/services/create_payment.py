@@ -7,7 +7,7 @@ from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.options import AccountStatus
 from apps.banking.dbapi import get_bank_account
-from apps.payment.dbapi import create_transaction
+from apps.payment.dbapi import create_transaction, get_payment_qrcode
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   FACILITATION_FEES_PERCENTAGE)
 from apps.payment.validators import CreatePaymentValidator
@@ -30,6 +30,7 @@ class CreatePayment(ServiceBase):
         payment_amount = payment_data["payment_amount"]
         tip_amount = payment_data["tip_amount"]
         payment_currency = payment_data["payment_currency"]
+        payment_qrcode_id= payment_data["payment_qrcode_id"]
 
         sender_bank_account = get_bank_account(account_id=self.account_id)
 
@@ -67,6 +68,7 @@ class CreatePayment(ServiceBase):
             payment_amount=payment_amount,
             tip_amount=tip_amount,
             payment_currency=payment_currency,
+            payment_qrcode_id=payment_qrcode_id,
         )
         dwolla_id = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(dwolla_id=dwolla_id)
@@ -96,12 +98,30 @@ class CreatePayment(ServiceBase):
                     )
                 }
             )
+        
+        qrcode_id = data.get("qrcode_id")
+        if qrcode_id:
+            payment_qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
+            if not payment_qrcode:
+                raise ValidationError({
+                    "qrcode_id": [
+                        ErrorDetail(_("Invalid QR code."))
+                    ]
+                })
+            if payment_qrcode.merchant != merchant_account:
+                raise ValidationError({
+                    "detail": ErrorDetail("QR Code does not belong to provided merchant.")
+                })
+            payment_qrcode_id = payment_qrcode.id
+        else:
+            payment_qrcode_id = None
 
         return {
             "merchant_account": merchant_account,
             "payment_amount": data["payment_amount"],
             "tip_amount": data["tip_amount"],
             "payment_currency": DEFAULT_CURRENCY,
+            "payment_qrcode_id": payment_qrcode_id,
         }
 
     def _check_balance(self, bank_account):
@@ -127,6 +147,7 @@ class CreatePayment(ServiceBase):
         payment_amount,
         tip_amount,
         payment_currency,
+        payment_qrcode_id,
     ):
         fee_amount = payment_amount * FACILITATION_FEES_PERCENTAGE / 100
         fee_amount = round(fee_amount, 2)
@@ -140,6 +161,7 @@ class CreatePayment(ServiceBase):
             payment_currency=payment_currency,
             fee_amount=fee_amount,
             fee_currency=FACILITATION_FEES_CURRENCY,
+            payment_qrcode_id=payment_qrcode_id,
         )
 
     def _send_to_dwolla(self, transaction):

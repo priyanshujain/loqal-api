@@ -14,6 +14,9 @@ class TransactionResponse(serializers.ModelSerializer):
     status = serializers.CharField(
         source="status.label", read_only=True
     )
+    payment_qrcode_id = serializers.CharField(
+        source="payment_qrcode.qrcode_id", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -26,6 +29,7 @@ class TransactionResponse(serializers.ModelSerializer):
             "tip_amount",
             "payment_currency",
             "status",
+            "payment_qrcode_id",
         )
 
 

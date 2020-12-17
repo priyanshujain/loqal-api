@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from apps.payment.dbapi import get_payment_qrcode
-from apps.user.dbapi import get_user_by_phone
 from apps.account.dbapi import (
     get_consumer_account_by_username,
     get_consumer_account_by_phone_number,
@@ -50,6 +49,7 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
 
 class CreatePaymentValidator(PaymentValidatorBase):
     merchant_id = serializers.UUIDField()
+    qrcode_id = serializers.CharField(required=False)
 
 
 class CreatePaymentRequestValidator(PaymentValidatorBase):

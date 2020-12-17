@@ -23,6 +23,7 @@ class QrCodeResponse(serializers.ModelSerializer):
 
 
 class MerchantQrCodeResponse(serializers.ModelSerializer):
+    merchant_uid = serializers.CharField(source="merchant.u_id", read_only=True)
     merchant_id = serializers.IntegerField(source="merchant.id", read_only=True)
     cashier_id = serializers.IntegerField(source="cashier.id", read_only=True)
 
@@ -32,6 +33,7 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
             "qrcode_id",
             "is_expired",
             "currency",
+            "merchant_uid",
             "merchant_id",
             "cashier_id",
         )

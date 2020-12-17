@@ -34,7 +34,7 @@ def create_transaction(
     payment_currency,
     fee_amount,
     fee_currency,
-    payment_qrcode=None,
+    payment_qrcode_id,
 ):
     """
     dbapi for creating new transaction.
@@ -49,7 +49,7 @@ def create_transaction(
             payment_currency=payment_currency,
             fee_amount=fee_amount,
             fee_currency=fee_currency,
-            payment_qrcode=payment_qrcode,
+            payment_qrcode_id=payment_qrcode_id,
         )
     except IntegrityError:
         return None
