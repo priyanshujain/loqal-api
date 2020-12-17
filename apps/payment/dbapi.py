@@ -32,6 +32,8 @@ def create_transaction(
     payment_amount,
     tip_amount,
     payment_currency,
+    fee_amount,
+    fee_currency,
     payment_qrcode=None,
 ):
     """
