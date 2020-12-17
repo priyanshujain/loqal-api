@@ -4,7 +4,7 @@ from apps.merchant.views.consumer import MerchantBasicDetailsAPI
 
 urlpatterns = [
     path(
-        "merchant/basic-info/",
+        "basic-info/",
         MerchantBasicDetailsAPI.as_view(),
         name="business_basic_details",
     ),

@@ -241,7 +241,7 @@ class Authenticator(BaseModel):
 
 class UserSession(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    session_key = models.CharField(max_length=512)
+    session_key = models.TextField()
     user_agent = models.CharField(max_length=512)
     ip_address = models.GenericIPAddressField()
     is_ip_routable = models.BooleanField(default=True)
