@@ -16,6 +16,7 @@ from apps.payment.validators import (
 from apps.payment.dbapi import create_payment_request, get_payment_reqeust_by_id
 from apps.provider.options import DEFAULT_CURRENCY
 from .create_payment import CreatePayment
+from apps.payment.options import PaymentRequestStatus
 
 __all__ = (
     "CreatePaymentRequest",
@@ -116,6 +117,10 @@ class ApprovePaymentRequest(ServiceBase):
                     ]
                 }
             )
+        if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
+            raise ValidationError({
+                "detail": ErrorDetail(_("Payment request is expired."))
+            })
         data["payment_request"] = payment_request
         return data
 
@@ -148,4 +153,8 @@ class RejectPaymentRequest(ServiceBase):
                     ]
                 }
             )
+        if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
+            raise ValidationError({
+                "detail": ErrorDetail(_("Payment request is expired."))
+            })
         return payment_request

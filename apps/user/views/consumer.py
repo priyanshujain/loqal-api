@@ -135,9 +135,15 @@ class SmsOtpAuthAPI(APIView):
         return self.response()
 
     def _run_services(self, user):
-        SmsOtpAuth(
+        is_valid = SmsOtpAuth(
             user=user, request=self.request, data=self.request_data
         ).validate_otp()
+        if not is_valid:
+            raise ValidationError({
+                "otp": [
+                    ErrorDetail(_("Otp is not valid or expired."))
+                ]
+            })
 
 
 class ResendSmsOtpAuthAPI(APIView):
