@@ -32,7 +32,7 @@ class ValidationSerializer(BaseSerializer):
                 error_list.append(ErrorDetail(error))
             else:
                 error_list.append(error)
-                
+
         error_list = []
         if not isinstance(errors, list):
             add_to_error_list(errors)
@@ -41,8 +41,6 @@ class ValidationSerializer(BaseSerializer):
                 add_to_error_list(error)
 
         self._errors[field] = error_list
-
-        
 
 
 class ModelSerializer(BaseSerializer, ModelSerializer):

@@ -1,8 +1,7 @@
 from django.utils.translation import gettext as _
 
-from db.models.fields import ChoiceEnum
-
 from apps.provider.options import DEFAULT_CURRENCY
+from db.models.fields import ChoiceEnum
 
 FACILITATION_FEES_PERCENTAGE = 1.5
 FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY

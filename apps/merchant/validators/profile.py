@@ -1,6 +1,5 @@
-from apps.merchant.models import MerchantProfile
 from api import serializers
-
+from apps.merchant.models import MerchantProfile
 
 __all__ = ("MerchantProfileValidator",)
 

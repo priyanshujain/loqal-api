@@ -10,7 +10,9 @@ def get_all_countries():
 def partial_search_city(country_code, partial_city_name):
     city_qs = (
         City.objects.filter(country_code=country_code)
-        .annotate(similarity=TrigramSimilarity("name", partial_city_name),)
+        .annotate(
+            similarity=TrigramSimilarity("name", partial_city_name),
+        )
         .filter(similarity__gt=0.3)
         .order_by("-similarity")
     )

@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reference', '0003_auto_20201214_1120'),
+        ("reference", "0003_auto_20201214_1120"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='zipcode',
-            name='area_code',
+            model_name="zipcode",
+            name="area_code",
         ),
         migrations.RemoveField(
-            model_name='zipcode',
-            name='lat',
+            model_name="zipcode",
+            name="lat",
         ),
         migrations.RemoveField(
-            model_name='zipcode',
-            name='lon',
+            model_name="zipcode",
+            name="lon",
         ),
     ]

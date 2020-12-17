@@ -1,7 +1,7 @@
-from db.models.base import BaseModel
 from django.db import models
 
 from db.models import BaseModel
+from db.models.base import BaseModel
 
 
 class RegionState(BaseModel):

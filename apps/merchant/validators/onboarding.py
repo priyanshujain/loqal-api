@@ -31,7 +31,7 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
             "verification_document_type",
             "verification_document_file",
         )
-    
+
     # def validate_ein_number(self, ein_number):
     #     pass
 

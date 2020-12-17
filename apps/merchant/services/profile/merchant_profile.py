@@ -6,9 +6,7 @@ from api.services import ServiceBase
 from apps.merchant.dbapi import update_merchant_profile
 from apps.merchant.validators import MerchantProfileValidator
 
-__all__ = (
-    "UpdateMerchantProfile",
-)
+__all__ = ("UpdateMerchantProfile",)
 
 
 class UpdateMerchantProfile(ServiceBase):
@@ -25,7 +23,4 @@ class UpdateMerchantProfile(ServiceBase):
         return data
 
     def _update_merchant_profile(self):
-        update_merchant_profile(
-            merchant_id=self.merchant_id,
-            **self.data
-        )
+        update_merchant_profile(merchant_id=self.merchant_id, **self.data)

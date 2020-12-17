@@ -6,44 +6,44 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reference', '0005_auto_20201214_1443'),
+        ("reference", "0005_auto_20201214_1443"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='city',
-            name='created_by',
+            model_name="city",
+            name="created_by",
         ),
         migrations.RemoveField(
-            model_name='city',
-            name='deleted_by',
+            model_name="city",
+            name="deleted_by",
         ),
         migrations.RemoveField(
-            model_name='city',
-            name='updated_by',
+            model_name="city",
+            name="updated_by",
         ),
         migrations.RemoveField(
-            model_name='country',
-            name='created_by',
+            model_name="country",
+            name="created_by",
         ),
         migrations.RemoveField(
-            model_name='country',
-            name='deleted_by',
+            model_name="country",
+            name="deleted_by",
         ),
         migrations.RemoveField(
-            model_name='country',
-            name='updated_by',
+            model_name="country",
+            name="updated_by",
         ),
         migrations.RemoveField(
-            model_name='regionstate',
-            name='created_by',
+            model_name="regionstate",
+            name="created_by",
         ),
         migrations.RemoveField(
-            model_name='regionstate',
-            name='deleted_by',
+            model_name="regionstate",
+            name="deleted_by",
         ),
         migrations.RemoveField(
-            model_name='regionstate',
-            name='updated_by',
+            model_name="regionstate",
+            name="updated_by",
         ),
     ]

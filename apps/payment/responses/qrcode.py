@@ -1,9 +1,8 @@
-from apps.merchant import models
 from api import serializers
-from apps.payment.models import PaymentQrCode
 from apps.account.models import MerchantAccount
+from apps.merchant import models
 from apps.merchant.models import MerchantProfile
-
+from apps.payment.models import PaymentQrCode
 
 __all__ = (
     "QrCodeResponse",
@@ -23,8 +22,12 @@ class QrCodeResponse(serializers.ModelSerializer):
 
 
 class MerchantQrCodeResponse(serializers.ModelSerializer):
-    merchant_uid = serializers.CharField(source="merchant.u_id", read_only=True)
-    merchant_id = serializers.IntegerField(source="merchant.id", read_only=True)
+    merchant_uid = serializers.CharField(
+        source="merchant.u_id", read_only=True
+    )
+    merchant_id = serializers.IntegerField(
+        source="merchant.id", read_only=True
+    )
     cashier_id = serializers.IntegerField(source="cashier.id", read_only=True)
 
     class Meta:
@@ -47,15 +50,21 @@ class QrCodeMerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="merchantprofile.full_name", read_only=True
     )
-    about = serializers.CharField(source="merchantprofile.about", read_only=True)
-    category = serializers.CharField(source="merchantprofile.category", read_only=True)
+    about = serializers.CharField(
+        source="merchantprofile.about", read_only=True
+    )
+    category = serializers.CharField(
+        source="merchantprofile.category", read_only=True
+    )
     sub_category = serializers.CharField(
         source="merchantprofile.sub_category", read_only=True
     )
     hero_image = serializers.CharField(
         source="merchantprofile.hero_image", read_only=True
     )
-    address = serializers.JSONField(source="merchantprofile.address", read_only=True)
+    address = serializers.JSONField(
+        source="merchantprofile.address", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount

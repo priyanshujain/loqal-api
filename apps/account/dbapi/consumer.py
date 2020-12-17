@@ -22,7 +22,9 @@ def get_account(account_id):
 def create_consumer_account(user_id, username):
     account = Account.objects.create()
     try:
-        return ConsumerAccount.objects.create(account=account, user_id=user_id, username=username)
+        return ConsumerAccount.objects.create(
+            account=account, user_id=user_id, username=username
+        )
     except IntegrityError:
         account.delete()
         return None
@@ -47,7 +49,6 @@ def get_consumer_account_by_phone_number(phone_number):
         return ConsumerAccount.objects.get(user__phone_number=phone_number)
     except ConsumerAccount.DoesNotExist:
         return None
-
 
 
 def check_account_username(username):

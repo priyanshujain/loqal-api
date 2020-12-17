@@ -1,8 +1,11 @@
 from api.views import APIView, MerchantAPIView
-from apps.merchant.services import BusinessClassifications
 from apps.merchant.constants import MERCHANT_CATEGORIES
+from apps.merchant.services import BusinessClassifications
 
-__all__ = ("BusinessClassificationsAPI", "MerchantCategoriesAPI",)
+__all__ = (
+    "BusinessClassificationsAPI",
+    "MerchantCategoriesAPI",
+)
 
 
 class BusinessClassificationsAPI(MerchantAPIView):

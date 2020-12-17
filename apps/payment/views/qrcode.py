@@ -1,10 +1,14 @@
-from django.utils.translation import gettext as _
-from api.exceptions import ValidationError, ErrorDetail
-from api.views import MerchantAPIView, ConsumerAPIView
-from apps.payment.responses import QrCodeResponse, MerchantQrCodeResponse, QrCodeMerchantDetailsResponse
-from apps.payment.services import CreateQrCode, AssignQrCode
-from apps.payment.dbapi import get_cashier_qrcode, get_merchant_qrcodes, get_payment_qrcode
 import qrcode as qrcodelib
+from django.utils.translation import gettext as _
+
+from api.exceptions import ErrorDetail, ValidationError
+from api.views import ConsumerAPIView, MerchantAPIView
+from apps.payment.dbapi import (get_cashier_qrcode, get_merchant_qrcodes,
+                                get_payment_qrcode)
+from apps.payment.responses import (MerchantQrCodeResponse,
+                                    QrCodeMerchantDetailsResponse,
+                                    QrCodeResponse)
+from apps.payment.services import AssignQrCode, CreateQrCode
 from utils.shortcuts import img2base64
 
 
@@ -17,7 +21,9 @@ class CreateQrCodeAPI(MerchantAPIView):
 class AssignQrCodeAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        AssignQrCode(merchant_id=merchant_account.id, data=self.request_data).handle()
+        AssignQrCode(
+            merchant_id=merchant_account.id, data=self.request_data
+        ).handle()
         return self.response(status=200)
 
 
@@ -46,11 +52,11 @@ class GetCashierQrCodesAPI(MerchantAPIView):
 class GetQrCodeMerchantDetailsAPI(ConsumerAPIView):
     def get(self, request):
         qrcode_id = self.request_data.get("qrcid")
-        qrcode = get_payment_qrcode(
-            qrcode_id=qrcode_id
-        )
+        qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
         if not qrcode or not qrcode.merchant:
-            raise ValidationError({
-                "detail": ErrorDetail(_("Invalid QR code."))
-            })
-        return self.response(QrCodeMerchantDetailsResponse(qrcode.merchant).data)
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid QR code."))}
+            )
+        return self.response(
+            QrCodeMerchantDetailsResponse(qrcode.merchant).data
+        )

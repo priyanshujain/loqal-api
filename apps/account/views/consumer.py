@@ -5,12 +5,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import APIView, ConsumerAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
-from apps.account.services import (
-    AddZipCode,
-    CreateConsumerAccount,
-    ChangeAccountUsername,
-    CheckAccountUsername,
-)
+from apps.account.services import (AddZipCode, ChangeAccountUsername,
+                                   CheckAccountUsername, CreateConsumerAccount)
 from utils.auth import login
 
 __all__ = (
@@ -32,7 +28,9 @@ class ConsumerSignupAPI(APIView):
 
     def _run_services(self, ip_address):
         data = self.request_data
-        service = CreateConsumerAccount(data=self.request_data, ip_address=ip_address)
+        service = CreateConsumerAccount(
+            data=self.request_data, ip_address=ip_address
+        )
         consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request, user=user)
@@ -54,16 +52,18 @@ class ConsumerAccountProfileAPI(ConsumerAPIView):
     def get(self, request):
         consumer_account = request.consumer_account
         return self.response(
-            ConsumerAccountProfileResponse(
-                consumer_account
-            ).data
+            ConsumerAccountProfileResponse(consumer_account).data
         )
 
 
 class ChangeAccountUsernameAPI(ConsumerAPIView):
     def post(self, request):
         consumer_account = request.consumer_account
-        return self.response(ChangeAccountUsername(consumer_account=consumer_account, data=self.request_data).handle())
+        return self.response(
+            ChangeAccountUsername(
+                consumer_account=consumer_account, data=self.request_data
+            ).handle()
+        )
 
 
 class CheckAccountUsernameAPI(ConsumerAPIView):

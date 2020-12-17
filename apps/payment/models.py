@@ -2,15 +2,15 @@ from datetime import timedelta
 from re import T
 
 from django.db import models
-from db.models.fields import ChoiceEnumField
 from django.utils import timezone
 
 from apps.account.models import Account, MerchantAccount
-from apps.merchant.models import AccountMember
 from apps.banking.models import BankAccount
-from apps.payment.options import TransactionStatus, PaymentRequestStatus
+from apps.merchant.models import AccountMember
+from apps.payment.options import PaymentRequestStatus, TransactionStatus
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
 
 
@@ -59,7 +59,9 @@ class PaymentQrCode(AbstractBaseModel):
     merchant = models.ForeignKey(
         MerchantAccount, on_delete=models.CASCADE, blank=True, null=True
     )
-    cashier = models.ForeignKey(AccountMember, on_delete=models.SET_NULL, blank=True, null=True)
+    cashier = models.ForeignKey(
+        AccountMember, on_delete=models.SET_NULL, blank=True, null=True
+    )
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     qrcode_id = models.CharField(max_length=10, unique=True)
     is_expired = models.BooleanField(default=False)
@@ -92,7 +94,9 @@ class Transaction(AbstractBaseModel):
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_amount = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    status = ChoiceEnumField(default=TransactionStatus.NOT_SENT)
+    status = ChoiceEnumField(
+        enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
+    )
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
@@ -116,7 +120,10 @@ class PaymentRequest(AbstractBaseModel):
     )
     payment_amount = models.FloatField()
     payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
-    status = ChoiceEnumField(default=PaymentRequestStatus.REQUEST_SENT)
+    status = ChoiceEnumField(
+        enum_type=PaymentRequestStatus,
+        default=PaymentRequestStatus.REQUEST_SENT,
+    )
     transaction = models.OneToOneField(
         Transaction, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -126,7 +133,7 @@ class PaymentRequest(AbstractBaseModel):
         self.status = PaymentRequestStatus.PROCESSED
         if save:
             self.save()
-    
+
     def reject(self, save=True):
         self.status = PaymentRequestStatus.REJECTED
         if save:

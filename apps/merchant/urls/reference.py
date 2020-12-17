@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.merchant.views.reference import BusinessClassificationsAPI, MerchantCategoriesAPI
+from apps.merchant.views.reference import (BusinessClassificationsAPI,
+                                           MerchantCategoriesAPI)
 
 urlpatterns = [
     path(

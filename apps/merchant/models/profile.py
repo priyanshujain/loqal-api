@@ -4,11 +4,9 @@ from django.utils.translation import gettext as _
 
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
+from apps.merchant.constants import MERCHANT_CATEGORIES
 from db.models import AbstractBaseModel
 from db.postgres.fields import ArrayField
-
-from apps.merchant.constants import MERCHANT_CATEGORIES
-
 
 __all__ = (
     "MerchantProfile",
@@ -22,8 +20,13 @@ class MerchantProfile(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=256)
     about = models.TextField(blank=True)
-    category = models.CharField(max_length=64, default=MERCHANT_CATEGORIES[0]["category_slug"])
-    sub_category = models.CharField(max_length=64, default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"])
+    category = models.CharField(
+        max_length=64, default=MERCHANT_CATEGORIES[0]["category_slug"]
+    )
+    sub_category = models.CharField(
+        max_length=64,
+        default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"],
+    )
     hero_image = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )

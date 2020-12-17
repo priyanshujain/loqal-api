@@ -1,10 +1,9 @@
+from django.utils.translation import gettext as _
+
 from api import serializers
+from api.exceptions import ErrorDetail, ValidationError
 from apps.merchant.shortcuts import validate_category
 from apps.user.dbapi import get_user_by_phone
-
-from django.utils.translation import gettext as _
-from api.exceptions import ErrorDetail, ValidationError
-
 
 __all__ = ("CreateMerchantAccountValidator",)
 
@@ -20,25 +19,32 @@ class CreateMerchantAccountValidator(serializers.ValidationSerializer):
     phone_number = serializers.CharField(max_length=20)
     password = serializers.CharField(max_length=64)
 
-
     def validate(self, attrs):
         attrs = super().validate(attrs)
         category = attrs.get("category")
         sub_category = attrs.get("sub_category")
         if not validate_category(category=category, sub_category=sub_category):
-            raise ValidationError({
-                "category": ErrorDetail(_("Provided category is not valid."))
-            })
-        
+            raise ValidationError(
+                {"category": ErrorDetail(_("Provided category is not valid."))}
+            )
+
         phone_number = attrs.get("phone_number")
         if len(phone_number) != 10:
-            raise ValidationError({
-                "phone_number": ErrorDetail(_("Phone number should be consisting of 10 digits."))
-            })
-        
+            raise ValidationError(
+                {
+                    "phone_number": ErrorDetail(
+                        _("Phone number should be consisting of 10 digits.")
+                    )
+                }
+            )
+
         user = get_user_by_phone(phone_number=phone_number)
         if user:
-            raise ValidationError({
-                "phone_number": ErrorDetail(_("A user already exist with this phone number."))
-            })
+            raise ValidationError(
+                {
+                    "phone_number": ErrorDetail(
+                        _("A user already exist with this phone number.")
+                    )
+                }
+            )
         return attrs

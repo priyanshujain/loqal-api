@@ -1,5 +1,6 @@
 from apps.merchant.constants import MERCHANT_CATEGORIES
 
+
 def validate_category(category, sub_category):
     for merchant_category in MERCHANT_CATEGORIES:
         if merchant_category["category_slug"] == category:

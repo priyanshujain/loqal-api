@@ -1,10 +1,10 @@
 from django.urls import path
 
 from apps.account.views.consumer import (AddAccountZipCodeAPI,
-                                         ConsumerAccountProfileAPI,
-                                         ConsumerSignupAPI,
                                          ChangeAccountUsernameAPI,
-                                         CheckAccountUsernameAPI,)
+                                         CheckAccountUsernameAPI,
+                                         ConsumerAccountProfileAPI,
+                                         ConsumerSignupAPI)
 
 urlpatterns = [
     path(

@@ -30,13 +30,17 @@ class CreatePayment(ServiceBase):
         payment_amount = payment_data["payment_amount"]
         tip_amount = payment_data["tip_amount"]
         payment_currency = payment_data["payment_currency"]
-        payment_qrcode_id= payment_data["payment_qrcode_id"]
+        payment_qrcode_id = payment_data["payment_qrcode_id"]
 
         sender_bank_account = get_bank_account(account_id=self.account_id)
 
         if not sender_bank_account:
             raise ValidationError(
-                {"detail": ErrorDetail("Please add the bank account before making payment.")}
+                {
+                    "detail": ErrorDetail(
+                        "Please add the bank account before making payment."
+                    )
+                }
             )
 
         recipient_bank_account = get_bank_account(
@@ -98,20 +102,22 @@ class CreatePayment(ServiceBase):
                     )
                 }
             )
-        
+
         qrcode_id = data.get("qrcode_id")
         if qrcode_id:
             payment_qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
             if not payment_qrcode:
-                raise ValidationError({
-                    "qrcode_id": [
-                        ErrorDetail(_("Invalid QR code."))
-                    ]
-                })
+                raise ValidationError(
+                    {"qrcode_id": [ErrorDetail(_("Invalid QR code."))]}
+                )
             if payment_qrcode.merchant != merchant_account:
-                raise ValidationError({
-                    "detail": ErrorDetail("QR Code does not belong to provided merchant.")
-                })
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            "QR Code does not belong to provided merchant."
+                        )
+                    }
+                )
             payment_qrcode_id = payment_qrcode.id
         else:
             payment_qrcode_id = None

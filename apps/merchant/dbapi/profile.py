@@ -1,6 +1,6 @@
-from apps.merchant.models import MerchantProfile
 from django.db.utils import IntegrityError
 
+from apps.merchant.models import MerchantProfile
 
 __all__ = (
     "create_merchant_profile",

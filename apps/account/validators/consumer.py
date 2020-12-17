@@ -30,7 +30,6 @@ class ConsumerZipCodeValidator(serializers.ValidationSerializer):
     zip_code = serializers.CharField(max_length=5)
 
 
-
 class ConsumerUsernameValidator(serializers.ValidationSerializer):
     """
     check consumer account username

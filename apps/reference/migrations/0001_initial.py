@@ -118,7 +118,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="ProviderPopCode",
@@ -315,6 +317,7 @@ class Migration(migrations.Migration):
             unique_together={("provider", "pop_value", "code")},
         ),
         migrations.AlterUniqueTogether(
-            name="city", unique_together={("name", "country_code")},
+            name="city",
+            unique_together={("name", "country_code")},
         ),
     ]

@@ -8,7 +8,9 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.user.dbapi import get_user_by_phone
 from apps.user.models import Authenticator
-from apps.user.validators import VerifyPhoneNumberOtpValidator, PhoneNumberValidator, ResendPhoneNumberOtpValidator
+from apps.user.validators import (PhoneNumberValidator,
+                                  ResendPhoneNumberOtpValidator,
+                                  VerifyPhoneNumberOtpValidator)
 
 __all__ = (
     "StartSmsAuthEnrollment",
@@ -22,15 +24,15 @@ class StartSmsAuthEnrollment(object):
     """
     TODO: look at this approach using secret from security standpoint
     """
+
     def __init__(self, request):
         self.user = request.user
         self.request = request
-    
+
     def handle(self):
         return EnrollSmsAuthenticator(
             request=self.request, user=self.user
         ).request_enrollment()
-
 
 
 class AddPhoneNumber(ServiceBase):
@@ -45,7 +47,9 @@ class AddPhoneNumber(ServiceBase):
 
         phone_number = data["phone_number"]
         self.user.add_phone_number(phone_number=phone_number)
-        EnrollSmsAuthenticator(request=self.request, user=self.user, data=data).send_otp()
+        EnrollSmsAuthenticator(
+            request=self.request, user=self.user, data=data
+        ).send_otp()
 
     def _validate_data(self, data):
         if self.user.phone_number_verified:
@@ -102,7 +106,9 @@ class VerifyPhoneNumber(ServiceBase):
                     )
                 }
             )
-        return run_validator(validator=VerifyPhoneNumberOtpValidator, data=data)
+        return run_validator(
+            validator=VerifyPhoneNumberOtpValidator, data=data
+        )
 
 
 class ResendPhoneNumberOtp(object):
@@ -110,7 +116,7 @@ class ResendPhoneNumberOtp(object):
         self.user = user
         self.request = request
         self.data = data
-    
+
     def _validate_data(self):
         return run_validator(ResendPhoneNumberOtpValidator, data=self.data)
 
@@ -119,7 +125,6 @@ class ResendPhoneNumberOtp(object):
         return EnrollSmsAuthenticator(
             request=self.request, user=self.user, data=data
         ).send_otp()
-
 
 
 class EnrollSmsAuthenticator(object):
@@ -134,11 +139,17 @@ class EnrollSmsAuthenticator(object):
         )
         if interface.is_enrolled():
             raise ValidationError(
-                {"detail": ErrorDetail(_("Phone number has already been verified."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Phone number has already been verified.")
+                    )
+                }
             )
         return interface
-    
-    def _validate_data(self,):
+
+    def _validate_data(
+        self,
+    ):
         interface = self._validate_interface()
         try:
             interface.secret = self.data["secret"]
@@ -150,7 +161,7 @@ class EnrollSmsAuthenticator(object):
                     )
                 }
             )
-        
+
         phone_number = self.user.phone_number
         phone_number_verified = self.user.phone_number_verified
         if not phone_number:
@@ -167,7 +178,7 @@ class EnrollSmsAuthenticator(object):
             )
         interface.phone_number = phone_number
         return interface
-    
+
     def request_enrollment(self):
         interface = self._validate_interface()
         return interface.secret

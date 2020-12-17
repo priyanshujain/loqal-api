@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.merchant.views.profile import GetMerchantProfileAPI, UpdateMerchantProfileAPI
+from apps.merchant.views.profile import (GetMerchantProfileAPI,
+                                         UpdateMerchantProfileAPI)
 
 urlpatterns = [
     path(

@@ -1,4 +1,5 @@
 import uuid
+
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -44,13 +45,15 @@ class Account(AbstractBaseModel):
 class ConsumerAccount(AbstractBaseModel):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    username = models.CharField(max_length=32, default=None, null=True, unique=True)
+    username = models.CharField(
+        max_length=32, default=None, null=True, unique=True
+    )
 
     def change_username(self, username, save=True):
         self.username = username
         if save:
             self.save()
-    
+
     class Meta:
         unique_together = (
             "account",

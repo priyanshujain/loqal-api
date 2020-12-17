@@ -2,17 +2,14 @@
 Payments relted db operations.
 """
 
-from rest_framework import request
-from apps.payment.responses import payment
 import re
-from django.db.utils import IntegrityError
 
-from apps.payment.models import (
-    PaymentRegister,
-    Transaction,
-    PaymentQrCode,
-    PaymentRequest,
-)
+from django.db.utils import IntegrityError
+from rest_framework import request
+
+from apps.payment.models import (PaymentQrCode, PaymentRegister,
+                                 PaymentRequest, Transaction)
+from apps.payment.responses import payment
 
 
 def create_payment_register(account_id):
@@ -87,7 +84,6 @@ def get_payment_qrcode(qrcode_id):
         return None
 
 
-
 def assign_payment_qrcode(qrcode_id, merchant_id, cashier_id):
     """
     Assign QR code to a merchant
@@ -104,23 +100,26 @@ def get_merchant_qrcodes(merchant_id):
     qrcode_qs = PaymentQrCode.objects.filter(merchant_id=merchant_id)
     if qrcode_qs.exists():
         return qrcode_qs
-    return None       
+    return None
+
 
 def get_cashier_qrcode(merchant_id, cashier_id):
     """
     Get QR code for a cashier
     """
     try:
-        return PaymentQrCode.objects.get(merchant_id=merchant_id, cashier_id=cashier_id)
+        return PaymentQrCode.objects.get(
+            merchant_id=merchant_id, cashier_id=cashier_id
+        )
     except PaymentQrCode.DoesNotExist:
         return None
-        
+
+
 def get_empty_qrcodes():
     """
     Get QR code for a cashier
     """
     return PaymentQrCode.objects.filter(merchant_id=None, cashier_id=None)
-    
 
 
 def create_payment_request(
@@ -154,6 +153,8 @@ def get_consumer_payment_reqeust(account_id):
 
 def get_payment_reqeust_by_id(payment_request_id, requested_to_id):
     try:
-        return PaymentRequest.objects.get(id=payment_request_id, requested_to_id=requested_to_id)
+        return PaymentRequest.objects.get(
+            id=payment_request_id, requested_to_id=requested_to_id
+        )
     except PaymentRequest.DoesNotExist:
         return None

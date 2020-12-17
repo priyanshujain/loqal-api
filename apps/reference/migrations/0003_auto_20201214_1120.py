@@ -6,32 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reference', '0002_auto_20201214_1118'),
+        ("reference", "0002_auto_20201214_1118"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='country',
+            name="country",
             options={},
         ),
         migrations.AlterModelOptions(
-            name='zipcode',
+            name="zipcode",
             options={},
         ),
         migrations.AlterModelTable(
-            name='city',
-            table='city',
+            name="city",
+            table="city",
         ),
         migrations.AlterModelTable(
-            name='country',
-            table='country',
+            name="country",
+            table="country",
         ),
         migrations.AlterModelTable(
-            name='regionstate',
-            table='region_state',
+            name="regionstate",
+            table="region_state",
         ),
         migrations.AlterModelTable(
-            name='zipcode',
-            table='zip_code',
+            name="zipcode",
+            table="zip_code",
         ),
     ]

@@ -4,16 +4,14 @@ from django.utils.translation import gettext as _
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
+from apps.account.dbapi import (get_consumer_account_by_phone_number,
+                                get_consumer_account_by_username)
 from apps.payment.dbapi import get_payment_qrcode
-from apps.account.dbapi import (
-    get_consumer_account_by_username,
-    get_consumer_account_by_phone_number,
-)
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
     payment_amount = serializers.FloatField(min_value=0)
-    
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         payment_amount = attrs.get("payment_amount")
@@ -21,14 +19,22 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
 
         if payment_amount < 1.00:
             raise ValidationError(
-                {"amount": [ErrorDetail(_("Amount should be greater than a dollar."))]}
+                {
+                    "amount": [
+                        ErrorDetail(
+                            _("Amount should be greater than a dollar.")
+                        )
+                    ]
+                }
             )
         payment_amount_decimal = decimal.Decimal(str(payment_amount))
         if abs(payment_amount_decimal.as_tuple().exponent) > 2:
             raise ValidationError(
                 {
                     "payment_amount": [
-                        ErrorDetail(_("Amount can only have two digits after decimal."))
+                        ErrorDetail(
+                            _("Amount can only have two digits after decimal.")
+                        )
                     ]
                 }
             )
@@ -50,7 +56,9 @@ class CreatePaymentValidator(PaymentValidatorBase):
                 {
                     "tip_amount": [
                         ErrorDetail(
-                            _("Tip amount can only have two digits after decimal.")
+                            _(
+                                "Tip amount can only have two digits after decimal."
+                            )
                         )
                     ]
                 }
@@ -106,10 +114,16 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
                         ]
                     }
                 )
-            consumer_account = get_consumer_account_by_username(username=loqal_id)
+            consumer_account = get_consumer_account_by_username(
+                username=loqal_id
+            )
             if not consumer_account:
                 raise ValidationError(
-                    {"detail": ErrorDetail(_("No user exists with given Loqal ID."))}
+                    {
+                        "detail": ErrorDetail(
+                            _("No user exists with given Loqal ID.")
+                        )
+                    }
                 )
         return attrs
 
@@ -124,7 +138,11 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
         qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
         if not qrcode:
             raise ValidationError(
-                {"qrcode_id": [ErrorDetail(_("Provided QR Code is not valid."))]}
+                {
+                    "qrcode_id": [
+                        ErrorDetail(_("Provided QR Code is not valid."))
+                    ]
+                }
             )
         return attrs
 
@@ -143,7 +161,9 @@ class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
                 {
                     "tip_amount": [
                         ErrorDetail(
-                            _("Tip amount can only have two digits after decimal.")
+                            _(
+                                "Tip amount can only have two digits after decimal."
+                            )
                         )
                     ]
                 }
@@ -153,4 +173,3 @@ class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
 
 class RejectPaymentRequestValidator(serializers.ValidationSerializer):
     payment_request_id = serializers.IntegerField()
-    

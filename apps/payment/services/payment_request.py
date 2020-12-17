@@ -3,20 +3,18 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
+from apps.account.dbapi import (get_consumer_account_by_phone_number,
+                                get_consumer_account_by_username)
 from apps.banking.dbapi import get_bank_account
-from apps.account.dbapi import (
-    get_consumer_account_by_phone_number,
-    get_consumer_account_by_username,
-)
-from apps.payment.validators import (
-    CreatePaymentRequestValidator,
-    ApprovePaymentRequestValidator,
-    RejectPaymentRequestValidator,
-)
-from apps.payment.dbapi import create_payment_request, get_payment_reqeust_by_id
-from apps.provider.options import DEFAULT_CURRENCY
-from .create_payment import CreatePayment
+from apps.payment.dbapi import (create_payment_request,
+                                get_payment_reqeust_by_id)
 from apps.payment.options import PaymentRequestStatus
+from apps.payment.validators import (ApprovePaymentRequestValidator,
+                                     CreatePaymentRequestValidator,
+                                     RejectPaymentRequestValidator)
+from apps.provider.options import DEFAULT_CURRENCY
+
+from .create_payment import CreatePayment
 
 __all__ = (
     "CreatePaymentRequest",
@@ -46,7 +44,9 @@ class CreatePaymentRequest(ServiceBase):
                 phone_number=phone_number
             )
         else:
-            consumer_account = get_consumer_account_by_username(username=loqal_id)
+            consumer_account = get_consumer_account_by_username(
+                username=loqal_id
+            )
 
         bank_account = get_bank_account(account_id=self.account_id)
         if not bank_account:
@@ -107,7 +107,8 @@ class ApprovePaymentRequest(ServiceBase):
         payment_request_id = data["payment_request_id"]
 
         payment_request = get_payment_reqeust_by_id(
-            payment_request_id=payment_request_id, requested_to_id=self.account_id
+            payment_request_id=payment_request_id,
+            requested_to_id=self.account_id,
         )
         if not payment_request:
             raise ValidationError(
@@ -118,9 +119,9 @@ class ApprovePaymentRequest(ServiceBase):
                 }
             )
         if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
-            raise ValidationError({
-                "detail": ErrorDetail(_("Payment request is expired."))
-            })
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Payment request is expired."))}
+            )
         data["payment_request"] = payment_request
         return data
 
@@ -143,7 +144,8 @@ class RejectPaymentRequest(ServiceBase):
         payment_request_id = data["payment_request_id"]
 
         payment_request = get_payment_reqeust_by_id(
-            payment_request_id=payment_request_id, requested_to_id=self.account_id
+            payment_request_id=payment_request_id,
+            requested_to_id=self.account_id,
         )
         if not payment_request:
             raise ValidationError(
@@ -154,7 +156,7 @@ class RejectPaymentRequest(ServiceBase):
                 }
             )
         if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
-            raise ValidationError({
-                "detail": ErrorDetail(_("Payment request is expired."))
-            })
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Payment request is expired."))}
+            )
         return payment_request

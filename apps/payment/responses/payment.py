@@ -1,9 +1,13 @@
 from api import serializers
+from apps.account.models import Account, MerchantAccount
 from apps.account.responses import MerchantDetailsResponse
-from apps.payment.models import Transaction, PaymentRequest
-from apps.account.models import MerchantAccount, Account
+from apps.payment.models import PaymentRequest, Transaction
 
-__all__ = ("TransactionResponse", "PaymentRequestResponse","ConsumerPaymentRequestResponse",)
+__all__ = (
+    "TransactionResponse",
+    "PaymentRequestResponse",
+    "ConsumerPaymentRequestResponse",
+)
 
 
 class TransactionResponse(serializers.ModelSerializer):
@@ -11,9 +15,7 @@ class TransactionResponse(serializers.ModelSerializer):
         source="recipient.account.merchantaccount", read_only=True
     )
     uid = serializers.CharField(source="u_id", read_only=True)
-    status = serializers.CharField(
-        source="status.label", read_only=True
-    )
+    status = serializers.CharField(source="status.label", read_only=True)
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True
     )
@@ -38,15 +40,21 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="merchantprofile.full_name", read_only=True
     )
-    about = serializers.CharField(source="merchantprofile.about", read_only=True)
-    category = serializers.CharField(source="merchantprofile.category", read_only=True)
+    about = serializers.CharField(
+        source="merchantprofile.about", read_only=True
+    )
+    category = serializers.CharField(
+        source="merchantprofile.category", read_only=True
+    )
     sub_category = serializers.CharField(
         source="merchantprofile.sub_category", read_only=True
     )
     hero_image = serializers.CharField(
         source="merchantprofile.hero_image", read_only=True
     )
-    address = serializers.JSONField(source="merchantprofile.address", read_only=True)
+    address = serializers.JSONField(
+        source="merchantprofile.address", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount
@@ -65,9 +73,7 @@ class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
     merchant = PaymentRequestMerchantDetailsResponse(
         source="account.merchantaccount", read_only=True
     )
-    status = serializers.CharField(
-        source="status.label", read_only=True
-    )
+    status = serializers.CharField(source="status.label", read_only=True)
 
     class Meta:
         model = PaymentRequest
@@ -79,7 +85,6 @@ class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
             "payment_currency",
             "status",
         )
-
 
 
 class ConsumerBasicInfoResponse(serializers.ModelSerializer):
@@ -97,10 +102,9 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
             "last_name",
         )
 
+
 class PaymentRequestResponse(serializers.ModelSerializer):
-    status = serializers.CharField(
-        source="status.label", read_only=True
-    )
+    status = serializers.CharField(source="status.label", read_only=True)
     requested_to = ConsumerBasicInfoResponse(read_only=True)
 
     class Meta:
@@ -113,5 +117,3 @@ class PaymentRequestResponse(serializers.ModelSerializer):
             "payment_currency",
             "status",
         )
-
-

@@ -1,11 +1,10 @@
-from api.exceptions import ValidationError, ErrorDetail
 from django.utils.translation import gettext as _
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.views import APIView
 from apps.reference.dbapi import get_all_countries, get_zipcode
-from apps.reference.services import (CitySearch,
-                                     RegionStateList)
 from apps.reference.responses import ZipCodeResponse
+from apps.reference.services import CitySearch, RegionStateList
 
 
 class CountriesAPI(APIView):
@@ -43,14 +42,14 @@ class GetZipCodeAPI(APIView):
     def get(self, request):
         code = self.request_data.get("code", None)
         if not code:
-            raise ValidationError({
-                "detail": ErrorDetail(_("code is required."))
-            })
-        
+            raise ValidationError(
+                {"detail": ErrorDetail(_("code is required."))}
+            )
+
         zip_code = get_zipcode(code=code)
         if not zip_code:
-            raise ValidationError({
-                "detail": ErrorDetail(_("code is invalid."))
-            })
-            
+            raise ValidationError(
+                {"detail": ErrorDetail(_("code is invalid."))}
+            )
+
         return self.response(ZipCodeResponse(zip_code).data)

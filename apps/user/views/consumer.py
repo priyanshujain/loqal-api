@@ -17,8 +17,8 @@ from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
                                 EmailVerification, LoginRequest,
                                 RequestResetPassword, ResendPhoneNumberOtp,
                                 ResendSmsOtpAuth, ResetPasswordTokenValidate,
-                                Session, SmsOtpAuth, VerifyPhoneNumber,
-                                StartSmsAuthEnrollment,)
+                                Session, SmsOtpAuth, StartSmsAuthEnrollment,
+                                VerifyPhoneNumber)
 from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils import auth
 from utils.shortcuts import img2base64, rand_str
@@ -139,11 +139,9 @@ class SmsOtpAuthAPI(APIView):
             user=user, request=self.request, data=self.request_data
         ).validate_otp()
         if not is_valid:
-            raise ValidationError({
-                "otp": [
-                    ErrorDetail(_("Otp is not valid or expired."))
-                ]
-            })
+            raise ValidationError(
+                {"otp": [ErrorDetail(_("Otp is not valid or expired."))]}
+            )
 
 
 class ResendSmsOtpAuthAPI(APIView):
@@ -174,7 +172,9 @@ class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
         return self.response()
 
     def _run_services(self, user):
-        ResendPhoneNumberOtp(user=user, request=self.request, data=self.request_data).handle()
+        ResendPhoneNumberOtp(
+            user=user, request=self.request, data=self.request_data
+        ).handle()
 
 
 class AddPhoneNumberAPI(LoggedInAPIView):
@@ -190,11 +190,7 @@ class AddPhoneNumberAPI(LoggedInAPIView):
 class StartSmsAuthEnrollmentAPI(LoggedInAPIView):
     def post(self, request):
         enrollment_secret = self._run_services()
-        return self.response(
-            {
-                "secret": enrollment_secret
-            }
-        )
+        return self.response({"secret": enrollment_secret})
 
     def _run_services(self):
         service = StartSmsAuthEnrollment(request=self.request)

@@ -4,11 +4,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi import create_merchant_account
 from apps.account.notifications import SendAccountVerifyEmail
-from apps.merchant.dbapi import (
-    create_account_member_on_reg,
-    get_super_admin_role,
-    create_merchant_profile,
-)
+from apps.merchant.dbapi import (create_account_member_on_reg,
+                                 create_merchant_profile, get_super_admin_role)
 from apps.merchant.services import CreateDefaultRoles
 from apps.user.dbapi import create_user, get_user_by_email
 

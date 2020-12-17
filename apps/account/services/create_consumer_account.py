@@ -1,18 +1,21 @@
 from random import randint
-from apps.account.dbapi import check_account_username
+
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import create_consumer_account
+from apps.account.dbapi import check_account_username, create_consumer_account
 from apps.account.notifications import SendAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_user_by_email
 
-__all__ = ("CreateConsumerAccount", "GenerateUsername",)
+__all__ = (
+    "CreateConsumerAccount",
+    "GenerateUsername",
+)
 
 
 class CreateConsumerAccount(ServiceBase):
@@ -50,7 +53,9 @@ class CreateConsumerAccount(ServiceBase):
     def _factory_account(self, user):
         # TODO: Store spotlight terms and condition consent record
         username = GenerateUsername(user=user).handle()
-        consumer_account = create_consumer_account(user_id=user.id, username=username)
+        consumer_account = create_consumer_account(
+            user_id=user.id, username=username
+        )
         self._factory_payment_register(account_id=consumer_account.account.id)
         return consumer_account
 
@@ -107,7 +112,7 @@ class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
 class GenerateUsername(object):
     def __init__(self, user):
         self.user = user
-    
+
     def generate(self):
         number = randint(11111, 99999)
         first_name_i = self.user.first_name[0].lower()
@@ -117,5 +122,5 @@ class GenerateUsername(object):
     def handle(self):
         username = self.generate()
         while check_account_username(username=username):
-                   username = self.generate()
+            username = self.generate()
         return username
