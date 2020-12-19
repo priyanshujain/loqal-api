@@ -11,12 +11,12 @@ class MemberSignupInviteEmail:
         self.invite = invite
 
     def send(self):
-        invite_key = self.invite.invite_key
+        token = self.invite.token
         invite_email = self.invite.email
         first_name = self.invite.first_name
 
         # Sending invited client email.
-        key_path = f"/team/signup/{invite_key}"
+        key_path = f"/team/signup/{token}"
         path = f"{settings.APP_BASE_URL}{key_path}"
         render_data = dict(path=path, username=first_name)
 

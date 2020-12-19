@@ -35,7 +35,7 @@ class UpdateMemberInviteValidator(serializers.ValidationSerializer):
 
 
 class MemberSignupValidator(serializers.ValidationSerializer):
-    invite_key = serializers.CharField(max_length=256)
+    token = serializers.CharField(max_length=256)
     first_name = serializers.CharField(max_length=1024)
     last_name = serializers.CharField(
         max_length=1024, default="", required=False

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+
+{% block title %}
+  Signup
+{% endblock %}
+
+
+
+{% block preheader %} 
+  Signup to Spotlight
+{% endblock %}
+
+
+
+{% block salutation %}
+  <br>
+  Dear {{username}},
+{% endblock %}
+
+
+
+{% block message %} 
+  <p>We’re delighted to let you know your account with Spotlight has been enabled by your company’s designated Spotlight administrator.</p>
+  <p>Please click the following link to get started:</p>
+  <p><a href={{ path }}>{{ path }}</a></p>
+{% endblock %}
+
+
+{% block button_message %}
+{% endblock %}
+
+
+
+{% block second_message %}
+{% endblock %}

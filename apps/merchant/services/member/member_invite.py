@@ -52,7 +52,7 @@ class CreateMemberInvite(ServiceBase):
             raise ValidationError(
                 {"role_id": [ErrorDetail(_("Invalid role_id."))]}
             )
-        if role.account.id != self.merchant_id:
+        if role.merchant.id != self.merchant_id:
             raise ValidationError(
                 {"role_id": [ErrorDetail(_("Invalid role_id."))]}
             )

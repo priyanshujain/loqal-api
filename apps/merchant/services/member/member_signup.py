@@ -18,11 +18,11 @@ class MemberSignup(ServiceBase):
     def validate_data(self):
         data = run_validator(validator=MemberSignupValidator, data=self.data)
 
-        invite_key = data["invite_key"]
-        invite = get_member_invite_by_token(invite_key=invite_key)
+        token = data["token"]
+        invite = get_member_invite_by_token(token=token)
         if not invite:
             raise ValidationError(
-                {"invite_key": [ErrorDetail(_("Invalid invite_key."))]}
+                {"token": [ErrorDetail(_("Invalid token."))]}
             )
         self.invite = invite
         self.data = data

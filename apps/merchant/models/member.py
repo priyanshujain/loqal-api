@@ -64,12 +64,12 @@ class AccountMember(AbstractBaseModel):
     def disable_member(self):
         user = self.user
         user.is_disbled = True
-        User.save()
+        user.save()
 
     def enable_member(self):
         user = self.user
         user.is_disbled = False
-        User.save()
+        user.save()
 
     def update_role(self, role_id):
         self.role_id = role_id
