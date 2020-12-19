@@ -83,6 +83,15 @@ def get_payment_qrcode(qrcode_id):
     except PaymentQrCode.DoesNotExist:
         return None
 
+def get_payment_qrcode_by_id(qrcode_id, merchant_id):
+    """
+    get QR code by qrcode_id and merchant_id
+    """
+    try:
+        return PaymentQrCode.objects.get(qrcode_id=qrcode_id, merchant_id=merchant_id)
+    except PaymentQrCode.DoesNotExist:
+        return None
+
 
 def assign_payment_qrcode(qrcode_id, merchant_id, cashier_id):
     """

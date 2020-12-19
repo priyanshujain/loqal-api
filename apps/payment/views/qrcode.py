@@ -4,7 +4,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_cashier_qrcode, get_merchant_qrcodes,
-                                get_payment_qrcode)
+                                get_payment_qrcode,
+                                get_payment_qrcode_by_id)
 from apps.payment.responses import (MerchantQrCodeResponse,
                                     QrCodeMerchantDetailsResponse,
                                     QrCodeResponse)
@@ -41,6 +42,25 @@ class GetCashierQrCodesAPI(MerchantAPIView):
             merchant_id=merchant_account_member.merchant.id,
             cashier_id=merchant_account_member.id,
         )
+        response_data = MerchantQrCodeResponse(qrcode).data
+        image = qrcodelib.make(
+            f"loqal://pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}"
+        )
+        response_data["image_base64"] = img2base64(image)
+        return self.response(response_data)
+
+class GetQrCodeImageAPI(MerchantAPIView):
+    def get(self, request):
+        qrcode_id = self.request_data.get("qrcode_id")
+        merchant = request.merchant_account
+        qrcode = get_payment_qrcode_by_id(
+            qrcode_id=qrcode_id,
+            merchant_id=merchant.id,
+        )
+        if not qrcode:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid QR code."))}
+            )
         response_data = MerchantQrCodeResponse(qrcode).data
         image = qrcodelib.make(
             f"loqal://pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}"

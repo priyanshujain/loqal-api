@@ -1,7 +1,7 @@
 from api import serializers
 from apps.account.models import MerchantAccount
 from apps.merchant import models
-from apps.merchant.models import MerchantProfile
+from apps.merchant.models import AccountMember
 from apps.payment.models import PaymentQrCode
 
 __all__ = (
@@ -21,6 +21,14 @@ class QrCodeResponse(serializers.ModelSerializer):
         )
 
 
+class CashierDetailsResponse(serializers.ModelSerializer):
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
+
+    class Meta:
+        model = AccountMember
+        fields = ("first_name", "last_name",)
+
 class MerchantQrCodeResponse(serializers.ModelSerializer):
     merchant_uid = serializers.CharField(
         source="merchant.u_id", read_only=True
@@ -29,6 +37,8 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
         source="merchant.id", read_only=True
     )
     cashier_id = serializers.IntegerField(source="cashier.id", read_only=True)
+    cashier = CashierDetailsResponse(read_only=True)
+
 
     class Meta:
         model = PaymentQrCode
@@ -39,6 +49,9 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
             "merchant_uid",
             "merchant_id",
             "cashier_id",
+            "cashier",
+            "updated_at",
+            "created_at",
         )
 
 

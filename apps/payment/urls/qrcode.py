@@ -3,7 +3,8 @@ from django.urls import path
 from apps.payment.views.qrcode import (AssignQrCodeAPI, CreateQrCodeAPI,
                                        GetAllMerchantQrCodesAPI,
                                        GetCashierQrCodesAPI,
-                                       GetQrCodeMerchantDetailsAPI)
+                                       GetQrCodeMerchantDetailsAPI,
+                                       GetQrCodeImageAPI)
 
 urlpatterns = [
     path("qrcode/create/", CreateQrCodeAPI.as_view(), name="create_qrcode"),
@@ -22,5 +23,10 @@ urlpatterns = [
         "qrcode/merchant-details/",
         GetQrCodeMerchantDetailsAPI.as_view(),
         name="qrcode_merchant_details",
+    ),
+    path(
+        "qrcode/image/",
+        GetQrCodeImageAPI.as_view(),
+        name="qrcode_image",
     ),
 ]

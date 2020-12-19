@@ -44,14 +44,14 @@ class MemberInviteDetailsResponse(serializers.ModelSerializer):
 class AccountMemberResponse(serializers.ModelSerializer):
     member_id = serializers.IntegerField(source="id", read_only=True)
     first_name = serializers.CharField(
-        source="profile.first_name", read_only=True
+        source="user.first_name", read_only=True
     )
     last_name = serializers.CharField(
-        source="profile.last_name", read_only=True
+        source="user.last_name", read_only=True
     )
     email = serializers.CharField(source="profile.user.email", read_only=True)
-    is_enabled = serializers.BooleanField(
-        source="profile.is_activated", read_only=True
+    is_disbled = serializers.BooleanField(
+        source="user.is_disabled", read_only=True
     )
     role = RoleInfoResponse(read_only=True)
 
@@ -63,7 +63,7 @@ class AccountMemberResponse(serializers.ModelSerializer):
             "last_name",
             "email",
             "position",
-            "is_enabled",
+            "is_disbled",
             "role",
         )
 
