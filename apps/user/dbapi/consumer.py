@@ -44,16 +44,14 @@ def create_user(
 
 
 def update_user_profile(
-    user_profile, first_name, last_name, phone_number, position
+    user, first_name, last_name
 ):
     """
     User user profile dbapi
     """
-    user_profile.first_name = first_name
-    user_profile.last_name = last_name
-    user_profile.phone_number = phone_number
-    user_profile.save()
-    user_profile.accountmember.set_position(position)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
 
 
 def get_user_by_email(email):

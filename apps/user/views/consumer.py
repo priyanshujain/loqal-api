@@ -48,13 +48,11 @@ class UpdateUserProfileAPI(LoggedInAPIView):
 
     def put(self, request):
         data = run_validator(EditProfileValidator, self.request_data)
-        user_profile = request.user.userprofile
+        user = request.user
         update_user_profile(
-            user_profile=user_profile,
+            user=user,
             first_name=data["first_name"],
             last_name=data["last_name"],
-            phone_number=data["phone_number"],
-            position=data["position"],
         )
         return self.response(status=204)
 

@@ -20,12 +20,6 @@ __all__ = (
 class EditProfileValidator(serializers.ValidationSerializer):
     first_name = serializers.CharField(max_length=64)
     last_name = serializers.CharField(max_length=64, required=False)
-    phone_number = serializers.CharField(
-        max_length=10, allow_blank=True, required=False
-    )
-    position = serializers.CharField(
-        max_length=255, allow_blank=True, required=False
-    )
 
 
 class UserEmailExistsValidator(serializers.ValidationSerializer):
