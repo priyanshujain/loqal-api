@@ -27,7 +27,7 @@ def create_user(
     last_name,
     email,
     password,
-    phone_number="",
+    phone_number=None,
     email_verified=False,
 ):
     user = User.objects.create(
