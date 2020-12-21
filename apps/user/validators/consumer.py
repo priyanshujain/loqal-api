@@ -19,7 +19,7 @@ __all__ = (
 
 class EditProfileValidator(serializers.ValidationSerializer):
     first_name = serializers.CharField(max_length=64)
-    last_name = serializers.CharField(max_length=64, required=False)
+    last_name = serializers.CharField(max_length=64)
 
 
 class UserEmailExistsValidator(serializers.ValidationSerializer):
