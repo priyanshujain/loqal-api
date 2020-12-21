@@ -19,6 +19,8 @@ class ControllerDetailsResponse(serializers.ModelSerializer):
 
 
 class BeneficialOwnerResponse(serializers.ModelSerializer):
+    status = serializers.CharField(source="status.label", read_only=True)
+
     class Meta:
         model = BeneficialOwner
         fields = "__all__"

@@ -24,3 +24,9 @@ class MerchantBasicDetailsAPI(ConsumerAPIView):
                 {"detail": ErrorDetail(_("Invalid merchant."))}
             )
         return self.response(MerchantDetailsResponse(merchant_account).data)
+
+
+class RecentMerchantsAPI(ConsumerAPIView):
+    def get(self, request):
+        consumer_account = request.consumer_account
+        return self.response()

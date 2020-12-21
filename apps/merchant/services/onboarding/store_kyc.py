@@ -104,6 +104,7 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
 
 
 class CreateControllerDetails(ServiceBase):
+    # TODO: Validate for aleast ssn or passport number required
     def __init__(self, merchant_id, data):
         self.data = data
         self.merchant_id = merchant_id

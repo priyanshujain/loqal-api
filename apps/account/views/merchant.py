@@ -1,5 +1,6 @@
 from django.utils.translation import gettext as _
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, MerchantAPIView
 from apps.account.responses import MerchantAccountProfileResponse
@@ -14,6 +15,11 @@ __all__ = (
 
 class MerchantSignupAPI(APIView):
     def post(self, request):
+        if request.user.is_authenticated:
+            raise ValidationError(
+                {"details": ErrorDetail(_("User has aleady logged in."))}
+            )
+
         data = run_validator(CreateMerchantAccountValidator, self.request_data)
         self._run_services(data=data)
         return self.response(status=201)

@@ -1,20 +1,28 @@
+from django.core.exceptions import ValidationError
+from apps.account.options import MerchantAccountStatus, MerchantAccountCerficationStatus
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import get_merchant_account, merchant
-from apps.merchant.dbapi import get_account_member_by_user_id
+from apps.account.dbapi import get_merchant_account
+from apps.merchant.dbapi import (
+    get_account_member_by_user_id,
+    update_beneficial_owner_status,
+)
 from apps.merchant.serializers import OnboardingDataSerializer
 from apps.merchant.validators import OnboardingDataValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
-from apps.provider.lib.api import account
 from integrations.utils.options import RequestStatusTypes
+from apps.merchant.options import BenficialOwnerStatus
+
 
 __all__ = ("CreateDwollaMerchantAccount",)
 
 
 class CreateDwollaMerchantAccount(ServiceBase):
+    is_all_verified = True
+
     def __init__(self, merchant_id, user_id, ip_address):
         self.merchant_id = merchant_id
         self.user_id = user_id
@@ -22,12 +30,23 @@ class CreateDwollaMerchantAccount(ServiceBase):
 
     def handle(self):
         data, merchant = self._prepare_data()
-        return self._create_dwolla_acconut(data=data, merchant=merchant)
+        merchant = self._create_dwolla_acconut(data=data, merchant=merchant)
+        if (
+            self.is_all_verified
+            and merchant.is_certification_required
+            and merchant.certification_status
+            != MerchantAccountCerficationStatus.CERTIFIED
+        ):
+            certification = DwollaCertifyBeneficialOwnerAPIAction(
+                account_id=merchant.account.id
+            ).certify(dwolla_customer_id=merchant.account.dwolla_id)
+            merchant.update_certification_status(status=certification["status"])
+        return merchant
 
     def _prepare_data(self):
         merchant = get_merchant_account(merchant_id=self.merchant_id)
         data = OnboardingDataSerializer(merchant).data
-        assert self._validate_data(data=data)
+        assert self._validate_data(data=data, merchant=merchant)
         merchant_member = get_account_member_by_user_id(user_id=self.user_id)
         data["incorporation_details"]["user"] = {
             "first_name": merchant_member.user.first_name,
@@ -37,28 +56,106 @@ class CreateDwollaMerchantAccount(ServiceBase):
         data["incorporation_details"]["ip_address"] = self.ip_address
         return data, merchant
 
-    def _validate_data(self, data):
+    def _validate_data(self, data, merchant):
         run_validator(validator=OnboardingDataValidator, data=data)
+        account = merchant.account
+        if merchant.account_status == MerchantAccountStatus.DOCUMENT_PENDING:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Merchant has already been submitted for KYC, "
+                            "addition documents are required for identification."
+                        )
+                    )
+                }
+            )
+        if merchant.account_status == MerchantAccountStatus.SUSPENDED:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "The account has been suspended, please contact our support team."
+                        )
+                    )
+                }
+            )
         return True
 
     def _create_dwolla_acconut(self, data, merchant):
+        merchant_account_data = {
+            "incorporation_details": data["incorporation_details"],
+            "controller_details": data["controller_details"],
+        }
         account = merchant.account
-        dwolla_response = DwollaCreateMerchantAccountAPIAction(
-            account_id=account.id
-        ).create(data=data)
-        account.add_dwolla_id(dwolla_id=dwolla_response["dwolla_customer_id"])
-        merchant.update_status(status=dwolla_response["status"])
+        is_account_update = False
+        if merchant.account_status == MerchantAccountStatus.RETRY:
+            is_account_update = True
+            merchant_account_data["dwolla_id"] = account.dwolla_id
+
+        if merchant.account_status == MerchantAccountStatus.VERIFIED:
+            self._create_beneficial_owner(
+                account_id=account.id, dwolla_customer_id=account.dwolla_id, data=data
+            )
+        else:
+            dwolla_response = DwollaCreateMerchantAccountAPIAction(
+                account_id=account.id
+            ).create(data=merchant_account_data, is_update=is_account_update)
+            dwolla_customer_id = dwolla_response["dwolla_customer_id"]
+            dwolla_status = dwolla_response["status"]
+            is_certification_required = dwolla_response["is_certification_required"]
+            account.add_dwolla_id(dwolla_id=dwolla_customer_id)
+            merchant.update_status(status=dwolla_status)
+            merchant.update_certification_required(required=is_certification_required)
+            if dwolla_status != MerchantAccountStatus.VERIFIED:
+                self.is_all_verified = False
+
+            self._create_beneficial_owner(
+                account_id=account.id, dwolla_customer_id=dwolla_customer_id, data=data
+            )
+        return merchant
+
+    def _create_beneficial_owner(self, account_id, dwolla_customer_id, data):
+        beneficial_owners = data["beneficial_owners"]
+        for beneficial_owner in beneficial_owners:
+            is_ba_update = False
+            if beneficial_owner["status"] == BenficialOwnerStatus.VERIFIED:
+                continue
+            if beneficial_owner["status"] == BenficialOwnerStatus.DOCUMENT_PENDING:
+                continue
+            if beneficial_owner["status"] == BenficialOwnerStatus.INCOMPLETE:
+                is_account_update = True
+            ba_response = DwollaAddBeneficialOwnerAPIAction(
+                account_id=account_id
+            ).create(
+                data=beneficial_owner,
+                dwolla_customer_id=dwolla_customer_id,
+                is_update=is_ba_update,
+            )
+            status = ba_response["status"]
+            update_beneficial_owner_status(
+                beneficial_owner_id=beneficial_owner["id"],
+                dwolla_id=ba_response["dwolla_id"],
+                status=status,
+            )
+            if status != BenficialOwnerStatus.VERIFIED:
+                self.is_all_verified = False
+
+    def _certify_beneficial_owners(self):
+        pass
 
 
 class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
-    def create(self, data):
-        response = self.client.account.create_merchant_account(data=data)
+    def create(self, data, is_update=False):
+        response = self.client.account.create_merchant_account(
+            data=data, is_update=is_update
+        )
         if self.get_errors(response):
             raise ProviderAPIException(
                 {
                     "detail": ErrorDetail(
                         _(
-                            "Banking service failed, Please try "
+                            "KYC service failed, Please try "
                             "again. If the problem persists please "
                             "contact our support team."
                         )
@@ -68,5 +165,50 @@ class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
         return {
             "status": response["data"].get("status"),
             "dwolla_customer_id": response["data"]["dwolla_customer_id"],
-            "status": response["data"]["status"],
+            "is_certification_required": response["data"]["is_certification_required"]
+        }
+
+
+class DwollaAddBeneficialOwnerAPIAction(ProviderAPIActionBase):
+    def create(self, data, dwolla_customer_id, is_update=False):
+        response = self.client.account.add_beneficial_owner(
+            data=data, dwolla_customer_id=dwolla_customer_id, is_update=is_update
+        )
+        if self.get_errors(response):
+            raise ProviderAPIException(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "KYC service failed, Please try "
+                            "again. If the problem persists please "
+                            "contact our support team."
+                        )
+                    )
+                }
+            )
+        return {
+            "status": response["data"].get("status"),
+            "dwolla_id": response["data"].get("dwolla_id"),
+        }
+
+
+class DwollaCertifyBeneficialOwnerAPIAction(ProviderAPIActionBase):
+    def certify(self, dwolla_customer_id):
+        response = self.client.account.certify_beneficial_owner(
+            dwolla_customer_id=dwolla_customer_id
+        )
+        if self.get_errors(response):
+            raise ProviderAPIException(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "KYC service failed, Please try "
+                            "again. If the problem persists please "
+                            "contact our support team."
+                        )
+                    )
+                }
+            )
+        return {
+            "status": response["data"].get("status"),
         }

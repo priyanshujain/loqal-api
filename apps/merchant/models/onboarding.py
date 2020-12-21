@@ -4,7 +4,10 @@ from django.utils.translation import gettext as _
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
+from apps.merchant.options import BenficialOwnerStatus
+
 
 __all__ = (
     "IncorporationConsent",
@@ -73,6 +76,28 @@ class ControllerDetails(IndividualBase):
 
 class BeneficialOwner(IndividualBase):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
+    dwolla_id = models.CharField(max_length=64, blank=True)
+    status = ChoiceEnumField(
+        enum_type=BenficialOwnerStatus,
+        default=BenficialOwnerStatus.PENDING,
+        help_text=_("Status for the beneficial owner with dwolla."),
+    )
+    
+    def add_dwolla_id(self, dwolla_id, save=True):
+        """
+        add dwolla id
+        """
+        self.dwolla_id = dwolla_id
+        if save:
+            self.save()
+
+    def update_status(self, status, save=True):
+        """
+        update status
+        """
+        self.account_status = status
+        if save:
+            self.save()
 
     class Meta:
         db_table = "merchant_onboarding_beneficial_owner"

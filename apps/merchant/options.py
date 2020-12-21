@@ -58,3 +58,10 @@ class AllowedFeatureAcessTypes:
         "UPDATE",
         "VIEW",
     ]
+
+
+class BenficialOwnerStatus(ChoiceEnum):
+    PENDING = 0, _("Pending")
+    VERIFIED = 1, _("Verified")
+    DOCUMENT_PENDING = 2, _("Document Pending")
+    INCOMPLETE = 3, _("Incomplete")

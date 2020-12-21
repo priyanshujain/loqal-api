@@ -14,6 +14,7 @@ __all__ = (
     "create_beneficial_owner",
     "update_beneficial_owner",
     "delete_beneficial_owner",
+    "update_beneficial_owner_status",
 )
 
 
@@ -119,3 +120,7 @@ def delete_beneficial_owner(merchant_id, beneficial_owner_id):
         return beneficial_owner.delete()
     else:
         return None
+
+
+def update_beneficial_owner_status(beneficial_owner_id, dwolla_id, status):
+    BeneficialOwner.objects.filter(id=beneficial_owner_id).update(dwolla_id=dwolla_id, status=status)

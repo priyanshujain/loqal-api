@@ -5,7 +5,7 @@ from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
-from apps.account.options import AccountStatus
+from apps.account.options import MerchantAccountStatus
 from apps.banking.dbapi import get_bank_account
 from apps.payment.dbapi import create_transaction, get_payment_qrcode
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
@@ -94,7 +94,7 @@ class CreatePayment(ServiceBase):
                 }
             )
 
-        if merchant_account.account_status != AccountStatus.VERIFIED:
+        if merchant_account.account_status != MerchantAccountStatus.VERIFIED:
             raise ValidationError(
                 {
                     "merchant_id": ErrorDetail(

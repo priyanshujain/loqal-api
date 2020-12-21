@@ -1,3 +1,4 @@
+from apps.account.responses.merchant import MerchantAccountProfileResponse
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
 from apps.merchant.responses import OnboardingDataResponse
@@ -143,15 +144,15 @@ class OnboardingDataAPI(MerchantAPIView):
 
 
 class SubmitKycDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
+    # permission_classes = (IsMerchantAccountPendingPermission,)
 
     def post(self, request):
         merchant_account = request.merchant_account
         user = request.user
         ip_address = request.ip
-        res_data = CreateDwollaMerchantAccount(
+        updated_merchant_account = CreateDwollaMerchantAccount(
             merchant_id=merchant_account.id,
             user_id=user.id,
             ip_address=ip_address,
         ).handle()
-        return self.response(res_data)
+        return self.response(MerchantAccountProfileResponse(updated_merchant_account).data)
