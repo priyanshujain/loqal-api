@@ -10,8 +10,8 @@ from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 __all__ = (
-    "ChoiceEnum",
-    "ChoiceEnumField",
+    "ChoiceCharEnum",
+    "ChoiceCharEnumField",
 )
 
 
@@ -58,7 +58,7 @@ class ChoiceEnumMeta(enum.EnumMeta):
             return None
 
 
-class ChoiceEnum(enum.Enum, metaclass=ChoiceEnumMeta):
+class ChoiceCharEnum(enum.Enum, metaclass=ChoiceEnumMeta):
     """
     Utility class to handle choices in Django model and/or form fields.
     Usage:
@@ -79,14 +79,14 @@ class ChoiceEnum(enum.Enum, metaclass=ChoiceEnumMeta):
 
 
 # TODO: Error it does not add default value in django migration
-class ChoiceEnumField(models.PositiveSmallIntegerField):
+class ChoiceCharEnumField(models.CharField):
     description = _("")
 
     def __init__(self, *args, **kwargs):
         self.enum_type = kwargs.pop(
-            "enum_type", ChoiceEnum
+            "enum_type", ChoiceCharEnum
         )  # fallback is required form migrations
-        if not issubclass(self.enum_type, ChoiceEnum):
+        if not issubclass(self.enum_type, ChoiceCharEnum):
             raise ValueError("enum_type must be a subclass of `ChoiceEnum`.")
         kwargs.update(choices=self.enum_type.choices)
         kwargs.setdefault("default", self.enum_type.default)

@@ -6,7 +6,7 @@ from apps.merchant.dbapi import (
     get_controller_details,
     get_incorporation_details
 )
-from apps.merchant.options import BenficialOwnerStatus
+from apps.merchant.options import BeneficialOwnerStatus
 
 
 __all__ = (
@@ -24,7 +24,7 @@ class DocumentRequirements(ServiceBase):
         for beneficial_owner in beneficial_owners:
             if not beneficial_owner.dwolla_id:
                 continue
-            if beneficial_owner.status == BenficialOwnerStatus.DOCUMENT_PENDING:
+            if beneficial_owner.status == BeneficialOwnerStatus.DOCUMENT_PENDING:
                 ba_details = self._individual_docs_requirement(beneficial_owner)
                 ba_required_docs.append(ba_details)
         if ba_required_docs:
@@ -44,7 +44,7 @@ class DocumentRequirements(ServiceBase):
                     "id": incorporation_details.verification_document_file.id,
                     "file_name": incorporation_details.verification_document_file.file_name
                 }
-                inc_details["verification_document_type"] = incorporation_details.verification_document_type
+                inc_details["verification_document_type"] = incorporation_details.verification_document_type.label
             docs_required["incorporation"] = incorporation_details
         return docs_required
     
@@ -60,5 +60,7 @@ class DocumentRequirements(ServiceBase):
                 "id": individual_obj.verification_document_file.id,
                 "file_name": individual_obj.verification_document_file.file_name
             }
-            req_details["verification_document_type"] = individual_obj.verification_document_type
+            req_details["verification_document_type"] = individual_obj.verification_document_type.label
         return req_details
+
+

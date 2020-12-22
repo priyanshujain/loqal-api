@@ -3,6 +3,7 @@ from django.db import IntegrityError
 
 from apps.merchant.models import (BeneficialOwner, ControllerDetails,
                                   IncorporationDetails)
+from apps.merchant.options import VerificationDocumentStatus
 
 __all__ = (
     "get_incorporation_details",
@@ -17,6 +18,9 @@ __all__ = (
     "delete_beneficial_owner",
     "update_beneficial_owner_status",
     "get_all_beneficial_owners",
+    "update_beneficial_owner_document",
+    "update_controller_document",
+    "update_business_document",
 )
 
 
@@ -137,3 +141,27 @@ def update_beneficial_owner_status(beneficial_owner_id, dwolla_id, status):
         return
     beneficial_owner.add_dwolla_id(dwolla_id=dwolla_id, save=False)
     beneficial_owner.update_status(status=status)
+
+
+def update_beneficial_owner_document(beneficial_owner_id, verification_document_id, verification_document_type):
+        BeneficialOwner.objects.filter(id=beneficial_owner_id).update(
+            verification_document_type=verification_document_type,
+            verification_document_file_id=verification_document_id,
+            verification_document_status=VerificationDocumentStatus.UPLOADED
+        )
+
+
+def update_controller_document(merchant_id, verification_document_id, verification_document_type):
+        ControllerDetails.objects.filter(merchant_id=merchant_id).update(
+            verification_document_type=verification_document_type,
+            verification_document_file_id=verification_document_id,
+            verification_document_status=VerificationDocumentStatus.UPLOADED
+        )
+
+
+def update_business_document(merchant_id, verification_document_id, verification_document_type):
+        IncorporationDetails.objects.filter(merchant_id=merchant_id).update(
+            verification_document_type=verification_document_type,
+            verification_document_file_id=verification_document_id,
+            verification_document_status=VerificationDocumentStatus.UPLOADED
+        )

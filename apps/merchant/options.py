@@ -1,6 +1,8 @@
 from django.utils.translation import gettext as _
 
-from db.models.fields import ChoiceEnum
+from db.models.fields import ChoiceEnum, ChoiceCharEnum
+
+
 
 __all__ = (
     "BusinessTypes",
@@ -10,7 +12,7 @@ __all__ = (
 )
 
 
-class BusinessTypes(ChoiceEnum):
+class BusinessTypes(ChoiceCharEnum):
     SOLE_PROPRIETORSHIP = "sole_proprietorship", _("Sole Proprietorship")
     LLC = "llc", _("LLC")
     CORPORATION = "corporation", _("Corporation")
@@ -60,7 +62,7 @@ class AllowedFeatureAcessTypes:
     ]
 
 
-class BenficialOwnerStatus(ChoiceEnum):
+class BeneficialOwnerStatus(ChoiceEnum):
     PENDING = 0, _("Pending")
     VERIFIED = 1, _("Verified")
     DOCUMENT_PENDING = 2, _("Document Pending")
@@ -72,4 +74,21 @@ class VerificationDocumentStatus(ChoiceEnum):
     VERIFIED = 1, _("Verified")
     INCOMPLETE = 2, _("Incomplete")
     RETRY = 3, _("Retry")
-    NOT_APPLICABLE = 4, ("Not Applicable")
+    NOT_APPLICABLE = 4, _("Not Applicable")
+    UPLOADED = 5, _("Uploaded")
+    SUBMITTED = 6, _("Submitted")
+
+
+class IndividualDocumentType(ChoiceCharEnum):
+    DRIVER_LICENSE = "driver_license", _("Driver’s License")
+    US_PASSPORT = "us_passport", _("US Passport")
+    FOREIGN_PASSPORT = "foreign_passport", _("Foreign Passport")
+    US_VISA = "us_visa", _("US Visa")
+    FEAC = "employment_authorization_card", _("Federal Employment Authorization Card")
+
+
+class BusinessDocumentType(ChoiceCharEnum):
+    EIN_LETTER = "ein_letter", _("EIN Letter")
+    BUSINESS_LICENSE = "business_license", _("Business License")
+    DRIVER_LICENSE = "driver_license", _("Driver’s License")
+    US_PASSPORT = "us_passport", _("US Passport")

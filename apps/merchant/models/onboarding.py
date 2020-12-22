@@ -4,9 +4,15 @@ from django.utils.translation import gettext as _
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceEnumField
+from db.models.fields import ChoiceEnumField, ChoiceCharEnumField
 from utils.shortcuts import generate_uuid_hex
-from apps.merchant.options import BenficialOwnerStatus, VerificationDocumentStatus
+from apps.merchant.options import (
+    BeneficialOwnerStatus,
+    VerificationDocumentStatus,
+    IndividualDocumentType,
+    BusinessDocumentType,
+    BusinessTypes,
+)
 
 
 __all__ = (
@@ -22,11 +28,13 @@ class IncorporationDetails(AbstractBaseModel):
     legal_business_name = models.CharField(max_length=512)
     ein_number = models.CharField(max_length=11, blank=True)
     registered_address = models.JSONField()
-    business_type = models.CharField(max_length=32)
+    business_type = ChoiceCharEnumField(max_length=32, enum_type=BusinessTypes)
     business_classification = models.CharField(max_length=64)
     business_classification_id = models.CharField(max_length=64)
     verification_document_required = models.BooleanField(default=False)
-    verification_document_type = models.CharField(max_length=32, blank=True)
+    verification_document_type = ChoiceCharEnumField(
+        max_length=32, blank=True, enum_type=BusinessDocumentType
+    )
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )
@@ -35,6 +43,7 @@ class IncorporationDetails(AbstractBaseModel):
         default=VerificationDocumentStatus.NOT_APPLICABLE,
         help_text=_("Status for the verification document with dwolla."),
     )
+    dwolla_document_id = models.CharField(max_length=64, blank=True)
 
     def update_verification_document_status(self, status, save=True):
         self.verification_document_status = status
@@ -44,6 +53,11 @@ class IncorporationDetails(AbstractBaseModel):
     def update_verification_document_required(self, required, save=True):
         self.verification_document_required = required
         self.verification_document_status = VerificationDocumentStatus.PENDING
+        if save:
+            self.save()
+    
+    def add_dwolla_document_id(self, dwolla_id, save=True):
+        self.dwolla_document_id = dwolla_id
         if save:
             self.save()
 
@@ -71,10 +85,14 @@ class IndividualBase(AbstractBaseModel):
     is_us_citizen = models.BooleanField()
     ssn = models.CharField(max_length=9, blank=True)
     dob = models.DateField()
+    # TODO: Create a json schema validator for address
     address = models.JSONField()
+    # TODO: Apply an enum validator for country code
     passport_country = models.CharField(max_length=2, blank=True)
     passport_number = models.CharField(max_length=32, blank=True)
-    verification_document_type = models.CharField(max_length=32, blank=True)
+    verification_document_type = ChoiceCharEnumField(
+        max_length=32, blank=True, enum_type=IndividualDocumentType
+    )
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )
@@ -83,9 +101,15 @@ class IndividualBase(AbstractBaseModel):
         default=VerificationDocumentStatus.NOT_APPLICABLE,
         help_text=_("Status for the verification document with dwolla."),
     )
+    dwolla_document_id = models.CharField(max_length=64, blank=True)
 
     def update_verification_document_status(self, status, save=True):
         self.verification_document_status = status
+        if save:
+            self.save()
+    
+    def add_dwolla_document_id(self, dwolla_id, save=True):
+        self.dwolla_document_id = dwolla_id
         if save:
             self.save()
 
@@ -112,8 +136,8 @@ class BeneficialOwner(IndividualBase):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
     dwolla_id = models.CharField(max_length=64, blank=True)
     status = ChoiceEnumField(
-        enum_type=BenficialOwnerStatus,
-        default=BenficialOwnerStatus.PENDING,
+        enum_type=BeneficialOwnerStatus,
+        default=BeneficialOwnerStatus.PENDING,
         help_text=_("Status for the beneficial owner with dwolla."),
     )
 
@@ -131,7 +155,7 @@ class BeneficialOwner(IndividualBase):
         """
         self.status = status
         if (
-            status == BenficialOwnerStatus.DOCUMENT_PENDING
+            status == BeneficialOwnerStatus.DOCUMENT_PENDING
             and not self.verification_document_file
         ):
             self.verification_document_status = VerificationDocumentStatus.PENDING

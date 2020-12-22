@@ -1,15 +1,20 @@
 from django.urls import path
 
-from apps.merchant.views.onboarding import (CreateBeneficialOwnerAPI,
-                                            CreateControllerAPI,
-                                            CreateIncorporationDetailsAPI,
-                                            OnboardingDataAPI,
-                                            RemoveBeneficialOwnerAPI,
-                                            SubmitKycDataAPI,
-                                            UpdateBeneficialOwnerAPI,
-                                            UpdateControllerAPI,
-                                            UpdateIncorporationDetailsAPI,
-                                            DocumentRequirementsAPI)
+from apps.merchant.views.onboarding import (
+    CreateBeneficialOwnerAPI,
+    CreateControllerAPI,
+    CreateIncorporationDetailsAPI,
+    OnboardingDataAPI,
+    RemoveBeneficialOwnerAPI,
+    SubmitKycDataAPI,
+    UpdateBeneficialOwnerAPI,
+    UpdateControllerAPI,
+    UpdateIncorporationDetailsAPI,
+    DocumentRequirementsAPI,
+    UpdateOwnerVerificationDocumentAPI,
+    UpdateBusinessVerificationDocumentAPI,
+    UpdateControllerVerificationDocumentAPI,
+)
 
 urlpatterns = [
     path(
@@ -61,5 +66,20 @@ urlpatterns = [
         "onboarding/required-documents/",
         DocumentRequirementsAPI.as_view(),
         name="required_documents",
+    ),
+    path(
+        "onboarding/incorporation-details/document-upload/",
+        UpdateBusinessVerificationDocumentAPI.as_view(),
+        name="incorporation_document_upload",
+    ),
+    path(
+        "onboarding/controller/document-upload/",
+        UpdateControllerVerificationDocumentAPI.as_view(),
+        name="controller_document_upload",
+    ),
+    path(
+        "onboarding/beneficial-owner/document-upload/",
+        UpdateOwnerVerificationDocumentAPI.as_view(),
+        name="beneficial_owner_document_upload",
     ),
 ]

@@ -13,7 +13,7 @@ from apps.merchant.serializers import OnboardingDataSerializer
 from apps.merchant.validators import OnboardingDataValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
 from integrations.utils.options import RequestStatusTypes
-from apps.merchant.options import BenficialOwnerStatus
+from apps.merchant.options import BeneficialOwnerStatus
 
 
 __all__ = ("CreateDwollaMerchantAccount",)
@@ -129,11 +129,11 @@ class CreateDwollaMerchantAccount(ServiceBase):
         beneficial_owners = data["beneficial_owners"]
         for beneficial_owner in beneficial_owners:
             is_ba_update = False
-            if beneficial_owner["status"] == BenficialOwnerStatus.VERIFIED:
+            if beneficial_owner["status"] == BeneficialOwnerStatus.VERIFIED:
                 continue
-            if beneficial_owner["status"] == BenficialOwnerStatus.DOCUMENT_PENDING:
+            if beneficial_owner["status"] == BeneficialOwnerStatus.DOCUMENT_PENDING:
                 continue
-            if beneficial_owner["status"] == BenficialOwnerStatus.INCOMPLETE:
+            if beneficial_owner["status"] == BeneficialOwnerStatus.INCOMPLETE:
                 is_account_update = True
             ba_response = DwollaAddBeneficialOwnerAPIAction(
                 account_id=account_id
@@ -148,7 +148,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
                 dwolla_id=ba_response["dwolla_id"],
                 status=status,
             )
-            if status != BenficialOwnerStatus.VERIFIED:
+            if status != BeneficialOwnerStatus.VERIFIED:
                 self.is_all_verified = False
 
     def _certify_beneficial_owners(self):

@@ -10,7 +10,10 @@ from apps.merchant.services import (CreateBeneficialOwner,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
                                     UpdateIncorporationDetails,
-                                    DocumentRequirements)
+                                    DocumentRequirements,
+                                    BusinessDocumentUpload,
+                                    ControllerDocumentUpload,
+                                    BeneficialOwnerDocumentUpload)
 
 
 __all__ = (
@@ -23,6 +26,10 @@ __all__ = (
     "RemoveBeneficialOwnerAPI",
     "OnboardingDataAPI",
     "DocumentRequirementsAPI",
+    "UpdateBusinessVerificationDocumentAPI",
+    "UpdateOwnerVerificationDocumentAPI",
+    "UpdateControllerVerificationDocumentAPI",
+
 )
 
 
@@ -166,3 +173,24 @@ class DocumentRequirementsAPI(MerchantAPIView):
         merchant_account = request.merchant_account
         required_docs = DocumentRequirements(merchant=merchant_account).handle()
         return self.response(required_docs)
+
+
+class UpdateBusinessVerificationDocumentAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        BusinessDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        return self.response()
+
+
+class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        ControllerDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        return self.response()
+
+
+class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        BeneficialOwnerDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        return self.response()

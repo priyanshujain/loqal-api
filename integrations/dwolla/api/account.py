@@ -10,7 +10,7 @@ from integrations.dwolla.errors import BadRequestError
 from integrations.dwolla.http import Http
 from integrations.utils.options import RequestStatusTypes
 from apps.account.options import MerchantAccountStatus, MerchantAccountCerficationStatus
-from apps.merchant.options import BenficialOwnerStatus
+from apps.merchant.options import BeneficialOwnerStatus
 
 
 __all__ = "Account"
@@ -24,9 +24,9 @@ class MerchantAccountStatusMap:
 
 
 class BeneficialOwnerStatusMap:
-    verified = BenficialOwnerStatus.VERIFIED
-    incomplete = BenficialOwnerStatus.INCOMPLETE
-    document = BenficialOwnerStatus.DOCUMENT_PENDING
+    verified = BeneficialOwnerStatus.VERIFIED
+    incomplete = BeneficialOwnerStatus.INCOMPLETE
+    document = BeneficialOwnerStatus.DOCUMENT_PENDING
 
 
 class BeneficialOwnerCertificationStatusMap:
@@ -113,9 +113,35 @@ class Account(Http):
         location = response_headers["location"]
         dwolla_customer_id = location.split("/").pop()
         return self.get_merhant_account(customer_id=dwolla_customer_id)
-  
- 
 
+    def upload_customer_document(self, document_file, document_type):
+        """
+        Upload verification document for a customer
+        """
+
+        endpoint = f"/customers/${self.customer_id}/documents"
+        try:
+            response = self.post(
+                endpoint,
+                files={
+                    "file": open(document_file.name, "rb"),
+                    "documentType": document_type
+                },
+                authenticated=True,
+                retry=False,
+            )
+        except BadRequestError as err:
+            return {
+                "status": RequestStatusTypes.ERROR,
+                "errors": err.api_errors,
+            }
+
+        response_headers = response.headers
+        location = response_headers["location"]
+        dwolla_id = location.split("/").pop()
+        return {
+            "dwolla_id": dwolla_id
+        }
     
     def get_beneficial_owner(self, beneficial_owner_id):
         """
@@ -160,6 +186,34 @@ class Account(Http):
 
         return self.get_beneficial_owner(beneficial_owner_id=beneficial_owner_id)
 
+    def upload_ba_document(self, beneficial_owner_id, document_file, document_type):
+        """
+        Upload verification document for beneficial owner
+        """
+
+        endpoint = f"/benficial_owners/${beneficial_owner_id}/documents"
+        try:
+            response = self.post(
+                endpoint,
+                files={
+                    "file": open(document_file.name, "rb"),
+                    "documentType": document_type
+                },
+                authenticated=True,
+                retry=False,
+            )
+        except BadRequestError as err:
+            return {
+                "status": RequestStatusTypes.ERROR,
+                "errors": err.api_errors,
+            }
+
+        response_headers = response.headers
+        location = response_headers["location"]
+        dwolla_id = location.split("/").pop()
+        return {
+            "dwolla_id": dwolla_id
+        }
     
     def get_ba_cerification_status(self, dwolla_customer_id):
         """
