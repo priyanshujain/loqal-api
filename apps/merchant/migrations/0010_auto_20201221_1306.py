@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='beneficialowner',
             name='status',
-            field=db.models.fields.enum.ChoiceEnumField(help_text='Status for the beneficial owner with dwolla.'),
+            field=db.models.fields.enum.ChoiceEnumField(default=0, help_text='Status for the beneficial owner with dwolla.'),
         ),
     ]
