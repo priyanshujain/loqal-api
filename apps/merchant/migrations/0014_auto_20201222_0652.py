@@ -6,18 +6,18 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0013_auto_20201222_0647'),
+        ("merchant", "0013_auto_20201222_0647"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='beneficialowner',
-            old_name='verification_docs_required',
-            new_name='verification_document_required',
+            model_name="beneficialowner",
+            old_name="verification_docs_required",
+            new_name="verification_document_required",
         ),
         migrations.RenameField(
-            model_name='controllerdetails',
-            old_name='verification_docs_required',
-            new_name='verification_document_required',
+            model_name="controllerdetails",
+            old_name="verification_docs_required",
+            new_name="verification_document_required",
         ),
     ]

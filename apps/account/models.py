@@ -1,10 +1,12 @@
-from re import T
 import uuid
+from re import T
 
 from django.db import models
 from django.utils.translation import gettext as _
 
-from apps.account.options import MerchantAccountStatus, ConsumerAccountStatus, MerchantAccountCerficationStatus
+from apps.account.options import (ConsumerAccountStatus,
+                                  MerchantAccountCerficationStatus,
+                                  MerchantAccountStatus)
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceEnumField
@@ -80,24 +82,25 @@ class MerchantAccount(AbstractBaseModel):
     certification_status = ChoiceEnumField(
         enum_type=MerchantAccountCerficationStatus,
         default=MerchantAccountCerficationStatus.PENDING,
-        help_text=_("Status for the merchant beneficial owner certified with dwolla."),
+        help_text=_(
+            "Status for the merchant beneficial owner certified with dwolla."
+        ),
     )
 
     def update_status(self, status, save=True):
         self.account_status = status
         if save:
             self.save()
-    
+
     def update_certification_status(self, status, save=True):
         self.certification_status = status
         if save:
             self.save()
-    
+
     def update_certification_required(self, required, save=True):
         self.is_certification_required = required
         if save:
             self.save()
-            
 
     class Meta:
         db_table = "merchant_account"

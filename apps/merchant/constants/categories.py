@@ -7,7 +7,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Antiques/Jewelry",
                 "slug": "antiques_jewelry",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -17,7 +17,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Art/Framing/Galleries",
                 "slug": "art_framing_galleries",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -27,7 +27,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Beauty/Bath/Cosmetics",
                 "slug": "beauty_bath_cosmetics",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -37,7 +37,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Books",
                 "slug": "books",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -47,7 +47,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Bridal/Formal Wear",
                 "slug": "bridal_formal_wear",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -57,7 +57,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Cards/Collectibles",
                 "slug": "cards_collectibles",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -67,7 +67,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Cellular",
                 "slug": "cellular",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -77,7 +77,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Clothing Accessories - Adult",
                 "slug": "clothing_accessories_-_adult",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -87,7 +87,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Clothing Accessories -Children",
                 "slug": "clothing_accessories_children",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -97,7 +97,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Coffee",
                 "slug": "coffee",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -107,7 +107,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Consignment/Couture/Thrift",
                 "slug": "consignment_couture_thrift",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -117,7 +117,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Gifts/Stationery",
                 "slug": "gifts_stationery",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -127,7 +127,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Grocery/Food Service",
                 "slug": "grocery_food_service",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -137,7 +137,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Hearing Aids",
                 "slug": "hearing_aids",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -147,7 +147,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Home Furnishings",
                 "slug": "home_furnishings",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -157,7 +157,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Housewares/Appliances",
                 "slug": "housewares_appliances",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -167,7 +167,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Jewelry/Watches",
                 "slug": "jewelry_watches",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -177,7 +177,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Lawnmower/Lock",
                 "slug": "lawnmower_lock",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -187,7 +187,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Luggage",
                 "slug": "luggage",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -197,7 +197,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Newspaper/Newsstands",
                 "slug": "newspaper_newsstands",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -207,7 +207,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Office Supplies/Printing/Shipping",
                 "slug": "office_supplies_printing_shipping",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -217,7 +217,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Oils & Balsamics",
                 "slug": "oils_&_balsamics",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -227,7 +227,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Eye wear",
                 "slug": "eye_wear",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -237,7 +237,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Paint",
                 "slug": "paint",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -247,7 +247,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Pharmacies",
                 "slug": "pharmacies",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -257,7 +257,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Shoes",
                 "slug": "shoes",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -267,7 +267,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Spices",
                 "slug": "spices",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -277,7 +277,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Sporting Goods/Shoes/Apparel",
                 "slug": "sporting_goods_shoes_apparel",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -287,7 +287,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Ticket Agencies",
                 "slug": "ticket_agencies",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -297,7 +297,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Toys/Games/Hobbies",
                 "slug": "toys_games_hobbies",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -307,7 +307,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Wine/Liquor",
                 "slug": "wine_liquor",
             },
-        ]
+        ],
     },
     {
         "category_slug": "shopping",
@@ -317,7 +317,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Accountants",
                 "slug": "accountants",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -327,7 +327,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Architects",
                 "slug": "architects",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -337,7 +337,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Attorneys",
                 "slug": "attorneys",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -347,7 +347,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Automotive Services",
                 "slug": "automotive_services",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -357,7 +357,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Banking/Financial Services",
                 "slug": "banking_financial_services",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -367,7 +367,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Birthday Parties",
                 "slug": "birthday_parties",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -377,7 +377,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Childcare/Educational",
                 "slug": "childcare_educational",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -387,7 +387,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Civic & Government",
                 "slug": "civic_&_government",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -397,7 +397,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Contractors/Home Improvement",
                 "slug": "contractors_home_improvement",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -407,7 +407,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Dentists",
                 "slug": "dentists",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -417,7 +417,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Dry Cleaners/Tailors",
                 "slug": "dry_cleaners_tailors",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -427,7 +427,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Entertainment",
                 "slug": "entertainment",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -437,7 +437,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Fitness",
                 "slug": "fitness",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -447,7 +447,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Florists",
                 "slug": "florists",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -457,7 +457,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Hair Salons/Barber Shops/Nails/Skin",
                 "slug": "hair_salons_barber_shops_nails_skin",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -467,7 +467,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Health/Wellness/Massage",
                 "slug": "health_wellness_massage",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -477,7 +477,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Home/Kitchen/Bath Design",
                 "slug": "home_kitchen_bath_design",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -487,7 +487,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Hotels",
                 "slug": "hotels",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -497,7 +497,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Houses of Worship",
                 "slug": "houses_of_worship",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -507,7 +507,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Insurance",
                 "slug": "insurance",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -517,7 +517,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Limousine/Car Service",
                 "slug": "limousine_car_service",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -527,7 +527,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Music/Dance/Arts",
                 "slug": "music_dance_arts",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -537,7 +537,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Opticians/Opthalmologists",
                 "slug": "opticians_opthalmologists",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -547,7 +547,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Photography/Film/Video",
                 "slug": "photography_film_video",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -557,7 +557,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Physicians",
                 "slug": "physicians",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -567,7 +567,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Professional Services",
                 "slug": "professional_services",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -577,7 +577,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Realtors/Appraisals/Surveyors",
                 "slug": "realtors_appraisals_surveyors",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -587,7 +587,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Shoe Repair",
                 "slug": "shoe_repair",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -597,7 +597,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Social Services",
                 "slug": "social_services",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -607,7 +607,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Theaters",
                 "slug": "theaters",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -617,7 +617,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Travel Agents",
                 "slug": "travel_agents",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -627,7 +627,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Web Design",
                 "slug": "web_design",
             },
-        ]
+        ],
     },
     {
         "category_slug": "services",
@@ -637,7 +637,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Wedding Planning",
                 "slug": "wedding_planning",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -647,7 +647,7 @@ MERCHANT_CATEGORIES = [
                 "name": "American",
                 "slug": "american",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -657,7 +657,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Asian",
                 "slug": "asian",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -667,7 +667,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Bakery/Coffee",
                 "slug": "bakery_coffee",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -677,7 +677,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Brunch",
                 "slug": "brunch",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -687,7 +687,7 @@ MERCHANT_CATEGORIES = [
                 "name": "CafÈ/Bistro",
                 "slug": "cafÈ_bistro",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -697,7 +697,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Candy",
                 "slug": "candy",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -707,7 +707,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Catering",
                 "slug": "catering",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -717,7 +717,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Continental",
                 "slug": "continental",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -727,7 +727,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Cuban",
                 "slug": "cuban",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -737,7 +737,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Delicatessen/Bagels",
                 "slug": "delicatessen_bagels",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -747,7 +747,7 @@ MERCHANT_CATEGORIES = [
                 "name": "French",
                 "slug": "french",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -757,7 +757,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Ice Cream/Gelato/Frozen Yogurt",
                 "slug": "ice_cream_gelato_frozen_yogurt",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -767,7 +767,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Indian",
                 "slug": "indian",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -777,7 +777,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Italian",
                 "slug": "italian",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -787,7 +787,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Juice Bar",
                 "slug": "juice_bar",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -797,7 +797,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Mexican",
                 "slug": "mexican",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -807,7 +807,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Portuguese",
                 "slug": "portuguese",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -817,7 +817,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Seafood",
                 "slug": "seafood",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -827,7 +827,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Steak House",
                 "slug": "steak_house",
             },
-        ]
+        ],
     },
     {
         "category_slug": "restaurants",
@@ -837,6 +837,6 @@ MERCHANT_CATEGORIES = [
                 "name": "Tea Room",
                 "slug": "tea_room",
             },
-        ]
+        ],
     },
 ]

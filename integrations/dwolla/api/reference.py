@@ -29,7 +29,9 @@ class Reference(Http):
                 "name": category["name"],
                 "subcategories": [
                     {"name": subcategory["name"], "id": subcategory["id"]}
-                    for subcategory in category["_embedded"]["industry-classifications"]
+                    for subcategory in category["_embedded"][
+                        "industry-classifications"
+                    ]
                 ],
             }
             for category in categories

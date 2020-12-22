@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('box', '0004_auto_20201211_1541'),
+        ("box", "0004_auto_20201211_1541"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='boxfile',
-            name='in_use',
+            model_name="boxfile",
+            name="in_use",
             field=models.BooleanField(default=False),
         ),
     ]

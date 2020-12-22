@@ -1,22 +1,14 @@
 from django.utils.translation import gettext as _
+from stdnum.us import ein
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from apps.account.models import MerchantAccount
-from apps.merchant.models import (
-    BeneficialOwner,
-    ControllerDetails,
-    IncorporationDetails,
-)
-from apps.merchant.options import (
-    BusinessTypes,
-    IndividualDocumentType,
-    BusinessDocumentType,
-)
 from apps.box.dbapi import get_boxfile
-
-from stdnum.us import ein
-
+from apps.merchant.models import (BeneficialOwner, ControllerDetails,
+                                  IncorporationDetails)
+from apps.merchant.options import (BusinessDocumentType, BusinessTypes,
+                                   IndividualDocumentType)
 
 __all__ = (
     "IncorporationDetailsValidator",
@@ -50,7 +42,10 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
         business_type = attrs.get("business_type")
         ein_number = attrs.get("ein_number")
 
-        if business_type != BusinessTypes.SOLE_PROPRIETORSHIP.value and not ein_number:
+        if (
+            business_type != BusinessTypes.SOLE_PROPRIETORSHIP.value
+            and not ein_number
+        ):
             raise ValidationError(
                 {
                     "ein_number": [
@@ -65,7 +60,11 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
 
         if not ein.is_valid(ein_number):
             raise ValidationError(
-                {"ein_number": [ErrorDetail(_("EIN number is not in currect format."))]}
+                {
+                    "ein_number": [
+                        ErrorDetail(_("EIN number is not in currect format."))
+                    ]
+                }
             )
         attrs["ein_number"] = ein.format(ein_number)
         return attrs
@@ -149,7 +148,9 @@ class DocumentFileValidator(serializers.ValidationSerializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        verification_document_file_id = attrs.get("verification_document_file_id")
+        verification_document_file_id = attrs.get(
+            "verification_document_file_id"
+        )
         verification_document_type = attrs.get("verification_document_type")
         boxfile = get_boxfile(boxfile_id=verification_document_file_id)
         if not boxfile:
@@ -177,7 +178,6 @@ class DocumentFileValidator(serializers.ValidationSerializer):
                 }
             )
         return attrs
-            
 
 
 class BeneficialOwnerDocumentValidator(DocumentFileValidator):

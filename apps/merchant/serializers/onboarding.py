@@ -18,7 +18,7 @@ class ControllerDetailsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class BeneficialOwnerSerializer(serializers.ModelSerializer):    
+class BeneficialOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = BeneficialOwner
         fields = "__all__"

@@ -1,20 +1,18 @@
-from apps.account.options import MerchantAccountStatus, MerchantAccountCerficationStatus
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
-from apps.merchant.dbapi import (
-    get_account_member_by_user_id,
-    update_beneficial_owner_status,
-)
+from apps.account.options import (MerchantAccountCerficationStatus,
+                                  MerchantAccountStatus)
+from apps.merchant.dbapi import (get_account_member_by_user_id,
+                                 update_beneficial_owner_status)
+from apps.merchant.options import BeneficialOwnerStatus
 from apps.merchant.serializers import OnboardingDataSerializer
 from apps.merchant.validators import OnboardingDataValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
 from integrations.utils.options import RequestStatusTypes
-from apps.merchant.options import BeneficialOwnerStatus
-
 
 __all__ = ("CreateDwollaMerchantAccount",)
 
@@ -39,7 +37,9 @@ class CreateDwollaMerchantAccount(ServiceBase):
             certification = DwollaCertifyBeneficialOwnerAPIAction(
                 account_id=merchant.account.id
             ).certify(dwolla_customer_id=merchant.account.dwolla_id)
-            merchant.update_certification_status(status=certification["status"])
+            merchant.update_certification_status(
+                status=certification["status"]
+            )
         return merchant
 
     def _prepare_data(self):
@@ -94,7 +94,9 @@ class CreateDwollaMerchantAccount(ServiceBase):
 
         if merchant.account_status == MerchantAccountStatus.VERIFIED:
             self._create_beneficial_owner(
-                account_id=account.id, dwolla_customer_id=account.dwolla_id, data=data
+                account_id=account.id,
+                dwolla_customer_id=account.dwolla_id,
+                data=data,
             )
         else:
             dwolla_response = DwollaCreateMerchantAccountAPIAction(
@@ -102,26 +104,38 @@ class CreateDwollaMerchantAccount(ServiceBase):
             ).create(data=merchant_account_data, is_update=is_account_update)
             dwolla_customer_id = dwolla_response["dwolla_customer_id"]
             dwolla_status = dwolla_response["status"]
-            is_certification_required = dwolla_response["is_certification_required"]
-            controller_document_required = dwolla_response["controller_document_required"]
-            business_document_required = dwolla_response["business_document_required"]
-            
+            is_certification_required = dwolla_response[
+                "is_certification_required"
+            ]
+            controller_document_required = dwolla_response[
+                "controller_document_required"
+            ]
+            business_document_required = dwolla_response[
+                "business_document_required"
+            ]
+
             account.add_dwolla_id(dwolla_id=dwolla_customer_id)
             merchant.update_status(status=dwolla_status)
-            merchant.update_certification_required(required=is_certification_required)
+            merchant.update_certification_required(
+                required=is_certification_required
+            )
             if dwolla_status != MerchantAccountStatus.VERIFIED:
                 self.is_all_verified = False
 
             if controller_document_required:
                 controller = merchant.controllerdetails
                 controller.update_verification_document_required(required=True)
-            
+
             if business_document_required:
                 incorporation_details = merchant.incorporationdetails
-                incorporation_details.update_verification_document_required(required=True)
+                incorporation_details.update_verification_document_required(
+                    required=True
+                )
 
             self._create_beneficial_owner(
-                account_id=account.id, dwolla_customer_id=dwolla_customer_id, data=data
+                account_id=account.id,
+                dwolla_customer_id=dwolla_customer_id,
+                data=data,
             )
         return merchant
 
@@ -131,7 +145,10 @@ class CreateDwollaMerchantAccount(ServiceBase):
             is_ba_update = False
             if beneficial_owner["status"] == BeneficialOwnerStatus.VERIFIED:
                 continue
-            if beneficial_owner["status"] == BeneficialOwnerStatus.DOCUMENT_PENDING:
+            if (
+                beneficial_owner["status"]
+                == BeneficialOwnerStatus.DOCUMENT_PENDING
+            ):
                 continue
             if beneficial_owner["status"] == BeneficialOwnerStatus.INCOMPLETE:
                 is_account_update = True
@@ -175,16 +192,24 @@ class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
         return {
             "status": response["data"].get("status"),
             "dwolla_customer_id": response["data"].get("dwolla_customer_id"),
-            "is_certification_required": response["data"].get("is_certification_required"),
-            "controller_document_required": response["data"].get("controller_document_required"),
-            "business_document_required": response["data"].get("business_document_required"),
+            "is_certification_required": response["data"].get(
+                "is_certification_required"
+            ),
+            "controller_document_required": response["data"].get(
+                "controller_document_required"
+            ),
+            "business_document_required": response["data"].get(
+                "business_document_required"
+            ),
         }
 
 
 class DwollaAddBeneficialOwnerAPIAction(ProviderAPIActionBase):
     def create(self, data, dwolla_customer_id, is_update=False):
         response = self.client.account.add_beneficial_owner(
-            data=data, dwolla_customer_id=dwolla_customer_id, is_update=is_update
+            data=data,
+            dwolla_customer_id=dwolla_customer_id,
+            is_update=is_update,
         )
         if self.get_errors(response):
             raise ProviderAPIException(

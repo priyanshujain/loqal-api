@@ -17,6 +17,7 @@ class MerchantAccountCerficationStatus(ChoiceEnum):
     RECERTIFY = 2, _("Recertify")
     CERTIFIED = 3, _("Certified")
 
+
 class ConsumerAccountStatus(ChoiceEnum):
     PENDING = 0, _("Pending")
     VERIFIED = 1, _("Verified")

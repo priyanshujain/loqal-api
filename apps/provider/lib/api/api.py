@@ -27,7 +27,7 @@ class API(object):
             except AttributeError:
                 pass
             return {"status": RequestStatusTypes.ERROR, "data": {}}
-        
+
         # TODO: Catch API error through an API error exception rather than this comparision
         if response.get("status") == RequestStatusTypes.ERROR:
             return response

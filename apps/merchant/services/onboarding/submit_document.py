@@ -1,14 +1,14 @@
-from apps.merchant.dbapi.onboarding import get_beneficial_owner
-from apps.provider.lib.actions import ProviderAPIActionBase
-from api.helpers import run_validator
 import os
 import tempfile
 
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
+from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.box.dbapi import get_boxfile
+from apps.merchant.dbapi.onboarding import get_beneficial_owner
+from apps.provider.lib.actions import ProviderAPIActionBase
 from plugins.gcs import GoogleCloudStorage
 
 
@@ -57,4 +57,3 @@ class DocumentInterface(object):
                 os.unlink(file_object.name)
             except FileNotFoundError:
                 continue
-

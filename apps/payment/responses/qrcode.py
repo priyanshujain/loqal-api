@@ -22,12 +22,18 @@ class QrCodeResponse(serializers.ModelSerializer):
 
 
 class CashierDetailsResponse(serializers.ModelSerializer):
-    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    first_name = serializers.CharField(
+        source="user.first_name", read_only=True
+    )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
 
     class Meta:
         model = AccountMember
-        fields = ("first_name", "last_name",)
+        fields = (
+            "first_name",
+            "last_name",
+        )
+
 
 class MerchantQrCodeResponse(serializers.ModelSerializer):
     merchant_uid = serializers.CharField(
@@ -38,7 +44,6 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
     )
     cashier_id = serializers.IntegerField(source="cashier.id", read_only=True)
     cashier = CashierDetailsResponse(read_only=True)
-
 
     class Meta:
         model = PaymentQrCode

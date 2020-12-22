@@ -43,9 +43,7 @@ def create_user(
     return user
 
 
-def update_user_profile(
-    user, first_name, last_name
-):
+def update_user_profile(user, first_name, last_name):
     """
     User user profile dbapi
     """

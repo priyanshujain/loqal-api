@@ -4,8 +4,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_cashier_qrcode, get_merchant_qrcodes,
-                                get_payment_qrcode,
-                                get_payment_qrcode_by_id)
+                                get_payment_qrcode, get_payment_qrcode_by_id)
 from apps.payment.responses import (MerchantQrCodeResponse,
                                     QrCodeMerchantDetailsResponse,
                                     QrCodeResponse)
@@ -48,6 +47,7 @@ class GetCashierQrCodesAPI(MerchantAPIView):
         )
         response_data["image_base64"] = img2base64(image)
         return self.response(response_data)
+
 
 class GetQrCodeImageAPI(MerchantAPIView):
     def get(self, request):

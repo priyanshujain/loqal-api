@@ -3,17 +3,12 @@ from django.utils.translation import gettext as _
 
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
+from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
+                                   BusinessTypes, IndividualDocumentType,
+                                   VerificationDocumentStatus)
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceEnumField, ChoiceCharEnumField
+from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
-from apps.merchant.options import (
-    BeneficialOwnerStatus,
-    VerificationDocumentStatus,
-    IndividualDocumentType,
-    BusinessDocumentType,
-    BusinessTypes,
-)
-
 
 __all__ = (
     "IncorporationConsent",
@@ -55,7 +50,7 @@ class IncorporationDetails(AbstractBaseModel):
         self.verification_document_status = VerificationDocumentStatus.PENDING
         if save:
             self.save()
-    
+
     def add_dwolla_document_id(self, dwolla_id, save=True):
         self.dwolla_document_id = dwolla_id
         if save:
@@ -107,7 +102,7 @@ class IndividualBase(AbstractBaseModel):
         self.verification_document_status = status
         if save:
             self.save()
-    
+
     def add_dwolla_document_id(self, dwolla_id, save=True):
         self.dwolla_document_id = dwolla_id
         if save:
@@ -158,7 +153,9 @@ class BeneficialOwner(IndividualBase):
             status == BeneficialOwnerStatus.DOCUMENT_PENDING
             and not self.verification_document_file
         ):
-            self.verification_document_status = VerificationDocumentStatus.PENDING
+            self.verification_document_status = (
+                VerificationDocumentStatus.PENDING
+            )
         if save:
             self.save()
 

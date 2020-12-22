@@ -1,20 +1,19 @@
-from apps.account.responses.merchant import MerchantAccountProfileResponse
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
+from apps.account.responses.merchant import MerchantAccountProfileResponse
 from apps.merchant.responses import OnboardingDataResponse
-from apps.merchant.services import (CreateBeneficialOwner,
+from apps.merchant.services import (BeneficialOwnerDocumentUpload,
+                                    BusinessDocumentUpload,
+                                    ControllerDocumentUpload,
+                                    CreateBeneficialOwner,
                                     CreateControllerDetails,
                                     CreateDwollaMerchantAccount,
                                     CreateIncorporationDetails,
+                                    DocumentRequirements,
                                     RemoveBeneficialOwner,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
-                                    UpdateIncorporationDetails,
-                                    DocumentRequirements,
-                                    BusinessDocumentUpload,
-                                    ControllerDocumentUpload,
-                                    BeneficialOwnerDocumentUpload)
-
+                                    UpdateIncorporationDetails)
 
 __all__ = (
     "CreateIncorporationDetailsAPI",
@@ -29,7 +28,6 @@ __all__ = (
     "UpdateBusinessVerificationDocumentAPI",
     "UpdateOwnerVerificationDocumentAPI",
     "UpdateControllerVerificationDocumentAPI",
-
 )
 
 
@@ -165,32 +163,42 @@ class SubmitKycDataAPI(MerchantAPIView):
             user_id=user.id,
             ip_address=ip_address,
         ).handle()
-        return self.response(MerchantAccountProfileResponse(updated_merchant_account).data)
+        return self.response(
+            MerchantAccountProfileResponse(updated_merchant_account).data
+        )
 
 
 class DocumentRequirementsAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
-        required_docs = DocumentRequirements(merchant=merchant_account).handle()
+        required_docs = DocumentRequirements(
+            merchant=merchant_account
+        ).handle()
         return self.response(required_docs)
 
 
 class UpdateBusinessVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BusinessDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        BusinessDocumentUpload(
+            merchant=merchant_account, data=self.request_data
+        ).handle()
         return self.response()
 
 
 class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        ControllerDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        ControllerDocumentUpload(
+            merchant=merchant_account, data=self.request_data
+        ).handle()
         return self.response()
 
 
 class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BeneficialOwnerDocumentUpload(merchant=merchant_account, data=self.request_data).handle()
+        BeneficialOwnerDocumentUpload(
+            merchant=merchant_account, data=self.request_data
+        ).handle()
         return self.response()

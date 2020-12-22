@@ -6,17 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0017_remove_incorporationconsent_verification_document_status'),
+        (
+            "merchant",
+            "0017_remove_incorporationconsent_verification_document_status",
+        ),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='beneficialowner',
-            name='verification_document_required',
+            model_name="beneficialowner",
+            name="verification_document_required",
         ),
         migrations.AddField(
-            model_name='incorporationdetails',
-            name='verification_document_required',
+            model_name="incorporationdetails",
+            name="verification_document_required",
             field=models.BooleanField(default=False),
         ),
     ]

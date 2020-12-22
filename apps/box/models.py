@@ -10,7 +10,7 @@ class BoxFile(BaseModel):
     content_type = models.CharField(max_length=256)
     document_type = models.CharField(max_length=512)
     encryption_key = models.CharField(max_length=64)
-    in_use = models.BooleanField(default=False) 
+    in_use = models.BooleanField(default=False)
 
     def __str__(self):
         return self.file_name or "-"

@@ -19,36 +19,36 @@ class Error(Exception):
                 body = res.json()
             else:
                 body = res
-            c = body.get('code', body.get('error'))
+            c = body.get("code", body.get("error"))
         except:
             c = None
 
         return {
-            'access_denied':             AccessDeniedError,
-            'InvalidCredentials':        InvalidCredentialsError,
-            'NotFound':                  NotFoundError,
-            'BadRequest':                BadRequestError,
-            'invalid_grant':             InvalidGrantError,
-            'RequestTimeout':            RequestTimeoutError,
-            'ExpiredAccessToken':        ExpiredAccessTokenError,
-            'invalid_request':           InvalidRequestError,
-            'ServerError':               ServerError,
-            'Forbidden':                 ForbiddenError,
-            'InvalidResourceState':      InvalidResourceStateError,
-            'temporarily_unavailable':   TemporarilyUnavailableError,
-            'InvalidAccessToken':        InvalidAccessTokenError,
-            'InvalidScope':              InvalidScopeError,
-            'unauthorized_client':       UnauthorizedClientError,
-            'InvalidAccountStatus':      InvalidAccountStatusError,
-            'unsupported_grant_type':    UnsupportedGrantTypeError,
-            'InvalidApplicationStatus':  InvalidApplicationStatusError,
-            'InvalidVersion':            InvalidVersionError,
-            'unsupported_response_type': UnsupportedResponseTypeError,
-            'invalid_client':            InvalidClientError,
-            'method_not_allowed':        MethodNotAllowedError,
-            'ValidationError':           ValidationError,
-            'TooManyRequests':           TooManyRequestsError,
-            'Conflict':                  ConflictError
+            "access_denied": AccessDeniedError,
+            "InvalidCredentials": InvalidCredentialsError,
+            "NotFound": NotFoundError,
+            "BadRequest": BadRequestError,
+            "invalid_grant": InvalidGrantError,
+            "RequestTimeout": RequestTimeoutError,
+            "ExpiredAccessToken": ExpiredAccessTokenError,
+            "invalid_request": InvalidRequestError,
+            "ServerError": ServerError,
+            "Forbidden": ForbiddenError,
+            "InvalidResourceState": InvalidResourceStateError,
+            "temporarily_unavailable": TemporarilyUnavailableError,
+            "InvalidAccessToken": InvalidAccessTokenError,
+            "InvalidScope": InvalidScopeError,
+            "unauthorized_client": UnauthorizedClientError,
+            "InvalidAccountStatus": InvalidAccountStatusError,
+            "unsupported_grant_type": UnsupportedGrantTypeError,
+            "InvalidApplicationStatus": InvalidApplicationStatusError,
+            "InvalidVersion": InvalidVersionError,
+            "unsupported_response_type": UnsupportedResponseTypeError,
+            "invalid_client": InvalidClientError,
+            "method_not_allowed": MethodNotAllowedError,
+            "ValidationError": ValidationError,
+            "TooManyRequests": TooManyRequestsError,
+            "Conflict": ConflictError,
         }.get(c, Error)(res)
 
     def _get_body(self, res):
@@ -156,4 +156,3 @@ class TooManyRequestsError(Error):
 
 class ConflictError(Error):
     pass
-© 2020 GitHub, Inc.

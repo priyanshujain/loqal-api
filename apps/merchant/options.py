@@ -1,8 +1,6 @@
 from django.utils.translation import gettext as _
 
-from db.models.fields import ChoiceEnum, ChoiceCharEnum
-
-
+from db.models.fields import ChoiceCharEnum, ChoiceEnum
 
 __all__ = (
     "BusinessTypes",
@@ -84,7 +82,9 @@ class IndividualDocumentType(ChoiceCharEnum):
     US_PASSPORT = "us_passport", _("US Passport")
     FOREIGN_PASSPORT = "foreign_passport", _("Foreign Passport")
     US_VISA = "us_visa", _("US Visa")
-    FEAC = "employment_authorization_card", _("Federal Employment Authorization Card")
+    FEAC = "employment_authorization_card", _(
+        "Federal Employment Authorization Card"
+    )
 
 
 class BusinessDocumentType(ChoiceCharEnum):

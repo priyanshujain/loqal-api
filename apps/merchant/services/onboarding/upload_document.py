@@ -1,28 +1,18 @@
-from apps.merchant.dbapi.onboarding import (
-    get_beneficial_owner,
-    update_business_document,
-    update_beneficial_owner_document,
-    update_controller_document,
-)
-from api.helpers import run_validator
-
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
+from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.box.dbapi import get_boxfile
-from apps.merchant.validators import (
-    BusinessDocumentValidator,
-    ControllerDocumentValidator,
-    BeneficialOwnerDocumentValidator,
-)
-from apps.merchant.options import (
-    BusinessTypes,
-    BusinessDocumentType,
-    BeneficialOwnerStatus,
-)
-from apps.box.dbapi import get_boxfile
-
+from apps.merchant.dbapi.onboarding import (get_beneficial_owner,
+                                            update_beneficial_owner_document,
+                                            update_business_document,
+                                            update_controller_document)
+from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
+                                   BusinessTypes)
+from apps.merchant.validators import (BeneficialOwnerDocumentValidator,
+                                      BusinessDocumentValidator,
+                                      ControllerDocumentValidator)
 
 __all__ = (
     "BusinessDocumentUpload",
@@ -74,7 +64,8 @@ class BusinessDocumentUpload(ServiceBase):
             )
         verification_document_type = data["verification_document_type"]
         if (
-            incorporation_details.business_type != BusinessTypes.SOLE_PROPRIETORSHIP
+            incorporation_details.business_type
+            != BusinessTypes.SOLE_PROPRIETORSHIP
             and verification_document_type != BusinessDocumentType.EIN_LETTER
         ):
             raise ValidationError(
@@ -154,7 +145,8 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
         data = run_validator(BeneficialOwnerDocumentValidator, data=self.data)
         beneficial_owner_id = data["beneficial_owner_id"]
         benenficial_owner = get_beneficial_owner(
-            merchant_id=self.merchant.id, beneficial_owner_id=beneficial_owner_id
+            merchant_id=self.merchant.id,
+            beneficial_owner_id=beneficial_owner_id,
         )
         if not beneficial_owner_id:
             ValidationError(
@@ -167,6 +159,10 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
 
         if benenficial_owner.status != BeneficialOwnerStatus.DOCUMENT_PENDING:
             ValidationError(
-                {"detail": [ErrorDetail(_("Document has not been requested."))]}
+                {
+                    "detail": [
+                        ErrorDetail(_("Document has not been requested."))
+                    ]
+                }
             )
         return data

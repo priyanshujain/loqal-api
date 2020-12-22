@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0016_auto_20201222_0700'),
+        ("merchant", "0016_auto_20201222_0700"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='incorporationconsent',
-            name='verification_document_status',
+            model_name="incorporationconsent",
+            name="verification_document_status",
         ),
     ]
