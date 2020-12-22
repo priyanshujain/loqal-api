@@ -30,6 +30,8 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
             "merchant",
             "verification_document_type",
             "verification_document_file",
+            "verification_document_status",
+            "verification_document_required",
         )
 
     # def validate_ein_number(self, ein_number):
@@ -42,7 +44,12 @@ class ControllerValidator(serializers.ModelSerializer):
 
     class Meta:
         model = ControllerDetails
-        exclude = ("merchant",)
+        exclude = (
+            "merchant",
+            "verification_document_type",
+            "verification_document_file",
+            "verification_document_status",
+            "verification_document_required",)
 
     # def validate(attr):
     # TODO: Add other validators for the controller
@@ -54,7 +61,11 @@ class BeneficialOwnerValidator(serializers.ModelSerializer):
 
     class Meta:
         model = BeneficialOwner
-        exclude = ("merchant",)
+        exclude = (
+            "merchant",
+            "verification_document_type",
+            "verification_document_file",
+            "verification_document_status",)
 
 
 class UpdateBeneficialOwnerValidator(BeneficialOwnerValidator):

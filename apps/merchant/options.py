@@ -65,3 +65,11 @@ class BenficialOwnerStatus(ChoiceEnum):
     VERIFIED = 1, _("Verified")
     DOCUMENT_PENDING = 2, _("Document Pending")
     INCOMPLETE = 3, _("Incomplete")
+
+
+class VerificationDocumentStatus(ChoiceEnum):
+    PENDING = 0, _("Pending")
+    VERIFIED = 1, _("Verified")
+    INCOMPLETE = 2, _("Incomplete")
+    RETRY = 3, _("Retry")
+    NOT_APPLICABLE = 4, ("Not Applicable")

@@ -7,13 +7,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0009_remove_merchantaccount_company_name'),
+        ("account", "0009_remove_merchantaccount_company_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='consumeraccount',
-            name='account_status',
-            field=db.models.fields.enum.ChoiceEnumField(default=2, help_text='Status for the consumer account with dwolla.'),
+            model_name="consumeraccount",
+            name="account_status",
+            field=db.models.fields.enum.ChoiceEnumField(
+                default=2, help_text="Status for the consumer account with dwolla."
+            ),
         ),
     ]

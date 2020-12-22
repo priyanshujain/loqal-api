@@ -6,7 +6,7 @@ from apps.box.models import BoxFile
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
-from apps.merchant.options import BenficialOwnerStatus
+from apps.merchant.options import BenficialOwnerStatus, VerificationDocumentStatus
 
 
 __all__ = (
@@ -25,10 +25,27 @@ class IncorporationDetails(AbstractBaseModel):
     business_type = models.CharField(max_length=32)
     business_classification = models.CharField(max_length=64)
     business_classification_id = models.CharField(max_length=64)
+    verification_document_required = models.BooleanField(default=False)
     verification_document_type = models.CharField(max_length=32, blank=True)
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )
+    verification_document_status = ChoiceEnumField(
+        enum_type=VerificationDocumentStatus,
+        default=VerificationDocumentStatus.NOT_APPLICABLE,
+        help_text=_("Status for the verification document with dwolla."),
+    )
+
+    def update_verification_document_status(self, status, save=True):
+        self.verification_document_status = status
+        if save:
+            self.save()
+
+    def update_verification_document_required(self, required, save=True):
+        self.verification_document_required = required
+        self.verification_document_status = VerificationDocumentStatus.PENDING
+        if save:
+            self.save()
 
     class Meta:
         db_table = "merchant_onboarding_incorporation_details"
@@ -61,6 +78,16 @@ class IndividualBase(AbstractBaseModel):
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
     )
+    verification_document_status = ChoiceEnumField(
+        enum_type=VerificationDocumentStatus,
+        default=VerificationDocumentStatus.NOT_APPLICABLE,
+        help_text=_("Status for the verification document with dwolla."),
+    )
+
+    def update_verification_document_status(self, status, save=True):
+        self.verification_document_status = status
+        if save:
+            self.save()
 
     class Meta:
         abstract = True
@@ -69,6 +96,13 @@ class IndividualBase(AbstractBaseModel):
 class ControllerDetails(IndividualBase):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     title = models.CharField(max_length=256)
+    verification_document_required = models.BooleanField(default=False)
+
+    def update_verification_document_required(self, required, save=True):
+        self.verification_document_required = required
+        self.verification_document_status = VerificationDocumentStatus.PENDING
+        if save:
+            self.save()
 
     class Meta:
         db_table = "merchant_onboarding_controller_details"
@@ -82,7 +116,7 @@ class BeneficialOwner(IndividualBase):
         default=BenficialOwnerStatus.PENDING,
         help_text=_("Status for the beneficial owner with dwolla."),
     )
-    
+
     def add_dwolla_id(self, dwolla_id, save=True):
         """
         add dwolla id
@@ -95,7 +129,12 @@ class BeneficialOwner(IndividualBase):
         """
         update status
         """
-        self.account_status = status
+        self.status = status
+        if (
+            status == BenficialOwnerStatus.DOCUMENT_PENDING
+            and not self.verification_document_file
+        ):
+            self.verification_document_status = VerificationDocumentStatus.PENDING
         if save:
             self.save()
 

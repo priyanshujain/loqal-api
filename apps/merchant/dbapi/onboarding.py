@@ -1,3 +1,4 @@
+import re
 from django.db import IntegrityError
 
 from apps.merchant.models import (BeneficialOwner, ControllerDetails,
@@ -15,6 +16,7 @@ __all__ = (
     "update_beneficial_owner",
     "delete_beneficial_owner",
     "update_beneficial_owner_status",
+    "get_all_beneficial_owners",
 )
 
 
@@ -96,6 +98,12 @@ def get_beneficial_owner(merchant_id, beneficial_owner_id):
         return None
 
 
+def get_all_beneficial_owners(merchant_id):
+    return BeneficialOwner.objects.filter(
+        merchant_id=merchant_id
+    )
+
+
 def create_beneficial_owner(merchant_id, **kwargs):
     try:
         return BeneficialOwner.objects.create(
@@ -123,4 +131,9 @@ def delete_beneficial_owner(merchant_id, beneficial_owner_id):
 
 
 def update_beneficial_owner_status(beneficial_owner_id, dwolla_id, status):
-    BeneficialOwner.objects.filter(id=beneficial_owner_id).update(dwolla_id=dwolla_id, status=status)
+    try:
+        beneficial_owner = BeneficialOwner.objects.get(id=beneficial_owner_id)
+    except BeneficialOwner.DoesNotExist:
+        return
+    beneficial_owner.add_dwolla_id(dwolla_id=dwolla_id, save=False)
+    beneficial_owner.update_status(status=status)

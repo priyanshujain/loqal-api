@@ -9,7 +9,9 @@ from apps.merchant.services import (CreateBeneficialOwner,
                                     RemoveBeneficialOwner,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
-                                    UpdateIncorporationDetails)
+                                    UpdateIncorporationDetails,
+                                    DocumentRequirements)
+
 
 __all__ = (
     "CreateIncorporationDetailsAPI",
@@ -20,6 +22,7 @@ __all__ = (
     "UpdateBeneficialOwnerAPI",
     "RemoveBeneficialOwnerAPI",
     "OnboardingDataAPI",
+    "DocumentRequirementsAPI",
 )
 
 
@@ -135,7 +138,7 @@ class RemoveBeneficialOwnerAPI(MerchantAPIView):
 
 
 class OnboardingDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
+    # permission_classes = (IsMerchantAccountPendingPermission,)
 
     def get(self, request):
         merchant_account = request.merchant_account
@@ -156,3 +159,10 @@ class SubmitKycDataAPI(MerchantAPIView):
             ip_address=ip_address,
         ).handle()
         return self.response(MerchantAccountProfileResponse(updated_merchant_account).data)
+
+
+class DocumentRequirementsAPI(MerchantAPIView):
+    def get(self, request):
+        merchant_account = request.merchant_account
+        required_docs = DocumentRequirements(merchant=merchant_account).handle()
+        return self.response(required_docs)

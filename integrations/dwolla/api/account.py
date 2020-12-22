@@ -41,22 +41,6 @@ class Account(Http):
     This class provides an interface to the Customers endpoints of the dwolla API.
     """
 
-    def get_account(self, customer_id):
-        """
-        get customer account
-        """
-
-        response = self.get(
-            f"/customers/{customer_id}",
-            authenticated=True,
-            retry=False,
-        )
-        response = response.json()
-        return {
-            "status": getattr(MerchantAccountStatusMap, response["status"]),
-            "is_certification_required": "certify-beneficial-ownership" in response["_links"]
-        }
-
     def create_consumer_account(self, data):
         """
         Create consumer account
@@ -78,6 +62,29 @@ class Account(Http):
         location = response_headers["location"]
         dwolla_customer_id = location.split("/").pop()
         return {"dwolla_customer_id": dwolla_customer_id}
+    
+    def get_merhant_account(self, customer_id):
+        """
+        get customer account
+        """
+
+        response = self.get(
+            f"/customers/{customer_id}",
+            authenticated=True,
+            retry=False,
+        )
+        response = response.json()
+        links = response["_links"]
+        is_controller_docs_required = "verify-with-document" in links
+        is_business_docs_required = "verify-business-with-document" in links
+        is_both_docs_required = "verify-controller-and-business-with-document" in links
+        return {
+            "dwolla_customer_id": response["id"],
+            "status": getattr(MerchantAccountStatusMap, response["status"]),
+            "is_certification_required": "certify-beneficial-ownership" in links,
+            "controller_document_required": is_controller_docs_required or is_both_docs_required,
+            "business_document_required": is_business_docs_required or is_both_docs_required
+        }
 
     def create_merchant_account(self, data, is_update=False):
         """
@@ -105,13 +112,9 @@ class Account(Http):
         response_headers = response.headers
         location = response_headers["location"]
         dwolla_customer_id = location.split("/").pop()
-
-        account = self.get_account(customer_id=dwolla_customer_id)
-        return {
-            "dwolla_customer_id": dwolla_customer_id,
-            "status": account["status"],
-            "is_certification_required": account["is_certification_required"]
-        }
+        return self.get_merhant_account(customer_id=dwolla_customer_id)
+  
+ 
 
     
     def get_beneficial_owner(self, beneficial_owner_id):
@@ -125,6 +128,7 @@ class Account(Http):
         )
         response = response.json()
         return {
+            "dwolla_id": response["id"],
             "status": getattr(BeneficialOwnerStatusMap, response["verificationStatus"])
         }
 
@@ -154,11 +158,7 @@ class Account(Http):
         location = response_headers["location"]
         beneficial_owner_id = location.split("/").pop()
 
-        account = self.get_beneficial_owner(beneficial_owner_id=beneficial_owner_id)
-        return {
-            "dwolla_id": beneficial_owner_id,
-            "status": account["status"],
-        }
+        return self.get_beneficial_owner(beneficial_owner_id=beneficial_owner_id)
 
     
     def get_ba_cerification_status(self, dwolla_customer_id):

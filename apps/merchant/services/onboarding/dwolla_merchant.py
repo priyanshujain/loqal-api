@@ -1,8 +1,7 @@
-from django.core.exceptions import ValidationError
 from apps.account.options import MerchantAccountStatus, MerchantAccountCerficationStatus
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ProviderAPIException
+from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
@@ -104,11 +103,22 @@ class CreateDwollaMerchantAccount(ServiceBase):
             dwolla_customer_id = dwolla_response["dwolla_customer_id"]
             dwolla_status = dwolla_response["status"]
             is_certification_required = dwolla_response["is_certification_required"]
+            controller_document_required = dwolla_response["controller_document_required"]
+            business_document_required = dwolla_response["business_document_required"]
+            
             account.add_dwolla_id(dwolla_id=dwolla_customer_id)
             merchant.update_status(status=dwolla_status)
             merchant.update_certification_required(required=is_certification_required)
             if dwolla_status != MerchantAccountStatus.VERIFIED:
                 self.is_all_verified = False
+
+            if controller_document_required:
+                controller = merchant.controllerdetails
+                controller.update_verification_document_required(required=True)
+            
+            if business_document_required:
+                incorporation_details = merchant.incorporationdetails
+                incorporation_details.update_verification_document_required(required=True)
 
             self._create_beneficial_owner(
                 account_id=account.id, dwolla_customer_id=dwolla_customer_id, data=data
@@ -164,8 +174,10 @@ class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
-            "dwolla_customer_id": response["data"]["dwolla_customer_id"],
-            "is_certification_required": response["data"]["is_certification_required"]
+            "dwolla_customer_id": response["data"].get("dwolla_customer_id"),
+            "is_certification_required": response["data"].get("is_certification_required"),
+            "controller_document_required": response["data"].get("controller_document_required"),
+            "business_document_required": response["data"].get("business_document_required"),
         }
 
 

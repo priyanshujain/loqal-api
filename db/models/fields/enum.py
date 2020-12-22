@@ -78,6 +78,7 @@ class ChoiceEnum(enum.Enum, metaclass=ChoiceEnumMeta):
         return force_str(self.label)
 
 
+# TODO: Error it does not add default value in django migration
 class ChoiceEnumField(models.PositiveSmallIntegerField):
     description = _("Customer recognition state")
 

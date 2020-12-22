@@ -7,12 +7,16 @@ __all__ = ("OnboardingDataResponse",)
 
 
 class IncorporationDetailsResponse(serializers.ModelSerializer):
+    verification_document_status = serializers.CharField(source="verification_document_status.label", read_only=True)
+
     class Meta:
         model = IncorporationDetails
         fields = "__all__"
 
 
 class ControllerDetailsResponse(serializers.ModelSerializer):
+    verification_document_status = serializers.CharField(source="verification_document_status.label", read_only=True)
+
     class Meta:
         model = ControllerDetails
         fields = "__all__"
@@ -20,6 +24,7 @@ class ControllerDetailsResponse(serializers.ModelSerializer):
 
 class BeneficialOwnerResponse(serializers.ModelSerializer):
     status = serializers.CharField(source="status.label", read_only=True)
+    verification_document_status = serializers.CharField(source="verification_document_status.label", read_only=True)
 
     class Meta:
         model = BeneficialOwner
