@@ -3,10 +3,10 @@ from django.urls import path
 from apps.merchant.views.onboarding import (
     CreateBeneficialOwnerAPI, CreateControllerAPI,
     CreateIncorporationDetailsAPI, DocumentRequirementsAPI, OnboardingDataAPI,
-    RemoveBeneficialOwnerAPI, SubmitKycDataAPI, UpdateBeneficialOwnerAPI,
-    UpdateBusinessVerificationDocumentAPI, UpdateControllerAPI,
-    UpdateControllerVerificationDocumentAPI, UpdateIncorporationDetailsAPI,
-    UpdateOwnerVerificationDocumentAPI)
+    RemoveBeneficialOwnerAPI, SubmitDocumentAPI, SubmitKycDataAPI,
+    UpdateBeneficialOwnerAPI, UpdateBusinessVerificationDocumentAPI,
+    UpdateControllerAPI, UpdateControllerVerificationDocumentAPI,
+    UpdateIncorporationDetailsAPI, UpdateOwnerVerificationDocumentAPI)
 
 urlpatterns = [
     path(
@@ -73,5 +73,10 @@ urlpatterns = [
         "onboarding/beneficial-owner/document-upload/",
         UpdateOwnerVerificationDocumentAPI.as_view(),
         name="beneficial_owner_document_upload",
+    ),
+    path(
+        "onboarding/submit-documents/",
+        SubmitDocumentAPI.as_view(),
+        name="submit_documents",
     ),
 ]

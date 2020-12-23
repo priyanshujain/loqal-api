@@ -77,7 +77,6 @@ class HttpRequest(object):
             "timeout": timeout or self.DEFAULT_TIMEOUT,
         }
         response = session.send(prepared_request, **send_kwargs)
-
         if self.request_tracker:
             self.request_tracker.add_response(
                 request_time_taken=response.elapsed.total_seconds(),

@@ -63,9 +63,9 @@ class IncorporationDetailsAdapter(Adapter):
     postalCode = Field(source="registered_address.zip_code")
     businessName = Field(source="legal_business_name")
     businessType = Field(
-        source="business_type", format_callback=format_business_type
+        source="business_type.value", format_callback=format_business_type
     )
-    businessClassification = Field(source="business_classification_id")
+    businessClassification = Field(source="industry_classification_id")
     ein = Field(source="ein_number", required=False)
 
 
@@ -86,7 +86,7 @@ def get_adapted_kyc_data(data):
     business_type = incorporation_details["business_type"]
 
     adapted_data = {}
-    if business_type == DwollaBusinessTypes.sole_proprietorship:
+    if business_type.value == DwollaBusinessTypes.sole_proprietorship:
         adapted_data = {
             **IncorporationDetailsAdapter(incorporation_details).adapt(),
             **SolePersonAdapter(controller_details).adapt(),

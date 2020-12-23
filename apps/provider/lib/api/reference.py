@@ -11,3 +11,9 @@ class Reference(API):
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )
+
+    def get_business_classifcation(self, **kwargs):
+        request_method = self.psp_client.reference.get_business_classifcation
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )

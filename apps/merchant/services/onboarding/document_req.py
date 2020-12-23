@@ -10,8 +10,9 @@ __all__ = ("DocumentRequirements",)
 
 
 class DocumentRequirements(ServiceBase):
-    def __init__(self, merchant):
+    def __init__(self, merchant, internal=False):
         self.merchant = merchant
+        self.internal = internal
 
     def handle(self):
         docs_required = {}
@@ -29,15 +30,19 @@ class DocumentRequirements(ServiceBase):
                 ba_details = self._individual_docs_requirement(
                     beneficial_owner
                 )
+                if self.internal:
+                    ba_details["orm_object"] = beneficial_owner
                 ba_required_docs.append(ba_details)
-        if ba_required_docs:
-            docs_required["beneficial_owners"] = ba_required_docs
+        docs_required["beneficial_owners"] = ba_required_docs
 
         controller = get_controller_details(merchant_id=self.merchant.id)
         if controller.verification_document_required:
-            docs_required["controller"] = self._individual_docs_requirement(
-                controller
-            )
+            controller_details = self._individual_docs_requirement(controller)
+            if self.internal:
+                controller_details["orm_object"] = controller
+            docs_required["controller"] = controller_details
+        else:
+            docs_required["controller"] = None
 
         incorporation_details = get_incorporation_details(
             merchant_id=self.merchant.id
@@ -54,7 +59,17 @@ class DocumentRequirements(ServiceBase):
                 inc_details[
                     "verification_document_type"
                 ] = incorporation_details.verification_document_type.label
-            docs_required["incorporation"] = incorporation_details
+            if self.internal:
+                inc_details[
+                    "verification_document_type"
+                ] = incorporation_details.verification_document_type
+                inc_details[
+                    "verification_document_status"
+                ] = incorporation_details.verification_document_status
+                inc_details["orm_object"] = incorporation_details
+            docs_required["incorporation"] = inc_details
+        else:
+            docs_required["incorporation"] = None
         return docs_required
 
     def _individual_docs_requirement(self, individual_obj):
@@ -72,4 +87,11 @@ class DocumentRequirements(ServiceBase):
             req_details[
                 "verification_document_type"
             ] = individual_obj.verification_document_type.label
+            if self.internal:
+                req_details[
+                    "verification_document_type"
+                ] = individual_obj.verification_document_type
+                req_details[
+                    "verification_document_status"
+                ] = individual_obj.verification_document_status
         return req_details

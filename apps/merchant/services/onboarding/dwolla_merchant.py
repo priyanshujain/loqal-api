@@ -10,7 +10,6 @@ from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  update_beneficial_owner_status)
 from apps.merchant.options import BeneficialOwnerStatus
 from apps.merchant.serializers import OnboardingDataSerializer
-from apps.merchant.validators import OnboardingDataValidator
 from apps.provider.lib.actions import ProviderAPIActionBase
 from integrations.utils.options import RequestStatusTypes
 
@@ -36,7 +35,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
         ):
             certification = DwollaCertifyBeneficialOwnerAPIAction(
                 account_id=merchant.account.id
-            ).certify(dwolla_customer_id=merchant.account.dwolla_id)
+            ).certify()
             merchant.update_certification_status(
                 status=certification["status"]
             )
@@ -56,7 +55,16 @@ class CreateDwollaMerchantAccount(ServiceBase):
         return data, merchant
 
     def _validate_data(self, data, merchant):
-        run_validator(validator=OnboardingDataValidator, data=data)
+        if not (data["incorporation_details"] and data["controller_details"]):
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Please provide incorporation details and controller details."
+                        )
+                    )
+                }
+            )
         account = merchant.account
         if merchant.account_status == MerchantAccountStatus.DOCUMENT_PENDING:
             raise ValidationError(
@@ -95,7 +103,6 @@ class CreateDwollaMerchantAccount(ServiceBase):
         if merchant.account_status == MerchantAccountStatus.VERIFIED:
             self._create_beneficial_owner(
                 account_id=account.id,
-                dwolla_customer_id=account.dwolla_id,
                 data=data,
             )
         else:
@@ -156,7 +163,6 @@ class CreateDwollaMerchantAccount(ServiceBase):
                 account_id=account_id
             ).create(
                 data=beneficial_owner,
-                dwolla_customer_id=dwolla_customer_id,
                 is_update=is_ba_update,
             )
             status = ba_response["status"]
@@ -205,10 +211,9 @@ class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
 
 
 class DwollaAddBeneficialOwnerAPIAction(ProviderAPIActionBase):
-    def create(self, data, dwolla_customer_id, is_update=False):
+    def create(self, data, is_update=False):
         response = self.client.account.add_beneficial_owner(
             data=data,
-            dwolla_customer_id=dwolla_customer_id,
             is_update=is_update,
         )
         if self.get_errors(response):
@@ -230,10 +235,8 @@ class DwollaAddBeneficialOwnerAPIAction(ProviderAPIActionBase):
 
 
 class DwollaCertifyBeneficialOwnerAPIAction(ProviderAPIActionBase):
-    def certify(self, dwolla_customer_id):
-        response = self.client.account.certify_beneficial_owner(
-            dwolla_customer_id=dwolla_customer_id
-        )
+    def certify(self):
+        response = self.client.account.certify_beneficial_owner()
         if self.get_errors(response):
             raise ProviderAPIException(
                 {

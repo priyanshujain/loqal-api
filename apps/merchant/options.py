@@ -75,6 +75,8 @@ class VerificationDocumentStatus(ChoiceEnum):
     NOT_APPLICABLE = 4, _("Not Applicable")
     UPLOADED = 5, _("Uploaded")
     SUBMITTED = 6, _("Submitted")
+    PENDING_REVIEW = 7, _("Pending for review")
+    REVIEWED = 8, _("Reviewed")
 
 
 class IndividualDocumentType(ChoiceCharEnum):

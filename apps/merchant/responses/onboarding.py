@@ -43,6 +43,9 @@ class BeneficialOwnerResponse(serializers.ModelSerializer):
     verification_document_status = serializers.CharField(
         source="verification_document_status.label", read_only=True
     )
+    verification_document_type = serializers.CharField(
+        source="verification_document_type.label", read_only=True
+    )
 
     class Meta:
         model = BeneficialOwner

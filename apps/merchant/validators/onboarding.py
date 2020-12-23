@@ -1,5 +1,7 @@
 from django.utils.translation import gettext as _
+from rest_framework import request
 from stdnum.us import ein
+from stdnum.us import ssn as _ssn
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
@@ -16,7 +18,6 @@ __all__ = (
     "BeneficialOwnerValidator",
     "UpdateBeneficialOwnerValidator",
     "RemoveBeneficialOwnerValidator",
-    "OnboardingDataValidator",
     "BeneficialOwnerDocumentValidator",
     "ControllerDocumentValidator",
     "BusinessDocumentValidator",
@@ -62,7 +63,7 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
             raise ValidationError(
                 {
                     "ein_number": [
-                        ErrorDetail(_("EIN number is not in currect format."))
+                        ErrorDetail(_("EIN number is not in correct format."))
                     ]
                 }
             )
@@ -70,10 +71,69 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
         return attrs
 
 
-class ControllerValidator(serializers.ModelSerializer):
+class IndividualValidator(serializers.ValidationSerializer):
     dob = serializers.DateField(format="%Y-%m-%d")
     address = serializers.AddressSerializer()
+    is_us_citizen = serializers.BooleanField()
+    ssn_number = serializers.CharField(required=False)
+    passport_country = serializers.CharField(max_length=2, required=False)
+    passport_number = serializers.CharField(required=False)
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        is_us_citizen = attrs.get("is_us_citizen")
+        ssn = attrs.get("ssn")
+        passport_country = attrs.get("passport_country")
+        passport_number = attrs.get("passport_number")
+
+        if is_us_citizen and not ssn:
+            raise ValidationError(
+                {"ssn": [ErrorDetail(_("SSN is required for US citizens."))]}
+            )
+        if ssn and not _ssn.is_valid(ssn):
+            raise ValidationError(
+                {"ssn": [ErrorDetail(_("SSN is not in correct format."))]}
+            )
+
+        if not ssn:
+            if not (passport_country and passport_country):
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            _("Atleast one of passport or SSN is required.")
+                        )
+                    }
+                )
+            if not passport_country:
+                raise ValidationError(
+                    {
+                        "passport_country": [
+                            ErrorDetail(
+                                _(
+                                    "If SSN is not provided passport country is required."
+                                )
+                            )
+                        ]
+                    }
+                )
+            if not passport_number:
+                raise ValidationError(
+                    {
+                        "passport_number": [
+                            ErrorDetail(
+                                _(
+                                    "If SSN is not provided passport number is required."
+                                )
+                            )
+                        ]
+                    }
+                )
+        if ssn:
+            attrs["ssn"] = _ssn.format(ssn)
+        return attrs
+
+
+class ControllerValidator(IndividualValidator, serializers.ModelSerializer):
     class Meta:
         model = ControllerDetails
         exclude = (
@@ -88,10 +148,9 @@ class ControllerValidator(serializers.ModelSerializer):
     # TODO: Add other validators for the controller
 
 
-class BeneficialOwnerValidator(serializers.ModelSerializer):
-    dob = serializers.DateField(format="%Y-%m-%d")
-    address = serializers.AddressSerializer()
-
+class BeneficialOwnerValidator(
+    IndividualValidator, serializers.ModelSerializer
+):
     class Meta:
         model = BeneficialOwner
         exclude = (
@@ -108,38 +167,6 @@ class UpdateBeneficialOwnerValidator(BeneficialOwnerValidator):
 
 class RemoveBeneficialOwnerValidator(serializers.ValidationSerializer):
     id = serializers.IntegerField()
-
-
-class OnboardingDataValidator(serializers.ModelSerializer):
-    incorporation_details = IncorporationDetailsValidator()
-    controller_details = ControllerValidator()
-
-    class Meta:
-        model = MerchantAccount
-        fields = (
-            "incorporation_details",
-            "controller_details",
-        )
-
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        incorporation_details = attrs.get("incorporation_details")
-        controller_details = attrs.get("controller_details")
-        business_type = incorporation_details["business_type"]
-        if (
-            business_type != BusinessTypes.SOLE_PROPRIETORSHIP.value
-            and not controller_details["title"]
-        ):
-            raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _(
-                            "Controller title is required if you are a llp or a corporation."
-                        )
-                    )
-                }
-            )
-        return attrs
 
 
 class DocumentFileValidator(serializers.ValidationSerializer):

@@ -18,6 +18,12 @@ class Account(API):
             request_method=request_method, request_kwargs=kwargs
         )
 
+    def upload_customer_document(self, **kwargs):
+        request_method = self.psp_client.account.upload_customer_document
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )
+
     def add_beneficial_owner(self, **kwargs):
         request_method = self.psp_client.account.add_beneficial_owner
         return self.execute_request(
@@ -26,6 +32,12 @@ class Account(API):
 
     def certify_beneficial_owner(self, **kwargs):
         request_method = self.psp_client.account.certify_beneficial_owner
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )
+
+    def upload_ba_document(self, **kwargs):
+        request_method = self.psp_client.account.upload_ba_document
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )

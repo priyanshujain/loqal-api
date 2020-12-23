@@ -26,6 +26,8 @@ class IncorporationDetails(AbstractBaseModel):
     business_type = ChoiceCharEnumField(max_length=32, enum_type=BusinessTypes)
     business_classification = models.CharField(max_length=64)
     business_classification_id = models.CharField(max_length=64)
+    industry_classification = models.CharField(max_length=64)
+    industry_classification_id = models.CharField(max_length=64)
     verification_document_required = models.BooleanField(default=False)
     verification_document_type = ChoiceCharEnumField(
         max_length=32, blank=True, enum_type=BusinessDocumentType
@@ -53,6 +55,9 @@ class IncorporationDetails(AbstractBaseModel):
 
     def add_dwolla_document_id(self, dwolla_id, save=True):
         self.dwolla_document_id = dwolla_id
+        self.verification_document_status = (
+            VerificationDocumentStatus.PENDING_REVIEW
+        )
         if save:
             self.save()
 
@@ -78,7 +83,7 @@ class IndividualBase(AbstractBaseModel):
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256)
     is_us_citizen = models.BooleanField()
-    ssn = models.CharField(max_length=9, blank=True)
+    ssn = models.CharField(max_length=11, blank=True)
     dob = models.DateField()
     # TODO: Create a json schema validator for address
     address = models.JSONField()
@@ -105,6 +110,9 @@ class IndividualBase(AbstractBaseModel):
 
     def add_dwolla_document_id(self, dwolla_id, save=True):
         self.dwolla_document_id = dwolla_id
+        self.verification_document_status = (
+            VerificationDocumentStatus.PENDING_REVIEW
+        )
         if save:
             self.save()
 

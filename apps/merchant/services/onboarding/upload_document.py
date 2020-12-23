@@ -1,3 +1,9 @@
+"""
+TODO: Check for file validation
+1. Dwolla only allows file size upto 10MB
+2. File types personal [.jpg, .png, .jpeg]
+              business [.jpg, .png, .jpeg, .pdf]
+"""
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError

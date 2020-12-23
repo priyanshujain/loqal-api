@@ -10,7 +10,7 @@ from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     CreateDwollaMerchantAccount,
                                     CreateIncorporationDetails,
                                     DocumentRequirements,
-                                    RemoveBeneficialOwner,
+                                    RemoveBeneficialOwner, SubmitDocuments,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
                                     UpdateIncorporationDetails)
@@ -40,10 +40,10 @@ class CreateIncorporationDetailsAPI(MerchantAPIView):
     permission_classes = (IsMerchantAccountPendingPermission,)
 
     def post(self, request):
-        merchant_id = request.merchant_account.id
+        merchant_account = request.merchant_account
         data = self.request_data
         incorporation_details = CreateIncorporationDetails(
-            merchant_id=merchant_id, data=data
+            merchant=merchant_account, data=data
         ).handle()
         return self.response({"id": incorporation_details.id}, status=201)
 
@@ -56,9 +56,11 @@ class UpdateIncorporationDetailsAPI(MerchantAPIView):
     permission_classes = (IsMerchantAccountPendingPermission,)
 
     def put(self, request):
-        merchant_id = request.merchant_account.id
+        merchant_account = request.merchant_account
         data = self.request_data
-        UpdateIncorporationDetails(merchant_id=merchant_id, data=data).handle()
+        UpdateIncorporationDetails(
+            merchant=merchant_account, data=data
+        ).handle()
         return self.response(status=204)
 
 
@@ -201,4 +203,11 @@ class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
         BeneficialOwnerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
+        return self.response()
+
+
+class SubmitDocumentAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        SubmitDocuments(merchant=merchant_account).handle()
         return self.response()

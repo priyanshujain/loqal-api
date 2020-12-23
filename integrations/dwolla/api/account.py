@@ -2,11 +2,10 @@
 This module provides a class for account creation related calls to the dwolla API.
 """
 
-from rest_framework.exceptions import bad_request
 
 from apps.account.options import (MerchantAccountCerficationStatus,
                                   MerchantAccountStatus)
-from apps.merchant.options import BeneficialOwnerStatus
+from apps.merchant.options import BeneficialOwnerStatus, IndividualDocumentType
 from integrations.dwolla.adapters.kyc import (get_adapted_benficial_owner,
                                               get_adapted_kyc_data)
 from integrations.dwolla.errors import BadRequestError
@@ -33,6 +32,15 @@ class BeneficialOwnerCertificationStatusMap:
     uncertified = MerchantAccountCerficationStatus.UNCERTIFIED
     recertify = MerchantAccountCerficationStatus.RECERTIFY
     certified = MerchantAccountCerficationStatus.CERTIFIED
+
+
+INDIVIDUAL_DUCUMENT_MAP = {
+    IndividualDocumentType.DRIVER_LICENSE: "license",
+    IndividualDocumentType.US_PASSPORT: "passport",
+    IndividualDocumentType.FOREIGN_PASSPORT: "passport",
+    IndividualDocumentType.US_VISA: "other",
+    IndividualDocumentType.FEAC: "idCard",
+}
 
 
 class Account(Http):
@@ -118,19 +126,23 @@ class Account(Http):
         dwolla_customer_id = location.split("/").pop()
         return self.get_merhant_account(customer_id=dwolla_customer_id)
 
-    def upload_customer_document(self, document_file, document_type):
+    def upload_customer_document(
+        self, document_file, document_type, entity_type
+    ):
         """
         Upload verification document for a customer
         """
-
-        endpoint = f"/customers/${self.customer_id}/documents"
+        if entity_type == "business":
+            document_type = "other"
+        else:
+            document_type = INDIVIDUAL_DUCUMENT_MAP[document_type]
+        endpoint = f"/customers/{self.config.customer_id}/documents"
         try:
             response = self.post(
                 endpoint,
-                files={
-                    "file": open(document_file.name, "rb"),
-                    "documentType": document_type,
-                },
+                data={"documentType": document_type},
+                files=[("file", open(document_file.name, "rb"))],
+                custom_content_type="multipart/form-data",
                 authenticated=True,
                 retry=False,
             )
@@ -139,7 +151,6 @@ class Account(Http):
                 "status": RequestStatusTypes.ERROR,
                 "errors": err.api_errors,
             }
-
         response_headers = response.headers
         location = response_headers["location"]
         dwolla_id = location.split("/").pop()
@@ -162,13 +173,13 @@ class Account(Http):
             ),
         }
 
-    def add_beneficial_owner(self, data, dwolla_customer_id, is_update=False):
+    def add_beneficial_owner(self, data, is_update=False):
         """
         Add beneficial owner
         """
         request_data = get_adapted_benficial_owner(data=data)
 
-        endpoint = f"customers/{dwolla_customer_id}/beneficial-owners"
+        endpoint = f"customers/{self.config.customer_id}/beneficial-owners"
         if is_update:
             endpoint = f"{endpoint}/{data['dwolla_id']}"
         try:
@@ -198,16 +209,15 @@ class Account(Http):
         """
         Upload verification document for beneficial owner
         """
-
-        endpoint = f"/benficial_owners/${beneficial_owner_id}/documents"
+        document_type = INDIVIDUAL_DUCUMENT_MAP[document_type]
+        endpoint = f"/beneficial-owners/{beneficial_owner_id}/documents"
         try:
             response = self.post(
                 endpoint,
-                files={
-                    "file": open(document_file.name, "rb"),
-                    "documentType": document_type,
-                },
+                data={"documentType": document_type},
+                files=[("file", open(document_file.name, "rb"))],
                 authenticated=True,
+                custom_content_type="multipart/form-data",
                 retry=False,
             )
         except BadRequestError as err:
@@ -221,12 +231,12 @@ class Account(Http):
         dwolla_id = location.split("/").pop()
         return {"dwolla_id": dwolla_id}
 
-    def get_ba_cerification_status(self, dwolla_customer_id):
+    def get_ba_cerification_status(self):
         """
         get beneficial owner certifcation status
         """
 
-        endpoint = f"customers/{dwolla_customer_id}/beneficial-ownership"
+        endpoint = f"customers/{self.config.customer_id}/beneficial-ownership"
         response = self.get(
             endpoint,
             authenticated=True,
@@ -239,12 +249,12 @@ class Account(Http):
             )
         }
 
-    def certify_beneficial_owner(self, dwolla_customer_id):
+    def certify_beneficial_owner(self):
         """
         Add beneficial owner
         """
 
-        endpoint = f"customers/{dwolla_customer_id}/beneficial-ownership"
+        endpoint = f"customers/{self.config.customer_id}/beneficial-ownership"
         try:
             response = self.post(
                 endpoint,

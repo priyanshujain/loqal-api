@@ -1,6 +1,7 @@
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, InternalDBError, ValidationError
+from api.exceptions import (ErrorDetail, InternalDBError, ProviderAPIException,
+                            ValidationError)
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import (create_beneficial_owner,
@@ -12,11 +13,13 @@ from apps.merchant.dbapi import (create_beneficial_owner,
                                  update_beneficial_owner,
                                  update_controller_details,
                                  update_incorporation_details)
+from apps.merchant.options import BusinessTypes
 from apps.merchant.validators import (BeneficialOwnerValidator,
                                       ControllerValidator,
                                       IncorporationDetailsValidator,
                                       RemoveBeneficialOwnerValidator,
                                       UpdateBeneficialOwnerValidator)
+from apps.provider.lib.actions import ProviderAPIActionBase
 
 __all__ = (
     "CreateIncorporationDetails",
@@ -29,10 +32,64 @@ __all__ = (
 )
 
 
+def validate_business_classifcation(account_id, data):
+    business_classification_id = data.get("business_classification_id")
+    business_classification = data.get("business_classification")
+    industry_classification_id = data.get("industry_classification_id")
+    industry_classification = data.get("industry_classification")
+    classfications = BusinessClassificationAPIAction(
+        account_id=account_id
+    ).get(id=business_classification_id)
+    if not classfications:
+        raise ValidationError(
+            {
+                "business_classification_id": [
+                    ErrorDetail(_("Invalid business classification id"))
+                ]
+            }
+        )
+    if classfications["name"] != business_classification:
+        raise ValidationError(
+            {
+                "business_classification": [
+                    ErrorDetail(_("Invalid business classification"))
+                ]
+            }
+        )
+
+    industry_classification_filter_list = [
+        {"id": classfication["id"], "name": classfication["name"]}
+        for classfication in classfications["industry-classifications"]
+        if classfication["id"] == industry_classification_id
+    ]
+
+    if len(industry_classification_filter_list) == 0:
+        raise ValidationError(
+            {
+                "industry_classification_id": [
+                    ErrorDetail(_("Invalid industry classification id"))
+                ]
+            }
+        )
+
+    if (
+        industry_classification_filter_list[0]["name"]
+        != industry_classification
+    ):
+        raise ValidationError(
+            {
+                "industry_classification": [
+                    ErrorDetail(_("Invalid industry classification"))
+                ]
+            }
+        )
+    return True
+
+
 class CreateIncorporationDetails(ServiceBase):
-    def __init__(self, merchant_id, data):
+    def __init__(self, merchant, data):
         self.data = data
-        self.merchant_id = merchant_id
+        self.merchant = merchant
 
     def handle(self):
         assert self._validate_data()
@@ -40,7 +97,7 @@ class CreateIncorporationDetails(ServiceBase):
         return incorporation_details
 
     def _validate_data(self):
-        if get_incorporation_details(merchant_id=self.merchant_id):
+        if get_incorporation_details(merchant_id=self.merchant.id):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -48,13 +105,15 @@ class CreateIncorporationDetails(ServiceBase):
                     )
                 }
             )
-
         self.data = run_validator(IncorporationDetailsValidator, self.data)
+        assert validate_business_classifcation(
+            account_id=self.merchant.account.id, data=self.data
+        )
         return True
 
     def _factory_incorporation_details(self):
         incorporation_details = create_incorporation_details(
-            merchant_id=self.merchant_id, **self.data
+            merchant_id=self.merchant.id, **self.data
         )
         if incorporation_details:
             return incorporation_details
@@ -71,8 +130,8 @@ class CreateIncorporationDetails(ServiceBase):
 
 
 class UpdateIncorporationDetails(CreateIncorporationDetails):
-    def __init__(self, merchant_id, data):
-        super().__init__(merchant_id, data)
+    def __init__(self, merchant, data):
+        super().__init__(merchant, data)
 
     def handle(self):
         assert self._validate_data()
@@ -80,7 +139,7 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
 
     def _validate_data(self):
         incorporation_details = get_incorporation_details(
-            merchant_id=self.merchant_id
+            merchant_id=self.merchant.id
         )
         if not incorporation_details:
             raise ValidationError(
@@ -93,12 +152,15 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
         self.incorporation_details = incorporation_details
 
         self.data = run_validator(IncorporationDetailsValidator, self.data)
+        assert validate_business_classifcation(
+            account_id=self.merchant.account.id, data=self.data
+        )
         return True
 
     def _update_incorporation_details(self):
         update_incorporation_details(
             incorporation_details_id=self.incorporation_details.id,
-            merchant_id=self.merchant_id,
+            merchant_id=self.merchant.id,
             **self.data
         )
 
@@ -122,8 +184,34 @@ class CreateControllerDetails(ServiceBase):
                     )
                 }
             )
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant_id
+        )
+        if not incorporation_details:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Incorporation details are required before adding controller details."
+                        )
+                    )
+                }
+            )
 
-        self.data = run_validator(ControllerValidator, self.data)
+        data = run_validator(ControllerValidator, self.data)
+        title = data.get("title")
+        if (
+            incorporation_details.business_type
+            != BusinessTypes.SOLE_PROPRIETORSHIP
+            and not title
+        ):
+            raise ValidationError(
+                {
+                    "title": "Title is required for businesses other than sole proprietors"
+                }
+            )
+
+        self.data = data
         return True
 
     def _factory_controller_details(self):
@@ -238,3 +326,21 @@ class RemoveBeneficialOwner(UpdateBeneficialOwner):
             beneficial_owner_id=self.benefical_owner.id,
             merchant_id=self.merchant_id,
         )
+
+
+class BusinessClassificationAPIAction(ProviderAPIActionBase):
+    def get(self, id):
+        response = self.client.reference.get_business_classifcation(id=id)
+        if self.get_errors(response):
+            raise ProviderAPIException(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Banking service failed, Please try "
+                            "again. If the problem persists please "
+                            "contact our support team."
+                        )
+                    )
+                }
+            )
+        return response.get("data")
