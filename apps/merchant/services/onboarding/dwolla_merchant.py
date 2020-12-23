@@ -1,17 +1,17 @@
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
-from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
-from apps.account.options import (MerchantAccountCerficationStatus,
-                                  MerchantAccountStatus)
-from apps.merchant.dbapi import (get_account_member_by_user_id,
-                                 update_beneficial_owner_status)
+from apps.account.options import MerchantAccountCerficationStatus, MerchantAccountStatus
+from apps.merchant.dbapi import (
+    get_account_member_by_user_id,
+    update_beneficial_owner_status,
+)
 from apps.merchant.options import BeneficialOwnerStatus
 from apps.merchant.serializers import OnboardingDataSerializer
 from apps.provider.lib.actions import ProviderAPIActionBase
-from integrations.utils.options import RequestStatusTypes
+
 
 __all__ = ("CreateDwollaMerchantAccount",)
 
@@ -33,12 +33,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
             and merchant.certification_status
             != MerchantAccountCerficationStatus.CERTIFIED
         ):
-            certification = DwollaCertifyBeneficialOwnerAPIAction(
-                account_id=merchant.account.id
-            ).certify()
-            merchant.update_certification_status(
-                status=certification["status"]
-            )
+            self._certify_beneficial_owners(merchant=merchant)
         return merchant
 
     def _prepare_data(self):
@@ -111,21 +106,15 @@ class CreateDwollaMerchantAccount(ServiceBase):
             ).create(data=merchant_account_data, is_update=is_account_update)
             dwolla_customer_id = dwolla_response["dwolla_customer_id"]
             dwolla_status = dwolla_response["status"]
-            is_certification_required = dwolla_response[
-                "is_certification_required"
-            ]
+            is_certification_required = dwolla_response["is_certification_required"]
             controller_document_required = dwolla_response[
                 "controller_document_required"
             ]
-            business_document_required = dwolla_response[
-                "business_document_required"
-            ]
+            business_document_required = dwolla_response["business_document_required"]
 
             account.add_dwolla_id(dwolla_id=dwolla_customer_id)
             merchant.update_status(status=dwolla_status)
-            merchant.update_certification_required(
-                required=is_certification_required
-            )
+            merchant.update_certification_required(required=is_certification_required)
             if dwolla_status != MerchantAccountStatus.VERIFIED:
                 self.is_all_verified = False
 
@@ -141,21 +130,17 @@ class CreateDwollaMerchantAccount(ServiceBase):
 
             self._create_beneficial_owner(
                 account_id=account.id,
-                dwolla_customer_id=dwolla_customer_id,
                 data=data,
             )
         return merchant
 
-    def _create_beneficial_owner(self, account_id, dwolla_customer_id, data):
+    def _create_beneficial_owner(self, account_id, data):
         beneficial_owners = data["beneficial_owners"]
         for beneficial_owner in beneficial_owners:
             is_ba_update = False
             if beneficial_owner["status"] == BeneficialOwnerStatus.VERIFIED:
                 continue
-            if (
-                beneficial_owner["status"]
-                == BeneficialOwnerStatus.DOCUMENT_PENDING
-            ):
+            if beneficial_owner["status"] == BeneficialOwnerStatus.DOCUMENT_PENDING:
                 continue
             if beneficial_owner["status"] == BeneficialOwnerStatus.INCOMPLETE:
                 is_account_update = True
@@ -174,8 +159,11 @@ class CreateDwollaMerchantAccount(ServiceBase):
             if status != BeneficialOwnerStatus.VERIFIED:
                 self.is_all_verified = False
 
-    def _certify_beneficial_owners(self):
-        pass
+    def _certify_beneficial_owners(self, merchant):
+        certification = DwollaCertifyBeneficialOwnerAPIAction(
+            account_id=merchant.account.id
+        ).certify()
+        merchant.update_certification_status(status=certification["status"])
 
 
 class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):

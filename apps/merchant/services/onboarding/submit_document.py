@@ -96,6 +96,11 @@ class SubmitDocuments(ServiceBase):
         controller = required_docs.get("controller")
         incorporation = required_docs.get("incorporation")
 
+        if not (beneficial_owners or controller or incorporation):
+            raise ValidationError({
+                "detail": ErrorDetail(_("No doument submit pending."))
+            })
+
         account_id = self.merchant.account.id
         if incorporation:
             incorporation_object = incorporation["orm_object"]
