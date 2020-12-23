@@ -1,16 +1,19 @@
 from django.urls import path
 
-from apps.payment.views.payment import (ApprovePaymentRequestAPI,
-                                        CreatePaymentAPI,
-                                        CreatePaymentRequestAPI,
-                                        ListConsumerPaymentRequestAPI,
-                                        ListMerchantPaymentRequestAPI,
-                                        PaymentHistoryAPI,
-                                        RejectPaymentRequestAPI)
+from apps.payment.views.payment import (
+    ApprovePaymentRequestAPI,
+    CreatePaymentAPI,
+    CreatePaymentRequestAPI,
+    ListConsumerPaymentRequestAPI,
+    ListMerchantPaymentRequestAPI,
+    PaymentHistoryAPI,
+    RejectPaymentRequestAPI,
+    MerchantPaymentHistoryAPI,
+    CustomersAggregateHistoryAPI,
+)
 
 urlpatterns = [
     path("create/", CreatePaymentAPI.as_view(), name="create_payment"),
-    path("history/", PaymentHistoryAPI.as_view(), name="payment_history"),
     path(
         "request/create/",
         CreatePaymentRequestAPI.as_view(),
@@ -36,4 +39,15 @@ urlpatterns = [
         ListMerchantPaymentRequestAPI.as_view(),
         name="merchant_payment_request",
     ),
+    path(
+        "history/merchant/",
+        MerchantPaymentHistoryAPI.as_view(),
+        name="merchant_payment_history",
+    ),
+    path(
+        "history/customers/",
+        CustomersAggregateHistoryAPI.as_view(),
+        name="customers_payment_history",
+    ),
+    path("history/", PaymentHistoryAPI.as_view(), name="payment_history"),
 ]

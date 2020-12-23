@@ -10,14 +10,14 @@ from apps.payment.dbapi import get_payment_qrcode
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
-    payment_amount = serializers.FloatField(min_value=0)
+    amount = serializers.FloatField(min_value=0)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        payment_amount = attrs.get("payment_amount")
+        amount = attrs.get("amount")
         tip_amount = attrs.get("tip_amount")
 
-        if payment_amount < 1.00:
+        if amount < 1.00:
             raise ValidationError(
                 {
                     "amount": [
@@ -27,11 +27,11 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
                     ]
                 }
             )
-        payment_amount_decimal = decimal.Decimal(str(payment_amount))
+        payment_amount_decimal = decimal.Decimal(str(amount))
         if abs(payment_amount_decimal.as_tuple().exponent) > 2:
             raise ValidationError(
                 {
-                    "payment_amount": [
+                    "amount": [
                         ErrorDetail(
                             _("Amount can only have two digits after decimal.")
                         )

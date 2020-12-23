@@ -2,15 +2,17 @@
 Payments relted db operations.
 """
 
-import re
-
 from django.db.utils import IntegrityError
-from rest_framework import request
 
-from apps.payment.models import (PaymentQrCode, PaymentRegister,
-                                 PaymentRequest, Transaction)
-from apps.payment.responses import payment
-
+from apps.payment.models import (
+    PaymentQrCode,
+    PaymentRegister,
+    PaymentRequest,
+    Transaction,
+)
+from django.db.models import Sum, Count
+from apps.payment.options import TransactionTypes
+from utils.types import to_float
 
 def create_payment_register(account_id):
     """
@@ -26,9 +28,9 @@ def create_transaction(
     account_id,
     sender_id,
     recipient_id,
-    payment_amount,
+    amount,
     tip_amount,
-    payment_currency,
+    currency,
     fee_amount,
     fee_currency,
     payment_qrcode_id,
@@ -41,9 +43,9 @@ def create_transaction(
             account_id=account_id,
             sender_id=sender_id,
             recipient_id=recipient_id,
-            payment_amount=payment_amount,
+            amount=amount,
             tip_amount=tip_amount,
-            payment_currency=payment_currency,
+            currency=currency,
             fee_amount=fee_amount,
             fee_currency=fee_currency,
             payment_qrcode_id=payment_qrcode_id,
@@ -89,9 +91,7 @@ def get_payment_qrcode_by_id(qrcode_id, merchant_id):
     get QR code by qrcode_id and merchant_id
     """
     try:
-        return PaymentQrCode.objects.get(
-            qrcode_id=qrcode_id, merchant_id=merchant_id
-        )
+        return PaymentQrCode.objects.get(qrcode_id=qrcode_id, merchant_id=merchant_id)
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -120,9 +120,7 @@ def get_cashier_qrcode(merchant_id, cashier_id):
     Get QR code for a cashier
     """
     try:
-        return PaymentQrCode.objects.get(
-            merchant_id=merchant_id, cashier_id=cashier_id
-        )
+        return PaymentQrCode.objects.get(merchant_id=merchant_id, cashier_id=cashier_id)
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -137,8 +135,8 @@ def get_empty_qrcodes():
 def create_payment_request(
     account_id,
     requested_to_id,
-    payment_amount,
-    payment_currency,
+    amount,
+    currency,
 ):
     """
     dbapi for creating new payment request.
@@ -147,8 +145,8 @@ def create_payment_request(
         return PaymentRequest.objects.create(
             account_id=account_id,
             requested_to_id=requested_to_id,
-            payment_amount=payment_amount,
-            payment_currency=payment_currency,
+            amount=amount,
+            currency=currency,
         )
     except IntegrityError as err:
         raise err
@@ -170,3 +168,51 @@ def get_payment_reqeust_by_id(payment_request_id, requested_to_id):
         )
     except PaymentRequest.DoesNotExist:
         return None
+
+
+def get_transactions_to_merchant(account_id):
+    """
+    get transactions to a merchant's account
+    """
+    try:
+        return Transaction.objects.filter(
+            recipient__account_id=account_id,
+        )
+    except IntegrityError:
+        return None
+
+
+def get_customers_aggregate_transactions(account_id):
+    aggregate_consumers = []
+    consumers = [
+        transaction.sender.account.consumeraccount
+        for transaction in Transaction.objects.filter(recipient__account_id=account_id).distinct("sender")
+    ]
+    for consumer in consumers:
+        payment_stats = Transaction.objects.filter(
+            sender__account_id=consumer.account.id,
+            transaction_type=TransactionTypes.PAYMENT,
+        ).aggregate(
+            total_payment_amount=Sum("amount"),
+            total_tip_amount=Sum("tip_amount"),
+            total_payments=Count("id"),
+        )
+        refund_stats = Transaction.objects.filter(
+            sender__account_id=consumer.account.id,
+            transaction_type=TransactionTypes.REFUND,
+        ).aggregate(
+            total_refund_amount=Sum("amount"),
+            total_refunds=Count("id"),
+        )
+        aggregate_consumers.append({
+            "consumer_loqal_id": consumer.username,
+            "first_name": consumer.user.first_name,
+            "last_name": consumer.user.last_name,
+            "total_payments": payment_stats["total_payments"],
+            "total_payment_amount": to_float(payment_stats["total_payment_amount"]),
+            "total_tip_amount": to_float(payment_stats["total_tip_amount"]),
+            "total_refund_amount": to_float(refund_stats["total_refund_amount"]),
+            "total_refunds": refund_stats["total_refunds"],
+        })
+    return aggregate_consumers
+

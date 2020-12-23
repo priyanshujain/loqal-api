@@ -7,11 +7,12 @@ from django.utils import timezone
 from apps.account.models import Account, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.merchant.models import AccountMember
-from apps.payment.options import PaymentRequestStatus, TransactionStatus
+from apps.payment.options import PaymentRequestStatus, TransactionStatus, TransactionTypes
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
+from db.models.fields import ChoiceCharEnumField
 
 
 class PaymentRegister(AbstractBaseModel):
@@ -80,18 +81,25 @@ class Transaction(AbstractBaseModel):
         BankAccount,
         on_delete=models.DO_NOTHING,
         related_name="sender_bank_account",
+        db_index=True
     )
     recipient = models.ForeignKey(
         BankAccount,
         on_delete=models.DO_NOTHING,
         related_name="recipient_bank_account",
+        db_index=True
     )
     payment_qrcode = models.ForeignKey(
         PaymentQrCode, on_delete=models.SET_NULL, blank=True, null=True
     )
-    payment_amount = models.FloatField()
+    transaction_type = ChoiceCharEnumField(
+        enum_type=TransactionTypes,
+        default=TransactionTypes.PAYMENT,
+        max_length=64
+    )
+    amount = models.FloatField()
     tip_amount = models.FloatField(default=0)
-    payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_amount = models.FloatField(default=0.0)
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     status = ChoiceEnumField(
@@ -118,8 +126,8 @@ class PaymentRequest(AbstractBaseModel):
         on_delete=models.DO_NOTHING,
         related_name="requested_to_account",
     )
-    payment_amount = models.FloatField()
-    payment_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    amount = models.FloatField()
+    currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     status = ChoiceEnumField(
         enum_type=PaymentRequestStatus,
         default=PaymentRequestStatus.REQUEST_SENT,

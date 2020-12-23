@@ -27,9 +27,9 @@ class CreatePayment(ServiceBase):
     def handle(self):
         payment_data = self._validate_data()
         merchant_account = payment_data["merchant_account"]
-        payment_amount = payment_data["payment_amount"]
+        amount = payment_data["amount"]
         tip_amount = payment_data["tip_amount"]
-        payment_currency = payment_data["payment_currency"]
+        currency = payment_data["currency"]
         payment_qrcode_id = payment_data["payment_qrcode_id"]
 
         sender_bank_account = get_bank_account(account_id=self.account_id)
@@ -53,7 +53,7 @@ class CreatePayment(ServiceBase):
 
         balance = self._check_balance(bank_account=sender_bank_account)
         min_required_balance = (
-            payment_amount
+            amount
             + tip_amount
             + settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
         )
@@ -69,9 +69,9 @@ class CreatePayment(ServiceBase):
         transaction = self._factory_transaction(
             sender_id=sender_bank_account.id,
             recipient_id=recipient_bank_account.id,
-            payment_amount=payment_amount,
+            amount=amount,
             tip_amount=tip_amount,
-            payment_currency=payment_currency,
+            currency=currency,
             payment_qrcode_id=payment_qrcode_id,
         )
         dwolla_id = self._send_to_dwolla(transaction=transaction)
@@ -124,9 +124,9 @@ class CreatePayment(ServiceBase):
 
         return {
             "merchant_account": merchant_account,
-            "payment_amount": data["payment_amount"],
+            "amount": data["amount"],
             "tip_amount": data["tip_amount"],
-            "payment_currency": DEFAULT_CURRENCY,
+            "currency": DEFAULT_CURRENCY,
             "payment_qrcode_id": payment_qrcode_id,
         }
 
@@ -150,21 +150,21 @@ class CreatePayment(ServiceBase):
         self,
         sender_id,
         recipient_id,
-        payment_amount,
+        amount,
         tip_amount,
-        payment_currency,
+        currency,
         payment_qrcode_id,
     ):
-        fee_amount = payment_amount * FACILITATION_FEES_PERCENTAGE / 100
+        fee_amount = amount * FACILITATION_FEES_PERCENTAGE / 100
         fee_amount = round(fee_amount, 2)
 
         return create_transaction(
             account_id=self.account_id,
             sender_id=sender_id,
             recipient_id=recipient_id,
-            payment_amount=payment_amount,
+            amount=amount,
             tip_amount=tip_amount,
-            payment_currency=payment_currency,
+            currency=currency,
             fee_amount=fee_amount,
             fee_currency=FACILITATION_FEES_CURRENCY,
             payment_qrcode_id=payment_qrcode_id,
@@ -172,14 +172,14 @@ class CreatePayment(ServiceBase):
 
     def _send_to_dwolla(self, transaction):
         api_action = CreateTransferAPIAction(account_id=self.account_id)
-        total_amount = transaction.payment_amount + transaction.tip_amount
+        total_amount = transaction.amount + transaction.tip_amount
 
         psp_request_data = {
             "sender_bank_account_dwolla_id": transaction.sender.dwolla_id,
             "receiver_bank_account_dwolla_id": transaction.recipient.dwolla_id,
             "receiver_customer_dwolla_id": transaction.recipient.account.dwolla_id,
             "correlation_id": transaction.correlation_id,
-            "currency": transaction.payment_currency,
+            "currency": transaction.currency,
             "amount": total_amount,
             "fee_amount": transaction.fee_amount,
             "fee_currency": transaction.fee_currency,

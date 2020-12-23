@@ -1,7 +1,8 @@
+from db.models.fields.choice import ChoiceCharEnum
 from django.utils.translation import gettext as _
 
 from apps.provider.options import DEFAULT_CURRENCY
-from db.models.fields import ChoiceEnum
+from db.models.fields import ChoiceEnum, ChoiceCharEnum
 
 FACILITATION_FEES_PERCENTAGE = 1.5
 FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
@@ -19,3 +20,8 @@ class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
     PROCESSED = 1, _("Request Processed")
     REJECTED = 2, _("Request Rejected")
+
+
+class TransactionTypes(ChoiceCharEnum):
+    PAYMENT = "payment", _("Payment")
+    REFUND = "refund", _("Refund")

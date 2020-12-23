@@ -66,8 +66,8 @@ class CreatePaymentRequest(ServiceBase):
         return create_payment_request(
             account_id=self.account_id,
             requested_to_id=data["requested_to_id"],
-            payment_amount=data["payment_amount"],
-            payment_currency=DEFAULT_CURRENCY,
+            amount=data["amount"],
+            currency=DEFAULT_CURRENCY,
         )
 
 
@@ -93,7 +93,7 @@ class ApprovePaymentRequest(ServiceBase):
 
         payment_data = {
             "merchant_id": merchant_id,
-            "payment_amount": payment_request.payment_amount,
+            "amount": payment_request.amount,
             "tip_amount": data["tip_amount"],
         }
         transaction = CreatePayment(
