@@ -13,8 +13,9 @@ from apps.payment.validators import (ApprovePaymentRequestValidator,
                                      CreatePaymentRequestValidator,
                                      RejectPaymentRequestValidator)
 from apps.provider.options import DEFAULT_CURRENCY
-
 from .create_payment import CreatePayment
+from apps.order.dbapi import create_payment_request_order
+
 
 __all__ = (
     "CreatePaymentRequest",
@@ -59,15 +60,29 @@ class CreatePaymentRequest(ServiceBase):
                     ]
                 }
             )
-        data["requested_to_id"] = consumer_account.account.id
+        try:
+            merchant_account = bank_account.account.merchantaccount
+        except AttributeError:
+            raise ValidationError({
+                "detail": ErrorDetail(_("Invalid account."))
+            })
+        data["account_to_id"] = consumer_account.account.id
+        data["consumer_id"] = consumer_account.id
+        data["merchant_id"] = merchant_account.id
         return data
 
     def _factory_payment_request(self, data):
+        order = create_payment_request_order(
+            merchant_id=data["merchant_id"],
+            consumer_id=data["consumer_id"],
+            amount=data["amount"],
+        )
         return create_payment_request(
-            account_id=self.account_id,
-            requested_to_id=data["requested_to_id"],
+            account_from_id=self.account_id,
+            account_to_id=data["account_to_id"],
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
+            order_id=order.id
         )
 
 

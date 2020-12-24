@@ -5,8 +5,12 @@ Payments relted db operations.
 from django.db.models import Count, Sum
 from django.db.utils import IntegrityError
 
-from apps.payment.models import (PaymentQrCode, PaymentRegister,
-                                 PaymentRequest, Transaction)
+from apps.payment.models import (
+    PaymentQrCode,
+    PaymentRegister,
+    PaymentRequest,
+    Transaction,
+)
 from apps.payment.options import TransactionTypes
 from utils.types import to_float
 
@@ -88,9 +92,7 @@ def get_payment_qrcode_by_id(qrcode_id, merchant_id):
     get QR code by qrcode_id and merchant_id
     """
     try:
-        return PaymentQrCode.objects.get(
-            qrcode_id=qrcode_id, merchant_id=merchant_id
-        )
+        return PaymentQrCode.objects.get(qrcode_id=qrcode_id, merchant_id=merchant_id)
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -119,9 +121,7 @@ def get_cashier_qrcode(merchant_id, cashier_id):
     Get QR code for a cashier
     """
     try:
-        return PaymentQrCode.objects.get(
-            merchant_id=merchant_id, cashier_id=cashier_id
-        )
+        return PaymentQrCode.objects.get(merchant_id=merchant_id, cashier_id=cashier_id)
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -134,23 +134,24 @@ def get_empty_qrcodes():
 
 
 def create_payment_request(
-    account_id,
-    requested_to_id,
+    account_from_id,
+    account_to_id,
     amount,
     currency,
+    order_id,
 ):
     """
     dbapi for creating new payment request.
     """
     try:
         return PaymentRequest.objects.create(
-            account_id=account_id,
-            requested_to_id=requested_to_id,
+            account_from_id=account_from_id,
+            account_to_id=account_to_id,
             amount=amount,
             currency=currency,
+            order_id=order_id,
         )
-    except IntegrityError as err:
-        raise err
+    except IntegrityError:
         return None
 
 
@@ -213,15 +214,9 @@ def get_customers_aggregate_transactions(account_id):
                 "first_name": consumer.user.first_name,
                 "last_name": consumer.user.last_name,
                 "total_payments": payment_stats["total_payments"],
-                "total_payment_amount": to_float(
-                    payment_stats["total_payment_amount"]
-                ),
-                "total_tip_amount": to_float(
-                    payment_stats["total_tip_amount"]
-                ),
-                "total_refund_amount": to_float(
-                    refund_stats["total_refund_amount"]
-                ),
+                "total_payment_amount": to_float(payment_stats["total_payment_amount"]),
+                "total_tip_amount": to_float(payment_stats["total_tip_amount"]),
+                "total_refund_amount": to_float(refund_stats["total_refund_amount"]),
                 "total_refunds": refund_stats["total_refunds"],
             }
         )
