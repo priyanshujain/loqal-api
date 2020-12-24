@@ -106,13 +106,13 @@ class SubmitDocuments(ServiceBase):
         if incorporation:
             incorporation_object = incorporation["orm_object"]
             api_response = CustomerDocumentUploadAPIAction(
-                account_id=account_id
+                account_id=account_id,
             ).upload(
                 document_file_id=incorporation["verification_document_file"][
                     "id"
                 ],
                 document_type=incorporation["verification_document_type"],
-                entity_type="controller",
+                entity_type="business",
             )
             incorporation_object.add_dwolla_document_id(
                 dwolla_id=api_response["dwolla_id"]
