@@ -87,6 +87,7 @@ class IndividualDocumentType(ChoiceCharEnum):
     FEAC = "employment_authorization_card", _(
         "Federal Employment Authorization Card"
     )
+    NOT_APPLICABLE = "not_applicable", _("Not Applicable")
 
 
 class BusinessDocumentType(ChoiceCharEnum):
@@ -94,3 +95,4 @@ class BusinessDocumentType(ChoiceCharEnum):
     BUSINESS_LICENSE = "business_license", _("Business License")
     DRIVER_LICENSE = "driver_license", _("Driver’s License")
     US_PASSPORT = "us_passport", _("US Passport")
+    NOT_APPLICABLE = "not_applicable", _("Not Applicable")

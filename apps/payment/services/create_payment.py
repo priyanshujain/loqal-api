@@ -53,9 +53,7 @@ class CreatePayment(ServiceBase):
 
         balance = self._check_balance(bank_account=sender_bank_account)
         min_required_balance = (
-            amount
-            + tip_amount
-            + settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+            amount + tip_amount + settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
         )
         if balance < min_required_balance:
             raise ValidationError(

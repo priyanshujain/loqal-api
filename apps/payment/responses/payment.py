@@ -1,10 +1,11 @@
 from typing import cast
+
 import django
+
 from api import serializers
-from apps.account.models import Account, MerchantAccount, ConsumerAccount
+from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.account.responses import MerchantDetailsResponse
 from apps.payment.models import PaymentRequest, Transaction
-
 
 __all__ = (
     "TransactionResponse",
@@ -124,7 +125,9 @@ class PaymentRequestResponse(serializers.ModelSerializer):
 
 
 class ConsumerResponse(serializers.ModelSerializer):
-    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    first_name = serializers.CharField(
+        source="user.first_name", read_only=True
+    )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     loqal_id = serializers.CharField(source="username", read_only=True)
 
@@ -146,7 +149,9 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True
     )
-    transaction_type = serializers.CharField(source="transaction_type.label", read_only=True)
+    transaction_type = serializers.CharField(
+        source="transaction_type.label", read_only=True
+    )
 
     class Meta:
         model = Transaction

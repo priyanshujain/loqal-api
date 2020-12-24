@@ -30,7 +30,9 @@ class IncorporationDetails(AbstractBaseModel):
     industry_classification_id = models.CharField(max_length=64)
     verification_document_required = models.BooleanField(default=False)
     verification_document_type = ChoiceCharEnumField(
-        max_length=32, blank=True, enum_type=BusinessDocumentType
+        max_length=32,
+        default=BusinessDocumentType.NOT_APPLICABLE,
+        enum_type=BusinessDocumentType,
     )
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
@@ -91,7 +93,9 @@ class IndividualBase(AbstractBaseModel):
     passport_country = models.CharField(max_length=2, blank=True)
     passport_number = models.CharField(max_length=32, blank=True)
     verification_document_type = ChoiceCharEnumField(
-        max_length=32, blank=True, enum_type=IndividualDocumentType
+        max_length=32,
+        default=IndividualDocumentType.NOT_APPLICABLE,
+        enum_type=IndividualDocumentType,
     )
     verification_document_file = models.ForeignKey(
         BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True

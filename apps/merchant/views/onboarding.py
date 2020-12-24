@@ -1,6 +1,7 @@
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
 from apps.account.responses.merchant import MerchantAccountProfileResponse
+from apps.merchant.options import BusinessDocumentType, IndividualDocumentType
 from apps.merchant.responses import OnboardingDataResponse
 from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     BusinessDocumentUpload,
@@ -28,6 +29,7 @@ __all__ = (
     "UpdateBusinessVerificationDocumentAPI",
     "UpdateOwnerVerificationDocumentAPI",
     "UpdateControllerVerificationDocumentAPI",
+    "AcceptableDocumentTypesAPI",
 )
 
 
@@ -211,3 +213,24 @@ class SubmitDocumentAPI(MerchantAPIView):
         merchant_account = request.merchant_account
         SubmitDocuments(merchant=merchant_account).handle()
         return self.response()
+
+
+class AcceptableDocumentTypesAPI(MerchantAPIView):
+    def get(self, request):
+        individual_document_types = [
+            {"document_type_label": v, "document_type_value": k}
+            for k, v in IndividualDocumentType.choices
+            if IndividualDocumentType.NOT_APPLICABLE.value != k
+        ]
+        business_document_types = [
+            {"document_type_label": v, "document_type_value": k}
+            for k, v in BusinessDocumentType.choices
+            if BusinessDocumentType.NOT_APPLICABLE.value != k
+        ]
+        return self.response(
+            {
+                "incorporation": business_document_types,
+                "controller": individual_document_types,
+                "beneficial_owners": individual_document_types,
+            }
+        )

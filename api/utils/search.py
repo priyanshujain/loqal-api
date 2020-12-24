@@ -5,7 +5,6 @@ from datetime import datetime
 from django.utils import timezone
 
 
-
 class InvalidQuery(Exception):
     pass
 
@@ -28,7 +27,9 @@ def parse_datetime_string(value):
 
     for format in [DATETIME_FORMAT_MICROSECONDS, DATETIME_FORMAT, DATE_FORMAT]:
         try:
-            return datetime.strptime(value, format).replace(tzinfo=timezone.utc)
+            return datetime.strptime(value, format).replace(
+                tzinfo=timezone.utc
+            )
         except ValueError:
             pass
 
@@ -38,4 +39,3 @@ def parse_datetime_string(value):
         pass
 
     raise InvalidQuery(u"{} is not a valid ISO8601 date query".format(value))
-

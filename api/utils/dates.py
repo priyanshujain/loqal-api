@@ -5,14 +5,14 @@ from datetime import timedelta
 import six
 from django.utils import timezone
 
-from .search import parse_datetime_string, InvalidQuery
-
+from .search import InvalidQuery, parse_datetime_string
 
 MAX_STATS_PERIOD = timedelta(days=90)
 
 
 class InvalidParams(Exception):
     pass
+
 
 def default_start_end_dates(now=None):
     if now is None:

@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
+from apps.account.options import MerchantAccountStatus
 from apps.box.dbapi import get_boxfile
 from apps.merchant.dbapi.onboarding import get_beneficial_owner
 from apps.merchant.options import VerificationDocumentStatus
@@ -97,9 +98,9 @@ class SubmitDocuments(ServiceBase):
         incorporation = required_docs.get("incorporation")
 
         if not (beneficial_owners or controller or incorporation):
-            raise ValidationError({
-                "detail": ErrorDetail(_("No doument submit pending."))
-            })
+            raise ValidationError(
+                {"detail": ErrorDetail(_("No doument submit pending."))}
+            )
 
         account_id = self.merchant.account.id
         if incorporation:
@@ -149,6 +150,9 @@ class SubmitDocuments(ServiceBase):
                 beneficial_owner_object.add_dwolla_document_id(
                     dwolla_id=api_response["dwolla_id"]
                 )
+        self.merchant.update_status(
+            status=MerchantAccountStatus.DOCUMENT_REVIEW_PENDING
+        )
         return True
 
 

@@ -1,18 +1,19 @@
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ErrorDetail
+
+from api.exceptions import ErrorDetail, ValidationError
+from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
+                                get_customers_aggregate_transactions,
                                 get_merchant_payment_reqeust, get_transactions,
-                                get_transactions_to_merchant,
-                                get_customers_aggregate_transactions)
+                                get_transactions_to_merchant)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    MerchantTransactionResponse,
                                     PaymentRequestResponse,
-                                    TransactionResponse,
-                                    MerchantTransactionResponse)
+                                    TransactionResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePayment,
                                    CreatePaymentRequest, RejectPaymentRequest)
-from api.utils.dates import get_date_range_from_params, InvalidParams
-from api.exceptions import ValidationError, ErrorDetail
-from django.utils.translation import gettext as _
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -87,26 +88,32 @@ class MerchantPaymentHistoryAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
         start, end = self.validate_params(params=self.request_data)
-        transactions = get_transactions_to_merchant(account_id=merchant_account.account.id)
-        
+        transactions = get_transactions_to_merchant(
+            account_id=merchant_account.account.id
+        )
+
         if start and end:
             transactions = transactions.filter(created_at__range=[start, end])
-        return self.response(MerchantTransactionResponse(transactions, many=True).data)
-    
+        return self.response(
+            MerchantTransactionResponse(transactions, many=True).data
+        )
+
     def validate_params(self, params):
         try:
-            start, end = get_date_range_from_params(params=params, optional=True)
+            start, end = get_date_range_from_params(
+                params=params, optional=True
+            )
         except InvalidParams as e:
-            raise ValidationError({
-                "detail": ErrorDetail(_(str(e)))
-            })
+            raise ValidationError({"detail": ErrorDetail(_(str(e)))})
         return start, end
 
 
 class CustomersAggregateHistoryAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
-        customers = get_customers_aggregate_transactions(account_id=merchant_account.account.id)
+        customers = get_customers_aggregate_transactions(
+            account_id=merchant_account.account.id
+        )
         data = []
         # for customer in customers:
         #     data.append({

@@ -7,12 +7,12 @@ from django.utils import timezone
 from apps.account.models import Account, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.merchant.models import AccountMember
-from apps.payment.options import PaymentRequestStatus, TransactionStatus, TransactionTypes
+from apps.payment.options import (PaymentRequestStatus, TransactionStatus,
+                                  TransactionTypes)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceEnumField
+from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
-from db.models.fields import ChoiceCharEnumField
 
 
 class PaymentRegister(AbstractBaseModel):
@@ -81,13 +81,13 @@ class Transaction(AbstractBaseModel):
         BankAccount,
         on_delete=models.DO_NOTHING,
         related_name="sender_bank_account",
-        db_index=True
+        db_index=True,
     )
     recipient = models.ForeignKey(
         BankAccount,
         on_delete=models.DO_NOTHING,
         related_name="recipient_bank_account",
-        db_index=True
+        db_index=True,
     )
     payment_qrcode = models.ForeignKey(
         PaymentQrCode, on_delete=models.SET_NULL, blank=True, null=True
@@ -95,7 +95,7 @@ class Transaction(AbstractBaseModel):
     transaction_type = ChoiceCharEnumField(
         enum_type=TransactionTypes,
         default=TransactionTypes.PAYMENT,
-        max_length=64
+        max_length=64,
     )
     amount = models.FloatField()
     tip_amount = models.FloatField(default=0)
