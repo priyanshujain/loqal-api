@@ -18,10 +18,36 @@ class TransactionStatus(ChoiceEnum):
 
 class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
-    PROCESSED = 1, _("Request Processed")
+    ACCEPTED = 1, _("Request Accepted")
     REJECTED = 2, _("Request Rejected")
 
 
 class TransactionTypes(ChoiceCharEnum):
     PAYMENT = "payment", _("Payment")
     REFUND = "refund", _("Refund")
+
+
+class RefundType(ChoiceCharEnum):
+    PARTIAL = "partial", _("Partial Refund")
+    FULL = "full", _("Full Refund")
+
+
+class RefundStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    FAILED = 1, _("Failed")
+
+
+class PaymentStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    IN_PROGRESS = 1, _("In Progress")
+    FAILED = 2, _("Failed")
+
+
+class PaymentMethodType(ChoiceCharEnum):
+    ACH = "ach", _("ACH")
+
+
+class QrCodePaymentStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    IN_PROGRESS = 1, _("In Progress")
+    FAILED = 2, _("Failed")

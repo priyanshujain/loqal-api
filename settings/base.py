@@ -54,6 +54,7 @@ LOCAL_APPS = [
     "apps.payment",
     "apps.merchant",
     "apps.reference",
+    "apps.order",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
@@ -373,3 +374,5 @@ MAX_AVATAR_SIZE = 5000000
 
 # Transaction settings
 MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
+DEFAULT_MAX_DIGITS = 5
+DEFAULT_DECIMAL_PLACES = 2
