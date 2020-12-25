@@ -1,43 +1,16 @@
-from typing import cast
-
-import django
-
 from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.account.responses import MerchantDetailsResponse
-from apps.payment.models import PaymentRequest, Transaction
+from apps.payment.models import DirectMerchantPayment, Payment, PaymentRequest, Transaction
 
 __all__ = (
     "TransactionResponse",
     "PaymentRequestResponse",
     "ConsumerPaymentRequestResponse",
     "MerchantTransactionResponse",
+    "PaymentResponse",
+    "MerchantPaymentResponse",
 )
-
-
-class TransactionResponse(serializers.ModelSerializer):
-    merchant = MerchantDetailsResponse(
-        source="recipient.account.merchantaccount", read_only=True
-    )
-    uid = serializers.CharField(source="u_id", read_only=True)
-    status = serializers.CharField(source="status.label", read_only=True)
-    payment_qrcode_id = serializers.CharField(
-        source="payment_qrcode.qrcode_id", read_only=True
-    )
-
-    class Meta:
-        model = Transaction
-        fields = (
-            "id",
-            "uid",
-            "created_at",
-            "merchant",
-            "amount",
-            "tip_amount",
-            "currency",
-            "status",
-            "payment_qrcode_id",
-        )
 
 
 class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
@@ -110,13 +83,13 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
 
 class PaymentRequestResponse(serializers.ModelSerializer):
     status = serializers.CharField(source="status.label", read_only=True)
-    requested_to = ConsumerBasicInfoResponse(read_only=True)
+    account_to = ConsumerBasicInfoResponse(read_only=True)
 
     class Meta:
         model = PaymentRequest
         fields = (
             "id",
-            "requested_to",
+            "account_to",
             "created_at",
             "amount",
             "currency",
@@ -166,4 +139,44 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
             "status",
             "payment_qrcode_id",
             "transaction_type",
+        )
+
+
+class TransactionResponse(serializers.ModelSerializer):
+    uid = serializers.CharField(source="u_id", read_only=True)
+    status = serializers.CharField(source="status.label", read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = (
+            "uid",
+            "created_at",
+            "amount",
+            "currency",
+            "status",
+            "is_success",
+        )
+
+
+class PaymentResponse(serializers.ModelSerializer):
+    transactions = TransactionResponse(many=True, read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = (
+            "id",
+            "created_at",
+            "transactions",
+        )
+
+
+class MerchantPaymentResponse(serializers.ModelSerializer):
+    transaction = TransactionResponse(read_only=True)
+
+    class Meta:
+        model = DirectMerchantPayment
+        fields = (
+            "id",
+            "created_at",
+            "transaction",
         )

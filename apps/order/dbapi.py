@@ -1,11 +1,12 @@
+from django.db.utils import IntegrityError
+
 from apps.order.models import Order
 from apps.order.options import OrderType
-from django.db.utils import IntegrityError
 
 
 def create_payment_request_order(merchant_id, consumer_id, amount):
     """
-    Create an order for payment request 
+    Create an order for payment request
     """
     try:
         return Order.objects.create(

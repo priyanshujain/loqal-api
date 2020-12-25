@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.db import models
+
+from apps.account.models import ConsumerAccount, MerchantAccount
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
-from apps.account.models import ConsumerAccount, MerchantAccount
+
 from .options import OrderStatus, OrderType
-from django.conf import settings
 
 
 class Order(AbstractBaseModel):

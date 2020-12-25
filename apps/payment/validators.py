@@ -41,7 +41,7 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
         return attrs
 
 
-class CreatePaymentValidator(PaymentValidatorBase):
+class CreateMerchantPaymentValidator(PaymentValidatorBase):
     merchant_id = serializers.UUIDField()
     qrcode_id = serializers.CharField(required=False)
     tip_amount = serializers.FloatField(min_value=0)

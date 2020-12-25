@@ -14,6 +14,7 @@ class TransactionStatus(ChoiceEnum):
     PROCESSED = 2, _("Processed")
     FAILED = 3, _("Failed")
     CANCELLED = 4, _("Cancelled")
+    INTERNAL_PSP_ERROR = 5, _("Internal PSP Error")
 
 
 class PaymentRequestStatus(ChoiceEnum):
@@ -32,22 +33,30 @@ class RefundType(ChoiceCharEnum):
     FULL = "full", _("Full Refund")
 
 
-class RefundStatus(ChoiceEnum):
-    SUCCESS = 0, _("Success")
-    FAILED = 1, _("Failed")
-
-
 class PaymentStatus(ChoiceEnum):
     SUCCESS = 0, _("Success")
     IN_PROGRESS = 1, _("In Progress")
     FAILED = 2, _("Failed")
+    INSUFFICIENT_BALANCE = 3, _("Insufficient Balance")
 
 
 class PaymentMethodType(ChoiceCharEnum):
     ACH = "ach", _("ACH")
 
 
-class QrCodePaymentStatus(ChoiceEnum):
-    SUCCESS = 0, _("Success")
-    IN_PROGRESS = 1, _("In Progress")
-    FAILED = 2, _("Failed")
+class ChargeStatus(ChoiceEnum):
+    NOT_CHARGED = 0, _("Not Charged")
+    PENDING = 1, _("Pending")
+    PARTIALLY_CHARGED = 2, _("Partially Charged")
+    FULLY_CHARGED = 3, _("Fully Charged")
+    PARTIALLY_REFUNDED = 4, _("Partially Refunded")
+    FULLY_REFUNDED = 5, _("Fully Refunded")
+    REFUSED = 6, _("Refused")
+    CANCELLED = 7, _("Cancelled")
+
+
+class PaymentProcess(ChoiceEnum):
+    QRCODE = 0, _("QR Code")
+    DIRECT_APP = 1, _("App")
+    PAYMENT_REQUEST = 2, _("Payment Request")
+    NOT_PROVIDED = 3, _("Not Provided")

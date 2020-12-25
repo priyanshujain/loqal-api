@@ -1,26 +1,22 @@
+from apps.provider.lib.api import payment
 from datetime import timedelta
 from decimal import Decimal
+
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
 from apps.account.models import Account, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.merchant.models import AccountMember
-from apps.payment.options import (
-    PaymentRequestStatus,
-    TransactionStatus,
-    RefundType,
-    RefundStatus,
-    PaymentStatus,
-    PaymentMethodType,
-    QrCodePaymentStatus,
-)
+from apps.order.models import Order
+from apps.payment.options import (PaymentMethodType, PaymentRequestStatus,
+                                  PaymentStatus, RefundType, TransactionStatus,
+                                  ChargeStatus, PaymentProcess,)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
-from apps.order.models import Order
-from django.conf import settings
 
 
 class PaymentRegister(AbstractBaseModel):
@@ -84,17 +80,25 @@ class PaymentQrCode(AbstractBaseModel):
 
 
 class Payment(AbstractBaseModel):
+    """
+    This represents payment status for a single order
+    """
     gateway = models.CharField(max_length=64, default="dwolla")
     payment_method_type = ChoiceCharEnumField(
-        max_length=64, default=PaymentMethodType.ACH, enum_type=PaymentMethodType
+        max_length=64,
+        default=PaymentMethodType.ACH,
+        enum_type=PaymentMethodType,
     )
+    payment_process = ChoiceEnumField(enum_type=PaymentProcess, default=PaymentProcess.NOT_PROVIDED)
     captured_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=Decimal("0.0"),
     )
-    customer_ip_address = models.GenericIPAddressField(blank=True, null=True)
-    order = models.ForeignKey(Order, related_name="payments", on_delete=models.CASCADE)
+    charge_status = ChoiceEnumField(enum_type=ChargeStatus, default=ChargeStatus.NOT_CHARGED)
+    order = models.OneToOneField(
+        Order, related_name="payment", on_delete=models.CASCADE
+    )
     status = ChoiceEnumField(
         enum_type=PaymentStatus,
     )
@@ -104,18 +108,22 @@ class Payment(AbstractBaseModel):
 
 
 class Transaction(AbstractBaseModel):
-    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
-    sender = models.ForeignKey(
+    sender_bank_account = models.ForeignKey(
         BankAccount,
         on_delete=models.DO_NOTHING,
-        related_name="sender_bank_account",
+        related_name="sender_transactions",
         db_index=True,
     )
-    recipient = models.ForeignKey(
+    recipient_bank_account = models.ForeignKey(
         BankAccount,
         on_delete=models.DO_NOTHING,
-        related_name="recipient_bank_account",
+        related_name="recipient_transactions",
         db_index=True,
+    )
+    sender_balance_at_checkout = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
     )
     payment = models.ForeignKey(
         Payment,
@@ -124,18 +132,23 @@ class Transaction(AbstractBaseModel):
         related_name="transactions",
         on_delete=models.SET_NULL,
     )
+    customer_ip_address = models.GenericIPAddressField(blank=True, null=True)
     amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    fee_bearer_account = models.ForeignKey(
+        Account, null=True, blank=True, on_delete=models.SET_NULL
+    )
     fee_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
+    is_success = models.BooleanField(default=False)
     status = ChoiceEnumField(
         enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
     )
@@ -143,20 +156,43 @@ class Transaction(AbstractBaseModel):
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
     dwolla_id = models.CharField(max_length=255, blank=True)
-
-    def add_dwolla_id(self, dwolla_id):
+        
+    def add_dwolla_id(self, dwolla_id, status, save=True):
         self.dwolla_id = dwolla_id
-        self.status = TransactionStatus.PENDING
-        self.save()
+        self.status = status
+        self.is_success = True
+        if status == TransactionStatus.PENDING:
+            self.payment.status = PaymentStatus.SUCCESS
+            self.payment.save()
+        if save:
+            self.save()
+    
+    def update_status(self, status, save=True):
+        self.status = status
+        if save: 
+            self.save()
+    
+    def set_internal_error(self, save=True):
+        self.status = TransactionStatus.INTERNAL_PSP_ERROR
+        self.payment.status = PaymentStatus.FAILED
+        self.payment.save()
+        if save:
+            self.save()
 
     class Meta:
         db_table = "transaction"
 
 
 class Refund(AbstractBaseModel):
-    order = models.ForeignKey(Order, related_name="refunds", on_delete=models.CASCADE)
     refund_type = ChoiceCharEnumField(max_length=32, enum_type=RefundType)
-    payment = models.OneToOneField(
+    transaction = models.OneToOneField(
+        Transaction,
+        null=True,
+        blank=True,
+        related_name="refunds",
+        on_delete=models.CASCADE,
+    )
+    payment = models.ForeignKey(
         Payment,
         null=True,
         blank=True,
@@ -168,28 +204,22 @@ class Refund(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
-    status = ChoiceEnumField(
-        enum_type=RefundStatus,
-    )
 
     class Meta:
-        db_table = "refund"
+        db_table = "payment_refund"
 
-    def add_payment(self, payment, save=True):
-        self.payment = payment
+    def add_transaction(self, transaction, save=True):
+        self.transaction = transaction
         if save:
             self.save()
 
 
-class QrCodePayment(AbstractBaseModel):
-    order = models.ForeignKey(
-        Order, related_name="qrcode_payments", on_delete=models.CASCADE
-    )
+class DirectMerchantPayment(AbstractBaseModel):
     payment_qrcode = models.ForeignKey(
         PaymentQrCode,
         blank=True,
         null=True,
-        related_name="qrcode_payments",
+        related_name="direct_merchant_payments",
         on_delete=models.SET_NULL,
     )
     tip_amount = models.DecimalField(
@@ -197,36 +227,31 @@ class QrCodePayment(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
-    status = ChoiceEnumField(
-        enum_type=QrCodePaymentStatus,
-        default=QrCodePaymentStatus.IN_PROGRESS
-    )
-    payment = models.OneToOneField(
+    payment = models.ForeignKey(
         Payment,
         blank=True,
         null=True,
-        related_name="qrcode_payments",
+        related_name="direct_merchant_payments",
+        on_delete=models.SET_NULL,
+    )
+    transaction = models.OneToOneField(
+        Transaction,
+        blank=True,
+        null=True,
+        related_name="direct_merchant_payments",
         on_delete=models.CASCADE,
     )
 
     class Meta:
-        db_table = "qrcode_payment"
+        db_table = "direct_merchant_payment"
 
-    def add_payment(self, payment, save=True):
-        self.payment = payment
-        if save:
-            self.save()
-
-    def add_status(self, status, save=True):
-        self.status = status
+    def add_transaction(self, transaction, save=True):
+        self.transaction = transaction
         if save:
             self.save()
 
 
 class PaymentRequest(AbstractBaseModel):
-    order = models.ForeignKey(
-        Order, blank=True, null=True, related_name="payment_requests", on_delete=models.CASCADE
-    )
     account_from = models.ForeignKey(
         Account,
         blank=True,
@@ -256,8 +281,15 @@ class PaymentRequest(AbstractBaseModel):
         enum_type=PaymentRequestStatus,
         default=PaymentRequestStatus.REQUEST_SENT,
     )
-    payment = models.OneToOneField(
+    payment = models.ForeignKey(
         Payment,
+        blank=True,
+        null=True,
+        related_name="payment_requests",
+        on_delete=models.CASCADE,
+    )
+    transaction = models.OneToOneField(
+        Transaction,
         blank=True,
         null=True,
         related_name="payment_requests",
@@ -272,8 +304,8 @@ class PaymentRequest(AbstractBaseModel):
         if save:
             self.save()
 
-    def add_payment(self, payment, save=True):
-        self.payment = payment
+    def add_transaction(self, transaction, save=True):
+        self.transaction = transaction
         self.status = PaymentRequestStatus.ACCEPTED
         if save:
             self.save()

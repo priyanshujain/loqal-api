@@ -1,5 +1,7 @@
-from db.models.fields import ChoiceCharEnum
 from django.utils.translation import gettext as _
+
+from db.models.fields import ChoiceCharEnum
+
 
 class OrderStatus(ChoiceCharEnum):
     DRAFT = "draft", _("Draft")

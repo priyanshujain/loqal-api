@@ -72,7 +72,8 @@ class BusinessDocumentUpload(ServiceBase):
         if (
             incorporation_details.business_type
             != BusinessTypes.SOLE_PROPRIETORSHIP
-            and verification_document_type != BusinessDocumentType.EIN_LETTER.value
+            and verification_document_type
+            != BusinessDocumentType.EIN_LETTER.value
         ):
             raise ValidationError(
                 {

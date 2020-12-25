@@ -10,24 +10,24 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_transactions_to_merchant)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionResponse,
-                                    PaymentRequestResponse,
-                                    TransactionResponse)
-from apps.payment.services import (ApprovePaymentRequest, CreatePayment,
-                                   CreatePaymentRequest, RejectPaymentRequest)
+                                    PaymentRequestResponse, PaymentResponse,
+                                    TransactionResponse,
+                                    MerchantPaymentResponse)
+from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
+                                   DirectMerchantPayment, RejectPaymentRequest)
 
 
 class CreatePaymentAPI(ConsumerAPIView):
     def post(self, request):
-        account_id = request.account.id
-        service_response = self._run_services(account_id=account_id)
-        return self.response(
-            TransactionResponse(service_response).data, status=201
-        )
-
-    def _run_services(self, account_id):
-        return CreatePayment(
-            account_id=account_id, data=self.request_data
+        consumer_account = request.consumer_account
+        merchant_payment = DirectMerchantPayment(
+            consumer_account=consumer_account,
+            data=self.request_data,
+            ip_address=request.ip,
         ).handle()
+        return self.response(
+            MerchantPaymentResponse(merchant_payment).data, status=201
+        )
 
 
 class PaymentHistoryAPI(ConsumerAPIView):
@@ -51,10 +51,12 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class ApprovePaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        transaction = ApprovePaymentRequest(
-            account_id=account_id, data=self.request_data
+        payment = ApprovePaymentRequest(
+            account_id=account_id,
+            data=self.request_data,
+            ip_address=request.ip,
         ).handle()
-        return self.response(TransactionResponse(transaction).data)
+        return self.response(PaymentResponse(payment).data)
 
 
 class RejectPaymentRequestAPI(ConsumerAPIView):
@@ -114,10 +116,4 @@ class CustomersAggregateHistoryAPI(MerchantAPIView):
         customers = get_customers_aggregate_transactions(
             account_id=merchant_account.account.id
         )
-        data = []
-        # for customer in customers:
-        #     data.append({
-        #         "first_name": customer["first_name"],
-        #         "total": customer["total"]
-        #     })
         return self.response(customers)
