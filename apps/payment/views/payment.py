@@ -6,15 +6,19 @@ from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_customers_aggregate_transactions,
-                                get_merchant_payment_reqeust, get_transactions,
+                                get_merchant_payment_reqeust,
+                                get_consumer_transactions,
                                 get_transactions_to_merchant)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionResponse,
                                     PaymentRequestResponse, PaymentResponse,
                                     TransactionResponse,
-                                    MerchantPaymentResponse)
+                                    TransactionHistoryResponse,
+                                    MerchantPaymentResponse,
+                                    RefundPaymentResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
-                                   DirectMerchantPayment, RejectPaymentRequest)
+                                   DirectMerchantPayment, RejectPaymentRequest,
+                                   CreateRefund,)
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -26,15 +30,15 @@ class CreatePaymentAPI(ConsumerAPIView):
             ip_address=request.ip,
         ).handle()
         return self.response(
-            MerchantPaymentResponse(merchant_payment).data, status=201
+            TransactionResponse(merchant_payment.transaction).data, status=201
         )
 
 
 class PaymentHistoryAPI(ConsumerAPIView):
     def get(self, request):
-        account_id = request.account.id
-        transactions = get_transactions(account_id=account_id)
-        return self.response(TransactionResponse(transactions, many=True).data)
+        consumer_account = request.consumer_account
+        transactions = get_consumer_transactions(consumer_account=consumer_account)
+        return self.response(TransactionHistoryResponse(transactions, many=True).data)
 
 
 class CreatePaymentRequestAPI(MerchantAPIView):
@@ -51,12 +55,12 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class ApprovePaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        payment = ApprovePaymentRequest(
+        transaction = ApprovePaymentRequest(
             account_id=account_id,
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        return self.response(PaymentResponse(payment).data)
+        return self.response(TransactionResponse(transaction).data)
 
 
 class RejectPaymentRequestAPI(ConsumerAPIView):
@@ -117,3 +121,16 @@ class CustomersAggregateHistoryAPI(MerchantAPIView):
             account_id=merchant_account.account.id
         )
         return self.response(customers)
+
+
+class CreateRefundPaymentAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        refund_payment = CreateRefund(
+            merchant_account=merchant_account,
+            data=self.request_data,
+            ip_address=request.ip,
+        ).handle()
+        return self.response(
+            TransactionResponse(refund_payment.transaction).data, status=201
+        )

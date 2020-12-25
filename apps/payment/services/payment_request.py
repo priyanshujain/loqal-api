@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError

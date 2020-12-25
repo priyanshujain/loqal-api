@@ -18,3 +18,16 @@ def create_payment_request_order(merchant_id, consumer_id, amount):
         )
     except IntegrityError:
         return None
+
+
+def get_order_by_id(order_id, merchant_id):
+    """
+    get an order
+    """
+    try:
+        return Order.objects.get(
+            merchant_id=merchant_id,
+            id=order_id,
+        )
+    except Order.DoesNotExist:
+        return None

@@ -4,8 +4,9 @@ Payments relted db operations.
 
 from decimal import Decimal
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.db.utils import IntegrityError
+from django.utils import translation
 
 from apps.payment.models import (
     DirectMerchantPayment,
@@ -13,6 +14,7 @@ from apps.payment.models import (
     PaymentQrCode,
     PaymentRegister,
     PaymentRequest,
+    Refund,
     Transaction,
 )
 from apps.payment.options import PaymentStatus, TransactionTypes
@@ -198,6 +200,24 @@ def create_direct_merchant_payment(
         return None
 
 
+def create_refund_payment(
+    payment_id,
+    amount,
+    refund_type,
+):
+    """
+    dbapi for creating new refund payment.
+    """
+    try:
+        return Refund.objects.create(
+            payment_id=payment_id,
+            amount=amount,
+            refund_type=refund_type,
+        )
+    except IntegrityError:
+        return None
+
+
 def get_merchant_payment_reqeust(account_id):
     return PaymentRequest.objects.filter(account_id=account_id)
 
@@ -264,3 +284,10 @@ def get_customers_aggregate_transactions(account_id):
             }
         )
     return aggregate_consumers
+
+
+def get_consumer_transactions(consumer_account):
+    return Transaction.objects.filter(
+        Q(sender_bank_account__account=consumer_account.account)
+        | Q(recipient_bank_account__account=consumer_account.account)
+    )

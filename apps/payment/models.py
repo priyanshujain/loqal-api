@@ -10,13 +10,20 @@ from apps.account.models import Account, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.merchant.models import AccountMember
 from apps.order.models import Order
-from apps.payment.options import (PaymentMethodType, PaymentRequestStatus,
-                                  PaymentStatus, RefundType, TransactionStatus,
-                                  ChargeStatus, PaymentProcess,)
+from apps.payment.options import (
+    PaymentMethodType,
+    PaymentRequestStatus,
+    PaymentStatus,
+    RefundType,
+    TransactionStatus,
+    ChargeStatus,
+    PaymentProcess,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
+from django.utils.crypto import get_random_string
 
 
 class PaymentRegister(AbstractBaseModel):
@@ -29,6 +36,9 @@ class PaymentRegister(AbstractBaseModel):
     weekly_usage = models.FloatField(default=0.0)
     weekly_usage_start_time = models.DateTimeField(default=timezone.now)
     passcode_required_minimum = models.FloatField(default=100.0)
+
+    class Meta:
+        db_table = "payment_register"
 
     def update_usage(self, amount):
         if timezone.now() > self.daily_usage_start_time + timedelta(hours=24):
@@ -56,9 +66,6 @@ class PaymentRegister(AbstractBaseModel):
         self.passcode_required_minimum = value
         self.save()
 
-    class Meta:
-        db_table = "payment_register"
-
 
 class PaymentQrCode(AbstractBaseModel):
     merchant = models.ForeignKey(
@@ -83,19 +90,24 @@ class Payment(AbstractBaseModel):
     """
     This represents payment status for a single order
     """
+
     gateway = models.CharField(max_length=64, default="dwolla")
     payment_method_type = ChoiceCharEnumField(
         max_length=64,
         default=PaymentMethodType.ACH,
         enum_type=PaymentMethodType,
     )
-    payment_process = ChoiceEnumField(enum_type=PaymentProcess, default=PaymentProcess.NOT_PROVIDED)
+    payment_process = ChoiceEnumField(
+        enum_type=PaymentProcess, default=PaymentProcess.NOT_PROVIDED
+    )
     captured_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=Decimal("0.0"),
     )
-    charge_status = ChoiceEnumField(enum_type=ChargeStatus, default=ChargeStatus.NOT_CHARGED)
+    charge_status = ChoiceEnumField(
+        enum_type=ChargeStatus, default=ChargeStatus.NOT_CHARGED
+    )
     order = models.OneToOneField(
         Order, related_name="payment", on_delete=models.CASCADE
     )
@@ -155,10 +167,20 @@ class Transaction(AbstractBaseModel):
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
+    tracking_number = models.CharField(
+        max_length=10, null=True, blank=True, default=None, unique=True, editable=False
+    )
     dwolla_id = models.CharField(max_length=255, blank=True)
-        
-    def add_dwolla_id(self, dwolla_id, status, save=True):
+    individual_ach_id = models.CharField(
+        max_length=32, null=True, blank=True, default=None, unique=True
+    )
+
+    class Meta:
+        db_table = "transaction"
+
+    def add_dwolla_id(self, dwolla_id, individual_ach_id, status, save=True):
         self.dwolla_id = dwolla_id
+        self.individual_ach_id = individual_ach_id
         self.status = status
         self.is_success = True
         if status == TransactionStatus.PENDING:
@@ -166,12 +188,12 @@ class Transaction(AbstractBaseModel):
             self.payment.save()
         if save:
             self.save()
-    
+
     def update_status(self, status, save=True):
         self.status = status
-        if save: 
+        if save:
             self.save()
-    
+
     def set_internal_error(self, save=True):
         self.status = TransactionStatus.INTERNAL_PSP_ERROR
         self.payment.status = PaymentStatus.FAILED
@@ -179,8 +201,19 @@ class Transaction(AbstractBaseModel):
         if save:
             self.save()
 
-    class Meta:
-        db_table = "transaction"
+    def save(self, *args, **kwargs):
+        def id_generator():
+            return get_random_string(
+                length=8, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            )
+
+        if not self.tracking_number:
+            self.tracking_number = id_generator()
+            while Transaction.objects.filter(
+                tracking_number=self.tracking_number
+            ).exists():
+                self.tracking_number = id_generator()
+        return super().save(*args, **kwargs)
 
 
 class Refund(AbstractBaseModel):
@@ -189,7 +222,7 @@ class Refund(AbstractBaseModel):
         Transaction,
         null=True,
         blank=True,
-        related_name="refunds",
+        related_name="refund",
         on_delete=models.CASCADE,
     )
     payment = models.ForeignKey(
@@ -292,7 +325,7 @@ class PaymentRequest(AbstractBaseModel):
         Transaction,
         blank=True,
         null=True,
-        related_name="payment_requests",
+        related_name="payment_request",
         on_delete=models.CASCADE,
     )
 

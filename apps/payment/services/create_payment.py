@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
@@ -41,6 +42,7 @@ class CreatePayment(ServiceBase):
         dwolla_response = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(
             dwolla_id=dwolla_response["dwolla_transfer_id"],
+            individual_ach_id=dwolla_response["individual_ach_id"],
             status=dwolla_response["status"],
         )
         return transaction
@@ -71,7 +73,7 @@ class CreatePayment(ServiceBase):
     def _factory_transaction(self):
         payment = self.order.payment
         amount = self.total_amount
-        fee_amount = amount * FACILITATION_FEES_PERCENTAGE / 100
+        fee_amount = amount * Decimal(FACILITATION_FEES_PERCENTAGE) / 100
         fee_amount = round(fee_amount, 2)
 
         return create_transaction(
@@ -121,5 +123,6 @@ class CreateTransferAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
-            "dwolla_transfer_id": response["data"]["dwolla_transfer_id"],
+            "dwolla_transfer_id": response["data"].get("dwolla_transfer_id"),
+            "individual_ach_id": response["data"].get("individual_ach_id")
         }

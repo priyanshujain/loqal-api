@@ -123,4 +123,5 @@ class Payment(Http):
         return {
             "dwolla_transfer_id": dwolla_transfer_id,
             "status": getattr(TransactionStatusMap, payment_details["status"]),
+            "individual_ach_id": payment_details.get("individualAchId", None)
         }
