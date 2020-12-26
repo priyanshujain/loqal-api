@@ -1,841 +1,634 @@
 MERCHANT_CATEGORIES = [
     {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
+        "category_name": "Auto Services",
+        "category_slug": "auto_services",
         "subcategories": [
             {
-                "name": "Antiques/Jewelry",
-                "slug": "antiques_jewelry",
+                "name": "Audio and video",
+                "slug": "audio-and-video",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Art/Framing/Galleries",
-                "slug": "art_framing_galleries",
+                "name": "Towing service",
+                "slug": "towing-service",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Auto service", "slug": "auto-service"},
             {
-                "name": "Beauty/Bath/Cosmetics",
-                "slug": "beauty_bath_cosmetics",
+                "name": "Boat rental and leases",
+                "slug": "boat-rental-and-leases",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Books",
-                "slug": "books",
+                "name": "Tools and equipment",
+                "slug": "tools-and-equipment",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Car wash", "slug": "car-wash"},
             {
-                "name": "Bridal/Formal Wear",
-                "slug": "bridal_formal_wear",
+                "name": "Motorhome and recreational vehicle rental",
+                "slug": "motorhome-and-recreational-vehicle-rental",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Cards/Collectibles",
-                "slug": "cards_collectibles",
+                "name": "Truck and utility trailer rental",
+                "slug": "truck-and-utility-trailer-rental",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Cellular",
-                "slug": "cellular",
+                "name": "Parts, supplies, and accessories",
+                "slug": "parts-supplies-and-accessories",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Clothing Accessories - Adult",
-                "slug": "clothing_accessories_-_adult",
+                "name": "Auto body repair and paint",
+                "slug": "auto-body-repair-and-paint",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Clothing Accessories -Children",
-                "slug": "clothing_accessories_children",
+                "name": "Automotive tire supply and service",
+                "slug": "automotive-tire-supply-and-service",
             },
+            {"name": "Auto rental", "slug": "auto-rental"},
         ],
     },
     {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
+        "category_name": "Electronics",
+        "category_slug": "electronics",
         "subcategories": [
             {
-                "name": "Coffee",
-                "slug": "coffee",
+                "name": "Investigation and security services",
+                "slug": "investigation-and-security-services",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Consignment/Couture/Thrift",
-                "slug": "consignment_couture_thrift",
+                "name": "Electronic repair and maintenance",
+                "slug": "electronic-repair-and-maintenance",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Gifts/Stationery",
-                "slug": "gifts_stationery",
+                "name": "Radio, television, and stereo repair",
+                "slug": "radio-television-and-stereo-repair",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Grocery/Food Service",
-                "slug": "grocery_food_service",
+                "name": "Computer and data processing services",
+                "slug": "computer-and-data-processing-services",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Hearing Aids",
-                "slug": "hearing_aids",
+                "name": "Maintenance and repair services",
+                "slug": "maintenance-and-repair-services",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Online gaming", "slug": "online-gaming"},
+            {"name": "Software", "slug": "software"},
             {
-                "name": "Home Furnishings",
-                "slug": "home_furnishings",
+                "name": "Monitors and projectors",
+                "slug": "monitors-and-projectors",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Networking", "slug": "networking"},
             {
-                "name": "Housewares/Appliances",
-                "slug": "housewares_appliances",
+                "name": "Training services",
+                "slug": "training-services",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Peripherals", "slug": "peripherals"},
             {
-                "name": "Jewelry/Watches",
-                "slug": "jewelry_watches",
+                "name": "Desktops, laptops, and notebooks",
+                "slug": "desktops-laptops-and-notebooks",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Lawnmower/Lock",
-                "slug": "lawnmower_lock",
+                "name": "Parts and accessories",
+                "slug": "parts-and-accessories",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Luggage",
-                "slug": "luggage",
+                "name": "Camera and photographic supplies",
+                "slug": "camera-and-photographic-supplies",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
+            {"name": "Digital art", "slug": "digital-art"},
             {
-                "name": "Newspaper/Newsstands",
-                "slug": "newspaper_newsstands",
+                "name": "Camera and photographic supplies",
+                "slug": "camera-and-photographic-supplies",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Office Supplies/Printing/Shipping",
-                "slug": "office_supplies_printing_shipping",
+                "name": "General electronic accessories",
+                "slug": "general-electronic-accessories",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Oils & Balsamics",
-                "slug": "oils_&_balsamics",
+                "name": "Cell phones, PDAs, and pagers",
+                "slug": "cell-phones-pdas-and-pagers",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Eye wear",
-                "slug": "eye_wear",
+                "name": "Car audio and electronics",
+                "slug": "car-audio-and-electronics",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Paint",
-                "slug": "paint",
+                "name": "Telecommunication equipment and sales",
+                "slug": "telecommunication-equipment-and-sales",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Pharmacies",
-                "slug": "pharmacies",
+                "name": "Telephone cards",
+                "slug": "telephone-cards",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Shoes",
-                "slug": "shoes",
+                "name": "Home electronics",
+                "slug": "home-electronics",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Spices",
-                "slug": "spices",
+                "name": "Cameras, camcorders and equipment",
+                "slug": "cameras-camcorders-and-equipment",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Sporting Goods/Shoes/Apparel",
-                "slug": "sporting_goods_shoes_apparel",
+                "name": "Investigation and security services",
+                "slug": "investigation-and-security-services",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Ticket Agencies",
-                "slug": "ticket_agencies",
+                "name": "Telecommunication services",
+                "slug": "telecommunication-services",
             },
+            {"name": "Home audio", "slug": "home-audio"},
+            {"name": "Audio books", "slug": "audio-books"},
         ],
     },
     {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
+        "category_name": "Fashion",
+        "category_slug": "fashion",
         "subcategories": [
             {
-                "name": "Toys/Games/Hobbies",
-                "slug": "toys_games_hobbies",
+                "name": "Watch, clock, and jewelry repair",
+                "slug": "watch-clock-and-jewelry-repair",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Shopping",
-        "subcategories": [
             {
-                "name": "Wine/Liquor",
-                "slug": "wine_liquor",
+                "name": "Tailors and alterations",
+                "slug": "tailors-and-alterations",
             },
-        ],
-    },
-    {
-        "category_slug": "shopping",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Accountants",
-                "slug": "accountants",
+                "name": "Children's and baby's clothing",
+                "slug": "childrens-and-babys-clothing",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Architects",
-                "slug": "architects",
+                "name": "Women's clothing",
+                "slug": "womens-clothing",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Attorneys",
-                "slug": "attorneys",
+                "name": "Military and civil service uniforms",
+                "slug": "military-and-civil-service-uniforms",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Automotive Services",
-                "slug": "automotive_services",
+                "name": "Children's and baby's clothing",
+                "slug": "childrens-and-babys-clothing",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Men's clothing", "slug": "mens-clothing"},
             {
-                "name": "Banking/Financial Services",
-                "slug": "banking_financial_services",
+                "name": "Wholesale - precious stones and metals",
+                "slug": "wholesale-precious-stones-and-metals",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Shoes", "slug": "shoes"},
             {
-                "name": "Birthday Parties",
-                "slug": "birthday_parties",
+                "name": "Fashion jewelry",
+                "slug": "fashion-jewelry",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Accessories", "slug": "accessories"},
             {
-                "name": "Childcare/Educational",
-                "slug": "childcare_educational",
+                "name": "Retail - fine jewelry and watches",
+                "slug": "retail-fine-jewelry-and-watches",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Civic & Government",
-                "slug": "civic_&_government",
+                "name": "Fragrances and perfumes",
+                "slug": "fragrances-and-perfumes",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Contractors/Home Improvement",
-                "slug": "contractors_home_improvement",
+                "name": "Makeup and cosmetics",
+                "slug": "makeup-and-cosmetics",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Dentists",
-                "slug": "dentists",
+                "name": "Department store",
+                "slug": "department-store",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Variety store", "slug": "variety-store"},
             {
-                "name": "Dry Cleaners/Tailors",
-                "slug": "dry_cleaners_tailors",
+                "name": "Used and secondhand store",
+                "slug": "used-and-secondhand-store",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Entertainment",
-                "slug": "entertainment",
+                "name": "Miscellaneous store retailer",
+                "slug": "miscellaneous-store-retailer",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Fitness",
-                "slug": "fitness",
+                "name": "Discount store",
+                "slug": "discount-store",
             },
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Food and Grocery",
+        "category_slug": "food_grocery",
         "subcategories": [
+            {"name": "Gourmet foods", "slug": "gourmet-foods"},
             {
-                "name": "Florists",
-                "slug": "florists",
+                "name": "Alcoholic beverage drinking places",
+                "slug": "alcoholic-beverage-drinking-places",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Hair Salons/Barber Shops/Nails/Skin",
-                "slug": "hair_salons_barber_shops_nails_skin",
+                "name": "Beer, wine, and liquor store",
+                "slug": "beer-wine-and-liquor-store",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Tobacco", "slug": "tobacco"},
             {
-                "name": "Health/Wellness/Massage",
-                "slug": "health_wellness_massage",
+                "name": "Supplement store",
+                "slug": "supplement-store",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Home/Kitchen/Bath Design",
-                "slug": "home_kitchen_bath_design",
+                "name": "Specialty and miscellaneous food store",
+                "slug": "specialty-and-miscellaneous-food-store",
             },
+            {"name": "Gourmet foods", "slug": "gourmet-foods"},
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Gifts & Lifestyle",
+        "category_slug": "gifts_lifestyle",
         "subcategories": [
             {
-                "name": "Hotels",
-                "slug": "hotels",
+                "name": "Event and wedding planning",
+                "slug": "event-and-wedding-planning",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Houses of Worship",
-                "slug": "houses_of_worship",
+                "name": "Photographic studios - portraits",
+                "slug": "photographic-studios-portraits",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Insurance",
-                "slug": "insurance",
+                "name": "Membership clubs and organizations",
+                "slug": "membership-clubs-and-organizations",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Limousine/Car Service",
-                "slug": "limousine_car_service",
+                "name": "Hobby, toy, and game shops",
+                "slug": "hobby-toy-and-game-shops",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Music/Dance/Arts",
-                "slug": "music_dance_arts",
+                "name": "Stationery, printing, and writing paper",
+                "slug": "stationery-printing-and-writing-paper",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Opticians/Opthalmologists",
-                "slug": "opticians_opthalmologists",
+                "name": "Video games and systems",
+                "slug": "video-games-and-systems",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Photography/Film/Video",
-                "slug": "photography_film_video",
+                "name": "Arts and crafts",
+                "slug": "arts-and-crafts",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {"name": "Memorabilia", "slug": "memorabilia"},
             {
-                "name": "Physicians",
-                "slug": "physicians",
+                "name": "Stamp and coin",
+                "slug": "stamp-and-coin",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Professional Services",
-                "slug": "professional_services",
+                "name": "Music store - instruments and sheet music",
+                "slug": "music-store-instruments-and-sheet-music",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
             {
-                "name": "Realtors/Appraisals/Surveyors",
-                "slug": "realtors_appraisals_surveyors",
+                "name": "Stamp and coin",
+                "slug": "stamp-and-coin",
             },
-        ],
-    },
-    {
-        "category_slug": "services",
-        "category_name": "Services",
-        "subcategories": [
+            {
+                "name": "Sewing, needlework, and fabrics",
+                "slug": "sewing-needlework-and-fabrics",
+            },
+            {"name": "Antiques", "slug": "antiques"},
+            {
+                "name": "Stationery, printing and writing paper",
+                "slug": "stationery-printing-and-writing-paper",
+            },
+            {
+                "name": "Art dealers and galleries",
+                "slug": "art-dealers-and-galleries",
+            },
+            {"name": "Memorabilia", "slug": "memorabilia"},
+            {
+                "name": "Music store - instruments and sheet music",
+                "slug": "music-store-instruments-and-sheet-music",
+            },
+            {
+                "name": "Art and craft supplies",
+                "slug": "art-and-craft-supplies",
+            },
+            {
+                "name": "Vintage and collectibles",
+                "slug": "vintage-and-collectibles",
+            },
+            {
+                "name": "Rare and used books",
+                "slug": "rare-and-used-books",
+            },
+            {"name": "Printing", "slug": "printing"},
+            {"name": "Magazines", "slug": "magazines"},
+            {"name": "Publishing", "slug": "publishing"},
+            {"name": "Book store", "slug": "book-store"},
+            {
+                "name": "Gift, card, novelty, and souvenir shops",
+                "slug": "gift-card-novelty-and-souvenir-shops",
+            },
             {
-                "name": "Shoe Repair",
-                "slug": "shoe_repair",
+                "name": "Party supplies",
+                "slug": "party-supplies",
             },
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Healthcare",
+        "category_slug": "healthcare",
         "subcategories": [
+            {"name": "Vision care", "slug": "vision-care"},
+            {
+                "name": "Health and beauty spas",
+                "slug": "health-and-beauty-spas",
+            },
+            {"name": "Medical care", "slug": "medical-care"},
+            {
+                "name": "Child care services",
+                "slug": "child-care-services",
+            },
+            {
+                "name": "Insurance - auto and home",
+                "slug": "insurance-auto-and-home",
+            },
             {
-                "name": "Social Services",
-                "slug": "social_services",
+                "name": "Counseling services",
+                "slug": "counseling-services",
             },
+            {"name": "Dental care", "slug": "dental-care"},
+            {
+                "name": "Insurance - life and annuity",
+                "slug": "insurance-life-and-annuity",
+            },
+            {"name": "Dental care", "slug": "dental-care"},
+            {"name": "Vision care", "slug": "vision-care"},
+            {"name": "Medical care", "slug": "medical-care"},
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Home care",
+        "category_slug": "home_care",
         "subcategories": [
+            {
+                "name": "Consumer goods rental",
+                "slug": "consumer-goods-rental",
+            },
+            {"name": "Printing", "slug": "printing"},
+            {
+                "name": "All other personal services",
+                "slug": "all-other-personal-services",
+            },
+            {
+                "name": "Cleaning and maintenance",
+                "slug": "cleaning-and-maintenance",
+            },
+            {
+                "name": "Swimming pool services",
+                "slug": "swimming-pool-services",
+            },
+            {
+                "name": "Real estate agent",
+                "slug": "real-estate-agent",
+            },
+            {
+                "name": "Real estate - other",
+                "slug": "real-estate-other",
+            },
+            {"name": "Storage", "slug": "storage"},
+            {"name": "Moving", "slug": "moving"},
+            {
+                "name": "Quick copy and reproduction services",
+                "slug": "quick-copy-and-reproduction-services",
+            },
+            {
+                "name": "Photofinishing",
+                "slug": "photofinishing",
+            },
+            {
+                "name": "Landscaping and horticultural",
+                "slug": "landscaping-and-horticultural",
+            },
+            {"name": "Carpentry", "slug": "carpentry"},
+            {
+                "name": "Reupholstery and furniture repair",
+                "slug": "reupholstery-and-furniture-repair",
+            },
+            {"name": "Utilities", "slug": "utilities"},
+            {
+                "name": "Shipping and packing",
+                "slug": "shipping-and-packing",
+            },
+            {"name": "Antiques", "slug": "antiques"},
+            {
+                "name": "Glass, paint, and wallpaper",
+                "slug": "glass-paint-and-wallpaper",
+            },
+            {"name": "Appliances", "slug": "appliances"},
+            {
+                "name": "Exterminating and disinfecting services",
+                "slug": "exterminating-and-disinfecting-services",
+            },
+            {
+                "name": "Drapery, window covering, and upholstery",
+                "slug": "drapery-window-covering-and-upholstery",
+            },
+            {
+                "name": "Hardware and tools",
+                "slug": "hardware-and-tools",
+            },
+            {
+                "name": "Rugs and carpets",
+                "slug": "rugs-and-carpets",
+            },
+            {"name": "Furniture", "slug": "furniture"},
+            {
+                "name": "Construction material",
+                "slug": "construction-material",
+            },
+            {
+                "name": "Lawn and garden equipment and supplies",
+                "slug": "lawn-and-garden-equipment-and-supplies",
+            },
+            {
+                "name": "Home furnishings store",
+                "slug": "home-furnishings-store",
+            },
+            {
+                "name": "Art dealers and galleries",
+                "slug": "art-dealers-and-galleries",
+            },
+            {
+                "name": "Safety and health",
+                "slug": "safety-and-health",
+            },
+            {"name": "Furniture", "slug": "furniture"},
+            {
+                "name": "Vintage and collectibles",
+                "slug": "vintage-and-collectibles",
+            },
+            {
+                "name": "Swimming pools and spas",
+                "slug": "swimming-pools-and-spas",
+            },
             {
-                "name": "Theaters",
-                "slug": "theaters",
+                "name": "Nursery plants and flowers",
+                "slug": "nursery-plants-and-flowers",
             },
+            {"name": "Florist", "slug": "florist"},
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Personal Care",
+        "category_slug": "personal_care",
         "subcategories": [
+            {"name": "Online dating", "slug": "online-dating"},
             {
-                "name": "Travel Agents",
-                "slug": "travel_agents",
+                "name": "Legal services and attorneys",
+                "slug": "legal-services-and-attorneys",
             },
+            {
+                "name": "Courier services",
+                "slug": "courier-services",
+            },
+            {
+                "name": "IDs, licenses, and passports",
+                "slug": "ids-licenses-and-passports",
+            },
+            {
+                "name": "Local delivery service",
+                "slug": "local-delivery-service",
+            },
+            {
+                "name": "Career services",
+                "slug": "career-services",
+            },
+            {"name": "Bath and body", "slug": "bath-and-body"},
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Pet Supplies",
+        "category_slug": "pet_supplies",
         "subcategories": [
+            {
+                "name": "Pet shops, pet food, and supplies",
+                "slug": "pet-shops-pet-food-and-supplies",
+            },
             {
-                "name": "Web Design",
-                "slug": "web_design",
+                "name": "Veterinary services",
+                "slug": "veterinary-services",
             },
+            {
+                "name": "Medication and supplements",
+                "slug": "medication-and-supplements",
+            },
+            {
+                "name": "Specialty and rare pets",
+                "slug": "specialty-and-rare-pets",
+            },
         ],
     },
     {
-        "category_slug": "services",
-        "category_name": "Services",
+        "category_name": "Pharmacy",
+        "category_slug": "pharmacy",
         "subcategories": [
+            {
+                "name": "Pharmacy and drugstore",
+                "slug": "pharmacy-and-drugstore",
+            },
+            {
+                "name": "Vitamins and supplements",
+                "slug": "vitamins-and-supplements",
+            },
+            {
+                "name": "Pharmacy and drugstore",
+                "slug": "pharmacy-and-drugstore",
+            },
             {
-                "name": "Wedding Planning",
-                "slug": "wedding_planning",
+                "name": "Medical equipment and supplies",
+                "slug": "medical-equipment-and-supplies",
             },
         ],
     },
     {
+        "category_name": "Restaurants",
         "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
         "subcategories": [
+            {"name": "Distilleries", "slug": "distilleries"},
+            {"name": "Breweries", "slug": "breweries"},
+            {"name": "Wineries", "slug": "wineries"},
+            {"name": "Restaurant", "slug": "restaurant"},
             {
-                "name": "American",
-                "slug": "american",
+                "name": "Coffee and tea",
+                "slug": "coffee-and-tea",
+            },
+            {
+                "name": "Catering services",
+                "slug": "catering-services",
             },
         ],
     },
     {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
+        "category_name": "Sports and Entertainment",
+        "category_slug": "sports_entertainment",
         "subcategories": [
             {
-                "name": "Asian",
-                "slug": "asian",
+                "name": "Lottery and contests",
+                "slug": "lottery-and-contests",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
+            {"name": "Gambling", "slug": "gambling"},
             {
-                "name": "Bakery/Coffee",
-                "slug": "bakery_coffee",
+                "name": "Toys and games",
+                "slug": "toys-and-games",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
+            {"name": "Music", "slug": "music"},
+            {"name": "Gambling", "slug": "gambling"},
             {
-                "name": "Brunch",
-                "slug": "brunch",
+                "name": "Cable, satellite, and other pay TV and radio broadcasting",
+                "slug": "cable-satellite-and-other-pay-tv-and-radio-broadcasting",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
+            {"name": "Slot machines", "slug": "slot-machines"},
             {
-                "name": "CafÈ/Bistro",
-                "slug": "cafÈ_bistro",
+                "name": "Theater tickets",
+                "slug": "theater-tickets",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Candy",
-                "slug": "candy",
+                "name": "Motion picture and video",
+                "slug": "motion-picture-and-video",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Catering",
-                "slug": "catering",
+                "name": "Digital content",
+                "slug": "digital-content",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
+            {"name": "Entertainers", "slug": "entertainers"},
+            {"name": "Memorabilia", "slug": "memorabilia"},
             {
-                "name": "Continental",
-                "slug": "continental",
+                "name": "Music store - CDs, cassettes and albums",
+                "slug": "music-store-cds-cassettes-and-albums",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
+            {"name": "Online gaming", "slug": "online-gaming"},
             {
-                "name": "Cuban",
-                "slug": "cuban",
+                "name": "Adult digital content",
+                "slug": "adult-digital-content",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Delicatessen/Bagels",
-                "slug": "delicatessen_bagels",
+                "name": "Movie store - DVDs, videotapes",
+                "slug": "movie-store-dvds-videotapes",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "French",
-                "slug": "french",
+                "name": "Video games and systems",
+                "slug": "video-games-and-systems",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Ice Cream/Gelato/Frozen Yogurt",
-                "slug": "ice_cream_gelato_frozen_yogurt",
+                "name": "Concert tickets",
+                "slug": "concert-tickets",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Indian",
-                "slug": "indian",
+                "name": "Cable and other subscription programming",
+                "slug": "cable-and-other-subscription-programming",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Italian",
-                "slug": "italian",
+                "name": "Dance halls, studios, and schools",
+                "slug": "dance-halls-studios-and-schools",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Juice Bar",
-                "slug": "juice_bar",
+                "name": "Other sporting goods",
+                "slug": "other-sporting-goods",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Mexican",
-                "slug": "mexican",
+                "name": "Firearms, knives, and martial arts weapons",
+                "slug": "firearms-knives-and-martial-arts-weapons",
             },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
             {
-                "name": "Portuguese",
-                "slug": "portuguese",
-            },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
-            {
-                "name": "Seafood",
-                "slug": "seafood",
-            },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
-            {
-                "name": "Steak House",
-                "slug": "steak_house",
-            },
-        ],
-    },
-    {
-        "category_slug": "restaurants",
-        "category_name": "Restaurants & Food",
-        "subcategories": [
-            {
-                "name": "Tea Room",
-                "slug": "tea_room",
+                "name": "Fan gear and memorabilia",
+                "slug": "fan-gear-and-memorabilia",
             },
         ],
     },
