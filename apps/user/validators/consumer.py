@@ -1,4 +1,6 @@
 from api import serializers
+from lib.auth import password_validation
+
 
 __all__ = (
     "EditProfileValidator",
@@ -67,6 +69,10 @@ class ResetPasswordTokenValidator(serializers.ValidationSerializer):
 class ApplyResetPasswordValidator(serializers.ValidationSerializer):
     token = serializers.CharField()
     password = serializers.CharField()
+
+    def validate_password(self, password):
+        password_validation.validate_password(password)
+        return password
 
 
 class EmailVerificationValidator(serializers.ValidationSerializer):
