@@ -4,6 +4,8 @@ from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from apps.merchant.shortcuts import validate_category
 from apps.user.dbapi import get_user_by_phone
+from lib.auth import password_validation
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 __all__ = ("CreateMerchantAccountValidator",)
 
@@ -23,6 +25,8 @@ class CreateMerchantAccountValidator(serializers.ValidationSerializer):
         attrs = super().validate(attrs)
         category = attrs.get("category")
         sub_category = attrs.get("sub_category")
+        password = attrs.get("password")
+
         if not validate_category(category=category, sub_category=sub_category):
             raise ValidationError(
                 {"category": ErrorDetail(_("Provided category is not valid."))}
@@ -47,4 +51,10 @@ class CreateMerchantAccountValidator(serializers.ValidationSerializer):
                     )
                 }
             )
+        try:
+            password_validation.validate_password(password)
+        except DjangoValidationError as error:
+            raise ValidationError({
+                "password": error.messages
+            })
         return attrs

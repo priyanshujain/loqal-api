@@ -1,7 +1,9 @@
 """
 Validators for consumer APIs
 """
+from lib.auth import password_validation
 from api import serializers
+
 
 __all__ = (
     "CreateConsumerAccountValidator",
@@ -19,6 +21,10 @@ class CreateConsumerAccountValidator(serializers.ValidationSerializer):
     last_name = serializers.CharField(max_length=512)
     email = serializers.EmailField(max_length=254)
     password = serializers.CharField(max_length=64)
+
+    def validate_password(self, password):
+        password_validation.validate_password(password)
+        return password
 
 
 class ConsumerZipCodeValidator(serializers.ValidationSerializer):
