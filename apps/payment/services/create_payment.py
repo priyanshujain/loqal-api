@@ -1,16 +1,14 @@
 from decimal import Decimal
+
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.payment.dbapi import create_payment, create_transaction
-from apps.payment.options import (
-    FACILITATION_FEES_CURRENCY,
-    FACILITATION_FEES_PERCENTAGE,
-)
+from apps.payment.options import (FACILITATION_FEES_CURRENCY,
+                                  FACILITATION_FEES_PERCENTAGE)
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
-
 
 __all__ = ("CreatePayment",)
 
@@ -58,12 +56,20 @@ class CreatePayment(ServiceBase):
             )
         if not self.receiver_bank_account:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Receiver bank account is not valid."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Receiver bank account is not valid.")
+                    )
+                }
             )
         if not self.order:
-            raise ValidationError({"detail": ErrorDetail(_("Order is not valid."))})
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Order is not valid."))}
+            )
         if not self.total_amount:
-            raise ValidationError({"detail": ErrorDetail(_("Amount is not valid."))})
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Amount is not valid."))}
+            )
         if not self.fee_bearer_account:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Fee bearer account is not valid."))}
@@ -107,7 +113,9 @@ class CreateTransferAPIAction(ProviderAPIActionBase):
             "fee_amount": float(transaction.fee_amount),
             "fee_currency": transaction.fee_currency,
         }
-        response = self.client.payment.create_new_payment(data=psp_request_data)
+        response = self.client.payment.create_new_payment(
+            data=psp_request_data
+        )
         if self.get_errors(response):
             transaction.set_internal_error()
             raise ProviderAPIException(
@@ -124,5 +132,5 @@ class CreateTransferAPIAction(ProviderAPIActionBase):
         return {
             "status": response["data"].get("status"),
             "dwolla_transfer_id": response["data"].get("dwolla_transfer_id"),
-            "individual_ach_id": response["data"].get("individual_ach_id")
+            "individual_ach_id": response["data"].get("individual_ach_id"),
         }

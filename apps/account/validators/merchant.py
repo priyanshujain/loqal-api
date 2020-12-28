@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext as _
 
 from api import serializers
@@ -5,7 +6,6 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.merchant.shortcuts import validate_category
 from apps.user.dbapi import get_user_by_phone
 from lib.auth import password_validation
-from django.core.exceptions import ValidationError as DjangoValidationError
 
 __all__ = ("CreateMerchantAccountValidator",)
 
@@ -54,7 +54,5 @@ class CreateMerchantAccountValidator(serializers.ValidationSerializer):
         try:
             password_validation.validate_password(password)
         except DjangoValidationError as error:
-            raise ValidationError({
-                "password": error.messages
-            })
+            raise ValidationError({"password": error.messages})
         return attrs

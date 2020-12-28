@@ -1,7 +1,6 @@
 from api import serializers
 from lib.auth import password_validation
 
-
 __all__ = (
     "EditProfileValidator",
     "UserEmailExistsValidator",

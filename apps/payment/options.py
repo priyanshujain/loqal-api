@@ -60,3 +60,24 @@ class PaymentProcess(ChoiceEnum):
     DIRECT_APP = 1, _("App")
     PAYMENT_REQUEST = 2, _("Payment Request")
     NOT_PROVIDED = 3, _("Not Provided")
+
+
+class DisputeStatus(ChoiceEnum):
+    OPEN = 0, _("Open")
+    INTERNAL_REVIEW = 1, _("Internal Review")
+    BANK_REVIEW = 2, _("BANK_REVIEW")
+    CHARGEBACK_ACCEPTED = 3, _("Chargeback Accepted")
+    CHARGEBACK_REJECTED = 4, _("Chargeback Rejected")
+
+
+class DisputeStatus(ChoiceEnum):
+    OPEN = 0, _("Open")
+    INTERNAL_REVIEW = 1, _("Internal Review")
+    BANK_REVIEW = 2, _("BANK_REVIEW")
+    CHARGEBACK_ACCEPTED = 3, _("Chargeback Accepted")
+    CHARGEBACK_REJECTED = 4, _("Chargeback Rejected")
+
+
+class DisputeType(ChoiceCharEnum):
+    CHARGEBACK = "chargeback", _("Chargeback")
+    FRAUD = "fraud", _("Fraud")

@@ -5,20 +5,20 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
+                                get_consumer_transactions,
                                 get_customers_aggregate_transactions,
                                 get_merchant_payment_reqeust,
-                                get_consumer_transactions,
                                 get_transactions_to_merchant)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    MerchantPaymentResponse,
                                     MerchantTransactionResponse,
                                     PaymentRequestResponse, PaymentResponse,
-                                    TransactionResponse,
+                                    RefundPaymentResponse,
                                     TransactionHistoryResponse,
-                                    MerchantPaymentResponse,
-                                    RefundPaymentResponse)
+                                    TransactionResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
-                                   DirectMerchantPayment, RejectPaymentRequest,
-                                   CreateRefund,)
+                                   CreateRefund, DirectMerchantPayment,
+                                   RejectPaymentRequest)
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -37,8 +37,12 @@ class CreatePaymentAPI(ConsumerAPIView):
 class PaymentHistoryAPI(ConsumerAPIView):
     def get(self, request):
         consumer_account = request.consumer_account
-        transactions = get_consumer_transactions(consumer_account=consumer_account)
-        return self.response(TransactionHistoryResponse(transactions, many=True).data)
+        transactions = get_consumer_transactions(
+            consumer_account=consumer_account
+        )
+        return self.response(
+            TransactionHistoryResponse(transactions, many=True).data
+        )
 
 
 class CreatePaymentRequestAPI(MerchantAPIView):

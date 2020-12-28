@@ -1,4 +1,3 @@
-from apps.payment.options import PaymentProcess
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -7,11 +6,9 @@ from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.options import MerchantAccountStatus
 from apps.order.dbapi import create_payment_request_order
-from apps.payment.dbapi import (
-    create_direct_merchant_payment,
-    create_payment,
-    get_payment_qrcode,
-)
+from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
+                                get_payment_qrcode)
+from apps.payment.options import PaymentProcess
 from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
 
@@ -29,7 +26,9 @@ class DirectMerchantPayment(ServiceBase):
 
     def handle(self):
         payment_data = self._validate_data()
-        merhcant_payment = self._factory_merchant_payment(payment_data=payment_data)
+        merhcant_payment = self._factory_merchant_payment(
+            payment_data=payment_data
+        )
         total_amount = payment_data["amount"] + payment_data["tip_amount"]
         merhcant_account = payment_data["merchant_account"]
 
@@ -50,15 +49,25 @@ class DirectMerchantPayment(ServiceBase):
         data = run_validator(CreateMerchantPaymentValidator, self.data)
         merchant_id = data["merchant_id"]
 
-        merchant_account = get_merchant_account_by_uid(merchant_uid=merchant_id)
+        merchant_account = get_merchant_account_by_uid(
+            merchant_uid=merchant_id
+        )
         if not merchant_account:
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Given merchant does not exist."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Given merchant does not exist.")
+                    )
+                }
             )
 
         if merchant_account.account_status != MerchantAccountStatus.VERIFIED:
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Merchant account is not active yet."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Merchant account is not active yet.")
+                    )
+                }
             )
 
         qrcode_id = data.get("qrcode_id")
@@ -111,7 +120,9 @@ class DirectMerchantPayment(ServiceBase):
         payment_process = PaymentProcess.DIRECT_APP
         if payment_qrcode_id:
             payment_process = PaymentProcess.QRCODE
-        payment = create_payment(order_id=order.id, payment_process=payment_process)
+        payment = create_payment(
+            order_id=order.id, payment_process=payment_process
+        )
         return create_direct_merchant_payment(
             payment_id=payment.id,
             tip_amount=tip_amount,

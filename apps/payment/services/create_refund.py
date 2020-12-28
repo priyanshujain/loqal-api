@@ -1,12 +1,11 @@
-from apps.payment.options import RefundType
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-
 from apps.order.dbapi import get_order_by_id
 from apps.payment.dbapi import create_refund_payment
+from apps.payment.options import RefundType
 from apps.payment.validators import CreateRefundValidator
 
 from .create_payment import CreatePayment
@@ -51,11 +50,7 @@ class CreateRefund(ServiceBase):
         )
         if not order:
             raise ValidationError(
-                {
-                    "order_id": ErrorDetail(
-                        _("Given order does not exist.")
-                    )
-                }
+                {"order_id": ErrorDetail(_("Given order does not exist."))}
             )
         if amount > order.total_net_amount:
             raise ValidationError(
@@ -65,7 +60,7 @@ class CreateRefund(ServiceBase):
                     )
                 }
             )
-        
+
         # FIXME: check for the amount to be less than total of all previous refunds
 
         banking_data = ValidateBankBalance(
@@ -89,7 +84,5 @@ class CreateRefund(ServiceBase):
         if order.total_net_amount > amount:
             refund_type = RefundType.PARTIAL
         return create_refund_payment(
-            payment_id=order.payment.id,
-            amount=amount,
-            refund_type=refund_type
+            payment_id=order.payment.id, amount=amount, refund_type=refund_type
         )

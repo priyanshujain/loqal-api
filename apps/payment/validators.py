@@ -1,13 +1,11 @@
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
-from apps.account.dbapi import (
-    get_consumer_account_by_phone_number,
-    get_consumer_account_by_username,
-)
+from apps.account.dbapi import (get_consumer_account_by_phone_number,
+                                get_consumer_account_by_username)
 from apps.payment.dbapi import get_payment_qrcode
-from django.conf import settings
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
@@ -25,7 +23,13 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
 
         if amount < 1.00:
             raise ValidationError(
-                {"amount": [ErrorDetail(_("Amount should be greater than a dollar."))]}
+                {
+                    "amount": [
+                        ErrorDetail(
+                            _("Amount should be greater than a dollar.")
+                        )
+                    ]
+                }
             )
         return attrs
 
@@ -89,10 +93,16 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
                         ]
                     }
                 )
-            consumer_account = get_consumer_account_by_username(username=loqal_id)
+            consumer_account = get_consumer_account_by_username(
+                username=loqal_id
+            )
             if not consumer_account:
                 raise ValidationError(
-                    {"detail": ErrorDetail(_("No user exists with given Loqal ID."))}
+                    {
+                        "detail": ErrorDetail(
+                            _("No user exists with given Loqal ID.")
+                        )
+                    }
                 )
         return attrs
 
@@ -107,7 +117,11 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
         qrcode = get_payment_qrcode(qrcode_id=qrcode_id)
         if not qrcode:
             raise ValidationError(
-                {"qrcode_id": [ErrorDetail(_("Provided QR Code is not valid."))]}
+                {
+                    "qrcode_id": [
+                        ErrorDetail(_("Provided QR Code is not valid."))
+                    ]
+                }
             )
         return attrs
 

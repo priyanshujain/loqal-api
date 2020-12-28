@@ -1,29 +1,23 @@
-from apps.provider.lib.api import payment
 from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 from apps.account.models import Account, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.merchant.models import AccountMember
 from apps.order.models import Order
-from apps.payment.options import (
-    PaymentMethodType,
-    PaymentRequestStatus,
-    PaymentStatus,
-    RefundType,
-    TransactionStatus,
-    ChargeStatus,
-    PaymentProcess,
-)
+from apps.payment.options import (ChargeStatus, DisputeStatus, DisputeType,
+                                  PaymentMethodType, PaymentProcess,
+                                  PaymentRequestStatus, PaymentStatus,
+                                  RefundType, TransactionStatus)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
-from django.utils.crypto import get_random_string
 
 
 class PaymentRegister(AbstractBaseModel):
@@ -111,12 +105,34 @@ class Payment(AbstractBaseModel):
     order = models.OneToOneField(
         Order, related_name="payment", on_delete=models.CASCADE
     )
+    payment_tracking_id = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
+        editable=False,
+    )
     status = ChoiceEnumField(
         enum_type=PaymentStatus,
     )
 
     class Meta:
         db_table = "payment"
+
+    def save(self, *args, **kwargs):
+        def id_generator():
+            return get_random_string(
+                length=10, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            )
+
+        if not self.payment_tracking_id:
+            self.payment_tracking_id = id_generator()
+            while Payment.objects.filter(
+                payment_tracking_id=self.payment_tracking_id
+            ).exists():
+                self.payment_tracking_id = id_generator()
+        return super().save(*args, **kwargs)
 
 
 class Transaction(AbstractBaseModel):
@@ -161,14 +177,20 @@ class Transaction(AbstractBaseModel):
     )
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     is_success = models.BooleanField(default=False)
+    is_disputed = models.BooleanField(default=False)
     status = ChoiceEnumField(
         enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
     )
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
-    tracking_number = models.CharField(
-        max_length=10, null=True, blank=True, default=None, unique=True, editable=False
+    transaction_tracking_id = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
+        editable=False,
     )
     dwolla_id = models.CharField(max_length=255, blank=True)
     individual_ach_id = models.CharField(
@@ -204,15 +226,15 @@ class Transaction(AbstractBaseModel):
     def save(self, *args, **kwargs):
         def id_generator():
             return get_random_string(
-                length=8, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                length=10, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
             )
 
-        if not self.tracking_number:
-            self.tracking_number = id_generator()
+        if not self.transaction_tracking_id:
+            self.transaction_tracking_id = id_generator()
             while Transaction.objects.filter(
-                tracking_number=self.tracking_number
+                transaction_tracking_id=self.transaction_tracking_id
             ).exists():
-                self.tracking_number = id_generator()
+                self.transaction_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
 
@@ -342,3 +364,47 @@ class PaymentRequest(AbstractBaseModel):
         self.status = PaymentRequestStatus.ACCEPTED
         if save:
             self.save()
+
+
+class DisputeTransaction(AbstractBaseModel):
+    transaction = models.OneToOneField(
+        Transaction,
+        blank=True,
+        null=True,
+        related_name="dispute",
+        on_delete=models.CASCADE,
+    )
+    dispute_tracking_id = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
+        editable=False,
+    )
+    status = ChoiceEnumField(
+        enum_type=DisputeStatus,
+        default=DisputeStatus.OPEN,
+    )
+    type = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=DisputeType,
+        default=DisputeType.CHARGEBACK,
+    )
+
+    class Meta:
+        db_table = "dispute_transaction"
+
+    def save(self, *args, **kwargs):
+        def id_generator():
+            return get_random_string(
+                length=10, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            )
+
+        if not self.dispute_tracking_id:
+            self.dispute_tracking_id = id_generator()
+            while DisputeTransaction.objects.filter(
+                dispute_tracking_id=self.dispute_tracking_id
+            ).exists():
+                self.dispute_tracking_id = id_generator()
+        return super().save(*args, **kwargs)

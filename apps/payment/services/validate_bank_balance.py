@@ -1,10 +1,11 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account
 from plugins.plaid import PlaidPlugin
-from decimal import Decimal
 
 __all__ = ("ValidateBankBalance",)
 
@@ -38,8 +39,8 @@ class ValidateBankBalance(object):
             )
 
         balance = self._check_balance(bank_account=sender_bank_account)
-        min_required_balance = (
-            self.total_amount + Decimal(settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED)
+        min_required_balance = self.total_amount + Decimal(
+            settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
         )
         if balance < min_required_balance:
             raise ValidationError(

@@ -4,9 +4,9 @@ creation related calls to the dwolla API.
 """
 
 
+from apps.payment.options import TransactionStatus
 from integrations.dwolla.errors import BadRequestError
 from integrations.dwolla.http import Http
-from apps.payment.options import TransactionStatus
 
 __all__ = "Payment"
 
@@ -76,7 +76,9 @@ class Payment(Http):
         """
 
         sender_bank_account_dwolla_id = data["sender_bank_account_dwolla_id"]
-        receiver_bank_account_dwolla_id = data["receiver_bank_account_dwolla_id"]
+        receiver_bank_account_dwolla_id = data[
+            "receiver_bank_account_dwolla_id"
+        ]
         fee_bearer_dwolla_id = data["fee_bearer_dwolla_id"]
         correlation_id = data["correlation_id"]
         currency = data["currency"]
@@ -119,9 +121,11 @@ class Payment(Http):
         response_headers = response.headers
         location = response_headers["location"]
         dwolla_transfer_id = location.split("/").pop()
-        payment_details = self.get_payment_details(transfer_id=dwolla_transfer_id)
+        payment_details = self.get_payment_details(
+            transfer_id=dwolla_transfer_id
+        )
         return {
             "dwolla_transfer_id": dwolla_transfer_id,
             "status": getattr(TransactionStatusMap, payment_details["status"]),
-            "individual_ach_id": payment_details.get("individualAchId", None)
+            "individual_ach_id": payment_details.get("individualAchId", None),
         }

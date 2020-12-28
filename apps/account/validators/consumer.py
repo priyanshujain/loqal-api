@@ -1,9 +1,8 @@
 """
 Validators for consumer APIs
 """
-from lib.auth import password_validation
 from api import serializers
-
+from lib.auth import password_validation
 
 __all__ = (
     "CreateConsumerAccountValidator",
