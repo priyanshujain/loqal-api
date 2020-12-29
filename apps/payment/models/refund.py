@@ -5,6 +5,7 @@ from apps.payment.options import RefundStatus, RefundType
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.models.fields.enum import ChoiceEnumField
+from django.utils.crypto import get_random_string
 
 from .payment import Payment
 from .transaction import Transaction
@@ -36,6 +37,14 @@ class Refund(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+    refund_tracking_id = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
+        editable=False,
+    )
 
     class Meta:
         db_table = "payment_refund"
@@ -44,3 +53,18 @@ class Refund(AbstractBaseModel):
         self.transaction = transaction
         if save:
             self.save()
+    
+    def save(self, *args, **kwargs):
+        def id_generator():
+            return get_random_string(
+                length=10, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            )
+
+        if not self.refund_tracking_id:
+            self.refund_tracking_id = id_generator()
+            while Refund.objects.filter(
+                refund_tracking_id=self.refund_tracking_id
+            ).exists():
+                self.refund_tracking_id = id_generator()
+        return super().save(*args, **kwargs)
+
