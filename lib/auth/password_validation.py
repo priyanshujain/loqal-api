@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.translation import gettext
+from django.utils.translation import gettext, ngettext
 
 from utils.imports import import_string
 
@@ -56,7 +56,7 @@ class ContainsUppercaseValidator(object):
     def validate(self, password, user=None):
         if sum(c.isupper() for c in password) < self.min_uppercase:
             raise ValidationError(
-                gettext("Password must contain at least %(min_uppercase)d uppercase character.",
+                ngettext("Password must contain at least %(min_uppercase)d uppercase character.",
                          "Password must contain at least %(min_uppercase)d uppercase characters.",
                          self.min_uppercase),
                 code='password_too_weak',
@@ -64,7 +64,7 @@ class ContainsUppercaseValidator(object):
             )
 
     def get_help_text(self):
-        return gettext(
+        return ngettext(
             "Your password must contain at least %(min_uppercase)d uppercase character.",
             "Your password must contain at least %(min_uppercase)d uppercase characters.",
             self.min_uppercase
@@ -78,7 +78,7 @@ class ContainsLowercaseValidator(object):
     def validate(self, password, user=None):
         if sum(c.islower() for c in password) < self.min_lowercase:
             raise ValidationError(
-                gettext("Password must contain at least %(min_lowercase)d lowercase character.",
+                ngettext("Password must contain at least %(min_lowercase)d lowercase character.",
                          "Password must contain at least %(min_lowercase)d lowercase characters.",
                          self.min_lowercase),
                 code='password_too_weak',
@@ -86,7 +86,7 @@ class ContainsLowercaseValidator(object):
             )
 
     def get_help_text(self):
-        return gettext(
+        return ngettext(
             "Your password must contain at least %(min_lowercase)d lowercase character.",
             "Your password must contain at least %(min_lowercase)d lowercase characters.",
             self.min_lowercase
@@ -101,7 +101,7 @@ class ContainsSpecialCharactersValidator(object):
     def validate(self, password, user=None):
         if sum(c in self.characters for c in password) < self.min_characters:
             raise ValidationError(
-                gettext("Password must contain at least %(min_characters)d special character.",
+                ngettext("Password must contain at least %(min_characters)d special character.",
                          "Password must contain at least %(min_characters)d special characters.",
                          self.min_characters),
                 code='password_too_weak',
@@ -109,8 +109,30 @@ class ContainsSpecialCharactersValidator(object):
             )
 
     def get_help_text(self):
-        return gettext(
+        return ngettext(
             "Your password must contain at least %(min_characters)d special character.",
             "Your password must contain at least %(min_characters)d special characters.",
             self.min_characters
         ) % {'min_characters': self.min_characters}
+
+
+class ContainsDigitsValidator(object):
+    def __init__(self, min_digits=1):
+        self.min_digits = min_digits
+
+    def validate(self, password, user=None):
+        if sum(c.isdigit() for c in password) < self.min_digits:
+            raise ValidationError(
+                ngettext("Password must contain at least %(min_digits)d number.",
+                         "Password must contain at least %(min_digits)d numbers.",
+                         self.min_digits),
+                code='password_too_weak',
+                params={'min_digits': self.min_digits},
+            )
+
+    def get_help_text(self):
+        return ngettext(
+            "Your password must contain at least %(min_digits)d number.",
+            "Your password must contain at least %(min_digits)d numbers.",
+            self.min_digits
+        ) % {'min_digits': self.min_digits}

@@ -7,9 +7,10 @@ from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         CustomersAggregateHistoryAPI,
                                         ListConsumerPaymentRequestAPI,
                                         ListMerchantPaymentRequestAPI,
-                                        MerchantPaymentHistoryAPI,
                                         PaymentHistoryAPI,
                                         RejectPaymentRequestAPI)
+from apps.payment.views.merchant_payment import MerchantPaymentHistoryAPI
+
 
 urlpatterns = [
     path("create/", CreatePaymentAPI.as_view(), name="create_payment"),

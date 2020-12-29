@@ -75,8 +75,8 @@ class BeneficialOwnerAdapter(IndividualBaseAdapter):
 
 def get_individual_data(adapter, data):
     adapted_data = adapter(data).adapt()
-    if adapted_data.get("passport_number"):
-        adapted_data["passport"] = PassportAdapter(adapted_data).adapt()
+    if data.get("passport_number"):
+        adapted_data["passport"] = PassportAdapter(data).adapt()
     return adapted_data
 
 

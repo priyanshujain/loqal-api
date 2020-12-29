@@ -125,6 +125,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "lib.auth.password_validation.ContainsSpecialCharactersValidator",
     },
+    {
+        "NAME": "lib.auth.password_validation.ContainsDigitsValidator"
+    }
 ]
 
 
