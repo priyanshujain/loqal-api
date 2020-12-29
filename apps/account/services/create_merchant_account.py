@@ -31,12 +31,13 @@ class CreateMerchantAccount(ServiceBase):
         self._factory_default_roles(merchant_id=merchant_account.id)
 
         admin_role = get_super_admin_role(merchant_id=merchant_account.id)
-        create_account_member_on_reg(
+        account_member = create_account_member_on_reg(
             user_id=user.id,
             merchant_id=merchant_account.id,
             member_role_id=admin_role.id,
         )
         self._send_verfication_email(user=user)
+        return account_member
 
     def _validate_data(self):
         user = get_user_by_email(email=self._email)

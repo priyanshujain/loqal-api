@@ -6,6 +6,7 @@ from api.views import APIView, MerchantAPIView
 from apps.account.responses import MerchantAccountProfileResponse
 from apps.account.services import CreateMerchantAccount
 from apps.account.validators import CreateMerchantAccountValidator
+from utils.auth import login
 
 __all__ = (
     "MerchantSignupAPI",
@@ -26,7 +27,8 @@ class MerchantSignupAPI(APIView):
 
     def _run_services(self, data):
         service = CreateMerchantAccount(data=data)
-        service.handle()
+        account_member = service.handle()
+        login(request=self.request, user=account_member.user)
 
 
 class MerchantProfileAPI(MerchantAPIView):

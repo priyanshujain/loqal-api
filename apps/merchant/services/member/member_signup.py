@@ -38,7 +38,7 @@ class MemberSignup(ServiceBase):
         phone_number = data["phone_number"]
         password = data["password"]
 
-        create_account_member_from_team_invite(
+        account_member = create_account_member_from_team_invite(
             invite=invite,
             first_name=first_name,
             last_name=last_name,
@@ -46,4 +46,5 @@ class MemberSignup(ServiceBase):
             phone_number=phone_number,
             password=password,
         )
-        invite.expire_code()
+        invite.expire_token()
+        return account_member

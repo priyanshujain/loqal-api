@@ -114,7 +114,7 @@ class MemberInvite(AbstractBaseModel):
         self.token_expires_at = now() + timedelta(days=7)
         self.save()
 
-    def expire_invite_code(self):
+    def expire_token(self):
         self.token_expires_at = now()
         self.save()
 

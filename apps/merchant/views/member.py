@@ -18,6 +18,7 @@ from apps.merchant.services import (CreateFeatureAccessRole,
                                     MemberSignupInviteEmailResend,
                                     UpdateFeatureAccessRole,
                                     UpdateMemberInvite, UpdateMemberRole)
+from utils.auth import login
 
 
 class CreateMemberInviteAPI(MerchantAPIView):
@@ -108,11 +109,16 @@ class MemberSignupAPI(APIView):
     """
 
     def post(self, request):
+        if request.user.is_authenticated:
+            raise ValidationError(
+                {"details": ErrorDetail(_("User has aleady logged in."))}
+            )
         self._run_services()
         return self.response(status=201)
 
     def _run_services(self):
-        MemberSignup(data=self.request_data).handle()
+        account_member = MemberSignup(data=self.request_data).handle()
+        login(request=self.request, user=account_member.user)
 
 
 class UpdateMemberRoleAPI(MerchantAPIView):
