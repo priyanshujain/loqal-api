@@ -81,7 +81,7 @@ class OrderEvent(BaseModel):
 
     """
 
-    type = ChoiceEnumField(enum_type=OrderEventType)
+    event_type = ChoiceEnumField(enum_type=OrderEventType)
     order = models.ForeignKey(
         Order, related_name="events", on_delete=models.CASCADE
     )

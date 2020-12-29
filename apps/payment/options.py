@@ -17,6 +17,27 @@ class TransactionStatus(ChoiceEnum):
     INTERNAL_PSP_ERROR = 5, _("Internal PSP Error")
 
 
+class TransactionEventType(ChoiceEnum):
+    TRANSACTION_SENT = 0, _("Tranasction Sent")
+    TRANSACTION_FAILED = 1, _("Transaction Failed")
+    TRANSACTION_PEDNING = 2, _("Transaction Pending")
+    TRANSACTION_PROCESSED = 3, _("Transaction Processed")
+    TRANSACTION_CANCELLED = 4, _("Transaction Cancelled")
+    TRANSACTION_INTERNAL_ERROR = 5, _("Internal Error")
+
+
+class PaymentStatus(ChoiceEnum):
+    CAPTURED = 0, _("Captured")
+    IN_PROGRESS = 1, _("In Progress")
+    FAILED = 2, _("Failed")
+
+
+class PaymentEventType(ChoiceEnum):
+    PAYMENT_CAPTURED = 0, _("Payment Captured")
+    PAYMENT_FAILED = 1, _("Payment Failed")
+    PAYMENT_REFUND_INITIATED = 2, _("Refund Initiated")
+
+
 class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
     ACCEPTED = 1, _("Request Accepted")
@@ -33,11 +54,9 @@ class RefundType(ChoiceCharEnum):
     FULL = "full", _("Full Refund")
 
 
-class PaymentStatus(ChoiceEnum):
-    SUCCESS = 0, _("Success")
-    IN_PROGRESS = 1, _("In Progress")
-    FAILED = 2, _("Failed")
-    INSUFFICIENT_BALANCE = 3, _("Insufficient Balance")
+class RefundStatus(ChoiceEnum):
+    PROCESSED = 0, _("PROCESSED")
+    FAILED = 1, _("FAILED")
 
 
 class PaymentMethodType(ChoiceCharEnum):

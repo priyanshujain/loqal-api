@@ -1,5 +1,6 @@
 from django.urls import path
 
+from apps.payment.views.merchant_payment import MerchantPaymentHistoryAPI
 from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         CreatePaymentAPI,
                                         CreatePaymentRequestAPI,
@@ -9,8 +10,6 @@ from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         ListMerchantPaymentRequestAPI,
                                         PaymentHistoryAPI,
                                         RejectPaymentRequestAPI)
-from apps.payment.views.merchant_payment import MerchantPaymentHistoryAPI
-
 
 urlpatterns = [
     path("create/", CreatePaymentAPI.as_view(), name="create_payment"),

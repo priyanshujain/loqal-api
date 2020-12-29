@@ -8,7 +8,7 @@ from otpauth import OtpAuth
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
-from api.views import APIView, LoggedInAPIView
+from api.views import APIView, ConsumerAPIView, LoggedInAPIView
 from apps.account.notifications import SendAccountVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse
@@ -66,7 +66,7 @@ class ResendEmailverificationAPI(LoggedInAPIView):
             )
         if user.email_verification_token_expire_time < now():
             user.gen_email_verification_token()
-        SendVerifyEmail(user=user).send()
+        SendAccountVerifyEmail(user=user).send()
         return self.response()
 
 
@@ -159,7 +159,7 @@ class ResendSmsOtpAuthAPI(APIView):
         ResendSmsOtpAuth(request=self.request).handle()
 
 
-class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
+class ResendPhoneNumberVerifyOtpAPI(ConsumerAPIView):
     """
     Resend sms otp for phone number verification
     """
@@ -175,7 +175,7 @@ class ResendPhoneNumberVerifyOtpAPI(LoggedInAPIView):
         ).handle()
 
 
-class AddPhoneNumberAPI(LoggedInAPIView):
+class AddPhoneNumberAPI(ConsumerAPIView):
     def post(self, request):
         self._run_services()
         return self.response()
@@ -195,7 +195,7 @@ class StartSmsAuthEnrollmentAPI(LoggedInAPIView):
         return service.handle()
 
 
-class VerifyPhoneNumberAPI(LoggedInAPIView):
+class VerifyPhoneNumberAPI(ConsumerAPIView):
     def post(self, request):
         self._run_services(user=request.user)
         return self.response()
