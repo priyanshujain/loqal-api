@@ -1,14 +1,14 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.banking.models import BankAccount
-from apps.payment.models import Transaction
+from apps.payment.models import Transaction, DisputeTransaction
 from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
 
 __all__ = (
-    "RefundHistoryResponse",
-    "RefundListResponse",
+    "DisputeHistoryResponse",
+    "DisputeListResponse",
 )
 
 class CustomerDetailsResponse(serializers.ModelSerializer):
@@ -33,39 +33,39 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
         return ""
 
 
-class RefundHistoryResponse(serializers.ModelSerializer):
-    refund_type = serializers.CharField(
-        source="refund_type.label", read_only=True
+class DisputeHistoryResponse(serializers.ModelSerializer):
+    dispute_type = serializers.CharField(
+        source="dispute_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="payment.payment_tracking_id", read_only=True)
-    customer = CustomerDetailsResponse(source="payment.order.consumer", read_only=True)
+    payment_tracking_id = serializers.CharField(source="transaction.payment.payment_tracking_id", read_only=True)
+    customer = CustomerDetailsResponse(source="transaction.payment.order.consumer", read_only=True)
 
     class Meta:
-        model = Refund
+        model = DisputeTransaction
         fields = (
             "created_at",
-            "refund_type",
-            "refund_tracking_id",
+            "dispute_type",
+            "dispute_tracking_id",
             "payment_tracking_id",
             "customer",
             "status",
         )
 
 
-class RefundListResponse(serializers.ModelSerializer):
-    refund_type = serializers.CharField(
-        source="refund_type.label", read_only=True
+class DisputeListResponse(serializers.ModelSerializer):
+    dispute_type = serializers.CharField(
+        source="dispute_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="payment.payment_tracking_id", read_only=True)
+    payment_tracking_id = serializers.CharField(source="transaction.payment.payment_tracking_id", read_only=True)
 
     class Meta:
-        model = Refund
+        model = DisputeTransaction
         fields = (
             "created_at",
-            "refund_type",
-            "refund_tracking_id",
+            "dispute_type",
+            "dispute_tracking_id",
             "payment_tracking_id",
             "status",
         )

@@ -3,7 +3,6 @@ from django.utils.translation import gettext as _
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transactions,
-                                get_customers_aggregate_transactions,
                                 get_merchant_payment_reqeust)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
@@ -85,15 +84,6 @@ class ListConsumerPaymentRequestAPI(ConsumerAPIView):
         return self.response(
             ConsumerPaymentRequestResponse(payment_requests, many=True).data
         )
-
-
-class CustomersAggregateHistoryAPI(MerchantAPIView):
-    def get(self, request):
-        merchant_account = request.merchant_account
-        customers = get_customers_aggregate_transactions(
-            account_id=merchant_account.account.id
-        )
-        return self.response(customers)
 
 
 class CreateRefundPaymentAPI(MerchantAPIView):
