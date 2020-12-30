@@ -136,6 +136,7 @@ class Http(HttpRequest):
         if custom_content_type:
             headers["Content-Type"] = custom_content_type
 
+        # TODO: Fix this
         if custom_content_type == "multipart/form-data":
             del headers["Content-Type"]
 

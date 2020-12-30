@@ -1,4 +1,5 @@
 from api import serializers
+from apps.account.validators import MerchantAccountSignupValidatorBase
 from apps.merchant.options import FeatureAcessTypes
 
 __all__ = (
@@ -34,17 +35,9 @@ class UpdateMemberInviteValidator(serializers.ValidationSerializer):
     role_id = serializers.IntegerField()
 
 
-class MemberSignupValidator(serializers.ValidationSerializer):
+class MemberSignupValidator(MerchantAccountSignupValidatorBase):
     token = serializers.CharField(max_length=256)
-    first_name = serializers.CharField(max_length=1024)
-    last_name = serializers.CharField(
-        max_length=1024, default="", required=False
-    )
-    phone_number = serializers.CharField(
-        max_length=20, default="", required=False
-    )
     position = serializers.CharField(max_length=256)
-    password = serializers.CharField(max_length=128)
 
 
 class UpdateMemberRoleValidator(serializers.ValidationSerializer):

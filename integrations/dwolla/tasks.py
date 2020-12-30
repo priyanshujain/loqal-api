@@ -14,7 +14,7 @@ def store_auth_token(auth_data):
     """
     provider_obj = PaymentProvider.objects.get(provider_slug="DWOLLA")
     expires_in = int(auth_data["expires_in"]) - 30
-    expires_at = timezone.now() + -timedelta(seconds=expires_in)
+    expires_at = timezone.now() + timedelta(seconds=expires_in)
     try:
         provider_auth_obj = provider_obj.paymentproviderauth
         provider_auth_obj.auth_token = auth_data["access_token"]

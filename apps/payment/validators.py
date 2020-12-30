@@ -1,5 +1,4 @@
-import decimal
-
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api import serializers
@@ -10,7 +9,12 @@ from apps.payment.dbapi import get_payment_qrcode
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
-    amount = serializers.FloatField(min_value=0)
+    amount = serializers.DecimalField(
+        min_value=0,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -27,43 +31,18 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
                     ]
                 }
             )
-        payment_amount_decimal = decimal.Decimal(str(amount))
-        if abs(payment_amount_decimal.as_tuple().exponent) > 2:
-            raise ValidationError(
-                {
-                    "amount": [
-                        ErrorDetail(
-                            _("Amount can only have two digits after decimal.")
-                        )
-                    ]
-                }
-            )
         return attrs
 
 
-class CreatePaymentValidator(PaymentValidatorBase):
+class CreateMerchantPaymentValidator(PaymentValidatorBase):
     merchant_id = serializers.UUIDField()
     qrcode_id = serializers.CharField(required=False)
-    tip_amount = serializers.FloatField(min_value=0)
-
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        tip_amount = attrs.get("tip_amount")
-
-        tip_amount_decimal = decimal.Decimal(str(tip_amount))
-        if abs(tip_amount_decimal.as_tuple().exponent) > 2:
-            raise ValidationError(
-                {
-                    "tip_amount": [
-                        ErrorDetail(
-                            _(
-                                "Tip amount can only have two digits after decimal."
-                            )
-                        )
-                    ]
-                }
-            )
-        return attrs
+    tip_amount = serializers.DecimalField(
+        min_value=0,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
 
 
 class CreatePaymentRequestValidator(PaymentValidatorBase):
@@ -149,27 +128,23 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
 
 class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
     payment_request_id = serializers.IntegerField()
-    tip_amount = serializers.FloatField(min_value=0)
-
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        tip_amount = attrs.get("tip_amount")
-
-        tip_amount_decimal = decimal.Decimal(str(tip_amount))
-        if abs(tip_amount_decimal.as_tuple().exponent) > 2:
-            raise ValidationError(
-                {
-                    "tip_amount": [
-                        ErrorDetail(
-                            _(
-                                "Tip amount can only have two digits after decimal."
-                            )
-                        )
-                    ]
-                }
-            )
-        return attrs
+    tip_amount = serializers.DecimalField(
+        min_value=0,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
 
 
 class RejectPaymentRequestValidator(serializers.ValidationSerializer):
     payment_request_id = serializers.IntegerField()
+
+
+class CreateRefundValidator(serializers.ValidationSerializer):
+    order_id = serializers.IntegerField()
+    amount = serializers.DecimalField(
+        min_value=0,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )

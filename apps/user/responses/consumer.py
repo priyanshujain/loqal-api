@@ -25,6 +25,7 @@ class UserProfileResponse(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "email_verified",
             "username",
             "two_factor_auth",
             "phone_number",

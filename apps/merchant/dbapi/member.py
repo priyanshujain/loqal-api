@@ -203,7 +203,7 @@ def create_account_member_from_team_invite(
     )
     return AccountMember.objects.create(
         user_id=user.id,
-        merchant_id=invite.account.id,
+        merchant_id=invite.merchant.id,
         role_id=invite.role.id,
         position=position,
         account_active=True,
