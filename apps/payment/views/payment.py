@@ -25,7 +25,7 @@ class CreatePaymentAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        transaction_data = TransactionResponse(
+        transaction_data = TransactionHistoryResponse(
             merchant_payment.transaction
         ).data
         transaction_data["tip_amount"] = merchant_payment.tip_amount
