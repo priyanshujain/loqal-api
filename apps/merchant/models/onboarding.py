@@ -126,7 +126,7 @@ class IndividualBase(AbstractBaseModel):
 
 class ControllerDetails(IndividualBase):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
-    title = models.CharField(max_length=256)
+    title = models.CharField(max_length=256, blank=True)
     verification_document_required = models.BooleanField(default=False)
 
     def update_verification_document_required(self, required, save=True):

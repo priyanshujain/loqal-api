@@ -143,10 +143,7 @@ class ControllerValidator(IndividualValidator, serializers.ModelSerializer):
             "verification_document_status",
             "verification_document_required",
         )
-
-    # def validate(attrs):
-    # TODO: Add other validators for the controller
-
+        
 
 class BeneficialOwnerValidator(
     IndividualValidator, serializers.ModelSerializer
