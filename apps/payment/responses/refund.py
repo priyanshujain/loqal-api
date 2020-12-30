@@ -11,6 +11,7 @@ __all__ = (
     "RefundListResponse",
 )
 
+
 class CustomerDetailsResponse(serializers.ModelSerializer):
     first_name = serializers.CharField(
         source="user.first_name", read_only=True
@@ -38,8 +39,12 @@ class RefundHistoryResponse(serializers.ModelSerializer):
         source="refund_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="payment.payment_tracking_id", read_only=True)
-    customer = CustomerDetailsResponse(source="payment.order.consumer", read_only=True)
+    payment_tracking_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
+    customer = CustomerDetailsResponse(
+        source="payment.order.consumer", read_only=True
+    )
 
     class Meta:
         model = Refund
@@ -58,7 +63,9 @@ class RefundListResponse(serializers.ModelSerializer):
         source="refund_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="payment.payment_tracking_id", read_only=True)
+    payment_tracking_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
 
     class Meta:
         model = Refund

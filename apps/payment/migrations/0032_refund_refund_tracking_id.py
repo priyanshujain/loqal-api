@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0031_auto_20201229_1221'),
+        ("payment", "0031_auto_20201229_1221"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='refund',
-            name='refund_tracking_id',
-            field=models.CharField(blank=True, default=None, editable=False, max_length=10, null=True, unique=True),
+            model_name="refund",
+            name="refund_tracking_id",
+            field=models.CharField(
+                blank=True,
+                default=None,
+                editable=False,
+                max_length=10,
+                null=True,
+                unique=True,
+            ),
         ),
     ]

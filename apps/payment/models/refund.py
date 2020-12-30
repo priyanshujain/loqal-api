@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.db import models
+from django.utils.crypto import get_random_string
 
 from apps.payment.options import RefundStatus, RefundType
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.models.fields.enum import ChoiceEnumField
-from django.utils.crypto import get_random_string
 
 from .payment import Payment
 from .transaction import Transaction
@@ -53,7 +53,7 @@ class Refund(AbstractBaseModel):
         self.transaction = transaction
         if save:
             self.save()
-    
+
     def save(self, *args, **kwargs):
         def id_generator():
             return get_random_string(
@@ -67,4 +67,3 @@ class Refund(AbstractBaseModel):
             ).exists():
                 self.refund_tracking_id = id_generator()
         return super().save(*args, **kwargs)
-

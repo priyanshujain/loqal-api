@@ -7,18 +7,12 @@ from decimal import Decimal
 from django.db.models import Count, Q, Sum
 from django.db.utils import IntegrityError
 
-from apps.payment.models import (
-    DirectMerchantPayment,
-    Payment,
-    PaymentQrCode,
-    PaymentRegister,
-    PaymentRequest,
-    Refund,
-    Transaction,
-)
+from apps.order.models import Order
+from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
+                                 PaymentRegister, PaymentRequest, Refund,
+                                 Transaction)
 from apps.payment.options import PaymentStatus, RefundStatus, TransactionTypes
 from utils.types import to_float
-from apps.order.models import Order
 
 
 def create_payment_register(account_id):
@@ -117,7 +111,9 @@ def get_payment_qrcode_by_id(qrcode_id, merchant_id):
     get QR code by qrcode_id and merchant_id
     """
     try:
-        return PaymentQrCode.objects.get(qrcode_id=qrcode_id, merchant_id=merchant_id)
+        return PaymentQrCode.objects.get(
+            qrcode_id=qrcode_id, merchant_id=merchant_id
+        )
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -146,7 +142,9 @@ def get_cashier_qrcode(merchant_id, cashier_id):
     Get QR code for a cashier
     """
     try:
-        return PaymentQrCode.objects.get(merchant_id=merchant_id, cashier_id=cashier_id)
+        return PaymentQrCode.objects.get(
+            merchant_id=merchant_id, cashier_id=cashier_id
+        )
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -258,5 +256,3 @@ def get_merchant_transactions(merchant_account):
     return Transaction.objects.filter(
         recipient_bank_account__account=merchant_account.account
     )
-
-

@@ -22,7 +22,6 @@ class EmailVerification(ServiceBase):
         token = data["token"]
         user = get_user_by_email_token(token=token)
 
-
         if not user:
             raise ValidationError(
                 {"token": [ErrorDetail(_("Provided token is not valid."))]}

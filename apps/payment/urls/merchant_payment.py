@@ -1,6 +1,8 @@
 from django.urls import path
 
-from apps.payment.views.merchant_payment import MerchantPaymentDetailsAPI,MerchantCustomersAPI, MerchantCustomerDetailsAPI
+from apps.payment.views.merchant_payment import (MerchantCustomerDetailsAPI,
+                                                 MerchantCustomersAPI,
+                                                 MerchantPaymentDetailsAPI)
 
 urlpatterns = [
     path(

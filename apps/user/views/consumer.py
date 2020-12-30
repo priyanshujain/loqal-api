@@ -8,7 +8,8 @@ from otpauth import OtpAuth
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
-from api.views import APIView, ConsumerAPIView, LoggedInAPIView, ConsumerPre2FaAPIView
+from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
+                       LoggedInAPIView)
 from apps.account.notifications import SendAccountVerifyEmail
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.responses import UserProfileResponse

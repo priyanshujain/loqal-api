@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.banking.models import BankAccount
@@ -40,14 +41,7 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
 class CustomerBasicDetailsResponse(CustomerDetailsResponse):
     class Meta:
         model = ConsumerAccount
-        fields = (
-            "first_name",
-            "last_name",
-            "loqal_id",
-            "created_at"
-        )
-
- 
+        fields = ("first_name", "last_name", "loqal_id", "created_at")
 
 
 class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
@@ -187,9 +181,7 @@ class PaymentListResponse(serializers.ModelSerializer):
     charge_status = serializers.CharField(
         source="charge_status.label", read_only=True
     )
-    status = serializers.CharField(
-        source="status.label", read_only=True
-    )
+    status = serializers.CharField(source="status.label", read_only=True)
     payment_process = serializers.CharField(
         source="payment_process.label", read_only=True
     )
@@ -206,7 +198,7 @@ class PaymentListResponse(serializers.ModelSerializer):
             "payment_process",
             "tip_amount",
         )
-    
+
     def get_tip_amount(self, obj):
         if obj.payment_process == PaymentProcess.PAYMENT_REQUEST:
             payment_requests = obj.payment_requests

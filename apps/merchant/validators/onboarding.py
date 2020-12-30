@@ -143,7 +143,7 @@ class ControllerValidator(IndividualValidator, serializers.ModelSerializer):
             "verification_document_status",
             "verification_document_required",
         )
-        
+
 
 class BeneficialOwnerValidator(
     IndividualValidator, serializers.ModelSerializer

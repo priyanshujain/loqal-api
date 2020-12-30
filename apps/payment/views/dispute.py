@@ -13,14 +13,10 @@ class DisputeListAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
         start, end = self.validate_params(params=self.request_data)
-        disputes = get_merchant_disputes(
-            merchant_account=merchant_account
-        )
+        disputes = get_merchant_disputes(merchant_account=merchant_account)
         if start and end:
             disputes = disputes.filter(created_at__range=[start, end])
-        return self.response(
-            DisputeHistoryResponse(disputes, many=True).data
-        )
+        return self.response(DisputeHistoryResponse(disputes, many=True).data)
 
     def validate_params(self, params):
         try:
@@ -30,5 +26,3 @@ class DisputeListAPI(MerchantAPIView):
         except InvalidParams as e:
             raise ValidationError({"detail": ErrorDetail(_(str(e)))})
         return start, end
-
-

@@ -1,7 +1,6 @@
-from apps.payment.views.dispute import DisputeListAPI
-
 from django.urls import path
 
+from apps.payment.views.dispute import DisputeListAPI
 
 urlpatterns = [
     path(

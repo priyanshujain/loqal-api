@@ -1,18 +1,11 @@
 from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
-from apps.merchant.dbapi import (
-    get_all_beneficial_owners,
-    get_controller_details,
-    get_incorporation_details,
-)
-from apps.merchant.options import BeneficialOwnerStatus
-from apps.merchant.options import (
-    BusinessDocumentType,
-    IndividualDocumentType,
-    BusinessTypes,
-)
-
+from apps.merchant.dbapi import (get_all_beneficial_owners,
+                                 get_controller_details,
+                                 get_incorporation_details)
+from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
+                                   BusinessTypes, IndividualDocumentType)
 
 __all__ = ("DocumentRequirements",)
 
@@ -25,12 +18,19 @@ class DocumentRequirements(ServiceBase):
     def handle(self):
         docs_required = {}
         ba_required_docs = []
-        beneficial_owners = get_all_beneficial_owners(merchant_id=self.merchant.id)
+        beneficial_owners = get_all_beneficial_owners(
+            merchant_id=self.merchant.id
+        )
         for beneficial_owner in beneficial_owners:
             if not beneficial_owner.dwolla_id:
                 continue
-            if beneficial_owner.status == BeneficialOwnerStatus.DOCUMENT_PENDING:
-                ba_details = self._individual_docs_requirement(beneficial_owner)
+            if (
+                beneficial_owner.status
+                == BeneficialOwnerStatus.DOCUMENT_PENDING
+            ):
+                ba_details = self._individual_docs_requirement(
+                    beneficial_owner
+                )
                 if self.internal:
                     ba_details["orm_object"] = beneficial_owner
                 ba_required_docs.append(ba_details)
@@ -45,7 +45,9 @@ class DocumentRequirements(ServiceBase):
         else:
             docs_required["controller"] = None
 
-        incorporation_details = get_incorporation_details(merchant_id=self.merchant.id)
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant.id
+        )
         if incorporation_details.verification_document_required:
             inc_details = {
                 "verification_document_status": incorporation_details.verification_document_status.label
@@ -75,7 +77,10 @@ class DocumentRequirements(ServiceBase):
         return docs_required
 
     def _acceptable_business_document_types(self, incorporation_details):
-        if incorporation_details.business_type == BusinessTypes.SOLE_PROPRIETORSHIP:
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
             return [
                 {"document_type_label": v, "document_type_value": k}
                 for k, v in BusinessDocumentType.choices

@@ -60,7 +60,9 @@ class CreateMerchantAccountValidator(MerchantAccountSignupValidatorBase):
         category = attrs.get("category")
         sub_category = attrs.get("sub_category")
 
-        if not validate_subcategory(category=category, sub_category=sub_category):
+        if not validate_subcategory(
+            category=category, sub_category=sub_category
+        ):
             raise ValidationError(
                 {"category": ErrorDetail(_("Provided category is not valid."))}
             )

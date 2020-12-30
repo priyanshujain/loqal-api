@@ -75,4 +75,6 @@ def update_merchant_profile(
 
 def get_merchants_by_category(category):
     merchant_profile_qs = MerchantProfile.objects.filter(category=category)
-    return [merchant_profile.merchant for merchant_profile in merchant_profile_qs]
+    return [
+        merchant_profile.merchant for merchant_profile in merchant_profile_qs
+    ]

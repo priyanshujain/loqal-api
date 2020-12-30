@@ -2,25 +2,19 @@
 Merchant payments relted db operations.
 """
 
-from apps.payment.models.transaction import DisputeTransaction
 from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
 from django.db.utils import IntegrityError
 from django.utils import translation
 
-from apps.payment.models import (
-    DirectMerchantPayment,
-    Payment,
-    PaymentQrCode,
-    PaymentRegister,
-    PaymentRequest,
-    Refund,
-    Transaction,
-)
-from apps.payment.options import PaymentStatus, TransactionTypes, RefundStatus
-from utils.types import to_float
 from apps.order.models import Order
+from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
+                                 PaymentRegister, PaymentRequest, Refund,
+                                 Transaction)
+from apps.payment.models.transaction import DisputeTransaction
+from apps.payment.options import PaymentStatus, RefundStatus, TransactionTypes
+from utils.types import to_float
 
 
 def get_merchant_payment(merchant_account, payment_id):
@@ -75,13 +69,16 @@ def get_merchant_customers(merchant_account):
                 "first_name": consumer.user.first_name,
                 "last_name": consumer.user.last_name,
                 "total_payments": payment_stats["total_payments"],
-                "total_payment_amount": to_float(payment_stats["total_payment_amount"]),
-                "total_refund_amount": to_float(refund_stats["total_refund_amount"]),
+                "total_payment_amount": to_float(
+                    payment_stats["total_payment_amount"]
+                ),
+                "total_refund_amount": to_float(
+                    refund_stats["total_refund_amount"]
+                ),
                 "total_refunds": refund_stats["total_refunds"],
             }
         )
     return aggregate_consumers
-
 
 
 def get_customer_details(merchant_account, customer_id):
@@ -92,15 +89,14 @@ def get_customer_details(merchant_account, customer_id):
         return None
     consumer_account = payments.first().order.consumer
     refunds = Refund.objects.filter(
-            payment__order__consumer=consumer_account,
-        )
+        payment__order__consumer=consumer_account,
+    )
     disputes = DisputeTransaction.objects.filter(
-            transaction__payment__order__consumer=consumer_account,
-        )
+        transaction__payment__order__consumer=consumer_account,
+    )
     return {
         "consumer_account": consumer_account,
         "payments": payments,
         "refunds": refunds,
         "disputes": disputes,
     }
-

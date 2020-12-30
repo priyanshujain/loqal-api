@@ -1,7 +1,6 @@
-from apps.payment.views.refund import RefundListAPI
-
 from django.urls import path
 
+from apps.payment.views.refund import RefundListAPI
 
 urlpatterns = [
     path(

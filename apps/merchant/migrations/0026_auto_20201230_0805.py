@@ -6,53 +6,53 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0025_auto_20201228_1105'),
+        ("merchant", "0025_auto_20201228_1105"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='codesandprotocols',
-            name='contactless_payments',
+            model_name="codesandprotocols",
+            name="contactless_payments",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='codesandprotocols',
-            name='mask_required',
+            model_name="codesandprotocols",
+            name="mask_required",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='codesandprotocols',
-            name='ourdoor_seating',
+            model_name="codesandprotocols",
+            name="ourdoor_seating",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='codesandprotocols',
-            name='sanitizer_provided',
+            model_name="codesandprotocols",
+            name="sanitizer_provided",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='controllerdetails',
-            name='title',
+            model_name="controllerdetails",
+            name="title",
             field=models.CharField(blank=True, max_length=256),
         ),
         migrations.AlterField(
-            model_name='serviceavailability',
-            name='curbside_pickup',
+            model_name="serviceavailability",
+            name="curbside_pickup",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='serviceavailability',
-            name='delivery',
+            model_name="serviceavailability",
+            name="delivery",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='serviceavailability',
-            name='sitting_dining',
+            model_name="serviceavailability",
+            name="sitting_dining",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='serviceavailability',
-            name='takeout',
+            model_name="serviceavailability",
+            name="takeout",
             field=models.BooleanField(default=False),
         ),
     ]

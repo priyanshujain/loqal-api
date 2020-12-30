@@ -1,12 +1,7 @@
 from api import serializers
-from apps.merchant.models import (
-    MerchantProfile,
-    MerchantOperationHours,
-    CodesAndProtocols,
-    ServiceAvailability,
-)
 from apps.account.models import MerchantAccount
-
+from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
+                                  MerchantProfile, ServiceAvailability)
 
 __all__ = ("CategoryMerchantListResponse",)
 
@@ -56,14 +51,18 @@ class MerchantServicesResponse(serializers.ModelSerializer):
 
 
 class CategoryMerchantListResponse(serializers.ModelSerializer):
-    profile = MerchantBasicProfileResponse(source="merchantprofile", read_only=True)
+    profile = MerchantBasicProfileResponse(
+        source="merchantprofile", read_only=True
+    )
     hours = MerchantOperatingHoursResponse(
         source="merchantoperationhours", read_only=True
     )
     codes_and_protocols = MerchantCodesProtocolsResponse(
         source="codesandprotocols", read_only=True
     )
-    services = MerchantServicesResponse(source="serviceavailability", read_only=True)
+    services = MerchantServicesResponse(
+        source="serviceavailability", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount

@@ -11,7 +11,6 @@ def validate_subcategory(category, sub_category):
     return False
 
 
-
 def validate_category(category):
     for merchant_category in MERCHANT_CATEGORIES:
         if merchant_category["category_slug"] == category:

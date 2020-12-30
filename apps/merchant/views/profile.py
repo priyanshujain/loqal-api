@@ -5,7 +5,6 @@ from api.views import MerchantAPIView
 from apps.merchant.responses import MerchantProfileResponse
 from apps.merchant.services import UpdateMerchantProfile
 
-
 __all__ = (
     "UpdateMerchantProfileAPI",
     "GetMerchantProfileAPI",

@@ -1,7 +1,7 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.banking.models import BankAccount
-from apps.payment.models import Transaction, DisputeTransaction
+from apps.payment.models import DisputeTransaction, Transaction
 from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
@@ -10,6 +10,7 @@ __all__ = (
     "DisputeHistoryResponse",
     "DisputeListResponse",
 )
+
 
 class CustomerDetailsResponse(serializers.ModelSerializer):
     first_name = serializers.CharField(
@@ -38,8 +39,12 @@ class DisputeHistoryResponse(serializers.ModelSerializer):
         source="dispute_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="transaction.payment.payment_tracking_id", read_only=True)
-    customer = CustomerDetailsResponse(source="transaction.payment.order.consumer", read_only=True)
+    payment_tracking_id = serializers.CharField(
+        source="transaction.payment.payment_tracking_id", read_only=True
+    )
+    customer = CustomerDetailsResponse(
+        source="transaction.payment.order.consumer", read_only=True
+    )
 
     class Meta:
         model = DisputeTransaction
@@ -58,7 +63,9 @@ class DisputeListResponse(serializers.ModelSerializer):
         source="dispute_type.label", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
-    payment_tracking_id = serializers.CharField(source="transaction.payment.payment_tracking_id", read_only=True)
+    payment_tracking_id = serializers.CharField(
+        source="transaction.payment.payment_tracking_id", read_only=True
+    )
 
     class Meta:
         model = DisputeTransaction

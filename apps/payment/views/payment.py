@@ -4,6 +4,7 @@ from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust)
+from apps.payment.models import transaction
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
                                     TransactionHistoryResponse,
@@ -21,9 +22,11 @@ class CreatePaymentAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        return self.response(
-            TransactionResponse(merchant_payment.transaction).data, status=201
-        )
+        transaction_data = TransactionResponse(
+            merchant_payment.transaction
+        ).data
+        transaction_data["tip_amount"] = merchant_payment.tip_amount
+        return self.response(transaction_data, status=201)
 
 
 class PaymentHistoryAPI(ConsumerAPIView):
