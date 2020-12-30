@@ -17,6 +17,7 @@ urlpatterns = [
     path("api/reference/", include("apps.reference.urls")),
     path("api/merchant/", include("apps.merchant.urls")),
     path("api/provider/", include("apps.provider.urls.consumer")),
+    path("api/support/", include("apps.support.urls")),
     path("api/staff/tracking/", include("apps.tracking.urls")),
     path("api/staff/provider/", include("apps.provider.urls.staff")),
     path("", WelcomeAPI.as_view()),
