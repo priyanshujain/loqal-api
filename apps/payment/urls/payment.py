@@ -8,7 +8,8 @@ from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         ListConsumerPaymentRequestAPI,
                                         ListMerchantPaymentRequestAPI,
                                         PaymentHistoryAPI,
-                                        RejectPaymentRequestAPI)
+                                        RejectPaymentRequestAPI,
+                                        TransactionDetailsAPI)
 
 urlpatterns = [
     path("create/", CreatePaymentAPI.as_view(), name="create_payment"),
@@ -47,5 +48,10 @@ urlpatterns = [
         "refund/",
         CreateRefundPaymentAPI.as_view(),
         name="create_refund_payment",
+    ),
+    path(
+        "transactions/details/<str:transaction_id>",
+        TransactionDetailsAPI.as_view(),
+        name="consumer_transaction_details",
     ),
 ]

@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
+from apps.banking.models import BankAccount
 from apps.payment.models import (DirectMerchantPayment, Payment,
                                  PaymentRequest, Refund, Transaction)
 from apps.payment.options import PaymentProcess
@@ -13,6 +16,7 @@ __all__ = (
     "MerchantPaymentResponse",
     "RefundPaymentResponse",
     "TransactionHistoryResponse",
+    "TransactionDetailsResponse",
 )
 
 
@@ -225,6 +229,9 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
     payment_status = serializers.CharField(
         source="payment.status.label", read_only=True
     )
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
+    )
     merchant = MerchantDetailsResponse(
         source="payment.order.merchant", read_only=True
     )
@@ -238,6 +245,7 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
             "amount",
             "currency",
             "payment_status",
+            "transaction_id",
             "is_success",
             "merchant",
             "bank_logo",
@@ -256,3 +264,79 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
         if self.refund:
             return True
         return False
+
+
+class BankAcconutResponse(serializers.ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = (
+            "bank_logo_base64",
+            "bank_name",
+            "account_number_suffix",
+        )
+
+
+class TransactionDetailsResponse(serializers.ModelSerializer):
+    payment_status = serializers.CharField(
+        source="payment.status.label", read_only=True
+    )
+    payment_tracking_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
+    merchant = MerchantDetailsResponse(
+        source="payment.order.merchant", read_only=True
+    )
+    banks_details = serializers.SerializerMethodField("get_bank_details")
+    tip_amount = serializers.SerializerMethodField("get_tip_amount")
+    is_credit = serializers.SerializerMethodField("is_credit_transaction")
+
+    class Meta:
+        model = Transaction
+        fields = (
+            "created_at",
+            "amount",
+            "currency",
+            "payment_status",
+            "payment_tracking_id",
+            "is_success",
+            "merchant",
+            "banks_details",
+            "is_credit",
+            "tip_amount",
+        )
+
+    def get_bank_details(self, obj):
+        self.refund = None
+        bank_account = None
+        try:
+            self.refund = obj.refund
+            bank_account = obj.recipient_bank_account
+        except Refund.DoesNotExist:
+            bank_account = obj.sender_bank_account
+        return BankAcconutResponse(bank_account).data
+
+    def is_credit_transaction(self, obj):
+        if self.refund:
+            return True
+        return False
+
+    def get_tip_amount(self, obj):
+        payment = obj.payment
+        if payment:
+            if payment.payment_process == PaymentProcess.PAYMENT_REQUEST:
+                payment_requests = payment.payment_requests
+                if not payment_requests.exists():
+                    return None
+                payment_request = payment_requests.first()
+                return payment_request.tip_amount
+
+            if payment.payment_process in [
+                PaymentProcess.QRCODE,
+                PaymentProcess.DIRECT_APP,
+            ]:
+                direct_merchant_payments = payment.direct_merchant_payments
+                if not direct_merchant_payments.exists():
+                    return None
+                direct_merchant_payment = direct_merchant_payments.first()
+                return direct_merchant_payment.tip_amount
+        return Decimal(0.0)

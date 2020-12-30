@@ -256,3 +256,13 @@ def get_merchant_transactions(merchant_account):
     return Transaction.objects.filter(
         recipient_bank_account__account=merchant_account.account
     )
+
+
+def get_consumer_transaction(consumer_account, transaction_tracking_id):
+    transactions = get_consumer_transactions(consumer_account=consumer_account)
+    transactions = transactions.filter(
+        transaction_tracking_id=transaction_tracking_id
+    )
+    if not transactions.exists():
+        return None
+    return transactions.first()

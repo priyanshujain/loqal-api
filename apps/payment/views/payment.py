@@ -1,12 +1,15 @@
 from django.utils.translation import gettext as _
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
+                                get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust)
 from apps.payment.models import transaction
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
+                                    TransactionDetailsResponse,
                                     TransactionHistoryResponse,
                                     TransactionResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
@@ -38,6 +41,20 @@ class PaymentHistoryAPI(ConsumerAPIView):
         return self.response(
             TransactionHistoryResponse(transactions, many=True).data
         )
+
+
+class TransactionDetailsAPI(ConsumerAPIView):
+    def get(self, request, transaction_id):
+        consumer_account = request.consumer_account
+        transaction = get_consumer_transaction(
+            consumer_account=consumer_account,
+            transaction_tracking_id=transaction_id,
+        )
+        if not transaction:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid transaction_id."))}
+            )
+        return self.response(TransactionDetailsResponse(transaction).data)
 
 
 class CreatePaymentRequestAPI(MerchantAPIView):
