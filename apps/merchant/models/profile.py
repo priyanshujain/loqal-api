@@ -81,10 +81,10 @@ class MerchantOperationHours(AbstractBaseModel):
 
 class CodesAndProtocols(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
-    contactless_payments = models.BooleanField(default=True)
-    mask_required = models.BooleanField(default=True)
-    sanitizer_provided = models.BooleanField(default=True)
-    ourdoor_seating = models.BooleanField(default=True)
+    contactless_payments = models.BooleanField(default=False)
+    mask_required = models.BooleanField(default=False)
+    sanitizer_provided = models.BooleanField(default=False)
+    ourdoor_seating = models.BooleanField(default=False)
     last_cleaned_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -93,10 +93,10 @@ class CodesAndProtocols(AbstractBaseModel):
 
 class ServiceAvailability(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
-    curbside_pickup = models.BooleanField(default=True)
-    delivery = models.BooleanField(default=True)
-    takeout = models.BooleanField(default=True)
-    sitting_dining = models.BooleanField(default=True)
+    curbside_pickup = models.BooleanField(default=False)
+    delivery = models.BooleanField(default=False)
+    takeout = models.BooleanField(default=False)
+    sitting_dining = models.BooleanField(default=False)
 
     class Meta:
         db_table = "merchant_service_availability"
