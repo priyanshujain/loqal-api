@@ -1,14 +1,12 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
-from apps.banking.models import BankAccount
-from apps.payment.models import DisputeTransaction, Transaction
-from apps.payment.models.payment import Payment, PaymentEvent
-from apps.payment.models.refund import Refund
-from apps.payment.options import PaymentProcess
+from apps.payment.models import DisputeTransaction
 
 __all__ = (
     "DisputeHistoryResponse",
     "DisputeListResponse",
+    "ConsumerDisputeDetailsResponse",
+    "MerchantDisputeDetailsResponse",
 )
 
 
@@ -66,6 +64,9 @@ class DisputeListResponse(serializers.ModelSerializer):
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
+    reason_type = serializers.CharField(
+        source="reason_type.label", read_only=True
+    )
 
     class Meta:
         model = DisputeTransaction
@@ -74,5 +75,61 @@ class DisputeListResponse(serializers.ModelSerializer):
             "dispute_type",
             "dispute_tracking_id",
             "payment_tracking_id",
+            "reason_type",
             "status",
+        )
+
+
+class ConsumerDisputeDetailsResponse(serializers.ModelSerializer):
+    dispute_type = serializers.CharField(
+        source="dispute_type.label", read_only=True
+    )
+    status = serializers.CharField(source="status.label", read_only=True)
+    reason_type = serializers.CharField(
+        source="reason_type.label", read_only=True
+    )
+
+    class Meta:
+        model = DisputeTransaction
+        fields = (
+            "created_at",
+            "dispute_type",
+            "dispute_tracking_id",
+            "reason_type",
+            "status",
+            "reason_message",
+            "reason_type",
+        )
+
+
+class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
+    dispute_type = serializers.CharField(
+        source="dispute_type.label", read_only=True
+    )
+    status = serializers.CharField(source="status.label", read_only=True)
+    transaction_tracking_id = serializers.CharField(
+        source="transaction.transaction_tracking_id", read_only=True
+    )
+    payment_tracking_id = serializers.CharField(
+        source="transaction.payment.payment_tracking_id", read_only=True
+    )
+    reason_type = serializers.CharField(
+        source="reason_type.label", read_only=True
+    )
+    customer = CustomerDetailsResponse(
+        source="transaction.payment.order.consume", read_only=True
+    )
+
+    class Meta:
+        model = DisputeTransaction
+        fields = (
+            "created_at",
+            "dispute_type",
+            "dispute_tracking_id",
+            "payment_tracking_id",
+            "transaction_tracking_id",
+            "status",
+            "customer",
+            "reason_message",
+            "reason_type",
         )

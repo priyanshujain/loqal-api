@@ -4,9 +4,9 @@ from django.utils.crypto import get_random_string
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (ChargeStatus, DisputeStatus, DisputeType,
-                                  PaymentStatus, TransactionEventType,
-                                  TransactionStatus)
+from apps.payment.options import (ChargeStatus, DisputeReasonType,
+                                  DisputeStatus, DisputeType, PaymentStatus,
+                                  TransactionEventType, TransactionStatus)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -127,6 +127,11 @@ class Transaction(AbstractBaseModel):
                 self.transaction_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
+    def enable_disputed(self, save=True):
+        self.is_disputed = True
+        if save:
+            self.save()
+
 
 class TransactionEvent(AbstractBaseModel):
     transaction = models.ForeignKey(
@@ -168,6 +173,12 @@ class DisputeTransaction(AbstractBaseModel):
         enum_type=DisputeType,
         default=DisputeType.CHARGEBACK,
     )
+    reason_type = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=DisputeReasonType,
+        default=DisputeReasonType.OTHER,
+    )
+    reason_message = models.TextField(default="")
 
     class Meta:
         db_table = "dispute_transaction"

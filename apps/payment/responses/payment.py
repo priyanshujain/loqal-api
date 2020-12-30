@@ -303,6 +303,7 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "banks_details",
             "is_credit",
             "tip_amount",
+            "is_disputed",
         )
 
     def get_bank_details(self, obj):

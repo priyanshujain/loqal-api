@@ -100,3 +100,11 @@ class DisputeStatus(ChoiceEnum):
 class DisputeType(ChoiceCharEnum):
     CHARGEBACK = "chargeback", _("Chargeback")
     FRAUD = "fraud", _("Fraud")
+
+
+class DisputeReasonType(ChoiceCharEnum):
+    MONEY_NOT_REACHED = "money_not_reached", _(
+        "Money has not reached to merchant"
+    )
+    PAID_TWICE = "paid_twice", _("Paid twice for the order")
+    OTHER = "other", _("Other issues")
