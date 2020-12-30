@@ -68,11 +68,11 @@ urlpatterns = [
         name="check_email_exists",
     ),
     path("profile/", GetUserProfileAPI.as_view(), name="view_user_profile"),
-    path(
-        "profile/update/",
-        UpdateUserProfileAPI.as_view(),
-        name="update_user_profile",
-    ),
+    # path(
+    #     "profile/update/",
+    #     UpdateUserProfileAPI.as_view(),
+    #     name="update_user_profile",
+    # ),
     path(
         "tfa/status/",
         CheckTFAStausAPI.as_view(),
