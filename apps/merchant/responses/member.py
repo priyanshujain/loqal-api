@@ -47,7 +47,7 @@ class AccountMemberResponse(serializers.ModelSerializer):
         source="user.first_name", read_only=True
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
-    email = serializers.CharField(source="profile.user.email", read_only=True)
+    email = serializers.CharField(source="user.email", read_only=True)
     is_disbled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )

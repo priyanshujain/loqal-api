@@ -5,6 +5,7 @@ from apps.merchant.models import MerchantProfile
 __all__ = (
     "create_merchant_profile",
     "update_merchant_profile",
+    "get_merchants_by_category",
 )
 
 
@@ -70,3 +71,8 @@ def update_merchant_profile(
         amenities=amenities,
         additional_details=additional_details,
     )
+
+
+def get_merchants_by_category(category):
+    merchant_profile_qs = MerchantProfile.objects.filter(category=category)
+    return [merchant_profile.merchant for merchant_profile in merchant_profile_qs]

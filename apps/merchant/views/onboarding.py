@@ -227,6 +227,7 @@ class AcceptableDocumentTypesAPI(MerchantAPIView):
             for k, v in BusinessDocumentType.choices
             if BusinessDocumentType.NOT_APPLICABLE.value != k
         ]
+
         return self.response(
             {
                 "incorporation": business_document_types,
