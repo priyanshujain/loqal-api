@@ -55,8 +55,8 @@ class RefundType(ChoiceCharEnum):
 
 
 class RefundStatus(ChoiceEnum):
-    PROCESSED = 0, _("PROCESSED")
-    FAILED = 1, _("FAILED")
+    PROCESSED = 0, _("Processed")
+    FAILED = 1, _("Failed")
 
 
 class PaymentMethodType(ChoiceCharEnum):

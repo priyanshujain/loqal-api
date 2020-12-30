@@ -3,8 +3,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import MerchantAPIView
-from apps.payment.dbapi import get_merchant_refunds
-from apps.payment.responses import RefundHistoryResponse
+from apps.payment.dbapi import get_merchant_refund, get_merchant_refunds
+from apps.payment.responses import RefundDetailsResponse, RefundHistoryResponse
 
 __all__ = ("RefundListAPI",)
 
@@ -26,3 +26,16 @@ class RefundListAPI(MerchantAPIView):
         except InvalidParams as e:
             raise ValidationError({"detail": ErrorDetail(_(str(e)))})
         return start, end
+
+
+class RefundDetailsAPI(MerchantAPIView):
+    def get(self, request, refund_id):
+        merchant_account = request.merchant_account
+        refund = get_merchant_refund(
+            merchant_account=merchant_account, refund_id=refund_id
+        )
+        if not refund:
+            raise ValidationError(
+                {"detail": ErrorDetail("refund_id is not valid.")}
+            )
+        return self.response(RefundDetailsResponse(refund).data)

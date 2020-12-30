@@ -32,6 +32,17 @@ def get_merchant_refunds(merchant_account):
     return Refund.objects.filter(payment__order__merchant=merchant_account)
 
 
+def get_merchant_refund(merchant_account, refund_id):
+    """"""
+    try:
+        return Refund.objects.get(
+            payment__order__merchant=merchant_account,
+            refund_tracking_id=refund_id,
+        )
+    except Refund.DoesNotExist:
+        return None
+
+
 def get_merchant_disputes(merchant_account):
     """"""
     return DisputeTransaction.objects.filter(
