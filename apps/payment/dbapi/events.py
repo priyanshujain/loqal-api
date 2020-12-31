@@ -1,5 +1,6 @@
 from apps.payment.models import PaymentEvent
 from apps.payment.options import PaymentEventType
+from utils.types import to_float
 
 
 def initiate_payment_event(payment_id):
@@ -28,7 +29,10 @@ def partial_refund_payment_event(payment_id, refund_tracking_id, amount):
     PaymentEvent.objects.create(
         payment_id=payment_id,
         event_type=PaymentEventType.PAYMENT_PARTIALLY_REFUNDED,
-        parameters={"refund_tracking_id": refund_tracking_id, "amount": amount},
+        parameters={
+            "refund_tracking_id": refund_tracking_id,
+            "amount": to_float(amount),
+        },
     )
 
 

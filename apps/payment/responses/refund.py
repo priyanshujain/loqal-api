@@ -54,6 +54,7 @@ class RefundHistoryResponse(serializers.ModelSerializer):
             "payment_tracking_id",
             "customer",
             "status",
+            "amount",
         )
 
 

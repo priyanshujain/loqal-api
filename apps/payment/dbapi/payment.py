@@ -268,3 +268,13 @@ def get_consumer_transaction(consumer_account, transaction_tracking_id):
     if not transactions.exists():
         return None
     return transactions.first()
+
+
+def get_merchant_payment(merchant_account, payment_tracking_id):
+    payments = Payment.objects.filter(
+        payment_tracking_id=payment_tracking_id,
+        order__merchant=merchant_account,
+    )
+    if not payments.exists():
+        return None
+    return payments.first()

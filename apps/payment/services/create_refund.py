@@ -3,8 +3,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.order.dbapi import get_order_by_id
-from apps.payment.dbapi import create_refund_payment
+from apps.payment.dbapi import create_refund_payment, get_merchant_payment
 from apps.payment.dbapi.events import (full_refund_payment_event,
                                        partial_refund_payment_event)
 from apps.payment.options import RefundType, TransactionType
@@ -56,21 +55,22 @@ class CreateRefund(ServiceBase):
 
     def _validate_data(self):
         data = run_validator(CreateRefundValidator, self.data)
-        order_id = data["order_id"]
+        payment_id = data["payment_id"]
         amount = data["amount"]
 
-        order = get_order_by_id(
-            merchant_id=self.merchant_account.id, order_id=order_id
+        payment = get_merchant_payment(
+            merchant_account=self.merchant_account,
+            payment_tracking_id=payment_id,
         )
-        if not order:
+        if not payment:
             raise ValidationError(
-                {"order_id": ErrorDetail(_("Given order does not exist."))}
+                {"payment_id": ErrorDetail(_("Given payment does not exist."))}
             )
-        if amount > order.total_net_amount:
+        if amount > payment.order.total_net_amount:
             raise ValidationError(
                 {
                     "amount": ErrorDetail(
-                        _("amount should be less than total order amount.")
+                        _("amount should be less than total payment amount.")
                     )
                 }
             )
@@ -79,12 +79,12 @@ class CreateRefund(ServiceBase):
 
         banking_data = ValidateBankBalance(
             sender_account_id=self.merchant_account.account.id,
-            receiver_account_id=order.consumer.account.id,
+            receiver_account_id=payment.order.consumer.account.id,
             total_amount=data["amount"],
         ).validate()
 
         return {
-            "order": order,
+            "order": payment.order,
             "amount": data["amount"],
             "sender_bank_account": banking_data["sender_bank_account"],
             "receiver_bank_account": banking_data["receiver_bank_account"],

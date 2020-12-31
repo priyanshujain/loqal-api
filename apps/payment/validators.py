@@ -142,7 +142,7 @@ class RejectPaymentRequestValidator(serializers.ValidationSerializer):
 
 
 class CreateRefundValidator(serializers.ValidationSerializer):
-    order_id = serializers.IntegerField()
+    payment_id = serializers.CharField()
     amount = serializers.DecimalField(
         min_value=0,
         max_digits=settings.DEFAULT_MAX_DIGITS,
