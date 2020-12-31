@@ -35,7 +35,7 @@ class IndividualBaseAdapter(Adapter):
 
 
 class ControllerAdapter(IndividualBaseAdapter):
-    title = Field()
+    title = Field(required=False)
     ssn = Field(required=False)
 
 
