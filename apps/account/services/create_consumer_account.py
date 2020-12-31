@@ -27,11 +27,6 @@ class CreateConsumerAccount(ServiceBase):
     def handle(self):
         data = self._validate_data()
         user = self._factory_user()
-        _ = self._factory_user_device(
-            user=user,
-            device_type=data["user_device_type"],
-            registration_id=data["device_registration_id"],
-        )
         consumer_account = self._factory_account(user=user)
         self._send_verfication_email(user=user)
         self._create_dwolla_account(consumer_account=consumer_account)
@@ -75,13 +70,6 @@ class CreateConsumerAccount(ServiceBase):
             last_name=self._last_name,
             email=self._email,
             password=self._password,
-        )
-
-    def _factory_user_device(self, user, device_type, registration_id):
-        return create_user_device(
-            user_id=user.id,
-            device_type=device_type,
-            registration_id=registration_id,
         )
 
     def _create_dwolla_account(self, consumer_account):
