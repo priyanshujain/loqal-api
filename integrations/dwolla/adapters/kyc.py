@@ -35,7 +35,6 @@ class IndividualBaseAdapter(Adapter):
 
 
 class ControllerAdapter(IndividualBaseAdapter):
-    title = Field(required=False)
     ssn = Field(required=False)
 
 
@@ -75,6 +74,8 @@ class BeneficialOwnerAdapter(IndividualBaseAdapter):
 
 def get_individual_data(adapter, data):
     adapted_data = adapter(data).adapt()
+    if data.get("title"):
+        adapted_data["title"] = data["title"]
     if data.get("passport_number"):
         adapted_data["passport"] = PassportAdapter(data).adapt()
     return adapted_data
