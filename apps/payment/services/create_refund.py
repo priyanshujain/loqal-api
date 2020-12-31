@@ -44,6 +44,7 @@ class CreateRefund(ServiceBase):
             partial_refund_payment_event(
                 payment_id=transaction.payment.id,
                 refund_tracking_id=refund_payment.refund_tracking_id,
+                amount=transaction.amount,
             )
         if refund_payment.refund_type == RefundType.FULL:
             full_refund_payment_event(
