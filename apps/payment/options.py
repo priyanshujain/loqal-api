@@ -8,6 +8,15 @@ FACILITATION_FEES_PERCENTAGE = 1.5
 FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
 
 
+class TransactionType(ChoiceCharEnum):
+    PAYMENT_REQUEST = "payment_request", _("Payment Request")
+    DIRECT_MERCHANT_PAYMENT = "direct_merchant_payment", _(
+        "Direct Merchant Payment"
+    )
+    REFUND_PAYMENT = "refund_payment", _("Refund Payment")
+    OTHER = "other", _("Other")
+
+
 class TransactionStatus(ChoiceEnum):
     NOT_SENT = 0, _("Not Sent")
     PENDING = 1, _("Pending")
@@ -33,20 +42,18 @@ class PaymentStatus(ChoiceEnum):
 
 
 class PaymentEventType(ChoiceEnum):
-    PAYMENT_CAPTURED = 0, _("Payment Captured")
-    PAYMENT_FAILED = 1, _("Payment Failed")
-    PAYMENT_REFUND_INITIATED = 2, _("Refund Initiated")
+    PAYMENT_INTIATED = 0, _("Payment Initiated")
+    PAYMENT_CAPTURED = 1, _("Payment Captured")
+    PAYMENT_FAILED = 2, _("Payment Failed")
+    PAYMENT_PARTIALLY_REFUNDED = 3, _("Partially Refunded")
+    PAYMENT_FULLY_REFUNDED = 4, _("Fully Refunded")
+    PAYMENT_DISPUTED = 4, _("Payment Disputed")
 
 
 class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
     ACCEPTED = 1, _("Request Accepted")
     REJECTED = 2, _("Request Rejected")
-
-
-class TransactionTypes(ChoiceCharEnum):
-    PAYMENT = "payment", _("Payment")
-    REFUND = "refund", _("Refund")
 
 
 class RefundType(ChoiceCharEnum):

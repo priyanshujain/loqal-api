@@ -11,7 +11,7 @@ from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
-from apps.payment.options import PaymentStatus, RefundStatus, TransactionTypes
+from apps.payment.options import PaymentStatus, TransactionType
 from utils.types import to_float
 
 
@@ -53,6 +53,7 @@ def create_transaction(
     fee_currency,
     payment_id,
     customer_ip_address,
+    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
 ):
     """
     dbapi for creating new transaction.
@@ -69,6 +70,7 @@ def create_transaction(
             fee_currency=fee_currency,
             payment_id=payment_id,
             customer_ip_address=customer_ip_address,
+            transaction_type=transaction_type,
         )
     except IntegrityError:
         return None

@@ -3,10 +3,15 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.payment.dbapi import (create_dispute_transaction,
-                                get_consumer_transaction,
-                                get_dispute_transaction)
+from apps.payment.dbapi import (
+    create_dispute_transaction,
+    get_consumer_transaction,
+    get_dispute_transaction,
+)
 from apps.payment.validators import CreateDisputeValidator
+from apps.payment.options import TransactionType
+from apps.payment.dbapi.events import dispute_payment_event
+
 
 __all__ = ("CreateDispute",)
 
@@ -52,6 +57,15 @@ class CreateDispute(ServiceBase):
                         _("Dispute already exists for this transaction.")
                     )
                 }
+            )
+
+        if transaction.transaction_type in [
+            TransactionType.PAYMENT_REQUEST,
+            TransactionType.DIRECT_MERCHANT_PAYMENT,
+        ]:
+            dispute_payment_event(
+                payment_id=transaction.payment.id,
+                dispute_tracking_id=dispute.dispute_tracking_id,
             )
 
         return {

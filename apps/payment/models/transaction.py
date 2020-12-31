@@ -6,7 +6,8 @@ from apps.account.models import Account
 from apps.banking.models import BankAccount
 from apps.payment.options import (ChargeStatus, DisputeReasonType,
                                   DisputeStatus, DisputeType, PaymentStatus,
-                                  TransactionEventType, TransactionStatus)
+                                  TransactionEventType, TransactionStatus,
+                                  TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -76,6 +77,11 @@ class Transaction(AbstractBaseModel):
         default=None,
         unique=True,
         editable=False,
+    )
+    transaction_type = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=TransactionType,
+        default=TransactionType.DIRECT_MERCHANT_PAYMENT,
     )
     dwolla_id = models.CharField(max_length=255, blank=True)
     individual_ach_id = models.CharField(

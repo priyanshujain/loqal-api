@@ -13,7 +13,7 @@ from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
 from apps.payment.models.transaction import DisputeTransaction
-from apps.payment.options import PaymentStatus, RefundStatus, TransactionTypes
+from apps.payment.options import PaymentStatus, RefundStatus
 from utils.types import to_float
 
 

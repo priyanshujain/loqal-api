@@ -5,7 +5,9 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.order.dbapi import get_order_by_id
 from apps.payment.dbapi import create_refund_payment
-from apps.payment.options import RefundType
+from apps.payment.dbapi.events import (full_refund_payment_event,
+                                       partial_refund_payment_event)
+from apps.payment.options import RefundType, TransactionType
 from apps.payment.validators import CreateRefundValidator
 
 from .create_payment import CreatePayment
@@ -36,7 +38,18 @@ class CreateRefund(ServiceBase):
             order=order,
             total_amount=refund_payment.amount,
             fee_bearer_account=self.merchant_account.account,
+            transaction_type=TransactionType.REFUND_PAYMENT,
         ).handle()
+        if refund_payment.refund_type == RefundType.PARTIAL:
+            partial_refund_payment_event(
+                payment_id=transaction.payment.id,
+                refund_tracking_id=refund_payment.refund_tracking_id,
+            )
+        if refund_payment.refund_type == RefundType.FULL:
+            full_refund_payment_event(
+                payment_id=transaction.payment.id,
+                refund_tracking_id=refund_payment.refund_tracking_id,
+            )
         refund_payment.add_transaction(transaction=transaction)
         return refund_payment
 

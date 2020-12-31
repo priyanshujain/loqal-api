@@ -11,7 +11,10 @@ from apps.banking.dbapi import get_bank_account
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_payment, create_payment_request,
                                 get_payment_reqeust_by_id)
-from apps.payment.options import PaymentProcess, PaymentRequestStatus
+from apps.payment.dbapi.events import (capture_payment_event,
+                                       initiate_payment_event)
+from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
+                                  TransactionType)
 from apps.payment.validators import (ApprovePaymentRequestValidator,
                                      CreatePaymentRequestValidator,
                                      RejectPaymentRequestValidator)
@@ -83,6 +86,7 @@ class CreatePaymentRequest(ServiceBase):
         payment = create_payment(
             order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
         )
+        initiate_payment_event(payment_id=payment.id)
         return create_payment_request(
             account_from_id=self.account_id,
             account_to_id=data["account_to_id"],
@@ -131,7 +135,12 @@ class ApprovePaymentRequest(ServiceBase):
             order=payment_request.payment.order,
             total_amount=total_amount,
             fee_bearer_account=merchant_account.account,
+            transaction_type=TransactionType.PAYMENT_REQUEST,
         ).handle()
+        capture_payment_event(
+            payment_id=transaction.payment.id,
+            transaction_tracking_id=transaction.transaction_tracking_id,
+        )
         payment_request.add_transaction(transaction=transaction)
         return transaction
 
