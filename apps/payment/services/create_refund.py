@@ -60,7 +60,7 @@ class CreateRefund(ServiceBase):
 
         payment = get_merchant_payment(
             merchant_account=self.merchant_account,
-            payment_tracking_id=payment_id,
+            payment_id=payment_id,
         )
         if not payment:
             raise ValidationError(
