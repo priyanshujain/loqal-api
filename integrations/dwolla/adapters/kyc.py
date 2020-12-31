@@ -1,10 +1,11 @@
+from apps.merchant.options import BusinessTypes
 from lib.adapter import Adapter, Field
 
 
 class SolePersonAdapter(Adapter):
     firstName = Field(source="first_name")
     lastName = Field(source="last_name")
-    DateOfBirth = Field(source="dob")
+    dateOfBirth = Field(source="dob")
     address1 = Field(source="address.address1")
     address2 = Field(source="address.address2")
     city = Field(source="address.city")
@@ -87,7 +88,7 @@ def get_adapted_kyc_data(data):
     business_type = incorporation_details["business_type"]
 
     adapted_data = {}
-    if business_type.value == DwollaBusinessTypes.sole_proprietorship:
+    if business_type == BusinessTypes.SOLE_PROPRIETORSHIP:
         adapted_data = {
             **IncorporationDetailsAdapter(incorporation_details).adapt(),
             **SolePersonAdapter(controller_details).adapt(),

@@ -210,6 +210,17 @@ class CreateControllerDetails(ServiceBase):
                     "title": "Title is required for businesses other than sole proprietors"
                 }
             )
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
+            data["title"] = ""
+            data["passport_number"] = ""
+            data["passport_country"] = ""
+            if not data.get("ssn"):
+                raise ValidationError(
+                    {"title": "SSN is required for sole proprietors"}
+                )
 
         self.data = data
         return True
@@ -247,7 +258,33 @@ class UpdateControllerDetails(CreateControllerDetails):
                 {"detail": ErrorDetail(_("Controller details did not found."))}
             )
 
-        self.data = run_validator(ControllerValidator, self.data)
+        incorporation_details = (
+            controller_details.merchant.incorporationdetails
+        )
+        data = run_validator(ControllerValidator, self.data)
+        title = data.get("title")
+        if (
+            incorporation_details.business_type
+            != BusinessTypes.SOLE_PROPRIETORSHIP
+            and not title
+        ):
+            raise ValidationError(
+                {
+                    "title": "Title is required for businesses other than sole proprietors"
+                }
+            )
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
+            data["title"] = ""
+            data["passport_number"] = ""
+            data["passport_country"] = ""
+            if not data.get("ssn"):
+                raise ValidationError(
+                    {"title": "SSN is required for sole proprietors"}
+                )
+        self.data = data
         return True
 
     def _update_controller_details(self):
@@ -264,6 +301,32 @@ class CreateBeneficialOwner(ServiceBase):
         return self._factory_controller_details()
 
     def _validate_data(self):
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant_id
+        )
+        if not incorporation_details:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Incorporation details are required before adding controller details."
+                        )
+                    )
+                }
+            )
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Beneficial owners are not required for sole proprietors."
+                        )
+                    )
+                }
+            )
         self.data = run_validator(BeneficialOwnerValidator, self.data)
         return True
 
