@@ -56,6 +56,7 @@ LOCAL_APPS = [
     "apps.reference",
     "apps.order",
     "apps.notification",
+    "apps.support",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
@@ -126,9 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "lib.auth.password_validation.ContainsSpecialCharactersValidator",
     },
-    {
-        "NAME": "lib.auth.password_validation.ContainsDigitsValidator"
-    }
+    {"NAME": "lib.auth.password_validation.ContainsDigitsValidator"},
 ]
 
 
@@ -182,9 +181,7 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = (
-    ["console", "sentry"] if allow_sentry_logging else ["console"]
-)
+LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
 
 
 LOGGING = {

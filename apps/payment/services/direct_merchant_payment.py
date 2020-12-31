@@ -8,7 +8,9 @@ from apps.account.options import MerchantAccountStatus
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
                                 get_payment_qrcode)
-from apps.payment.options import PaymentProcess
+from apps.payment.dbapi.events import (capture_payment_event,
+                                       initiate_payment_event)
+from apps.payment.options import PaymentProcess, TransactionType
 from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
 
@@ -41,7 +43,12 @@ class DirectMerchantPayment(ServiceBase):
             order=merhcant_payment.payment.order,
             total_amount=total_amount,
             fee_bearer_account=merhcant_account.account,
+            transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
         ).handle()
+        capture_payment_event(
+            payment_id=transaction.payment.id,
+            transaction_tracking_id=transaction.transaction_tracking_id,
+        )
         merhcant_payment.add_transaction(transaction=transaction)
         return merhcant_payment
 
@@ -123,6 +130,7 @@ class DirectMerchantPayment(ServiceBase):
         payment = create_payment(
             order_id=order.id, payment_process=payment_process
         )
+        initiate_payment_event(payment_id=payment.id)
         return create_direct_merchant_payment(
             payment_id=payment.id,
             tip_amount=tip_amount,

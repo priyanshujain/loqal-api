@@ -4,9 +4,10 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
-from apps.payment.dbapi import create_payment, create_transaction
+from apps.payment.dbapi import create_transaction
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
-                                  FACILITATION_FEES_PERCENTAGE)
+                                  FACILITATION_FEES_PERCENTAGE,
+                                  TransactionType)
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
 
@@ -24,6 +25,7 @@ class CreatePayment(ServiceBase):
         order,
         total_amount,
         fee_bearer_account,
+        transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     ):
         self.account_id = account_id
         self.ip_address = ip_address
@@ -33,6 +35,7 @@ class CreatePayment(ServiceBase):
         self.order = order
         self.total_amount = total_amount
         self.fee_bearer_account = fee_bearer_account
+        self.transaction_type = transaction_type
 
     def handle(self):
         assert self._validate_data()
@@ -93,6 +96,7 @@ class CreatePayment(ServiceBase):
             fee_currency=FACILITATION_FEES_CURRENCY,
             payment_id=payment.id,
             customer_ip_address=self.ip_address,
+            transaction_type=self.transaction_type,
         )
 
     def _send_to_dwolla(self, transaction):

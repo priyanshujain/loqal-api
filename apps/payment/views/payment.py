@@ -6,9 +6,9 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust)
-from apps.payment.models import transaction
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
+                                    RefundHistoryResponse,
                                     TransactionDetailsResponse,
                                     TransactionHistoryResponse,
                                     TransactionResponse)
@@ -115,5 +115,5 @@ class CreateRefundPaymentAPI(MerchantAPIView):
             ip_address=request.ip,
         ).handle()
         return self.response(
-            TransactionResponse(refund_payment.transaction).data, status=201
+            RefundHistoryResponse(refund_payment).data, status=201
         )

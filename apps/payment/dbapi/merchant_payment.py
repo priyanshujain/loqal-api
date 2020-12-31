@@ -13,7 +13,7 @@ from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
 from apps.payment.models.transaction import DisputeTransaction
-from apps.payment.options import PaymentStatus, RefundStatus, TransactionTypes
+from apps.payment.options import PaymentStatus, RefundStatus
 from utils.types import to_float
 
 
@@ -30,6 +30,17 @@ def get_merchant_payment(merchant_account, payment_id):
 def get_merchant_refunds(merchant_account):
     """"""
     return Refund.objects.filter(payment__order__merchant=merchant_account)
+
+
+def get_merchant_refund(merchant_account, refund_id):
+    """"""
+    try:
+        return Refund.objects.get(
+            payment__order__merchant=merchant_account,
+            refund_tracking_id=refund_id,
+        )
+    except Refund.DoesNotExist:
+        return None
 
 
 def get_merchant_disputes(merchant_account):

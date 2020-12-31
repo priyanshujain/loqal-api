@@ -12,7 +12,10 @@ from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 
-__all__ = ("Payment",)
+__all__ = (
+    "Payment",
+    "PaymentEvent",
+)
 
 
 class Payment(AbstractBaseModel):
@@ -30,6 +33,11 @@ class Payment(AbstractBaseModel):
         enum_type=PaymentProcess, default=PaymentProcess.NOT_PROVIDED
     )
     captured_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=Decimal("0.0"),
+    )
+    refunded_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=Decimal("0.0"),
@@ -69,6 +77,15 @@ class Payment(AbstractBaseModel):
             ).exists():
                 self.payment_tracking_id = id_generator()
         return super().save(*args, **kwargs)
+
+    def update_charge_status_by_refund(self, amount, save=True):
+        self.refunded_amount += amount
+        if self.refunded_amount < self.captured_amount:
+            self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
+        if self.refunded_amount == self.captured_amount:
+            self.charge_status == ChargeStatus.FULLY_REFUNDED
+        if save:
+            self.save()
 
 
 class PaymentEvent(AbstractBaseModel):
