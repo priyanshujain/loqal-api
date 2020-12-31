@@ -2,9 +2,8 @@
 Validators for consumer APIs
 """
 from api import serializers
-from lib.auth import password_validation
 from apps.notification.options import UserDeviceTypes
-
+from lib.auth import password_validation
 
 __all__ = (
     "CreateConsumerAccountValidator",

@@ -8,11 +8,10 @@ from api.services import ServiceBase
 from apps.account.dbapi import check_account_username, create_consumer_account
 from apps.account.notifications import SendAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
+from apps.notification.dbapi import create_user_device
 from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_user_by_email
-from apps.notification.dbapi import create_user_device
-
 
 __all__ = (
     "CreateConsumerAccount",
@@ -39,7 +38,9 @@ class CreateConsumerAccount(ServiceBase):
         return consumer_account
 
     def _validate_data(self):
-        data = run_validator(validator=CreateConsumerAccountValidator, data=self.data)
+        data = run_validator(
+            validator=CreateConsumerAccountValidator, data=self.data
+        )
         self._first_name = data["first_name"]
         self._last_name = data["last_name"]
         self._email = data["email"]
@@ -48,14 +49,20 @@ class CreateConsumerAccount(ServiceBase):
         user = get_user_by_email(email=self._email)
         if user:
             raise ValidationError(
-                {"email": [ErrorDetail(_("User with this email already exists."))]}
+                {
+                    "email": [
+                        ErrorDetail(_("User with this email already exists."))
+                    ]
+                }
             )
         return data
 
     def _factory_account(self, user):
         # TODO: Store spotlight terms and condition consent record
         username = GenerateUsername(user=user).handle()
-        consumer_account = create_consumer_account(user_id=user.id, username=username)
+        consumer_account = create_consumer_account(
+            user_id=user.id, username=username
+        )
         self._factory_payment_register(account_id=consumer_account.account.id)
         return consumer_account
 
@@ -72,7 +79,9 @@ class CreateConsumerAccount(ServiceBase):
 
     def _factory_user_device(self, user, device_type, registration_id):
         return create_user_device(
-            user_id=user.id, device_type=device_type, registration_id=registration_id
+            user_id=user.id,
+            device_type=device_type,
+            registration_id=registration_id,
         )
 
     def _create_dwolla_account(self, consumer_account):

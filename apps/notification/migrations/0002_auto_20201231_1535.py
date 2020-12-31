@@ -6,48 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notification', '0001_initial'),
+        ("notification", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='userdevice',
-            old_name='device_type',
-            new_name='device_platform',
+            model_name="userdevice",
+            old_name="device_type",
+            new_name="device_platform",
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='api_level',
+            model_name="userdevice",
+            name="api_level",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='brand_name',
+            model_name="userdevice",
+            name="brand_name",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='build_number',
+            model_name="userdevice",
+            name="build_number",
             field=models.CharField(blank=True, max_length=32),
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='device_id',
+            model_name="userdevice",
+            name="device_id",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='device_name',
+            model_name="userdevice",
+            name="device_name",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AddField(
-            model_name='userdevice',
-            name='manufacturer',
+            model_name="userdevice",
+            name="manufacturer",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AlterField(
-            model_name='userdevice',
-            name='registration_id',
+            model_name="userdevice",
+            name="registration_id",
             field=models.TextField(),
         ),
     ]

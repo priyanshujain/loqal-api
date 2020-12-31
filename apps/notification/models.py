@@ -1,16 +1,14 @@
 from django.conf import settings
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils.translation import gettext as _
 
 from db.models import BaseModel
 from db.models.fields import ChoiceCharEnumField
 
 from .options import UserDeviceTypes
-from .tasks import (
-    fcm_send_single_device_data_message,
-    fcm_send_single_device_notification_message,
-)
-from django.utils.crypto import get_random_string
+from .tasks import (fcm_send_single_device_data_message,
+                    fcm_send_single_device_notification_message)
 
 
 class UserDevice(BaseModel):
@@ -35,7 +33,9 @@ class UserDevice(BaseModel):
         blank=True, null=True, default=None, unique=True, max_length=32
     )
     fcm_token = models.TextField()
-    device_platform = ChoiceCharEnumField(enum_type=UserDeviceTypes, max_length=8)
+    device_platform = ChoiceCharEnumField(
+        enum_type=UserDeviceTypes, max_length=8
+    )
     manufacturer = models.CharField(max_length=128, blank=True)
 
     class Meta:
