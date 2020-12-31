@@ -18,6 +18,11 @@ class UserDevice(BaseModel):
     This represents user device for push notification
     """
 
+    device_name = models.CharField(max_length=128, blank=True)
+    device_id = models.CharField(max_length=128, blank=True)
+    build_number = models.CharField(max_length=32, blank=True)
+    brand_name = models.CharField(max_length=128, blank=True)
+    api_level = models.IntegerField(null=True, blank=True)
     active = models.BooleanField(default=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -29,8 +34,9 @@ class UserDevice(BaseModel):
     device_tracking_id = models.CharField(
         blank=True, null=True, default=None, unique=True, max_length=32
     )
-    registration_id = models.TextField(verbose_name=_("Registration token"))
-    device_type = ChoiceCharEnumField(enum_type=UserDeviceTypes, max_length=8)
+    fcm_token = models.TextField()
+    device_platform = ChoiceCharEnumField(enum_type=UserDeviceTypes, max_length=8)
+    manufacturer = models.CharField(max_length=128, blank=True)
 
     class Meta:
         db_table = "user_device"
@@ -65,7 +71,7 @@ class UserDevice(BaseModel):
         """
 
         result = fcm_send_single_device_notification_message(
-            registration_id=str(self.registration_id),
+            registration_id=str(self.fcm_token),
             title=title,
             body=body,
             icon=icon,
@@ -97,7 +103,7 @@ class UserDevice(BaseModel):
         """
 
         result = fcm_send_single_device_data_message(
-            registration_id=str(self.registration_id),
+            registration_id=str(self.fcm_token),
             condition=condition,
             collapse_key=collapse_key,
             delay_while_idle=delay_while_idle,
