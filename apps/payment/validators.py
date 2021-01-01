@@ -37,7 +37,7 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
 
 class CreateMerchantPaymentValidator(PaymentValidatorBase):
     merchant_id = serializers.UUIDField()
-    qrcode_id = serializers.CharField(required=False)
+    qrcode_id = serializers.CharField(required=False, allow_blank=True)
     tip_amount = serializers.DecimalField(
         min_value=0,
         max_digits=settings.DEFAULT_MAX_DIGITS,
