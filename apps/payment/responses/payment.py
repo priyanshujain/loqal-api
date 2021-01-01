@@ -358,6 +358,7 @@ class RecentStoresResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="merchant.merchantprofile.full_name", read_only=True
     )
+    merchant_id = serializers.CharField(source="merchant.u_id", read_only=True)
 
     class Meta:
         model = Order
@@ -367,4 +368,5 @@ class RecentStoresResponse(serializers.ModelSerializer):
             "address",
             "full_name",
             "created_at",
+            "merchant_id",
         )
