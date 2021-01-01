@@ -268,3 +268,7 @@ def get_consumer_transaction(consumer_account, transaction_tracking_id):
     if not transactions.exists():
         return None
     return transactions.first()
+
+
+def get_recent_store_orders(consumer_account):
+    return Order.objects.filter(consumer=consumer_account).distinct("merchant")

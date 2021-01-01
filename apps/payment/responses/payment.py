@@ -3,6 +3,7 @@ from decimal import Decimal
 from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.banking.models import BankAccount
+from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
                                  PaymentRequest, Refund, Transaction)
 from apps.payment.options import PaymentProcess
@@ -17,6 +18,7 @@ __all__ = (
     "RefundPaymentResponse",
     "TransactionHistoryResponse",
     "TransactionDetailsResponse",
+    "RecentStoresResponse",
 )
 
 
@@ -341,3 +343,28 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
                 direct_merchant_payment = direct_merchant_payments.first()
                 return direct_merchant_payment.tip_amount
         return Decimal(0.0)
+
+
+class RecentStoresResponse(serializers.ModelSerializer):
+    amount = serializers.CharField(
+        source="payment.captured_amount", read_only=True
+    )
+    category = serializers.CharField(
+        source="merchant.category", read_only=True
+    )
+    address = serializers.JSONField(
+        source="merchant.merchantprofile.address", read_only=True
+    )
+    full_name = serializers.CharField(
+        source="merchant.merchantprofile.full_name", read_only=True
+    )
+
+    class Meta:
+        model = Order
+        fields = (
+            "amount",
+            "category",
+            "address",
+            "full_name",
+            "created_at",
+        )

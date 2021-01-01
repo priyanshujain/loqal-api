@@ -5,9 +5,11 @@ from api.views import ConsumerAPIView, MerchantAPIView
 from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
-                                get_merchant_payment_reqeust)
+                                get_merchant_payment_reqeust,
+                                get_recent_store_orders)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
+                                    RecentStoresResponse,
                                     RefundHistoryResponse,
                                     TransactionDetailsResponse,
                                     TransactionHistoryResponse,
@@ -117,3 +119,10 @@ class CreateRefundPaymentAPI(MerchantAPIView):
         return self.response(
             RefundHistoryResponse(refund_payment).data, status=201
         )
+
+
+class RecentStoresAPI(ConsumerAPIView):
+    def get(self, request):
+        consumer_account = request.consumer_account
+        orders = get_recent_store_orders(consumer_account=consumer_account)
+        return self.response(RecentStoresResponse(orders, many=True).data)
