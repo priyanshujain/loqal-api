@@ -11,6 +11,7 @@ from api.helpers import run_validator
 from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
                        LoggedInAPIView)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
+from apps.notification.tasks import SendEmailVerifiedNotification
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.notifications import SendConsumerResetPasswordEmail
 from apps.user.responses import UserProfileResponse
@@ -204,4 +205,8 @@ class VerifyEmailAPI(APIView):
 
     def _run_services(self):
         service = EmailVerification(data=self.request_data)
-        service.handle()
+        if service.handle():
+            device_id = self.request.session.get("device_id")
+            SendEmailVerifiedNotification(
+                user_id=self.request.user.id, device_id=device_id
+            )

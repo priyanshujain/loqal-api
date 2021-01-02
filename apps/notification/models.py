@@ -5,10 +5,9 @@ from django.utils.translation import gettext as _
 
 from db.models import BaseModel
 from db.models.fields import ChoiceCharEnumField
+from plugins.fcm import FcmPlugin
 
 from .options import UserDeviceTypes
-from .tasks import (fcm_send_device_data_message,
-                    fcm_send_device_notification_message)
 
 
 class UserDevice(BaseModel):
@@ -82,8 +81,7 @@ class UserDevice(BaseModel):
         Send single notification message.
         """
 
-        result = fcm_send_device_notification_message(
-            registration_id=str(self.fcm_token),
+        result = FcmPlugin(token=self.fcm_token).send_notification(
             title=title,
             body=body,
             icon=icon,
@@ -114,8 +112,7 @@ class UserDevice(BaseModel):
         Send single data message.
         """
 
-        result = fcm_send_device_data_message(
-            registration_id=str(self.fcm_token),
+        result = FcmPlugin(token=self.fcm_token).send_data(
             condition=condition,
             collapse_key=collapse_key,
             delay_while_idle=delay_while_idle,
