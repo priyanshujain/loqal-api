@@ -1,1 +1,1 @@
-from .consumer import *
+from .base import *

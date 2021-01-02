@@ -7,7 +7,7 @@ from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         CreateRefundPaymentAPI,
                                         ListConsumerPaymentRequestAPI,
                                         ListMerchantPaymentRequestAPI,
-                                        PaymentHistoryAPI,
+                                        PaymentHistoryAPI, RecentStoresAPI,
                                         RejectPaymentRequestAPI,
                                         TransactionDetailsAPI)
 
@@ -53,5 +53,10 @@ urlpatterns = [
         "transactions/details/<str:transaction_id>",
         TransactionDetailsAPI.as_view(),
         name="consumer_transaction_details",
+    ),
+    path(
+        "recent-stores/",
+        RecentStoresAPI.as_view(),
+        name="recent_stores",
     ),
 ]

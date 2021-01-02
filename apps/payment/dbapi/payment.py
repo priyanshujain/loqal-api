@@ -270,11 +270,5 @@ def get_consumer_transaction(consumer_account, transaction_tracking_id):
     return transactions.first()
 
 
-def get_merchant_payment(merchant_account, payment_tracking_id):
-    payments = Payment.objects.filter(
-        payment_tracking_id=payment_tracking_id,
-        order__merchant=merchant_account,
-    )
-    if not payments.exists():
-        return None
-    return payments.first()
+def get_recent_store_orders(consumer_account):
+    return Order.objects.filter(consumer=consumer_account).distinct("merchant")

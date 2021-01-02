@@ -44,6 +44,9 @@ class RefundHistoryResponse(serializers.ModelSerializer):
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
     )
+    currency = serializers.CharField(
+        source="transaction.currency", read_only=True
+    )
 
     class Meta:
         model = Refund
@@ -55,6 +58,7 @@ class RefundHistoryResponse(serializers.ModelSerializer):
             "customer",
             "status",
             "amount",
+            "currency",
         )
 
 

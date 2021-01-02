@@ -15,4 +15,5 @@ class BankAccountResponse(serializers.ModelSerializer):
             "is_disabled",
             "currency",
             "created_at",
+            "name",
         )

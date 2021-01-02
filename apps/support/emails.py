@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 
 from utils.email import send_email_async
 
-__all__ = ("SendAccountVerifyEmail",)
+__all__ = ("SendSupportEmail",)
 
 
 class SendSupportEmail(object):

@@ -16,14 +16,14 @@
 
 {% block salutation %}
   <br>
-  Dear {{username}},
+  Hi {{username}},
 {% endblock %}
 
 
 
 {% block message %} 
-  <p>We’re delighted to let you know your account with Spotlight has been enabled by your company’s designated Spotlight administrator.</p>
-  <p>Please click the following link to get started:</p>
+  <p>You were just added as a team member of {{ company_name }}.</p>
+  <p>Please click the link below to accept invite.</p>
   <p><a href={{ path }}>{{ path }}</a></p>
 {% endblock %}
 

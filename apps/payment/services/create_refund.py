@@ -36,6 +36,7 @@ class CreateRefund(ServiceBase):
             receiver_bank_account=payment_data["receiver_bank_account"],
             order=order,
             total_amount=refund_payment.amount,
+            amount_towards_order=refund_payment.amount,
             fee_bearer_account=self.merchant_account.account,
             transaction_type=TransactionType.REFUND_PAYMENT,
         ).handle()
@@ -60,13 +61,13 @@ class CreateRefund(ServiceBase):
 
         payment = get_merchant_payment(
             merchant_account=self.merchant_account,
-            payment_tracking_id=payment_id,
+            payment_id=payment_id,
         )
         if not payment:
             raise ValidationError(
                 {"payment_id": ErrorDetail(_("Given payment does not exist."))}
             )
-        if amount > payment.order.total_net_amount:
+        if (payment.refunded_amount + amount) > payment.order.total_net_amount:
             raise ValidationError(
                 {
                     "amount": ErrorDetail(

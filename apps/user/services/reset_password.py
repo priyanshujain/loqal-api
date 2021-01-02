@@ -7,8 +7,6 @@ from api.services import ServiceBase
 from apps.user.dbapi import (gen_reset_password_token,
                              get_reset_password_object_by_token,
                              get_user_by_email, set_new_user_password)
-from apps.user.notifications import (SendPasswordChangeAlert,
-                                     SendResetPasswordEmail)
 from apps.user.validators import (ApplyResetPasswordValidator,
                                   RequestResetPasswordValidator,
                                   ResetPasswordTokenValidator)
@@ -51,10 +49,7 @@ class RequestResetPassword(ServiceBase):
     def handle(self):
         self._validate_data()
         user = self.user
-        reset_password_object = gen_reset_password_token(user_id=user.id)
-        SendResetPasswordEmail(
-            reset_password_object=reset_password_object
-        ).send()
+        return gen_reset_password_token(user_id=user.id)
 
 
 class ResetPasswordTokenValidate(ServiceBase):

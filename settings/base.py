@@ -55,6 +55,7 @@ LOCAL_APPS = [
     "apps.merchant",
     "apps.reference",
     "apps.order",
+    "apps.notification",
     "apps.support",
 ]
 
@@ -330,7 +331,8 @@ OPENTRACING_TRACER_CALLABLE = "opentracing.Tracer"
 # app config
 APP_BASE_URL = env("APP_BASE_URL")
 API_BASE_URL = env("API_BASE_URL")
-
+CONSUMER_APP_WEB_BASE_URL = env("CONSUMER_APP_WEB_BASE_URL")
+MERCHANT_APP_WEB_BASE_URL = env("MERCHANT_APP_WEB_BASE_URL")
 
 # Email configs.
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
@@ -385,3 +387,9 @@ MAX_AVATAR_SIZE = 5000000
 MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
 DEFAULT_MAX_DIGITS = 5
 DEFAULT_DECIMAL_PLACES = 2
+
+
+
+# Firebase settings
+FCM_SERVER_KEY = env("FCM_SERVER_KEY")
+FCM_SERVER = "https://fcm.googleapis.com/fcm/send"

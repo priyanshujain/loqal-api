@@ -27,6 +27,14 @@ class CreateDispute(ServiceBase):
             reason_type=dispute_data["reason_type"],
         )
         transaction.enable_disputed()
+        if transaction.transaction_type in [
+            TransactionType.PAYMENT_REQUEST,
+            TransactionType.DIRECT_MERCHANT_PAYMENT,
+        ]:
+            dispute_payment_event(
+                payment_id=transaction.payment.id,
+                dispute_tracking_id=dispute.dispute_tracking_id,
+            )
         return dispute
 
     def _validate_data(self):
@@ -54,15 +62,6 @@ class CreateDispute(ServiceBase):
                         _("Dispute already exists for this transaction.")
                     )
                 }
-            )
-
-        if transaction.transaction_type in [
-            TransactionType.PAYMENT_REQUEST,
-            TransactionType.DIRECT_MERCHANT_PAYMENT,
-        ]:
-            dispute_payment_event(
-                payment_id=transaction.payment.id,
-                dispute_tracking_id=dispute.dispute_tracking_id,
             )
 
         return {

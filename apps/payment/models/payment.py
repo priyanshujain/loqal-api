@@ -37,6 +37,11 @@ class Payment(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=Decimal("0.0"),
     )
+    total_tip_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=Decimal("0.0"),
+    )
     refunded_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
@@ -80,10 +85,24 @@ class Payment(AbstractBaseModel):
 
     def update_charge_status_by_refund(self, amount, save=True):
         self.refunded_amount += amount
-        if self.refunded_amount < self.captured_amount:
+        if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
-        if self.refunded_amount == self.captured_amount:
-            self.charge_status == ChargeStatus.FULLY_REFUNDED
+        elif self.refunded_amount == self.order.total_net_amount:
+            self.charge_status = ChargeStatus.FULLY_REFUNDED
+        if save:
+            self.save()
+
+    def capture_payment(self, amount, amount_towards_order, save=True):
+        self.status = PaymentStatus.CAPTURED
+        self.captured_amount += amount
+        self.total_tip_amount += amount - amount_towards_order
+        if amount_towards_order < self.order.total_net_amount:
+            self.charge_status = ChargeStatus.PARTIALLY_CHARGED
+        elif amount_towards_order == self.order.total_net_amount:
+            self.charge_status = ChargeStatus.FULLY_CHARGED
+        else:
+            self.charge_status = ChargeStatus.OTHER
+
         if save:
             self.save()
 

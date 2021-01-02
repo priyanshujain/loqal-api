@@ -15,8 +15,8 @@ Log In alert for Spotlight
 {% block message %}
 Hi,
 <p>
-  Your security is very important to us. This email address was used to access the Spotlight dashboard from a new IP
-  address:
+  Your security is very important to us. This email address was used to sign in to the Loqal app.
+  You are getting this email to make sure it was you.
 </p>
 <br />
 Email: {{ email }} <br />
@@ -27,7 +27,5 @@ Time: {{ last_activity }}
 <p style="margin-top: 32px;">
   If this was you, you can ignore this alert. If you suspect any suspicious activity on your account, please change your
   password and enable two-factor authentication.
-<p style="margin: 0;">If you have questions please email us at <a href="mailto:security@spotlightandcompany.com"
-    target="_blank">security@spotlightandcompany.com</a></p>
 
 {% endblock %}

@@ -22,9 +22,7 @@ class GoogleCloudStorage(object):
 
     def get_blob(self, file_path, encryption_key):
         encryption_key = base64.b64decode(encryption_key)
-        blob = self._bucket.get_blob(
-            file_path
-        )  # , encryption_key=encryption_key)
+        blob = self._bucket.get_blob(file_path)  # , encryption_key=encryption_key)
         return blob
 
     def upload_from_file(
@@ -45,9 +43,7 @@ class GoogleCloudStorage(object):
             return self.signed_url(blob)
         return filename
 
-    def upload_from_string(
-        self, file_content, filename, content_type, encryption_key
-    ):
+    def upload_from_string(self, file_content, filename, content_type, encryption_key):
         """
         Uploads a file to a given Cloud Storage bucket.
         """
