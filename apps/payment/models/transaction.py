@@ -91,7 +91,14 @@ class Transaction(AbstractBaseModel):
     class Meta:
         db_table = "transaction"
 
-    def add_dwolla_id(self, dwolla_id, individual_ach_id, status, save=True):
+    def add_dwolla_id(
+        self,
+        dwolla_id,
+        individual_ach_id,
+        status,
+        amount_towards_order,
+        save=True,
+    ):
         self.dwolla_id = dwolla_id
         self.individual_ach_id = individual_ach_id
         self.status = status
@@ -101,13 +108,10 @@ class Transaction(AbstractBaseModel):
                 TransactionType.PAYMENT_REQUEST,
                 TransactionType.DIRECT_MERCHANT_PAYMENT,
             ]:
-                self.payment.status = PaymentStatus.CAPTURED
-                self.payment.captured_amount += self.amount
-                if self.amount == self.payment.order.total_net_amount:
-                    self.payment.charge_status = ChargeStatus.FULLY_CHARGED
-                if self.amount < self.payment.order.total_net_amount:
-                    self.payment.charge_status = ChargeStatus.PARTIALLY_CHARGED
-                self.payment.save()
+                self.payment.capture_payment(
+                    amount=self.amount,
+                    amount_towards_order=amount_towards_order,
+                )
             if self.transaction_type == TransactionType.REFUND_PAYMENT:
                 self.payment.update_charge_status_by_refund(self.amount)
         if save:

@@ -42,6 +42,7 @@ class DirectMerchantPayment(ServiceBase):
             receiver_bank_account=payment_data["receiver_bank_account"],
             order=merhcant_payment.payment.order,
             total_amount=total_amount,
+            amount_towards_order=payment_data["amount"],
             fee_bearer_account=merhcant_account.account,
             transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
         ).handle()

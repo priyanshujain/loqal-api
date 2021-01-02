@@ -25,6 +25,7 @@ class CreatePayment(ServiceBase):
         order,
         total_amount,
         fee_bearer_account,
+        amount_towards_order,
         transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     ):
         self.account_id = account_id
@@ -36,6 +37,7 @@ class CreatePayment(ServiceBase):
         self.total_amount = total_amount
         self.fee_bearer_account = fee_bearer_account
         self.transaction_type = transaction_type
+        self.amount_towards_order = amount_towards_order
 
     def handle(self):
         assert self._validate_data()
@@ -45,6 +47,7 @@ class CreatePayment(ServiceBase):
             dwolla_id=dwolla_response["dwolla_transfer_id"],
             individual_ach_id=dwolla_response["individual_ach_id"],
             status=dwolla_response["status"],
+            amount_towards_order=self.amount_towards_order,
         )
         return transaction
 

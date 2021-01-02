@@ -134,6 +134,7 @@ class ApprovePaymentRequest(ServiceBase):
             receiver_bank_account=banking_data["receiver_bank_account"],
             order=payment_request.payment.order,
             total_amount=total_amount,
+            amount_towards_order=payment_request.amount,
             fee_bearer_account=merchant_account.account,
             transaction_type=TransactionType.PAYMENT_REQUEST,
         ).handle()

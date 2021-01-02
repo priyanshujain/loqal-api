@@ -11,7 +11,7 @@ from apps.payment.options import DisputeReasonType
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
     amount = serializers.DecimalField(
-        min_value=0,
+        min_value=1,
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         coerce_to_string=False,
@@ -144,7 +144,7 @@ class RejectPaymentRequestValidator(serializers.ValidationSerializer):
 class CreateRefundValidator(serializers.ValidationSerializer):
     payment_id = serializers.CharField()
     amount = serializers.DecimalField(
-        min_value=0,
+        min_value=1,
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         coerce_to_string=False,

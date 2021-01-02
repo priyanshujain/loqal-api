@@ -79,6 +79,7 @@ class ChargeStatus(ChoiceEnum):
     FULLY_REFUNDED = 5, _("Fully Refunded")
     REFUSED = 6, _("Refused")
     CANCELLED = 7, _("Cancelled")
+    OTHER = 8, _("Other")
 
 
 class PaymentProcess(ChoiceEnum):
