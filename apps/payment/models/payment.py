@@ -80,9 +80,9 @@ class Payment(AbstractBaseModel):
 
     def update_charge_status_by_refund(self, amount, save=True):
         self.refunded_amount += amount
-        if self.refunded_amount < self.captured_amount:
+        if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
-        if self.refunded_amount == self.captured_amount:
+        if self.refunded_amount == self.order.total_net_amount:
             self.charge_status == ChargeStatus.FULLY_REFUNDED
         if save:
             self.save()

@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notification', '0003_auto_20201231_1535'),
+        ("notification", "0003_auto_20201231_1535"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userdevice',
-            name='device_id',
-            field=models.CharField(blank=True, default=None, max_length=128, null=True, unique=True),
+            model_name="userdevice",
+            name="device_id",
+            field=models.CharField(
+                blank=True,
+                default=None,
+                max_length=128,
+                null=True,
+                unique=True,
+            ),
         ),
     ]

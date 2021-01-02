@@ -188,7 +188,7 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
             return TransactionPaymentResponse(transaction).data
 
         return None
-    
+
     def get_tip_amount(self, obj):
         if self.tip_amount:
             return self.tip_amount

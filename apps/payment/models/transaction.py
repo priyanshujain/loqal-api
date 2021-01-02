@@ -4,16 +4,10 @@ from django.utils.crypto import get_random_string
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (
-    ChargeStatus,
-    DisputeReasonType,
-    DisputeStatus,
-    DisputeType,
-    PaymentStatus,
-    TransactionEventType,
-    TransactionStatus,
-    TransactionType,
-)
+from apps.payment.options import (ChargeStatus, DisputeReasonType,
+                                  DisputeStatus, DisputeType, PaymentStatus,
+                                  TransactionEventType, TransactionStatus,
+                                  TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField

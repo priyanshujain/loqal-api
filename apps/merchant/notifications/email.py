@@ -22,7 +22,9 @@ class MemberSignupInviteEmail:
         # Sending invited client email.
         key_path = f"/team/signup/{token}"
         path = f"{settings.APP_BASE_URL}{key_path}"
-        render_data = dict(path=path, username=first_name, company_name=company_name)
+        render_data = dict(
+            path=path, username=first_name, company_name=company_name
+        )
 
         email_html = render_to_string("member_signup_invite.html", render_data)
         send_email_async(
