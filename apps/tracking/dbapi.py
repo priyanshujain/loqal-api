@@ -18,6 +18,9 @@ def create_psp_api_request(account_id, psp_id, request_id):
 def create_raw_api_request(
     origin, endpoint, query_params, headers, method, data, files
 ):
+    """
+    TODO: find a way to store files data for raw request
+    """
     try:
         return RawPspApiRequest.objects.create(
             origin=origin,
@@ -26,7 +29,7 @@ def create_raw_api_request(
             headers=headers or {},
             method=method,
             data=data or {},
-            files=files or [],
+            files=[],
         )
     except RawPspApiRequest.DoesNotExist:
         return None

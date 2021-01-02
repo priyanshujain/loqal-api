@@ -1,14 +1,18 @@
+from django.db import models
+
 from api import serializers
-from apps.account.models import Account
+from apps.account.models import ConsumerAccount
 
 __all__ = ("ConsumerAccountProfileResponse",)
 
 
 class ConsumerAccountProfileResponse(serializers.ModelSerializer):
+    zip_code = serializers.CharField(source="account.zip_code", read_only=True)
+
     class Meta:
-        model = Account
+        model = ConsumerAccount
         fields = (
             "created_at",
-            "id",
             "zip_code",
+            "username",
         )

@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 
 from django.utils.timezone import now
@@ -17,11 +18,17 @@ __all__ = (
     "gen_reset_password_token",
     "get_reset_password_object_by_token",
     "get_user_by_email_token",
+    "get_user_by_phone",
 )
 
 
 def create_user(
-    first_name, last_name, email, password, email_verified=False,
+    first_name,
+    last_name,
+    email,
+    password,
+    phone_number=None,
+    email_verified=False,
 ):
     user = User.objects.create(
         username=email,
@@ -29,23 +36,20 @@ def create_user(
         email_verified=email_verified,
         first_name=first_name,
         last_name=last_name,
+        phone_number=phone_number,
     )
     user.set_password(password)
     user.gen_email_verification_token()
     return user
 
 
-def update_user_profile(
-    user_profile, first_name, last_name, contact_number, position
-):
+def update_user_profile(user, first_name, last_name):
     """
     User user profile dbapi
     """
-    user_profile.first_name = first_name
-    user_profile.last_name = last_name
-    user_profile.contact_number = contact_number
-    user_profile.save()
-    user_profile.accountmember.set_position(position)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
 
 
 def get_user_by_email(email):
@@ -120,7 +124,9 @@ def gen_reset_password_token(user_id):
     token = rand_str()
     token_expire_time = now() + timedelta(hours=24)
     return UserPasswordReset.objects.create(
-        user_id=user_id, token=token, token_expire_time=token_expire_time,
+        user_id=user_id,
+        token=token,
+        token_expire_time=token_expire_time,
     )
 
 
@@ -135,4 +141,11 @@ def get_user_by_email_token(token):
     qs = User.objects.filter(email_verification_token=token)
     if qs.exists():
         return qs.first()
+    return None
+
+
+def get_user_by_phone(phone_number):
+    user_qs = User.objects.filter(phone_number=phone_number)
+    if user_qs.exists():
+        return user_qs.first()
     return None

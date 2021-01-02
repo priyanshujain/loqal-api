@@ -11,7 +11,7 @@ import yaml
 
 from api.exceptions import APIException
 
-__all__ = "ApiError"
+from .options import ErrorCodeMap
 
 
 class ApiError(APIException):
@@ -43,7 +43,9 @@ class ApiError(APIException):
                 "verb": str(self.verb),
                 "url": self.route,
             },
-            "response": {"status_code": self.status_code,},
+            "response": {
+                "status_code": self.status_code,
+            },
             "errors": self.errors,
         }
 
@@ -55,7 +57,23 @@ class ApiError(APIException):
 
 
 class BadRequestError(ApiError):
-    pass
+    def __init__(self, verb, route, params, response):
+        super().__init__(verb, route, params, response)
+
+    @property
+    def api_errors(self):
+        try:
+            errors = self.errors["_embedded"]["errors"]
+        except KeyError:
+            return []
+        return [
+            {
+                "code": getattr(ErrorCodeMap, error["code"]),
+                "message": error["message"],
+                "source": error["path"][1:].replace("/", "."),
+            }
+            for error in errors
+        ]
 
 
 class AuthenticationError(ApiError):

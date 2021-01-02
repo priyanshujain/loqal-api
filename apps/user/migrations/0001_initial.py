@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                     models.EmailField(blank=True, max_length=255),
                 ),
                 (
-                    "contact_number",
+                    "phone_number",
                     models.CharField(blank=True, max_length=255),
                 ),
                 ("email_verified", models.BooleanField(default=False)),
@@ -76,8 +76,12 @@ class Migration(migrations.Migration):
                 ("tfa_token", models.CharField(blank=True, max_length=254)),
                 ("is_disabled", models.BooleanField(default=False)),
             ],
-            options={"db_table": "user",},
-            managers=[("objects", apps.user.models.UserManager()),],
+            options={
+                "db_table": "user",
+            },
+            managers=[
+                ("objects", apps.user.models.UserManager()),
+            ],
         ),
         migrations.CreateModel(
             name="UserSession",
@@ -120,7 +124,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "user_session",},
+            options={
+                "db_table": "user_session",
+            },
         ),
         migrations.CreateModel(
             name="UserPasswordReset",
@@ -149,6 +155,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "user_password_reset",},
+            options={
+                "db_table": "user_password_reset",
+            },
         ),
     ]

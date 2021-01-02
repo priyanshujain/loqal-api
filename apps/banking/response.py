@@ -14,4 +14,6 @@ class BankAccountResponse(serializers.ModelSerializer):
             "bank_logo_base64",
             "is_disabled",
             "currency",
+            "created_at",
+            "name",
         )

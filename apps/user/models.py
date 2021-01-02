@@ -1,24 +1,31 @@
 from datetime import timedelta
 
+import six
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 from django.db.models.query_utils import select_related_descend
+from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
+from apps.box.models import BoxFile
 from apps.user.options import UserType
-from db.models.base import Base
+from db.models.base import BaseModel
+from db.models.fields import (BoundedPositiveIntegerField,
+                              EncryptedPickledObjectField)
+from lib.auth.authenticators import (AUTHENTICATOR_CHOICES,
+                                     AUTHENTICATOR_INTERFACES,
+                                     AUTHENTICATOR_INTERFACES_BY_TYPE,
+                                     available_authenticators)
 from utils.shortcuts import rand_str
 
 
 class UserManager(models.Manager):
     use_in_migrations = True
 
-    def get_by_natural_key(self, username):
-        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": username})
-
-    def find_by_username(self, username):
-        queryset = self.get_queryset()
-        return queryset.filter(username=username)
+    def get_by_natural_key(self, email):
+        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": email})
 
     def create_user(self, *arg, **kwargs):
         """Create and return a `User` with an email, username and password."""
@@ -33,9 +40,9 @@ class UserManager(models.Manager):
         return user
 
 
-class User(Base, AbstractBaseUser):
+class User(BaseModel, AbstractBaseUser):
     username = models.CharField(max_length=254, unique=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(
         max_length=254, default=rand_str
@@ -45,8 +52,16 @@ class User(Base, AbstractBaseUser):
     first_name = models.CharField(max_length=155, blank=True)
     last_name = models.CharField(max_length=155, blank=True)
     secondary_email = models.EmailField(max_length=255, blank=True)
-    contact_number = models.CharField(max_length=255, blank=True)
-    contact_number_verified = models.BooleanField(default=False)
+    phone_number = models.CharField(
+        max_length=10, default=None, null=True, unique=True
+    )
+    phone_number_country = models.CharField(max_length=2, default="US")
+    phone_number_verified = models.BooleanField(default=False)
+
+    # Avatar
+    avatar_file = models.ForeignKey(
+        BoxFile, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     # One of UserType
     user_type = models.CharField(max_length=254, default=UserType.REGULAR_USER)
@@ -57,7 +72,16 @@ class User(Base, AbstractBaseUser):
     tfa_token = models.CharField(max_length=254, blank=True)
     is_disabled = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "username"
+    is_password_expired = models.BooleanField(
+        _("password expired"),
+        default=False,
+        help_text=_(
+            "If set to true then the user needs to change the "
+            "password on next sign in."
+        ),
+    )
+
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
@@ -91,12 +115,12 @@ class User(Base, AbstractBaseUser):
         self.email_verification_token_expire_time = now() + timedelta(days=7)
         self.save()
 
-    def add_contact_number(self, contact_number):
-        self.contact_number = contact_number
+    def add_phone_number(self, phone_number):
+        self.phone_number = phone_number
         self.save()
 
-    def verify_contact_number(self):
-        self.contact_number_verified = True
+    def verify_phone_number(self):
+        self.phone_number_verified = True
         self.save()
 
     def set_tfa_token(self, token):
@@ -111,13 +135,115 @@ class User(Base, AbstractBaseUser):
         self.two_factor_auth = False
         self.save()
 
+    def change_avatar(self, boxfile):
+        self.avatar_file = boxfile
+        self.save()
+
     class Meta:
         db_table = "user"
 
 
-class UserSession(Base):
+class AuthenticatorManager(models.Manager):
+    def all_interfaces_for_user(
+        self, user, return_missing=False, ignore_backup=False
+    ):
+        """Returns a correctly sorted list of all interfaces the user
+        has enabled.  If `return_missing` is set to `True` then all
+        interfaces are returned even if not enabled.
+        """
+
+        def _sort(x):
+            return sorted(x, key=lambda x: (x.type == 0, x.type))
+
+        # Collect interfaces user is enrolled in
+        ifaces = [
+            x.interface
+            for x in Authenticator.objects.filter(
+                user=user,
+                type__in=[
+                    a.type
+                    for a in available_authenticators(
+                        ignore_backup=ignore_backup
+                    )
+                ],
+            )
+        ]
+
+        if return_missing:
+            # Collect additional interfaces that the user
+            # is not enrolled in
+            rvm = dict(AUTHENTICATOR_INTERFACES)
+            for iface in ifaces:
+                rvm.pop(iface.interface_id, None)
+            for iface_cls in six.itervalues(rvm):
+                if iface_cls.is_available:
+                    ifaces.append(iface_cls())
+
+        return _sort(ifaces)
+
+    def get_interface(self, user, interface_id):
+        """Looks up an interface by interface ID for a user.  If the
+        interface is not available but configured a
+        `Authenticator.DoesNotExist` will be raised just as if the
+        authenticator was not configured at all.
+        """
+        interface = AUTHENTICATOR_INTERFACES.get(interface_id)
+        if interface is None or not interface.is_available:
+            raise LookupError("No such interface %r" % interface_id)
+        try:
+            return Authenticator.objects.get(
+                user=user, type=interface.type
+            ).interface
+        except Authenticator.DoesNotExist:
+            return interface()
+
+    def user_has_2fa(self, user):
+        """Checks if the user has any 2FA configured."""
+        return Authenticator.objects.filter(
+            user=user,
+            type__in=[
+                a.type for a in available_authenticators(ignore_backup=True)
+            ],
+        ).exists()
+
+
+class Authenticator(BaseModel):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
+    type = BoundedPositiveIntegerField(choices=AUTHENTICATOR_CHOICES)
+    config = EncryptedPickledObjectField()
+    last_used_at = models.DateTimeField(_("last used at"), null=True)
+
+    objects = AuthenticatorManager()
+
+    class AlreadyEnrolled(Exception):
+        pass
+
+    class Meta:
+        db_table = "auth_authenticator"
+        verbose_name = _("authenticator")
+        verbose_name_plural = _("authenticators")
+        unique_together = (("user", "type"),)
+
+    @cached_property
+    def interface(self):
+        return AUTHENTICATOR_INTERFACES_BY_TYPE[self.type](self)
+
+    def mark_used(self, save=True):
+        self.last_used_at = timezone.now()
+        if save:
+            self.save()
+
+    def reset_fields(self, save=True):
+        self.created_at = timezone.now()
+        self.last_used_at = None
+        if save:
+            self.save()
+
+
+class UserSession(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    session_key = models.CharField(max_length=512)
+    session_key = models.TextField()
     user_agent = models.CharField(max_length=512)
     ip_address = models.GenericIPAddressField()
     is_ip_routable = models.BooleanField(default=True)
@@ -151,7 +277,7 @@ class UserSession(Base):
         db_table = "user_session"
 
 
-class UserPasswordReset(Base):
+class UserPasswordReset(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=254)
     token_expire_time = models.DateTimeField()

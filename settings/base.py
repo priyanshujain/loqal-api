@@ -52,6 +52,11 @@ LOCAL_APPS = [
     "apps.box",
     "apps.banking",
     "apps.payment",
+    "apps.merchant",
+    "apps.reference",
+    "apps.order",
+    "apps.notification",
+    "apps.support",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
@@ -113,6 +118,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+        "NAME": "lib.auth.password_validation.ContainsUppercaseValidator",
+    },
+    {
+        "NAME": "lib.auth.password_validation.ContainsLowercaseValidator",
+    },
+    {
+        "NAME": "lib.auth.password_validation.ContainsSpecialCharactersValidator",
+    },
+    {"NAME": "lib.auth.password_validation.ContainsDigitsValidator"},
 ]
 
 
@@ -166,9 +181,7 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = (
-    ["console", "sentry"] if allow_sentry_logging else ["console"]
-)
+LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
 
 
 LOGGING = {
@@ -259,8 +272,15 @@ def redis_config(db):
 
 CACHES = {"default": redis_config(db=1)}
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# CSRF_COOKIE_NAME = "lc"
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_CACHE_ALIAS = "default"
+SESSION_COOKIE_NAME = "session"
+
+# FIX: Change this to json serializer and convert last_activity to timestamp
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
 
 # Celery config
@@ -311,7 +331,8 @@ OPENTRACING_TRACER_CALLABLE = "opentracing.Tracer"
 # app config
 APP_BASE_URL = env("APP_BASE_URL")
 API_BASE_URL = env("API_BASE_URL")
-
+CONSUMER_APP_WEB_BASE_URL = env("CONSUMER_APP_WEB_BASE_URL")
+MERCHANT_APP_WEB_BASE_URL = env("MERCHANT_APP_WEB_BASE_URL")
 
 # Email configs.
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
@@ -329,6 +350,11 @@ PLAID_CLIENT_ID = env("PLAID_CLIENT_ID")
 PLAID_ENV = env("PLAID_ENV")
 PLAID_PUBLIC_KEY = env("PLAID_PUBLIC_KEY")
 PLAID_SECRET = env("PLAID_SECRET")
+PLAID_APP_NAME = "Loqal"
+PLAID_PRODUCTS = [
+    "auth",
+    "balance",
+]
 
 
 PROXY_IP_ALLOWED_LIST = []
@@ -346,3 +372,24 @@ MANAGERS = (("Priyanshu Jain", "priyanshu@spotlightandcompany.com"),)
 ADMINS = MANAGERS
 
 APP_NAME = env("APP_NAME", default="Spotlight")
+
+
+USE_CUSTOM_BIG_INTS = False
+
+SENTRY_ENCRYPTION_SCHEMES = ()
+
+
+# Max file size for avatar photo uploads
+MAX_AVATAR_SIZE = 5000000
+
+
+# Transaction settings
+MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
+DEFAULT_MAX_DIGITS = 5
+DEFAULT_DECIMAL_PLACES = 2
+
+
+
+# Firebase settings
+FCM_SERVER_KEY = env("FCM_SERVER_KEY")
+FCM_SERVER = "https://fcm.googleapis.com/fcm/send"

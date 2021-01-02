@@ -1,3 +1,4 @@
+from .avatar import *
 from .change_password import *
 from .email_verification import *
 from .login import *

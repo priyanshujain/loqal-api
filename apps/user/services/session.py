@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
+from apps.user.dbapi import create_session as _create_session
 from apps.user.dbapi import get_active_sessions, get_all_sessions, get_session
 
 __all__ = ("Session",)
@@ -19,7 +20,54 @@ class Session(object):
         self.only_active = only_active
         self.user = request.user
 
+    def create_session(self, user):
+        """
+        Create session record
+        """
+        # TODO: Combine cache based session and models based session so that
+        #       we have a record of expired sessions.
+        session = self.request.session
+
+        # TODO: get ifconfig from IP address, need to implment maxmind geodb service
+        ifconfig = {}
+
+        # from cache based session
+        user_agent = session["user_agent"]
+        ip_address = session["ip"]
+        is_ip_routable = session["is_ip_routable"]
+        last_activity = session["last_activity"]
+        ip_country_iso = session["cf_ip_country"]
+
+        # from maxmind ifconfig
+        country_iso = ifconfig.get("country_iso", "")
+        region = ifconfig.get("region", "")
+        region_code = ifconfig.get("region_code", "")
+        latitude = ifconfig.get("latitude", "")
+        longitude = ifconfig.get("longitude", "")
+        timezone = ifconfig.get("timezone", "")
+        asn = ifconfig.get("asn_org", "")
+        asn_code = ifconfig.get("asn", "")
+
+        _create_session(
+            user_id=user.id,
+            session_key=session.session_key,
+            user_agent=user_agent,
+            ip_address=ip_address,
+            is_ip_routable=is_ip_routable,
+            last_activity=last_activity,
+            ip_country_iso=ip_country_iso,
+            country_iso=country_iso,
+            region=region,
+            region_code=region_code,
+            latitude=latitude,
+            longitude=longitude,
+            timezone=timezone,
+            asn=asn,
+            asn_code=asn_code,
+        )
+
     def list_sessions(self):
+        # FIX: current session is causing error it's always showing false
         user = self.user
         request_session = self.request.session
 
@@ -39,7 +87,6 @@ class Session(object):
                 {
                     "is_current_session": request_session.session_key
                     == local_session.session_key,
-                    "session_key": local_session.session_key,
                     "user_agent": local_session.user_agent,
                     "ip_address": local_session.ip_address,
                     "is_ip_routable": local_session.is_ip_routable,

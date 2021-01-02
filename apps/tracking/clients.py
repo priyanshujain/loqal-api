@@ -18,7 +18,14 @@ class PspAPIRequestTracker(object):
         self.provider_id = provider_id
 
     def start_new_request(
-        self, origin, endpoint, query_params, headers, method, data, files,
+        self,
+        origin,
+        endpoint,
+        query_params,
+        headers,
+        method,
+        data,
+        files,
     ):
         headers = dict(headers)
         query_params = dict(query_params or {})
@@ -97,7 +104,7 @@ class PspAPIRequestTracker(object):
 
     def _convert_to_bytes(self, data):
         """
-        Convert any data to bytes 
+        Convert any data to bytes
         """
         if isinstance(data, bytes):
             return bytes

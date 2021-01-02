@@ -2,9 +2,12 @@ from datetime import date
 
 from django.utils.translation import gettext as _
 
-from api.views import APIView, UserAPIView
+from api.exceptions import ErrorDetail, ValidationError
+from api.views import APIView, ConsumerAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
-from apps.account.services import AddZipCode, CreateConsumerAccount
+from apps.account.services import (AddZipCode, ChangeAccountUsername,
+                                   CheckAccountUsername, CreateConsumerAccount)
+from utils.auth import login
 
 __all__ = (
     "ConsumerSignupAPI",
@@ -15,6 +18,11 @@ __all__ = (
 
 class ConsumerSignupAPI(APIView):
     def post(self, request):
+        if request.user.is_authenticated:
+            raise ValidationError(
+                {"details": ErrorDetail(_("User has aleady logged in."))}
+            )
+
         self._run_services(ip_address=request.ip)
         return self.response(status=201)
 
@@ -23,10 +31,12 @@ class ConsumerSignupAPI(APIView):
         service = CreateConsumerAccount(
             data=self.request_data, ip_address=ip_address
         )
-        service.execute()
+        consumer_account = service.handle()
+        user = consumer_account.user
+        login(request=self.request, user=user)
 
 
-class AddAccountZipCodeAPI(UserAPIView):
+class AddAccountZipCodeAPI(ConsumerAPIView):
     def post(self, request):
         account = request.account
         self._run_services(account=account)
@@ -35,10 +45,32 @@ class AddAccountZipCodeAPI(UserAPIView):
     def _run_services(self, account):
         data = self.request_data
         service = AddZipCode(data=self.request_data, account=account)
-        service.execute()
+        service.handle()
 
 
-class ConsumerAccountProfileAPI(UserAPIView):
+class ConsumerAccountProfileAPI(ConsumerAPIView):
     def get(self, request):
-        account = request.account
-        return self.response(ConsumerAccountProfileResponse(account).data)
+        consumer_account = request.consumer_account
+        return self.response(
+            ConsumerAccountProfileResponse(consumer_account).data
+        )
+
+
+class ChangeAccountUsernameAPI(ConsumerAPIView):
+    def post(self, request):
+        consumer_account = request.consumer_account
+        return self.response(
+            ChangeAccountUsername(
+                consumer_account=consumer_account, data=self.request_data
+            ).handle()
+        )
+
+
+class CheckAccountUsernameAPI(ConsumerAPIView):
+    def post(self, request):
+        consumer_account = request.consumer_account
+        return self.response(
+            CheckAccountUsername(
+                consumer_account=consumer_account, data=self.request_data
+            ).handle()
+        )

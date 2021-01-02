@@ -19,10 +19,8 @@ class ChangePassword(ServiceBase):
     def _validate_data(self):
         request = self.request
         data = run_validator(validator=ForgotPasswordValidator, data=self.data)
-        username = request.user.username
-        user = auth.authenticate(
-            username=username, password=data["old_password"]
-        )
+        email = request.user.email
+        user = auth.authenticate(email=email, password=data["old_password"])
         if not user:
             raise ValidationError(
                 {
@@ -43,7 +41,7 @@ class ChangePassword(ServiceBase):
 
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         session = self.request.session
         data = self.data

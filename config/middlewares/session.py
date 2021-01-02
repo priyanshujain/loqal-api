@@ -1,3 +1,4 @@
+from django.contrib.auth.models import update_last_login
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.timezone import now
 from ipware import get_client_ip

@@ -4,11 +4,11 @@ from django.db import models
 
 from apps.account.models import Account
 from apps.provider.models import PaymentProvider
-from db.models.abstract import AbstractBase
+from db.models.abstract import AbstractBaseModel
 from utils.shortcuts import upload_to
 
 
-class APIAccessLog(AbstractBase):
+class APIAccessLog(AbstractBaseModel):
     """ Logs API requests """
 
     user = models.ForeignKey(
@@ -22,10 +22,16 @@ class APIAccessLog(AbstractBase):
     time_elapsed = models.FloatField(default=0.0)
     request_path = models.CharField(max_length=1024, db_index=True)
     api_view = models.CharField(
-        max_length=254, null=True, blank=True, db_index=True,
+        max_length=254,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     view_method = models.CharField(
-        max_length=32, null=True, blank=True, db_index=True,
+        max_length=32,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     remote_addr = models.GenericIPAddressField()
     host = models.URLField()
@@ -42,7 +48,7 @@ class APIAccessLog(AbstractBase):
         db_table = "api_request_log"
 
 
-class RawPspApiResponse(AbstractBase):
+class RawPspApiResponse(AbstractBaseModel):
     request_time_taken = models.FloatField(null=True)
     status_code = models.PositiveIntegerField(null=True, blank=True)
     headers = models.JSONField()
@@ -52,7 +58,7 @@ class RawPspApiResponse(AbstractBase):
         db_table = "raw_psp_api_response"
 
 
-class RawPspApiRequest(AbstractBase):
+class RawPspApiRequest(AbstractBaseModel):
     origin = models.CharField(max_length=512)
     endpoint = models.CharField(max_length=512)
     query_params = models.CharField(max_length=512, blank=True)
@@ -67,7 +73,10 @@ class RawPspApiRequest(AbstractBase):
     )
     request_errors = models.TextField(null=True, blank=True)
     response = models.OneToOneField(
-        RawPspApiResponse, on_delete=models.DO_NOTHING, null=True, blank=True,
+        RawPspApiResponse,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
     )
 
     def set_response(self, response):
@@ -78,10 +87,13 @@ class RawPspApiRequest(AbstractBase):
         db_table = "raw_psp_api_request"
 
 
-class PspApiRequestStorage(AbstractBase):
+class PspApiRequestStorage(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     psp = models.ForeignKey(PaymentProvider, on_delete=models.DO_NOTHING)
-    request = models.OneToOneField(RawPspApiRequest, on_delete=models.CASCADE,)
+    request = models.OneToOneField(
+        RawPspApiRequest,
+        on_delete=models.CASCADE,
+    )
     api_errors = models.TextField(null=True, blank=True)
     exception_traceback = models.TextField(null=True, blank=True)
 

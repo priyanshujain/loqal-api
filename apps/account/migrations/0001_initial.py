@@ -66,7 +66,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "account",},
+            options={
+                "db_table": "account",
+            },
         ),
         migrations.CreateModel(
             name="MerchantAccount",
@@ -130,7 +132,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "account_settings",},
+            options={
+                "db_table": "account_settings",
+            },
         ),
         migrations.CreateModel(
             name="ConsumerAccount",
@@ -194,6 +198,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "consumer_account",},
+            options={
+                "db_table": "consumer_account",
+            },
         ),
     ]

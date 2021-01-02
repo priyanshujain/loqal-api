@@ -7,8 +7,6 @@ from api.services import ServiceBase
 from apps.user.dbapi import (gen_reset_password_token,
                              get_reset_password_object_by_token,
                              get_user_by_email, set_new_user_password)
-from apps.user.notifications import (SendPasswordChangeAlert,
-                                     SendResetPasswordEmail)
 from apps.user.validators import (ApplyResetPasswordValidator,
                                   RequestResetPasswordValidator,
                                   ResetPasswordTokenValidator)
@@ -48,13 +46,10 @@ class RequestResetPassword(ServiceBase):
             )
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
         user = self.user
-        reset_password_object = gen_reset_password_token(user_id=user.id)
-        SendResetPasswordEmail(
-            reset_password_object=reset_password_object
-        ).send()
+        return gen_reset_password_token(user_id=user.id)
 
 
 class ResetPasswordTokenValidate(ServiceBase):
@@ -92,7 +87,7 @@ class ResetPasswordTokenValidate(ServiceBase):
         token_object = self._validate_token(token=token)
         return token_object
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
 
 
@@ -103,7 +98,7 @@ class ApplyResetPassword(ResetPasswordTokenValidate):
         self.user = request.user
 
     def _check_if_old_password_used(self, email, password):
-        user = auth.authenticate(username=email, password=password)
+        user = auth.authenticate(email=email, password=password)
         if user:
             raise ValidationError(
                 {
@@ -127,7 +122,7 @@ class ApplyResetPassword(ResetPasswordTokenValidate):
         )
         return token_object
 
-    def execute(self):
+    def handle(self):
         token_object = self._validate_data()
 
         user = token_object.user

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+
+{% block title %}
+  Signup
+{% endblock %}
+
+
+
+{% block preheader %} 
+  Signup to Spotlight
+{% endblock %}
+
+
+
+{% block salutation %}
+  <br>
+  Hi {{username}},
+{% endblock %}
+
+
+
+{% block message %} 
+  <p>You were just added as a team member of {{ company_name }}.</p>
+  <p>Please click the link below to accept invite.</p>
+  <p><a href={{ path }}>{{ path }}</a></p>
+{% endblock %}
+
+
+{% block button_message %}
+{% endblock %}
+
+
+
+{% block second_message %}
+{% endblock %}

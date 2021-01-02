@@ -30,6 +30,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="consumeraccount", unique_together={("account", "user")},
+            name="consumeraccount",
+            unique_together={("account", "user")},
         ),
     ]

@@ -25,14 +25,22 @@ class Config(object):
     ENVIRONMENT_URLS = {
         ENV_PROD: {
             "auth": {"v1": "https://accounts.dwolla.com/auth"},
-            "token": {"v1": "https://api.dwolla.com/token",},
-            "api": {"v1": "https://api.dwolla.com",},
+            "token": {
+                "v1": "https://api.dwolla.com/token",
+            },
+            "api": {
+                "v1": "https://api.dwolla.com",
+            },
             "type": "production",
         },
         ENV_SANDBOX: {
             "auth": {"v1": "https://accounts-sandbox.dwolla.com/auth"},
-            "token": {"v1": "https://api-sandbox.dwolla.com/token",},
-            "api": {"v1": "https://api-sandbox.dwolla.com",},
+            "token": {
+                "v1": "https://api-sandbox.dwolla.com/token",
+            },
+            "api": {
+                "v1": "https://api-sandbox.dwolla.com",
+            },
         },
         "type": "sandbox",
     }

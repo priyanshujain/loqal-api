@@ -22,14 +22,14 @@ class EmailVerification(ServiceBase):
         token = data["token"]
         user = get_user_by_email_token(token=token)
 
-        if user.email_verified:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Email has been already verified."))}
-            )
-
         if not user:
             raise ValidationError(
                 {"token": [ErrorDetail(_("Provided token is not valid."))]}
+            )
+
+        if user.email_verified:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Email has been already verified."))}
             )
 
         if user.email_verification_token_expire_time < now():
@@ -45,7 +45,7 @@ class EmailVerification(ServiceBase):
 
         self.user = user
 
-    def execute(self):
+    def handle(self):
         self._validate_data()
 
         user = self.user

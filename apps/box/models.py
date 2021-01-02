@@ -1,22 +1,23 @@
-from datetime import timedelta
-
+# TODO: Make file mangement as per sentry files
 from django.db import models
-from django.utils.timezone import now
 
-from apps.account.models import Account
-from db.models.abstract import AbstractBase
-from utils.shortcuts import upload_to
+from db.models import BaseModel
 
 
-class BoxFile(AbstractBase):
-    account = models.ForeignKey(
-        Account, on_delete=models.CASCADE, blank=True, null=True
-    )
+class BoxFile(BaseModel):
     file_name = models.CharField(max_length=512)
     file_path = models.CharField(max_length=512)
     content_type = models.CharField(max_length=256)
     document_type = models.CharField(max_length=512)
     encryption_key = models.CharField(max_length=64)
+    in_use = models.BooleanField(default=False)
 
     def __str__(self):
         return self.file_name or "-"
+
+    def enable_use(self):
+        self.in_use = True
+        self.save()
+
+    class Meta:
+        db_table = "boxfile"

@@ -4,6 +4,7 @@ from django.conf import settings
 from plaid import Client
 from plaid.api import accounts, institutions
 from plaid.errors import InvalidInputError
+from rest_framework.exceptions import ErrorDetail
 
 from integrations.exceptions import IntegrationAPIError
 
@@ -24,13 +25,41 @@ class PlaidPlugin(object):
         self._client = Client(
             client_id=settings.PLAID_CLIENT_ID,
             secret=settings.PLAID_SECRET,
-            public_key=settings.PLAID_PUBLIC_KEY,
             environment=settings.PLAID_ENV,
         )
 
     @property
     def client(self):
         return self._client
+
+    def create_link_token(self, user_account_id):
+        """
+        Exchange access_token with short lived public_token
+
+        Args:
+            - public_token: token returned by plaidLink after auth
+
+        Returns:
+            - access_token: access_token will be stored into DB and will
+                            use for further auth purpose
+        """
+        try:
+            self._link_token = self._client.LinkToken.create(
+                {
+                    "user": {
+                        "client_user_id": user_account_id,
+                    },
+                    "products": ["auth"],
+                    "client_name": getattr(
+                        settings, "PLAID_APP_NAME", "Loqal"
+                    ),
+                    "country_codes": ["US"],
+                    "language": "en",
+                }
+            ).get("link_token")
+        except InvalidInputError:
+            return None
+        return self._link_token
 
     def exchange_public_token(self, public_token):
         """
@@ -68,9 +97,12 @@ class PlaidPlugin(object):
         # response = self._client.Auth.get(access_token, account_ids=[account_id])[
         #     "numbers"
         # ]
-        auth_data = self._client.Auth.get(
-            access_token, account_ids=[account_id]
-        )
+        try:
+            auth_data = self._client.Auth.get(
+                access_token, account_ids=[account_id]
+            )
+        except InvalidInputError:
+            return None
         accounts = auth_data["accounts"]
         if not accounts:
             return {}
@@ -93,15 +125,32 @@ class PlaidPlugin(object):
 
     def get_institution(self, institution_id):
         """
-        Get institution name and logo for given institution_id 
+        Get institution name and logo for given institution_id
         """
         institution = self._client.Institutions.get_by_id(
             institution_id=institution_id,
+            country_codes=["US"],
             _options={"include_optional_metadata": True},
-        ).get("institution",)
+        ).get(
+            "institution",
+        )
 
         return {
             "id": institution_id,
             "name": institution["name"],
             "logo_base64": institution["logo"],
         }
+
+    def get_balance(self, access_token, account_id):
+        """
+        Get institution name and logo for given institution_id
+        """
+        accounts = self._client.Accounts.balance.get(
+            access_token=access_token,
+            account_ids=[account_id],
+        ).get(
+            "accounts",
+        )
+        if accounts and len(accounts) > 0:
+            return float(accounts[0]["balances"]["available"])
+        return None

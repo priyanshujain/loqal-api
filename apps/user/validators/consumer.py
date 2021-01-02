@@ -1,4 +1,5 @@
 from api import serializers
+from lib.auth import password_validation
 
 __all__ = (
     "EditProfileValidator",
@@ -10,19 +11,16 @@ __all__ = (
     "ApplyResetPasswordValidator",
     "EmailVerificationValidator",
     "PhoneNumberValidator",
-    "PhoneNumberCodeValidator",
+    "OtpAuthValidator",
+    "AvatarValidator",
+    "VerifyPhoneNumberOtpValidator",
+    "ResendPhoneNumberOtpValidator",
 )
 
 
 class EditProfileValidator(serializers.ValidationSerializer):
     first_name = serializers.CharField(max_length=64)
-    last_name = serializers.CharField(max_length=64, required=False)
-    contact_number = serializers.CharField(
-        max_length=20, allow_blank=True, required=False
-    )
-    position = serializers.CharField(
-        max_length=255, allow_blank=True, required=False
-    )
+    last_name = serializers.CharField(max_length=64)
 
 
 class UserEmailExistsValidator(serializers.ValidationSerializer):
@@ -33,17 +31,25 @@ class UserLoginValidator(serializers.ValidationSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     tfa_code = serializers.CharField(required=False, allow_blank=True)
-    ifconfig = serializers.DictField()
+
+
+class OtpAuthValidator(serializers.ValidationSerializer):
+    otp = serializers.CharField(required=False, max_length=6)
 
 
 class PhoneNumberValidator(serializers.ValidationSerializer):
-    # Add a contact_number validator
-    contact_number = serializers.CharField()
+    # Add a phone_number validator
+    phone_number = serializers.CharField(max_length=10)
+    secret = serializers.CharField()
 
 
-class PhoneNumberCodeValidator(serializers.ValidationSerializer):
-    # Add a contact_number validator
-    code = serializers.CharField()
+class VerifyPhoneNumberOtpValidator(serializers.ValidationSerializer):
+    otp = serializers.CharField(required=False, max_length=6)
+    secret = serializers.CharField()
+
+
+class ResendPhoneNumberOtpValidator(serializers.ValidationSerializer):
+    secret = serializers.CharField()
 
 
 class ForgotPasswordValidator(serializers.ValidationSerializer):
@@ -63,6 +69,14 @@ class ApplyResetPasswordValidator(serializers.ValidationSerializer):
     token = serializers.CharField()
     password = serializers.CharField()
 
+    def validate_password(self, password):
+        password_validation.validate_password(password)
+        return password
 
-class EmailVerificationValidator(serializers.Serializer):
+
+class EmailVerificationValidator(serializers.ValidationSerializer):
     token = serializers.CharField()
+
+
+class AvatarValidator(serializers.ValidationSerializer):
+    avatar_file_id = serializers.IntegerField()

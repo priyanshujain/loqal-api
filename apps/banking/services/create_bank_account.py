@@ -15,7 +15,7 @@ class CreateBankAccount(ServiceBase):
         self.account_id = account_id
         self.data = data
 
-    def execute(self):
+    def handle(self):
         data = self._validate_data()
         plaid_item = self._process_plaid_token(data=data)
         plaid_access_token = plaid_item["plaid_access_token"]

@@ -1,21 +1,21 @@
-from apps.provider.lib.api import account
-from datetime import date
-from io import SEEK_CUR
-from django.db.models.fields import CommaSeparatedIntegerField
+from random import randint
 
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import create_consumer_account
-from apps.payment.dbapi import create_payment_register
-from apps.account.notifications import SendVerifyEmail
+from apps.account.dbapi import check_account_username, create_consumer_account
+from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
+from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_user_by_email
 
-__all__ = ("CreateConsumerAccount",)
+__all__ = (
+    "CreateConsumerAccount",
+    "GenerateUsername",
+)
 
 
 class CreateConsumerAccount(ServiceBase):
@@ -23,15 +23,18 @@ class CreateConsumerAccount(ServiceBase):
         self.data = data
         self.ip_address = ip_address
 
-    def execute(self):
-        self._validate_data()
+    def handle(self):
+        data = self._validate_data()
         user = self._factory_user()
         consumer_account = self._factory_account(user=user)
         self._send_verfication_email(user=user)
         self._create_dwolla_account(consumer_account=consumer_account)
+        return consumer_account
 
     def _validate_data(self):
-        data = run_validator(validator=CreateConsumerAccountValidator, data=self.data)
+        data = run_validator(
+            validator=CreateConsumerAccountValidator, data=self.data
+        )
         self._first_name = data["first_name"]
         self._last_name = data["last_name"]
         self._email = data["email"]
@@ -40,12 +43,20 @@ class CreateConsumerAccount(ServiceBase):
         user = get_user_by_email(email=self._email)
         if user:
             raise ValidationError(
-                {"email": [ErrorDetail(_("User with this email already exists."))]}
+                {
+                    "email": [
+                        ErrorDetail(_("User with this email already exists."))
+                    ]
+                }
             )
+        return data
 
     def _factory_account(self, user):
         # TODO: Store spotlight terms and condition consent record
-        consumer_account = create_consumer_account(user_id=user.id)
+        username = GenerateUsername(user=user).handle()
+        consumer_account = create_consumer_account(
+            user_id=user.id, username=username
+        )
         self._factory_payment_register(account_id=consumer_account.account.id)
         return consumer_account
 
@@ -75,7 +86,7 @@ class CreateConsumerAccount(ServiceBase):
         account.add_dwolla_id(dwolla_id=dwolla_customer_id)
 
     def _send_verfication_email(self, user):
-        SendVerifyEmail(user=user).send()
+        SendConsumerAccountVerifyEmail(user=user).send()
 
 
 class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
@@ -97,3 +108,20 @@ class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
             "status": response["data"].get("status"),
             "dwolla_customer_id": response["data"]["dwolla_customer_id"],
         }
+
+
+class GenerateUsername(object):
+    def __init__(self, user):
+        self.user = user
+
+    def generate(self):
+        number = randint(11111, 99999)
+        first_name_i = self.user.first_name[0].lower()
+        last_name_i = self.user.last_name[1].lower()
+        return f"{number}@{first_name_i}{last_name_i}"
+
+    def handle(self):
+        username = self.generate()
+        while check_account_username(username=username):
+            username = self.generate()
+        return username
