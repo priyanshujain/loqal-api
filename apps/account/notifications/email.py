@@ -3,10 +3,32 @@ from django.template.loader import render_to_string
 
 from utils.email import send_email_async
 
-__all__ = ("SendAccountVerifyEmail",)
+__all__ = (
+    "SendConsumerAccountVerifyEmail",
+    "SendMerchantAccountVerifyEmail",
+)
 
 
-class SendAccountVerifyEmail:
+class SendConsumerAccountVerifyEmail(object):
+    def __init__(self, user):
+        self.user = user
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        user = self.user
+        token = user.email_verification_token
+        key_path = f"/email-verification?key={token}"
+        path = f"{settings.CONSUMER_APP_WEB_BASE_URL}{key_path}"
+        render_data = {"path": path}
+        email_html = render_to_string(
+            "consumer_email_verification.html", render_data
+        )
+        send_email_async((user.email), "Confirm your email", email_html)
+
+
+class SendMerchantAccountVerifyEmail(object):
     def __init__(self, user):
         self.user = user
 
@@ -17,7 +39,9 @@ class SendAccountVerifyEmail:
         user = self.user
         token = user.email_verification_token
         key_path = f"/user/email-verification?key={token}"
-        path = f"{settings.APP_BASE_URL}{key_path}"
+        path = f"{settings.MERCHANT_APP_WEB_BASE_URL}{key_path}"
         render_data = {"path": path}
         email_html = render_to_string("user_welcome_email.html", render_data)
-        send_email_async((user.email), "Confirm your email", email_html)
+        send_email_async(
+            (user.email), "merchant_email_verification.html", email_html
+        )

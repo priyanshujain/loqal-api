@@ -6,7 +6,7 @@ from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import check_account_username, create_consumer_account
-from apps.account.notifications import SendAccountVerifyEmail
+from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
@@ -86,7 +86,7 @@ class CreateConsumerAccount(ServiceBase):
         account.add_dwolla_id(dwolla_id=dwolla_customer_id)
 
     def _send_verfication_email(self, user):
-        SendAccountVerifyEmail(user=user).send()
+        SendConsumerAccountVerifyEmail(user=user).send()
 
 
 class CreateConsumerAccountAPIAction(ProviderAPIActionBase):

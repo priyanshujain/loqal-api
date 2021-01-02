@@ -3,10 +3,10 @@ from django.template.loader import render_to_string
 
 from utils.email import send_email_async
 
-__all__ = ("SendConsumerResetPasswordEmail",)
+__all__ = ("SendMerchantResetPasswordEmail",)
 
 
-class SendConsumerResetPasswordEmail(object):
+class SendMerchantResetPasswordEmail(object):
     def __init__(self, reset_password_object):
         self.user = reset_password_object.user
         self.token = reset_password_object.token
@@ -19,11 +19,11 @@ class SendConsumerResetPasswordEmail(object):
         token = self.token
 
         render_data = {
-            "website_name": settings.CONSUMER_APP_WEB_BASE_URL,
-            "path": f"{settings.CONSUMER_APP_WEB_BASE_URL}/reset-password?key={token}",
+            "website_name": settings.MERCHANT_APP_WEB_BASE_URL,
+            "path": f"{settings.MERCHANT_APP_WEB_BASE_URL}/user/forgot/key/{token}",
         }
         email_html = render_to_string(
-            "consumer_reset_password_email.html", render_data
+            "merchant_reset_password_email.html", render_data
         )
         send_email_async(
             (user.email), "Reset your loqal app password", email_html
