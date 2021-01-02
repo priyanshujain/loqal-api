@@ -12,7 +12,7 @@ response_dict = {
 }
 
 
-def fcm_send_single_device_notification_message(
+def fcm_send_device_notification_message(
     registration_id,
     title=None,
     body=None,
@@ -85,7 +85,7 @@ def fcm_send_single_device_notification_message(
             response of FCM, create a new github issue to resolve it.
     """
     if api_key is None:
-        api_key = settings.get("FCM_SERVER_KEY")
+        api_key = settings.FCM_SERVER_KEY
     push_service = FCMNotification(api_key=api_key, json_encoder=json_encoder)
     result = push_service.notify_single_device(
         registration_id=registration_id,
@@ -121,7 +121,7 @@ def fcm_send_single_device_notification_message(
     return result
 
 
-def fcm_send_single_device_data_message(
+def fcm_send_device_data_message(
     registration_id,
     condition=None,
     collapse_key=None,
@@ -179,7 +179,7 @@ def fcm_send_single_device_data_message(
             contact the project owner to resolve the issue
     """
     push_service = FCMNotification(
-        api_key=settings.get("FCM_SERVER_KEY") if api_key is None else api_key,
+        api_key=settings.FCM_SERVER_KEY if api_key is None else api_key,
         json_encoder=json_encoder,
     )
     return push_service.single_device_data_message(

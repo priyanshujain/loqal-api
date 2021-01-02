@@ -7,8 +7,8 @@ from db.models import BaseModel
 from db.models.fields import ChoiceCharEnumField
 
 from .options import UserDeviceTypes
-from .tasks import (fcm_send_single_device_data_message,
-                    fcm_send_single_device_notification_message)
+from .tasks import (fcm_send_device_data_message,
+                    fcm_send_device_notification_message)
 
 
 class UserDevice(BaseModel):
@@ -17,7 +17,9 @@ class UserDevice(BaseModel):
     """
 
     device_name = models.CharField(max_length=128, blank=True)
-    device_id = models.CharField(max_length=128, blank=True)
+    device_id = models.CharField(
+        max_length=128, blank=True, null=True, default=None, unique=True
+    )
     build_number = models.CharField(max_length=32, blank=True)
     brand_name = models.CharField(max_length=128, blank=True)
     api_level = models.IntegerField(null=True, blank=True)
@@ -55,6 +57,16 @@ class UserDevice(BaseModel):
                 self.device_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
+    def update_fcm_token(self, fcm_token, save=True):
+        self.fcm_token = fcm_token
+        if save:
+            self.save()
+
+    def inactivate_device(self, save=True):
+        self.active = False
+        if save:
+            self.save()
+
     def send_notification_message(
         self,
         title=None,
@@ -70,7 +82,7 @@ class UserDevice(BaseModel):
         Send single notification message.
         """
 
-        result = fcm_send_single_device_notification_message(
+        result = fcm_send_device_notification_message(
             registration_id=str(self.fcm_token),
             title=title,
             body=body,
@@ -102,7 +114,7 @@ class UserDevice(BaseModel):
         Send single data message.
         """
 
-        result = fcm_send_single_device_data_message(
+        result = fcm_send_device_data_message(
             registration_id=str(self.fcm_token),
             condition=condition,
             collapse_key=collapse_key,
