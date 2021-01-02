@@ -4,10 +4,16 @@ from django.utils.crypto import get_random_string
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (ChargeStatus, DisputeReasonType,
-                                  DisputeStatus, DisputeType, PaymentStatus,
-                                  TransactionEventType, TransactionStatus,
-                                  TransactionType)
+from apps.payment.options import (
+    ChargeStatus,
+    DisputeReasonType,
+    DisputeStatus,
+    DisputeType,
+    PaymentStatus,
+    TransactionEventType,
+    TransactionStatus,
+    TransactionType,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -97,13 +103,19 @@ class Transaction(AbstractBaseModel):
         self.status = status
         self.is_success = True
         if status == TransactionStatus.PENDING:
-            self.payment.status = PaymentStatus.CAPTURED
-            self.payment.captured_amount += self.amount
-            if self.amount == self.payment.order.total_net_amount:
-                self.payment.charge_status = ChargeStatus.FULLY_CHARGED
-            else:
-                self.payment.charge_status = ChargeStatus.PARTIALLY_CHARGED
-            self.payment.save()
+            if self.transaction_type in [
+                TransactionType.PAYMENT_REQUEST,
+                TransactionType.DIRECT_MERCHANT_PAYMENT,
+            ]:
+                self.payment.status = PaymentStatus.CAPTURED
+                self.payment.captured_amount += self.amount
+                if self.amount == self.payment.order.total_net_amount:
+                    self.payment.charge_status = ChargeStatus.FULLY_CHARGED
+                else:
+                    self.payment.charge_status = ChargeStatus.PARTIALLY_CHARGED
+                self.payment.save()
+            if self.transaction_type == TransactionType.REFUND_PAYMENT:
+                self.payment.update_charge_status_by_refund(self.amount)
         if save:
             self.save()
 

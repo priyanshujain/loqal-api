@@ -137,7 +137,14 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
     charge_status = serializers.CharField(
         source="charge_status.label", read_only=True
     )
+    payment_status = serializers.CharField(
+        source="payment_status.label", read_only=True
+    )
+    order_amount = serializers.CharField(
+        source="order.total_net_amount", read_only=True
+    )
     transaction = serializers.SerializerMethodField("get_transaction_details")
+    tip_amount = serializers.SerializerMethodField("get_tip_amount")
 
     class Meta:
         model = Payment
@@ -149,17 +156,21 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
             "payment_currency",
             "transaction",
             "charge_status",
+            "payment_status",
             "customer",
+            "tip_amount",
         )
 
     def get_transaction_details(self, obj):
         transaction = None
+        self.tip_amount = Decimal(0.0)
         if obj.payment_process == PaymentProcess.PAYMENT_REQUEST:
             payment_requests = obj.payment_requests
             if not payment_requests.exists():
                 return None
             payment_request = payment_requests.first()
             transaction = payment_request.transaction
+            self.tip_amount = payment_request.tip_amount
 
         if obj.payment_process in [
             PaymentProcess.QRCODE,
@@ -170,11 +181,17 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
                 return None
             direct_merchant_payment = direct_merchant_payments.first()
             transaction = direct_merchant_payment.transaction
+            self.tip_amount = direct_merchant_payment.tip_amount
 
         if transaction:
             return TransactionPaymentResponse(transaction).data
 
         return None
+    
+    def get_tip_amount(self, obj):
+        if self.tip_amount:
+            return self.tip_amount
+        return Decimal(0.0)
 
 
 class PaymentListResponse(serializers.ModelSerializer):

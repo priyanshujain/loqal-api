@@ -1,92 +1,93 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>{% block title %} {% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style type="text/css">
 
-      /**
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <title>{% block title %} {% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style type="text/css">
+    /**
    * Avoid browser level font resizing.
    * 1. Windows Mobile
    * 2. iOS / OSX
    */
-      body,
-      table,
-      td,
-      a {
-        -ms-text-size-adjust: 100%; /* 1 */
-        -webkit-text-size-adjust: 100%; /* 2 */
-      }
+    body,
+    table,
+    td,
+    a {
+      -ms-text-size-adjust: 100%;
+      /* 1 */
+      -webkit-text-size-adjust: 100%;
+      /* 2 */
+    }
 
-      /**
+    /**
    * Remove extra space added to tables and cells in Outlook.
    */
-      table,
-      td {
-        mso-table-rspace: 0pt;
-        mso-table-lspace: 0pt;
-      }
+    table,
+    td {
+      mso-table-rspace: 0pt;
+      mso-table-lspace: 0pt;
+    }
 
-      /**
+    /**
    * Better fluid images in Internet Explorer.
    */
-      img {
-        -ms-interpolation-mode: bicubic;
-      }
+    img {
+      -ms-interpolation-mode: bicubic;
+    }
 
-      /**
+    /**
    * Remove blue links for iOS devices.
    */
-      a[x-apple-data-detectors] {
-        font-family: inherit !important;
-        font-size: inherit !important;
-        font-weight: inherit !important;
-        line-height: inherit !important;
-        color: inherit !important;
-        text-decoration: none !important;
-      }
+    a[x-apple-data-detectors] {
+      font-family: inherit !important;
+      font-size: inherit !important;
+      font-weight: inherit !important;
+      line-height: inherit !important;
+      color: inherit !important;
+      text-decoration: none !important;
+    }
 
-      /**
+    /**
    * Fix centering issues in Android 4.4.
    */
-      div[style*="margin: 16px 0;"] {
-        margin: 0 !important;
-      }
+    div[style*="margin: 16px 0;"] {
+      margin: 0 !important;
+    }
 
-      body {
-        width: 100% !important;
-        height: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
+    body {
+      width: 100% !important;
+      height: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
 
-      /**
+    /**
    * Collapse table borders to avoid space between cells.
    */
-      table {
-        border-collapse: collapse !important;
-      }
+    table {
+      border-collapse: collapse !important;
+    }
 
-      a {
-        color: #2f54eb;
-      }
+    a {
+      color: #2f54eb;
+    }
 
-      img {
-        height: auto;
-        line-height: 100%;
-        text-decoration: none;
-        border: 0;
-        outline: none;
-      }
-    </style>
-  </head>
-  <body style="background-color: #e9ecef;">
-    <!-- start preheader -->
-    <div
-      class="preheader"
-      style="
+    img {
+      height: auto;
+      line-height: 100%;
+      text-decoration: none;
+      border: 0;
+      outline: none;
+    }
+  </style>
+</head>
+
+<body style="background-color: #ffffff;">
+  <!-- start preheader -->
+  <div class="preheader" style="
         display: none;
         max-width: 0;
         max-height: 0;
@@ -95,240 +96,205 @@
         line-height: 1px;
         color: #fff;
         opacity: 0;
-      "
-    >
+      ">
     {% block preheader %} {% endblock %}
-    </div>
-    <!-- end preheader -->
+  </div>
+  <!-- end preheader -->
 
-    <!-- start body -->
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <!-- start logo -->
-      <tr>
-        <td align="center" bgcolor="#e9ecef">
-          <!--[if (gte mso 9)|(IE)]>
+  <!-- start body -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <!-- start logo -->
+    <tr>
+      <td align="center" bgcolor="#ffffff">
+        <!--[if (gte mso 9)|(IE)]>
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
         <tr>
         <td align="center" valign="top" width="600">
         <![endif]-->
-          <table
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-            style="max-width: 600px; background: #fff; margin-top: 32px;"
-          >
-            <tr>
-              <td align="center" valign="top" style="padding: 36px 32px; text-align: left;">
-                <a
-                  href="https://getspotlight.co"
-                  target="_blank"
-                  style="display: inline-block;"
-                >
-                  <img
-                    src="https://res.cloudinary.com/dhqh3pewg/image/upload/v1596200415/logo-new_2x_io5kz0.png"
-                    alt="Logo"
-                    border="0"
-                    width="160"
-                    style="
+        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+          style="max-width: 600px; background: #fff; margin-top: 32px;">
+          <tr>
+            <td align="center" valign="top" style="padding: 36px 32px; text-align: left;">
+              <a href="https://payloqal.com" target="_blank" style="display: inline-block;">
+                <img src="https://res.cloudinary.com/dhqh3pewg/image/upload/v1609581816/loqal_logo_blue.png" alt="Logo"
+                  border="0" width="160" style="
                       display: block;
-                      width: 200x;
-                      max-width: 200px;
+                      width: 150px;
+                      max-width: 150px;
                       min-width: 48px;
-                    "
-                  />
-                </a>
-              </td>
-            </tr>
-          </table>
-          <!--[if (gte mso 9)|(IE)]>
+                    " />
+              </a>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
         </td>
         </tr>
         </table>
         <![endif]-->
-        </td>
-      </tr>
-      <!-- end logo -->
+      </td>
+    </tr>
+    <!-- end logo -->
 
-      <!-- start hero -->
-      <tr>
-        <td align="center" bgcolor="#e9ecef">
-          <!--[if (gte mso 9)|(IE)]>
+    <!-- start hero -->
+    <tr>
+      <td align="center" bgcolor="#ffffff">
+        <!--[if (gte mso 9)|(IE)]>
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
         <tr>
         <td align="center" valign="top" width="600">
         <![endif]-->
-          <table
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-            style="max-width: 600px;"
-          >
-            <tr>
-              <td
-                align="left"
-                bgcolor="#ffffff"
-                style="
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="
                   padding: 32px 32px 0;
                   font-family: Helvetica, Arial, sans-serif;
-                "
-              >
-                <h1
-                  style="
+                ">
+              <h1 style="
                     margin: 0;
                     font-size: 32px;
                     font-weight: 400;
                     letter-spacing: -1px;
                     line-height: 48px;
-                  "
-                >
+                  ">
                 {% block headline %} {% endblock %}
-                </h1>
-              </td>
-            </tr>
-          </table>
-          <!--[if (gte mso 9)|(IE)]>
+              </h1>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
         </td>
         </tr>
         </table>
         <![endif]-->
-        </td>
-      </tr>
-      <!-- end hero -->
+      </td>
+    </tr>
+    <!-- end hero -->
 
-      <!-- start copy block -->
-      <tr>
-        <td align="center" bgcolor="#e9ecef">
-          <!--[if (gte mso 9)|(IE)]>
+    <!-- start copy block -->
+    <tr>
+      <td align="center" bgcolor="#ffffff">
+        <!--[if (gte mso 9)|(IE)]>
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
         <tr>
         <td align="center" valign="top" width="600">
         <![endif]-->
-          <table
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-            style="max-width: 600px;"
-          >
-            <!-- start copy -->
-            <tr>
-              <td
-                align="left"
-                bgcolor="#ffffff"
-                style="
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <!-- start copy -->
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="
                   padding: 0 32px 32px 16px;
                   font-family: Helvetica, Arial, sans-serif;
                   font-size: 16px;
                   line-height: 24px;
-                "
-              >
-                <p style="margin: 0;">
-                    {% block message %} {% endblock %}
-                </p>
-              </td>
-            </tr>
-            <!-- end copy -->
+                ">
+              <p style="margin: 0;">
+                {% block message %} {% endblock %}
+              </p>
+            </td>
+          </tr>
+          <!-- end copy -->
 
-            <!-- start button -->
-            <tr>
-              <td align="left" bgcolor="#ffffff">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td align="center" bgcolor="#ffffff">
-                      <table border="0" cellpadding="0" cellspacing="0">
-                        {% block button_message %}{% endblock %}
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
+          <!-- start button -->
+          <tr>
+            <td align="left" bgcolor="#ffffff">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" bgcolor="#ffffff">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      {% block button_message %}{% endblock %}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <!-- end button -->
+          <!-- end button -->
 
-            <!-- start copy -->
-            {% block second_message %}{% endblock %}
+          <!-- start copy -->
+          {% block second_message %}{% endblock %}
 
-            <!-- end copy -->
+          <!-- end copy -->
 
-            <!-- start copy -->
-            <tr>
-              <td
-                align="left"
-                bgcolor="#ffffff"
-                style="
-                  padding: 0 32px 32px 16px;
+          <!-- start copy -->
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="
+                  padding: 0 16px 16px 16px;
                   font-family: Helvetica, Arial, sans-serif;
                   font-size: 16px;
                   line-height: 24px;
-                "
-              >
-                <p style="margin-bottom: 32px;">
-                  Cheers,<br />
-                  The Spotlight Team
-                </p>
-              </td>
-            </tr>
-            <!-- end copy -->
-          </table>
-          <!--[if (gte mso 9)|(IE)]>
+                ">
+              <p>
+                If you have any questions or concerns please contact support at 
+                <a href="mailto:hello@payloqal.com">hello@payloqal.com</a> or (908) 913-7744
+              </p>
+            </td>
+          </tr>
+          <!-- end copy -->
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
         </td>
         </tr>
         </table>
         <![endif]-->
-        </td>
-      </tr>
-      <!-- end copy block -->
+      </td>
+    </tr>
+    <!-- end copy block -->
 
-      <!-- start footer -->
-      <tr>
-        <td align="center" bgcolor="#e9ecef" style="padding: 32px;">
-          <!--[if (gte mso 9)|(IE)]>
+    <!-- start footer -->
+    <tr>
+      <td align="center" bgcolor="#ffffff" style="padding: 32px;">
+        <!--[if (gte mso 9)|(IE)]>
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
         <tr>
         <td align="center" valign="top" width="600">
         <![endif]-->
-          <table
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-            style="max-width: 600px;"
-          >
-            <!-- start unsubscribe -->
-            <tr>
-              <td
-                align="center"
-                bgcolor="#e9ecef"
-                style="
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <tr>
+            <td align="center" bgcolor="#ffffff" style="
+                padding: 12px 32px;
+                font-family: Helvetica, Arial, sans-serif;
+                font-size: 12px;
+                line-height: 20px;
+                color: #666;
+              ">
+              <p style="margin: 0;">
+                You're receiving this email because you have a Loqal account. Please note, you may not be
+                able to opt out of these emails. as they're non-promotional in nature and contain important information
+                regarding your account.
+                Please do not reply to this email. Instead, refer to the contact information above. 
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" bgcolor="#ffffff" style="
                   padding: 12px 32px;
                   font-family: Helvetica, Arial, sans-serif;
                   font-size: 14px;
                   line-height: 20px;
                   color: #666;
-                "
-              >
-                <p style="margin: 0;">
-                  © Spotlight Services and Technologies Incorporated.
-                </p>
-                <p style="margin: 0;">
-                  362, Orenda Circle, Westfield, NJ 07090
-                </p>
-              </td>
-            </tr>
-            <!-- end unsubscribe -->
-          </table>
-          <!--[if (gte mso 9)|(IE)]>
+                ">
+              <p style="margin: 0;">
+                © Spotlight Services and Technologies Incorporated.
+              </p>
+              <p style="margin: 0;">
+                362, Orenda Circle, Westfield, NJ 07090
+              </p>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
         </td>
         </tr>
         </table>
         <![endif]-->
-        </td>
-      </tr>
-      <!-- end footer -->
-    </table>
-    <!-- end body -->
-  </body>
+      </td>
+    </tr>
+    <!-- end footer -->
+  </table>
+  <!-- end body -->
+</body>
+
 </html>
