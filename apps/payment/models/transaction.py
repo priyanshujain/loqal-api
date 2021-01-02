@@ -105,7 +105,7 @@ class Transaction(AbstractBaseModel):
                 self.payment.captured_amount += self.amount
                 if self.amount == self.payment.order.total_net_amount:
                     self.payment.charge_status = ChargeStatus.FULLY_CHARGED
-                else:
+                if self.amount < self.payment.order.total_net_amount:
                     self.payment.charge_status = ChargeStatus.PARTIALLY_CHARGED
                 self.payment.save()
             if self.transaction_type == TransactionType.REFUND_PAYMENT:
