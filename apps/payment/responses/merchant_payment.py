@@ -159,6 +159,7 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
             "payment_status",
             "customer",
             "tip_amount",
+            "order_amount",
         )
 
     def get_transaction_details(self, obj):
