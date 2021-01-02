@@ -1,7 +1,6 @@
-from django.http.multipartparser import parse_header
 from django.urls import path
 
-from apps.user.views.consumer import (ApplyResetPasswordAPI,
+from apps.user.views.merchant import (ApplyResetPasswordAPI,
                                       RequestResetPasswordAPI,
                                       ResendEmailverificationAPI, UserLoginAPI,
                                       VerifyEmailAPI)
