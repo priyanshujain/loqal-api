@@ -1,10 +1,8 @@
 import qrcode
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
-
-from django.contrib.auth.models import AnonymousUser
-
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator

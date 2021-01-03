@@ -88,7 +88,9 @@ class FcmPlugin(object):
         """
         if api_key is None:
             api_key = settings.FCM_SERVER_KEY
-        push_service = FCMNotification(api_key=api_key, json_encoder=json_encoder)
+        push_service = FCMNotification(
+            api_key=api_key, json_encoder=json_encoder
+        )
         result = push_service.notify_single_device(
             registration_id=self.fcm_token,
             message_title=title,

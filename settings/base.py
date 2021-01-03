@@ -181,7 +181,9 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
+LOGGING_HANDLERS = (
+    ["console", "sentry"] if allow_sentry_logging else ["console"]
+)
 
 
 LOGGING = {
@@ -387,7 +389,6 @@ MAX_AVATAR_SIZE = 5000000
 MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
 DEFAULT_MAX_DIGITS = 5
 DEFAULT_DECIMAL_PLACES = 2
-
 
 
 # Firebase settings

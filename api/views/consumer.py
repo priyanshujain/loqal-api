@@ -54,7 +54,6 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
         if not user.is_authenticated:
             exception_message = "User is not authenticated."
 
-
         consumer_account = get_consumer_account(user_id=user.id)
         if not consumer_account:
             exception_message = "User is not valid"

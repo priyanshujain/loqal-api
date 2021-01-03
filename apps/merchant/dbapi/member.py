@@ -4,6 +4,7 @@ from django.db.utils import IntegrityError
 
 from apps.merchant.models import AccountMember, FeatureAccessRole, MemberInvite
 from apps.user.dbapi import create_user
+from apps.user.models import User
 
 
 def get_account_member_by_id(member_id, merchant_id):
@@ -230,3 +231,12 @@ def check_invites_exists_by_role(role_id, merchant_id):
     return MemberInvite.objects.filter(
         role_id=role_id, merchant_id=merchant_id
     ).exists()
+
+
+def update_account_member(
+    user_id, member_id, first_name, last_name, phone_number, position
+):
+    AccountMember.objects.filter(id=member_id).update(position=position)
+    User.objects.filter(id=user_id).update(
+        first_name=first_name, last_name=last_name, phone_number=phone_number
+    )
