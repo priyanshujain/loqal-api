@@ -4,14 +4,14 @@ from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import APIView, ConsumerAPIView
+from api.views import APIView, MerchantAPIView
 from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.user.notifications import SendMerchantResetPasswordEmail
 from apps.user.services import (ApplyResetPassword, EmailVerification,
                                 LoginRequest, RequestResetPassword)
 
 
-class ResendEmailverificationAPI(ConsumerAPIView):
+class ResendEmailverificationAPI(MerchantAPIView):
     def post(self, request):
         user = request.user
         if user.email_verified:
