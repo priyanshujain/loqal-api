@@ -15,13 +15,14 @@ class SendEmailVerifiedNotification(object):
     def send(self):
         if not self.device_id:
             return
-        device = get_device_by_id(
-            user_id=self.user_id, device_id=self.device_id
-        )
+        device = get_device_by_id(user_id=self.user_id, device_id=self.device_id)
         if not device:
             return
         device.send_data_message(
-            data_message={"data": {"email_verified": True}},
+            data_message={
+                "action": "EMAIL_VERIFIED",
+                "payload": {"email_verified": True},
+            },
             content_available=True,
         )
 
@@ -35,9 +36,7 @@ class SendNewPaymentNotification(object):
     def send(self):
         if not self.device_id:
             return
-        device = get_device_by_id(
-            user_id=self.user_id, device_id=self.device_id
-        )
+        device = get_device_by_id(user_id=self.user_id, device_id=self.device_id)
         if not device:
             return
         device.send_notification_message(
@@ -56,9 +55,7 @@ class SendRefundNotification(object):
     def send(self):
         if not self.device_id:
             return
-        device = get_device_by_id(
-            user_id=self.user_id, device_id=self.device_id
-        )
+        device = get_device_by_id(user_id=self.user_id, device_id=self.device_id)
         if not device:
             return
         device.send_notification_message(
