@@ -3,6 +3,9 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
+from django.contrib.auth.models import AnonymousUser
+
+
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
@@ -147,6 +150,7 @@ class UserLogoutAPI(LoggedInAPIView):
         Logout the user i.e end the session.
         """
         auth.logout(request)
+        request.user = AnonymousUser()
         return self.response()
 
 
