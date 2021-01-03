@@ -41,7 +41,7 @@ class SendMerchantAccountVerifyEmail(object):
         key_path = f"/user/email-verification?key={token}"
         path = f"{settings.MERCHANT_APP_WEB_BASE_URL}{key_path}"
         render_data = {"path": path}
-        email_html = render_to_string("user_welcome_email.html", render_data)
-        send_email_async(
-            (user.email), "merchant_email_verification.html", email_html
+        email_html = render_to_string(
+            "merchant_email_verification.html", render_data
         )
+        send_email_async((user.email), "Confirm your email", email_html)
