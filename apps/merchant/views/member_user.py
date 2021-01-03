@@ -7,8 +7,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, MerchantAPIView
-from apps.merchant.dbapi import (get_account_member_by_user_id,
-                                 update_account_member)
+from apps.merchant.dbapi import get_account_member_by_user_id, update_account_member
 from apps.merchant.responses import MemberProfileResponse
 from apps.merchant.validators import EditMemberProfileValidator
 from apps.user.dbapi import get_user_by_phone
@@ -45,9 +44,7 @@ class UpdateUserProfileAPI(MerchantAPIView):
         account_member = request.merchant_account_member
         user = request.user
         phone_number = data["phone_number"]
-        assert self._validate_phone_number(
-            user=user, phone_number=phone_number
-        )
+        assert self._validate_phone_number(user=user, phone_number=phone_number)
         update_account_member(
             user_id=user.id,
             member_id=account_member.id,
@@ -65,9 +62,9 @@ class UpdateUserProfileAPI(MerchantAPIView):
         if get_user_by_phone(phone_number=phone_number):
             raise ValidationError(
                 {
-                    "phone_number": ErrorDetail(
-                        _("A user already exists with this phone number.")
-                    )
+                    "phone_number": [
+                        ErrorDetail(_("A user already exists with this phone number."))
+                    ]
                 }
             )
         return True
