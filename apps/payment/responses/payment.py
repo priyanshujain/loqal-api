@@ -350,7 +350,10 @@ class RecentStoresResponse(serializers.ModelSerializer):
         source="payment.captured_amount", read_only=True
     )
     category = serializers.CharField(
-        source="merchant.category", read_only=True
+        source="merchant.merchantprofile.category", read_only=True
+    )
+    sub_category = serializers.CharField(
+        source="merchant.merchantprofile.sub_category", read_only=True
     )
     address = serializers.JSONField(
         source="merchant.merchantprofile.address", read_only=True
@@ -365,6 +368,7 @@ class RecentStoresResponse(serializers.ModelSerializer):
         fields = (
             "amount",
             "category",
+            "sub_category",
             "address",
             "full_name",
             "created_at",
