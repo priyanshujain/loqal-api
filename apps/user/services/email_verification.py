@@ -50,4 +50,4 @@ class EmailVerification(ServiceBase):
 
         user = self.user
         user.verify_email()
-        return True
+        return user

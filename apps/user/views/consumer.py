@@ -205,8 +205,9 @@ class VerifyEmailAPI(APIView):
 
     def _run_services(self, request):
         service = EmailVerification(data=self.request_data)
-        if service.handle():
+        user = service.handle()
+        if user:
             device_id = request.session.get("device_id")
             SendEmailVerifiedNotification(
-                user_id=request.user.id, device_id=device_id
+                user_id=user.id, device_id=device_id
             ).send()
