@@ -1,3 +1,5 @@
+from enum import unique
+
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -17,7 +19,10 @@ class UserDevice(BaseModel):
 
     device_name = models.CharField(max_length=128, blank=True)
     device_id = models.CharField(
-        max_length=128, blank=True, null=True, default=None, unique=True
+        max_length=128,
+        blank=True,
+        null=True,
+        default=None,
     )
     build_number = models.CharField(max_length=32, blank=True)
     brand_name = models.CharField(max_length=128, blank=True)
@@ -31,7 +36,7 @@ class UserDevice(BaseModel):
     )
 
     device_tracking_id = models.CharField(
-        blank=True, null=True, default=None, unique=True, max_length=32
+        blank=True, null=True, default=None, max_length=32, unique=True
     )
     fcm_token = models.TextField()
     device_platform = ChoiceCharEnumField(
@@ -41,6 +46,10 @@ class UserDevice(BaseModel):
 
     class Meta:
         db_table = "user_device"
+        unique_together = (
+            "user",
+            "device_id",
+        )
 
     def save(self, *args, **kwargs):
         def id_generator():
