@@ -23,7 +23,7 @@ class SendMerchantResetPasswordEmail(object):
             "path": f"{settings.MERCHANT_APP_WEB_BASE_URL}/user/forgot/key/{token}",
         }
         email_html = render_to_string(
-            "merchant_reset_password_email.html", render_data
+            "merchant_reset_password.html", render_data
         )
         send_email_async(
             (user.email), "Reset your loqal app password", email_html
