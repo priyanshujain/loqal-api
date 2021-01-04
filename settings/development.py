@@ -19,6 +19,7 @@ CORS_ORIGIN_REGEX_WHITELIST += [
     "http://localhost:3000",
     "https://app-dev.payloqal.com",
     "https://merchant-demo.payloqal.com",
+    "https://dev-website.payloqal.com",
 ]
 
 
