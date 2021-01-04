@@ -13,7 +13,7 @@ ALLOWED_HOSTS = ["*"]
 API_ENV = APIEnvironmentTypes.SANDBOX
 from .base import *  # isort:skip
 
-APP_NAME = "Spotlight Development"
+APP_NAME = "Loqal development"
 
 CORS_ORIGIN_REGEX_WHITELIST += [
     "http://localhost:3000",

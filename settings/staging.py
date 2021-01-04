@@ -18,7 +18,7 @@ CORS_ORIGIN_REGEX_WHITELIST += [
     "https://app-stag.payloqal.com",
 ]
 
-APP_NAME = "Spotlight Staging"
+APP_NAME = "Loqal staging"
 
 
 CSRF_COOKIE_SECURE = True

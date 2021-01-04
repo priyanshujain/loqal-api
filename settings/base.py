@@ -277,12 +277,23 @@ CACHES = {"default": redis_config(db=1)}
 
 # CSRF_COOKIE_NAME = "lc"
 
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# TODO: look into it
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# SESSION_CACHE_ALIAS = "default"
+# SESSION_COOKIE_NAME = "session"
+
+# # FIX: Change this to json serializer and convert last_activity to timestamp
+# SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_NAME = "session"
 
-# FIX: Change this to json serializer and convert last_activity to timestamp
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+# # FIX: Change this to json serializer and convert last_activity to timestamp
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
+
 
 
 # Celery config
