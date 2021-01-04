@@ -15,7 +15,7 @@ class SendEmailVerifiedNotification(object):
     def send(self):
         if not self.device_id:
             devices = get_devices_by_user(user_id=self.user_id)
-            if not devices.count():
+            if not devices.count() > 0:
                 return False
             for device in devices:
                 self.send_single_message(device)

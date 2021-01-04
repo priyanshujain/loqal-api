@@ -8,12 +8,9 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from apps.user.dbapi import (
-    create_session as _create_session,
-    get_session_by_id,
-    get_active_sessions,
-    get_all_sessions,
-)
+from apps.user.dbapi import create_session as _create_session
+from apps.user.dbapi import (get_active_sessions, get_all_sessions,
+                             get_session_by_id)
 
 __all__ = ("Session",)
 
@@ -83,7 +80,9 @@ class Session(object):
         sessions_data = []
         for local_session in sessions:
             # session does not exist or is expired
-            if not self.check_session_exists(session_key=local_session.session_key):
+            if not self.check_session_exists(
+                session_key=local_session.session_key
+            ):
                 local_session.expire_session()
                 if self.only_active:
                     continue
@@ -122,7 +121,9 @@ class Session(object):
 
         local_session = get_session_by_id(session_id=session_id)
         if not local_session:
-            raise ValidationError({"detail": ErrorDetail(_("Invalid session_id."))})
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid session_id."))}
+            )
 
         if request_session.session_key == local_session.session_key:
             raise ValidationError(
@@ -135,7 +136,9 @@ class Session(object):
                 }
             )
 
-        if not self.check_session_exists(session_key=local_session.session_key):
+        if not self.check_session_exists(
+            session_key=local_session.session_key
+        ):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(

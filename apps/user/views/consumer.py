@@ -200,13 +200,13 @@ class ApplyResetPasswordAPI(APIView):
 
 class VerifyEmailAPI(APIView):
     def post(self, request):
-        self._run_services()
+        self._run_services(request)
         return self.response()
 
-    def _run_services(self):
+    def _run_services(self, request):
         service = EmailVerification(data=self.request_data)
         if service.handle():
-            device_id = self.request.session.get("device_id")
+            device_id = request.session.get("device_id")
             SendEmailVerifiedNotification(
-                user_id=self.request.user.id, device_id=device_id
+                user_id=request.user.id, device_id=device_id
             ).send()
