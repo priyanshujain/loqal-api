@@ -19,6 +19,7 @@ __all__ = (
     "get_reset_password_object_by_token",
     "get_user_by_email_token",
     "get_user_by_phone",
+    "get_session_by_id",
 )
 
 
@@ -111,6 +112,13 @@ def get_session(user_id, session_key):
         return UserSession.objects.get(
             user_id=user_id, is_expired=False, session_key=session_key
         )
+    except UserSession.DoesNotExist:
+        return None
+
+
+def get_session_by_id(session_id):
+    try:
+        return UserSession.objects.get(id=session_id)
     except UserSession.DoesNotExist:
         return None
 

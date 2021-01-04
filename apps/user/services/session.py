@@ -8,8 +8,12 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from apps.user.dbapi import create_session as _create_session
-from apps.user.dbapi import get_active_sessions, get_all_sessions, get_session
+from apps.user.dbapi import (
+    create_session as _create_session,
+    get_session_by_id,
+    get_active_sessions,
+    get_all_sessions,
+)
 
 __all__ = ("Session",)
 
@@ -79,14 +83,15 @@ class Session(object):
         sessions_data = []
         for local_session in sessions:
             # session does not exist or is expired
-            if not self.check_session_exists(
-                session_key=local_session.session_key
-            ):
+            if not self.check_session_exists(session_key=local_session.session_key):
                 local_session.expire_session()
+                if self.only_active:
+                    continue
             sessions_data.append(
                 {
                     "is_current_session": request_session.session_key
                     == local_session.session_key,
+                    "session_id": local_session.id,
                     "user_agent": local_session.user_agent,
                     "ip_address": local_session.ip_address,
                     "is_ip_routable": local_session.is_ip_routable,
@@ -111,11 +116,15 @@ class Session(object):
             return True
         return False
 
-    def delete_session(self, session_key):
+    def delete_session(self, session_id):
         request_session = self.request.session
         user = self.user
 
-        if request_session.session_key == session_key:
+        local_session = get_session_by_id(session_id=session_id)
+        if not local_session:
+            raise ValidationError({"detail": ErrorDetail(_("Invalid session_id."))})
+
+        if request_session.session_key == local_session.session_key:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -126,7 +135,7 @@ class Session(object):
                 }
             )
 
-        if not self.check_session_exists(session_key=session_key):
+        if not self.check_session_exists(session_key=local_session.session_key):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -135,10 +144,6 @@ class Session(object):
                 }
             )
 
-        request_session.delete(session_key)
-
-        local_session = get_session(user_id=user.id, session_key=session_key)
-        if local_session:
-            local_session.expire_session()
-
+        request_session.delete(local_session.session_key)
+        local_session.expire_session()
         return True
