@@ -7,11 +7,10 @@ from api.services import ServiceBase
 from apps.user.dbapi import (gen_reset_password_token,
                              get_reset_password_object_by_token,
                              get_user_by_email, set_new_user_password)
+from apps.user.notifications import SendPasswordChangeAlert
 from apps.user.validators import (ApplyResetPasswordValidator,
                                   RequestResetPasswordValidator,
                                   ResetPasswordTokenValidator)
-from apps.user.notifications import SendPasswordChangeAlert
-
 
 __all__ = (
     "RequestResetPassword",

@@ -1,4 +1,4 @@
-from apps.notification.dbapi import get_device_by_id
+from apps.notification.dbapi import get_device_by_id, get_devices_by_user
 
 __all__ = (
     "SendEmailVerifiedNotification",
@@ -8,18 +8,28 @@ __all__ = (
 
 
 class SendEmailVerifiedNotification(object):
-    def __init__(self, user_id, device_id):
+    def __init__(self, user_id, device_id=None):
         self.user_id = user_id
         self.device_id = device_id
 
     def send(self):
         if not self.device_id:
-            return
+            devices = get_devices_by_user(user_id=self.user_id)
+            if not devices.count():
+                return False
+            for device in devices:
+                self.send_single_message(device)
+            return True
+
         device = get_device_by_id(
             user_id=self.user_id, device_id=self.device_id
         )
         if not device:
-            return
+            return False
+        self.send_single_message(device)
+        return True
+
+    def send_single_message(self, device):
         device.send_data_message(
             data_message={
                 "action": "EMAIL_VERIFIED",
@@ -29,20 +39,13 @@ class SendEmailVerifiedNotification(object):
         )
 
 
-class SendNewPaymentNotification(object):
+class SendNewPaymentNotification(SendEmailVerifiedNotification):
     def __init__(self, user_id, device_id, data):
         self.user_id = user_id
         self.device_id = device_id
         self.data = data
 
-    def send(self):
-        if not self.device_id:
-            return
-        device = get_device_by_id(
-            user_id=self.user_id, device_id=self.device_id
-        )
-        if not device:
-            return
+    def send_single_message(self, device):
         device.send_notification_message(
             title="New payment recieved",
             body="Click to view payment details",
@@ -50,20 +53,13 @@ class SendNewPaymentNotification(object):
         )
 
 
-class SendRefundNotification(object):
+class SendRefundNotification(SendEmailVerifiedNotification):
     def __init__(self, user_id, device_id, data):
         self.user_id = user_id
         self.device_id = device_id
         self.data = data
 
-    def send(self):
-        if not self.device_id:
-            return
-        device = get_device_by_id(
-            user_id=self.user_id, device_id=self.device_id
-        )
-        if not device:
-            return
+    def send_single_message(self, device):
         device.send_notification_message(
             title="Refund recieved",
             body="Click to view refund details",

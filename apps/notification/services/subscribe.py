@@ -4,8 +4,6 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.notification.dbapi import get_device_by_id, register_user_device
 from apps.notification.validators import RegisterUserDeviceValidator
-from apps.user.notifications import SendPasswordChangeAlert
-
 
 __all__ = ("SubscribePushNotication",)
 
