@@ -185,7 +185,7 @@ class RequestResetPasswordAPI(APIView):
 
     def _run_services(self, request):
         service = RequestResetPassword(request=request, data=self.request_data)
-        service.handle()
+        return service.handle()
 
 
 class ApplyResetPasswordAPI(APIView):
