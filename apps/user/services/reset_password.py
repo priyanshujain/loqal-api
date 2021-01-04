@@ -10,6 +10,8 @@ from apps.user.dbapi import (gen_reset_password_token,
 from apps.user.validators import (ApplyResetPasswordValidator,
                                   RequestResetPasswordValidator,
                                   ResetPasswordTokenValidator)
+from apps.user.notifications import SendPasswordChangeAlert
+
 
 __all__ = (
     "RequestResetPassword",
