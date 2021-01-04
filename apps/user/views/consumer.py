@@ -209,4 +209,4 @@ class VerifyEmailAPI(APIView):
             device_id = self.request.session.get("device_id")
             SendEmailVerifiedNotification(
                 user_id=self.request.user.id, device_id=device_id
-            )
+            ).send()
