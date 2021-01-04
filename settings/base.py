@@ -292,8 +292,8 @@ SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_NAME = "session"
 
 # # FIX: Change this to json serializer and convert last_activity to timestamp
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
-
+# SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
 
 # Celery config
