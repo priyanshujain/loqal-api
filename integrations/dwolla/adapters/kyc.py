@@ -7,7 +7,7 @@ class SolePersonAdapter(Adapter):
     lastName = Field(source="last_name")
     dateOfBirth = Field(source="dob")
     address1 = Field(source="address.address1")
-    address2 = Field(source="address.address2")
+    address2 = Field(source="address.address2", required=False, default="")
     city = Field(source="address.city")
     state = Field(source="address.state")
     postalCode = Field(source="address.zip_code")
@@ -16,7 +16,7 @@ class SolePersonAdapter(Adapter):
 
 class AddressAdapter(Adapter):
     address1 = Field()
-    address2 = Field()
+    address2 = Field(required=False, default="")
     city = Field()
     stateProvinceRegion = Field(source="state")
     country = Field()
@@ -57,7 +57,7 @@ class IncorporationDetailsAdapter(Adapter):
     type = Field(default="business")
     ipAddress = Field(source="ip_address")
     address1 = Field(source="registered_address.address1")
-    address2 = Field(source="registered_address.address2")
+    address2 = Field(source="registered_address.address2", required=False, default="")
     city = Field(source="registered_address.city")
     state = Field(source="registered_address.state")
     postalCode = Field(source="registered_address.zip_code")
