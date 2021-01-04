@@ -4,6 +4,8 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.notification.dbapi import get_device_by_id, register_user_device
 from apps.notification.validators import RegisterUserDeviceValidator
+from apps.user.notifications import SendPasswordChangeAlert
+
 
 __all__ = ("SubscribePushNotication",)
 
@@ -25,6 +27,7 @@ class SubscribePushNotication(ServiceBase):
         else:
             user_device = self._factory_user_device(data)
         self.request.session["device_id"] = user_device.device_id
+        self.request.session.modified = True
         return user_device
 
     def _validate_data(self):
