@@ -147,7 +147,7 @@ class RemoveBeneficialOwnerAPI(MerchantAPIView):
 
 
 class OnboardingDataAPI(MerchantAPIView):
-    # permission_classes = (IsMerchantAccountPendingPermission,)
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def get(self, request):
         merchant_account = request.merchant_account
@@ -156,7 +156,7 @@ class OnboardingDataAPI(MerchantAPIView):
 
 
 class SubmitKycDataAPI(MerchantAPIView):
-    # permission_classes = (IsMerchantAccountPendingPermission,)
+    permission_classes = (IsMerchantAccountPendingPermission,)
 
     def post(self, request):
         merchant_account = request.merchant_account
