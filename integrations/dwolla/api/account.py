@@ -107,7 +107,7 @@ class Account(Http):
 
         endpoint = "/customers"
         if is_update:
-            endpoint = f"/customer/{data['dwolla_id']}"
+            endpoint = f"/customers/{data['dwolla_id']}"
         try:
             response = self.post(
                 endpoint,
