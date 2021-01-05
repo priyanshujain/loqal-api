@@ -175,9 +175,15 @@ class CreateDwollaMerchantAccount(ServiceBase):
 
 class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
     def create(self, data, is_update=False):
-        response = self.client.account.create_merchant_account(
-            data=data, is_update=is_update
+        dwolla_merchant_account_fn = (
+            self.client.account.create_merchant_account
         )
+        if is_update:
+            dwolla_merchant_account_fn = (
+                self.client.account.retry_merchant_account
+            )
+
+        response = dwolla_merchant_account_fn(data=data)
         if self.get_errors(response):
             raise ProviderAPIException(
                 {
