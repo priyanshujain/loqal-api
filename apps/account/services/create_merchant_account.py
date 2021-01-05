@@ -43,7 +43,11 @@ class CreateMerchantAccount(ServiceBase):
         user = get_user_by_email(email=self._email)
         if user:
             raise ValidationError(
-                {"email": [ErrorDetail(_("User email already exists."))]}
+                {
+                    "email": [
+                        ErrorDetail(_("User with this email already exists."))
+                    ]
+                }
             )
 
     def _factory_merchant_account(self):
