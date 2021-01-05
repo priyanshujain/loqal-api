@@ -10,7 +10,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.CharField(source="user.email", read_only=True)
-    email_verified = serializers.CharField(
+    email_verified = serializers.BooleanField(
         source="user.email_verified", read_only=True
     )
     phone_number = serializers.CharField(
