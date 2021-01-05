@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 
 from api.helpers import run_validator
 from apps.account.dbapi import create_payment_account_consent
+from apps.account.notifications import SendConsumerTermsEmail
 from apps.account.validators import PaymentAccountOpeningConsentValidator
 from apps.box.dbapi import create_boxfile
 from apps.box.tasks import store_file_to_gcs
@@ -24,10 +25,13 @@ class AcceptTerms(object):
         data = run_validator(
             PaymentAccountOpeningConsentValidator, data=self.data
         )
-        boxfile = DownloadTermsDocument(
+        tempfile_obj, boxfile = DownloadTermsDocument(
             document_url=data["payment_terms_url"]
         ).generate()
         self._factory_terms_consent(data=data, boxfile=boxfile)
+        SendConsumerTermsEmail(
+            user=self.user, file_path=tempfile_obj.name
+        ).send()
 
     def _factory_terms_consent(self, data, boxfile):
         return create_payment_account_consent(
@@ -45,11 +49,10 @@ class DownloadTermsDocument(object):
         self.document_url = document_url
 
     def generate(self):
-        f = NamedTemporaryFile(suffix=".pdf")
+        f = NamedTemporaryFile(suffix=".pdf", delete=False)
         pdfkit.from_url(self.document_url, f.name)
         gcs_file = store_file_to_gcs(f, f.name, "application/pdf")
-        os.unlink(f.name)
-        return create_boxfile(
+        return f, create_boxfile(
             file_name=f.name,
             file_path=gcs_file["file_name"],
             content_type=gcs_file["content_type"],

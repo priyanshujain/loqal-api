@@ -11,9 +11,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Towing service",
                 "slug": "towing-service",
             },
-            {
-		"name": "Other auto services", 
-		"slug": "other-auto-service"},
+            {"name": "Other auto services", "slug": "other-auto-service"},
             {
                 "name": "Boat rental and lease",
                 "slug": "boat-rental-and-leases",

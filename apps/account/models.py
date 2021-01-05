@@ -112,9 +112,7 @@ class PaymentAccountOpeningConsent(BaseModel):
     account = models.ForeignKey(
         Account, on_delete=models.DO_NOTHING, editable=False
     )
-    user = models.OneToOneField(
-        User, on_delete=models.DO_NOTHING, editable=False
-    )
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, editable=False)
     user_agent = models.TextField(editable=False)
     ip_address = models.GenericIPAddressField(editable=False)
     consent_timestamp = models.BigIntegerField(editable=False)
