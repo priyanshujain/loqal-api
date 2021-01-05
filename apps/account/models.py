@@ -3,12 +3,14 @@ from re import T
 
 from django.db import models
 from django.utils.translation import gettext as _
+from rest_framework.fields import ModelField
 
 from apps.account.options import (ConsumerAccountStatus,
                                   MerchantAccountCerficationStatus,
                                   MerchantAccountStatus)
+from apps.box.models import BoxFile
 from apps.user.models import User
-from db.models.abstract import AbstractBaseModel
+from db.models.abstract import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
 
@@ -104,3 +106,21 @@ class MerchantAccount(AbstractBaseModel):
 
     class Meta:
         db_table = "merchant_account"
+
+
+class PaymentAccountOpeningConsent(BaseModel):
+    account = models.ForeignKey(
+        Account, on_delete=models.DO_NOTHING, editable=False
+    )
+    user = models.OneToOneField(
+        User, on_delete=models.DO_NOTHING, editable=False
+    )
+    user_agent = models.TextField(editable=False)
+    ip_address = models.GenericIPAddressField(editable=False)
+    consent_timestamp = models.BigIntegerField(editable=False)
+    payment_term_document = models.ForeignKey(
+        BoxFile, on_delete=models.DO_NOTHING, editable=False
+    )
+
+    class Meta:
+        db_table = "payment_account_opening_consent"
