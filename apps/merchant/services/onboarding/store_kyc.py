@@ -113,7 +113,6 @@ class CreateIncorporationDetails(ServiceBase):
             account_id=self.merchant.account.id, data=self.data
         )
         assert self._validate_ein_number(
-            self,
             incorporation_details=None,
             ein_number=self.data.get("ein_number"),
         )
@@ -191,7 +190,6 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
             account_id=self.merchant.account.id, data=self.data
         )
         assert self._validate_ein_number(
-            self,
             incorporation_details=incorporation_details,
             ein_number=self.data.get("ein_number"),
         )
