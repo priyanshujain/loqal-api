@@ -48,7 +48,7 @@ class AddAccountZipCodeAPI(ConsumerAPIView):
         service.handle()
 
 
-class ConsumerAccountProfileAPI(ConsumerAPIView):
+class ConsumerAccountProfileAPI(ConsumerPre2FaAPIView):
     def get(self, request):
         consumer_account = request.consumer_account
         return self.response(
