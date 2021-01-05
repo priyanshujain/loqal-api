@@ -1,19 +1,21 @@
 MERCHANT_CATEGORIES = [
     {
-        "category_name": "Auto Services",
-        "category_slug": "auto_services",
+        "category_name": "Auto Service",
+        "category_slug": "auto_service",
         "subcategories": [
             {
-                "name": "Audio and video",
-                "slug": "audio-and-video",
+                "name": "Automotive Audio and Entertainment",
+                "slug": "automotive-audio-and-entertainment",
             },
             {
                 "name": "Towing service",
                 "slug": "towing-service",
             },
-            {"name": "Auto service", "slug": "auto-service"},
             {
-                "name": "Boat rental and leases",
+		"name": "Other auto services", 
+		"slug": "other-auto-service"},
+            {
+                "name": "Boat rental and lease",
                 "slug": "boat-rental-and-leases",
             },
             {
@@ -30,8 +32,8 @@ MERCHANT_CATEGORIES = [
                 "slug": "truck-and-utility-trailer-rental",
             },
             {
-                "name": "Parts, supplies, and accessories",
-                "slug": "parts-supplies-and-accessories",
+                "name": "Automotive parts, supplies, and accessories",
+                "slug": "automotive-parts-supplies-and-accessories",
             },
             {
                 "name": "Auto body repair and paint",
@@ -49,7 +51,7 @@ MERCHANT_CATEGORIES = [
         "category_slug": "electronics",
         "subcategories": [
             {
-                "name": "Investigation and security services",
+                "name": "Investigation and security service",
                 "slug": "investigation-and-security-services",
             },
             {
@@ -60,15 +62,6 @@ MERCHANT_CATEGORIES = [
                 "name": "Radio, television, and stereo repair",
                 "slug": "radio-television-and-stereo-repair",
             },
-            {
-                "name": "Computer and data processing services",
-                "slug": "computer-and-data-processing-services",
-            },
-            {
-                "name": "Maintenance and repair services",
-                "slug": "maintenance-and-repair-services",
-            },
-            {"name": "Online gaming", "slug": "online-gaming"},
             {"name": "Software", "slug": "software"},
             {
                 "name": "Monitors and projectors",
@@ -76,8 +69,8 @@ MERCHANT_CATEGORIES = [
             },
             {"name": "Networking", "slug": "networking"},
             {
-                "name": "Training services",
-                "slug": "training-services",
+                "name": "Training service",
+                "slug": "training-service",
             },
             {"name": "Peripherals", "slug": "peripherals"},
             {
@@ -85,8 +78,8 @@ MERCHANT_CATEGORIES = [
                 "slug": "desktops-laptops-and-notebooks",
             },
             {
-                "name": "Parts and accessories",
-                "slug": "parts-and-accessories",
+                "name": "Electronic parts and accessories",
+                "slug": "electronic-parts-and-accessories",
             },
             {
                 "name": "Camera and photographic supplies",
@@ -94,47 +87,18 @@ MERCHANT_CATEGORIES = [
             },
             {"name": "Digital art", "slug": "digital-art"},
             {
-                "name": "Camera and photographic supplies",
-                "slug": "camera-and-photographic-supplies",
-            },
-            {
-                "name": "General electronic accessories",
-                "slug": "general-electronic-accessories",
-            },
-            {
                 "name": "Cell phones, PDAs, and pagers",
                 "slug": "cell-phones-pdas-and-pagers",
-            },
-            {
-                "name": "Car audio and electronics",
-                "slug": "car-audio-and-electronics",
             },
             {
                 "name": "Telecommunication equipment and sales",
                 "slug": "telecommunication-equipment-and-sales",
             },
             {
-                "name": "Telephone cards",
-                "slug": "telephone-cards",
-            },
-            {
                 "name": "Home electronics",
                 "slug": "home-electronics",
             },
-            {
-                "name": "Cameras, camcorders and equipment",
-                "slug": "cameras-camcorders-and-equipment",
-            },
-            {
-                "name": "Investigation and security services",
-                "slug": "investigation-and-security-services",
-            },
-            {
-                "name": "Telecommunication services",
-                "slug": "telecommunication-services",
-            },
             {"name": "Home audio", "slug": "home-audio"},
-            {"name": "Audio books", "slug": "audio-books"},
         ],
     },
     {
@@ -146,12 +110,8 @@ MERCHANT_CATEGORIES = [
                 "slug": "watch-clock-and-jewelry-repair",
             },
             {
-                "name": "Tailors and alterations",
-                "slug": "tailors-and-alterations",
-            },
-            {
-                "name": "Children's and baby's clothing",
-                "slug": "childrens-and-babys-clothing",
+                "name": "Tailor and alteration",
+                "slug": "tailors-and-alteration",
             },
             {
                 "name": "Women's clothing",
@@ -171,13 +131,9 @@ MERCHANT_CATEGORIES = [
                 "slug": "wholesale-precious-stones-and-metals",
             },
             {"name": "Shoes", "slug": "shoes"},
-            {
-                "name": "Fashion jewelry",
-                "slug": "fashion-jewelry",
-            },
             {"name": "Accessories", "slug": "accessories"},
             {
-                "name": "Retail - fine jewelry and watches",
+                "name": "Jewelry and watches",
                 "slug": "retail-fine-jewelry-and-watches",
             },
             {
@@ -198,7 +154,7 @@ MERCHANT_CATEGORIES = [
                 "slug": "used-and-secondhand-store",
             },
             {
-                "name": "Miscellaneous store retailer",
+                "name": "Miscellaneous retailer",
                 "slug": "miscellaneous-store-retailer",
             },
             {
@@ -213,8 +169,8 @@ MERCHANT_CATEGORIES = [
         "subcategories": [
             {"name": "Gourmet foods", "slug": "gourmet-foods"},
             {
-                "name": "Alcoholic beverage drinking places",
-                "slug": "alcoholic-beverage-drinking-places",
+                "name": "Everyday grocery",
+                "slug": "everyday-grocery",
             },
             {
                 "name": "Beer, wine, and liquor store",
@@ -222,14 +178,13 @@ MERCHANT_CATEGORIES = [
             },
             {"name": "Tobacco", "slug": "tobacco"},
             {
-                "name": "Supplement store",
-                "slug": "supplement-store",
+                "name": "Convenience store",
+                "slug": "convenience-store",
             },
             {
                 "name": "Specialty and miscellaneous food store",
                 "slug": "specialty-and-miscellaneous-food-store",
             },
-            {"name": "Gourmet foods", "slug": "gourmet-foods"},
         ],
     },
     {
@@ -274,30 +229,13 @@ MERCHANT_CATEGORIES = [
                 "slug": "music-store-instruments-and-sheet-music",
             },
             {
-                "name": "Stamp and coin",
-                "slug": "stamp-and-coin",
-            },
-            {
                 "name": "Sewing, needlework, and fabrics",
                 "slug": "sewing-needlework-and-fabrics",
             },
             {"name": "Antiques", "slug": "antiques"},
             {
-                "name": "Stationery, printing and writing paper",
-                "slug": "stationery-printing-and-writing-paper",
-            },
-            {
                 "name": "Art dealers and galleries",
                 "slug": "art-dealers-and-galleries",
-            },
-            {"name": "Memorabilia", "slug": "memorabilia"},
-            {
-                "name": "Music store - instruments and sheet music",
-                "slug": "music-store-instruments-and-sheet-music",
-            },
-            {
-                "name": "Art and craft supplies",
-                "slug": "art-and-craft-supplies",
             },
             {
                 "name": "Vintage and collectibles",
@@ -307,8 +245,6 @@ MERCHANT_CATEGORIES = [
                 "name": "Rare and used books",
                 "slug": "rare-and-used-books",
             },
-            {"name": "Printing", "slug": "printing"},
-            {"name": "Magazines", "slug": "magazines"},
             {"name": "Publishing", "slug": "publishing"},
             {"name": "Book store", "slug": "book-store"},
             {
@@ -336,10 +272,6 @@ MERCHANT_CATEGORIES = [
                 "slug": "child-care-services",
             },
             {
-                "name": "Insurance - auto and home",
-                "slug": "insurance-auto-and-home",
-            },
-            {
                 "name": "Counseling services",
                 "slug": "counseling-services",
             },
@@ -348,9 +280,7 @@ MERCHANT_CATEGORIES = [
                 "name": "Insurance - life and annuity",
                 "slug": "insurance-life-and-annuity",
             },
-            {"name": "Dental care", "slug": "dental-care"},
-            {"name": "Vision care", "slug": "vision-care"},
-            {"name": "Medical care", "slug": "medical-care"},
+            {"name": "Other medical care", "slug": "medical-care"},
         ],
     },
     {
@@ -358,13 +288,12 @@ MERCHANT_CATEGORIES = [
         "category_slug": "home_care",
         "subcategories": [
             {
-                "name": "Consumer goods rental",
-                "slug": "consumer-goods-rental",
+                "name": "Insurance - auto and home",
+                "slug": "insurance-auto-and-home",
             },
-            {"name": "Printing", "slug": "printing"},
             {
-                "name": "All other personal services",
-                "slug": "all-other-personal-services",
+                "name": "Consumer goods rentals",
+                "slug": "consumer-goods-rentals",
             },
             {
                 "name": "Cleaning and maintenance",
@@ -378,20 +307,8 @@ MERCHANT_CATEGORIES = [
                 "name": "Real estate agent",
                 "slug": "real-estate-agent",
             },
-            {
-                "name": "Real estate - other",
-                "slug": "real-estate-other",
-            },
             {"name": "Storage", "slug": "storage"},
             {"name": "Moving", "slug": "moving"},
-            {
-                "name": "Quick copy and reproduction services",
-                "slug": "quick-copy-and-reproduction-services",
-            },
-            {
-                "name": "Photofinishing",
-                "slug": "photofinishing",
-            },
             {
                 "name": "Landscaping and horticultural",
                 "slug": "landscaping-and-horticultural",
@@ -406,7 +323,6 @@ MERCHANT_CATEGORIES = [
                 "name": "Shipping and packing",
                 "slug": "shipping-and-packing",
             },
-            {"name": "Antiques", "slug": "antiques"},
             {
                 "name": "Glass, paint, and wallpaper",
                 "slug": "glass-paint-and-wallpaper",
@@ -442,27 +358,13 @@ MERCHANT_CATEGORIES = [
                 "slug": "home-furnishings-store",
             },
             {
-                "name": "Art dealers and galleries",
-                "slug": "art-dealers-and-galleries",
-            },
-            {
                 "name": "Safety and health",
                 "slug": "safety-and-health",
-            },
-            {"name": "Furniture", "slug": "furniture"},
-            {
-                "name": "Vintage and collectibles",
-                "slug": "vintage-and-collectibles",
-            },
-            {
-                "name": "Swimming pools and spas",
-                "slug": "swimming-pools-and-spas",
             },
             {
                 "name": "Nursery plants and flowers",
                 "slug": "nursery-plants-and-flowers",
             },
-            {"name": "Florist", "slug": "florist"},
         ],
     },
     {
@@ -479,12 +381,16 @@ MERCHANT_CATEGORIES = [
                 "slug": "courier-services",
             },
             {
+                "name": "Accounting, audit and tax",
+                "slug": "accounting-services",
+            },
+            {
                 "name": "IDs, licenses, and passports",
                 "slug": "ids-licenses-and-passports",
             },
             {
-                "name": "Local delivery service",
-                "slug": "local-delivery-service",
+                "name": "Delivery services",
+                "slug": "delivery-service",
             },
             {
                 "name": "Career services",
@@ -520,16 +426,12 @@ MERCHANT_CATEGORIES = [
         "category_slug": "pharmacy",
         "subcategories": [
             {
-                "name": "Pharmacy and drugstore",
-                "slug": "pharmacy-and-drugstore",
+                "name": "Drugstores",
+                "slug": "drugstores",
             },
             {
                 "name": "Vitamins and supplements",
                 "slug": "vitamins-and-supplements",
-            },
-            {
-                "name": "Pharmacy and drugstore",
-                "slug": "pharmacy-and-drugstore",
             },
             {
                 "name": "Medical equipment and supplies",
@@ -538,15 +440,14 @@ MERCHANT_CATEGORIES = [
         ],
     },
     {
-        "category_name": "Restaurants",
-        "category_slug": "restaurants",
+        "category_name": "Dining",
+        "category_slug": "dining",
         "subcategories": [
-            {"name": "Distilleries", "slug": "distilleries"},
             {"name": "Breweries", "slug": "breweries"},
             {"name": "Wineries", "slug": "wineries"},
-            {"name": "Restaurant", "slug": "restaurant"},
+            {"name": "Restaurants", "slug": "restaurants"},
             {
-                "name": "Coffee and tea",
+                "name": "Cafes",
                 "slug": "coffee-and-tea",
             },
             {
@@ -557,7 +458,7 @@ MERCHANT_CATEGORIES = [
     },
     {
         "category_name": "Sports and Entertainment",
-        "category_slug": "sports_entertainment",
+        "category_slug": "sports-and-entertainment",
         "subcategories": [
             {
                 "name": "Lottery and contests",
@@ -565,54 +466,25 @@ MERCHANT_CATEGORIES = [
             },
             {"name": "Gambling", "slug": "gambling"},
             {
-                "name": "Toys and games",
-                "slug": "toys-and-games",
-            },
-            {"name": "Music", "slug": "music"},
-            {"name": "Gambling", "slug": "gambling"},
-            {
                 "name": "Cable, satellite, and other pay TV and radio broadcasting",
                 "slug": "cable-satellite-and-other-pay-tv-and-radio-broadcasting",
             },
-            {"name": "Slot machines", "slug": "slot-machines"},
             {
-                "name": "Theater tickets",
+                "name": "Theater and concert tickets",
                 "slug": "theater-tickets",
             },
             {
-                "name": "Motion picture and video",
-                "slug": "motion-picture-and-video",
-            },
-            {
-                "name": "Digital content",
-                "slug": "digital-content",
+                "name": "Movie or musical venue",
+                "slug": "movie-or-musical-venue",
             },
             {"name": "Entertainers", "slug": "entertainers"},
-            {"name": "Memorabilia", "slug": "memorabilia"},
             {
                 "name": "Music store - CDs, cassettes and albums",
                 "slug": "music-store-cds-cassettes-and-albums",
             },
-            {"name": "Online gaming", "slug": "online-gaming"},
-            {
-                "name": "Adult digital content",
-                "slug": "adult-digital-content",
-            },
-            {
-                "name": "Movie store - DVDs, videotapes",
-                "slug": "movie-store-dvds-videotapes",
-            },
             {
                 "name": "Video games and systems",
                 "slug": "video-games-and-systems",
-            },
-            {
-                "name": "Concert tickets",
-                "slug": "concert-tickets",
-            },
-            {
-                "name": "Cable and other subscription programming",
-                "slug": "cable-and-other-subscription-programming",
             },
             {
                 "name": "Dance halls, studios, and schools",
