@@ -22,6 +22,7 @@ __all__ = (
     "update_beneficial_owner_document",
     "update_controller_document",
     "update_business_document",
+    "get_incorporation_details_by_ein",
 )
 
 
@@ -75,6 +76,13 @@ def get_controller_details(merchant_id):
     try:
         return ControllerDetails.objects.get(merchant_id=merchant_id)
     except ControllerDetails.DoesNotExist:
+        return None
+
+
+def get_incorporation_details_by_ein(ein_number):
+    try:
+        return IncorporationDetails.objects.get(ein_number=ein_number)
+    except IncorporationDetails.DoesNotExist:
         return None
 
 
