@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import APIView, ConsumerAPIView
+from api.views import APIView, ConsumerAPIView, ConsumerPre2FaAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import (AddZipCode, ChangeAccountUsername,
                                    CheckAccountUsername, CreateConsumerAccount)
@@ -76,7 +76,7 @@ class CheckAccountUsernameAPI(ConsumerAPIView):
         )
 
 
-class AcceptTermsDocumentAPI(ConsumerAPIView):
+class AcceptTermsDocumentAPI(ConsumerPre2FaAPIView):
     def post(self, request):
         AcceptTerms(request=request, data=self.request_data).handle()
         return self.response()
