@@ -33,10 +33,11 @@ def get_payment_account_consent(
     account_id,
     user_id,
 ):
-    try:
-        return PaymentAccountOpeningConsent.objects.get(
-            account_id=account_id,
-            user_id=user_id,
-        )
-    except PaymentAccountOpeningConsent.DoesNotExist:
+    consents = PaymentAccountOpeningConsent.objects.filter(
+        account_id=account_id,
+        user_id=user_id,
+    ).order_by("-created_at")
+    if not consents.exists():
         return None
+
+    return consents.first()
