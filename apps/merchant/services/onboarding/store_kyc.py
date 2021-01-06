@@ -138,13 +138,11 @@ class CreateIncorporationDetails(ServiceBase):
     def _validate_ein_number(self, incorporation_details, ein_number):
         if not ein_number:
             return True
-
         ein_inc_details = get_incorporation_details_by_ein(
             ein_number=ein_number
         )
+        
         if not ein_inc_details:
-            return True
-        if ein_inc_details and not incorporation_details:
             return True
 
         if (ein_inc_details and not incorporation_details) or (
