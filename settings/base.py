@@ -286,7 +286,6 @@ CACHES = {"default": redis_config(db=1)}
 # SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
 
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_NAME = "session"

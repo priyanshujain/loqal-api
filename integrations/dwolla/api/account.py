@@ -89,11 +89,14 @@ class Account(Http):
         links = response["_links"]
         is_controller_docs_required = "verify-with-document" in links
         is_business_docs_required = "verify-business-with-document" in links
-        is_both_docs_required = "verify-controller-and-business-with-document" in links
+        is_both_docs_required = (
+            "verify-controller-and-business-with-document" in links
+        )
         return {
             "dwolla_customer_id": response["id"],
             "status": getattr(MerchantAccountStatusMap, response["status"]),
-            "is_certification_required": "certify-beneficial-ownership" in links,
+            "is_certification_required": "certify-beneficial-ownership"
+            in links,
             "controller_document_required": is_controller_docs_required
             or is_both_docs_required,
             "business_document_required": is_business_docs_required
@@ -147,7 +150,9 @@ class Account(Http):
             }
         return self.parse_merchant_details_response(response=response.json())
 
-    def upload_customer_document(self, document_file, document_type, entity_type):
+    def upload_customer_document(
+        self, document_file, document_type, entity_type
+    ):
         """
         Upload verification document for a customer
         """
@@ -187,7 +192,9 @@ class Account(Http):
         response = response.json()
         return {
             "dwolla_id": response["id"],
-            "status": getattr(BeneficialOwnerStatusMap, response["verificationStatus"]),
+            "status": getattr(
+                BeneficialOwnerStatusMap, response["verificationStatus"]
+            ),
         }
 
     def add_beneficial_owner(self, data, is_update=False):
@@ -216,9 +223,13 @@ class Account(Http):
         location = response_headers["location"]
         beneficial_owner_id = location.split("/").pop()
 
-        return self.get_beneficial_owner(beneficial_owner_id=beneficial_owner_id)
+        return self.get_beneficial_owner(
+            beneficial_owner_id=beneficial_owner_id
+        )
 
-    def upload_ba_document(self, beneficial_owner_id, document_file, document_type):
+    def upload_ba_document(
+        self, beneficial_owner_id, document_file, document_type
+    ):
         """
         Upload verification document for beneficial owner
         """
@@ -257,7 +268,9 @@ class Account(Http):
         )
         response = response.json()
         return {
-            "status": getattr(BeneficialOwnerCertificationStatusMap, response["status"])
+            "status": getattr(
+                BeneficialOwnerCertificationStatusMap, response["status"]
+            )
         }
 
     def certify_beneficial_owner(self):

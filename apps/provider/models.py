@@ -66,3 +66,44 @@ class TermsDocument(AbstractBaseModel):
 
     class Meta:
         db_table = "terms_document"
+
+
+class ProviderWebhook(AbstractBaseModel):
+    provider = models.ForeignKey(PaymentProvider, on_delete=models.CASCADE)
+    webhook_secret = models.CharField(max_length=256)
+    webhook_id = models.CharField(max_length=256, unique=True)
+    dwolla_id = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "provider_webhook"
+
+    def add_dwolla_id(self, dwolla_id, save=True):
+        """
+        docstring
+        """
+        self.dwolla_id = dwolla_id
+        if save:
+            self.save()
+
+    def deactivate(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()
+
+
+class ProviderWebhookEvent(AbstractBaseModel):
+    webhook = models.ForeignKey(ProviderWebhook, on_delete=models.CASCADE)
+    event_payload = models.JSONField(default=dict, null=True)
+    dwolla_id = models.CharField(max_length=255, blank=True)
+    is_processed = models.BooleanField(default=False)
+    topic = models.CharField(max_length=255, blank=True)
+    target_resource_dwolla_id = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "provider_webhook_event"
+
+    def mark_processed(self, save=True):
+        self.is_processed = True
+        if save:
+            self.save()

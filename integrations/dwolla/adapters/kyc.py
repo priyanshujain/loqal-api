@@ -57,7 +57,9 @@ class IncorporationDetailsAdapter(Adapter):
     type = Field(default="business")
     ipAddress = Field(source="ip_address")
     address1 = Field(source="registered_address.address1")
-    address2 = Field(source="registered_address.address2", required=False, default="")
+    address2 = Field(
+        source="registered_address.address2", required=False, default=""
+    )
     city = Field(source="registered_address.city")
     state = Field(source="registered_address.state")
     postalCode = Field(source="registered_address.zip_code")

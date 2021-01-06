@@ -2,35 +2,26 @@ from re import T
 
 from django.utils.translation import gettext as _
 
-from api.exceptions import (
-    ErrorDetail,
-    InternalDBError,
-    ProviderAPIException,
-    ValidationError,
-)
+from api.exceptions import (ErrorDetail, InternalDBError, ProviderAPIException,
+                            ValidationError)
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (
-    create_beneficial_owner,
-    create_controller_details,
-    create_incorporation_details,
-    delete_beneficial_owner,
-    get_beneficial_owner,
-    get_controller_details,
-    get_incorporation_details,
-    get_incorporation_details_by_ein,
-    update_beneficial_owner,
-    update_controller_details,
-    update_incorporation_details,
-)
+from apps.merchant.dbapi import (create_beneficial_owner,
+                                 create_controller_details,
+                                 create_incorporation_details,
+                                 delete_beneficial_owner, get_beneficial_owner,
+                                 get_controller_details,
+                                 get_incorporation_details,
+                                 get_incorporation_details_by_ein,
+                                 update_beneficial_owner,
+                                 update_controller_details,
+                                 update_incorporation_details)
 from apps.merchant.options import BusinessTypes
-from apps.merchant.validators import (
-    BeneficialOwnerValidator,
-    ControllerValidator,
-    IncorporationDetailsValidator,
-    RemoveBeneficialOwnerValidator,
-    UpdateBeneficialOwnerValidator,
-)
+from apps.merchant.validators import (BeneficialOwnerValidator,
+                                      ControllerValidator,
+                                      IncorporationDetailsValidator,
+                                      RemoveBeneficialOwnerValidator,
+                                      UpdateBeneficialOwnerValidator)
 from apps.provider.lib.actions import ProviderAPIActionBase
 
 __all__ = (
@@ -49,9 +40,9 @@ def validate_business_classifcation(account_id, data):
     business_classification = data.get("business_classification")
     industry_classification_id = data.get("industry_classification_id")
     industry_classification = data.get("industry_classification")
-    classfications = BusinessClassificationAPIAction(account_id=account_id).get(
-        id=business_classification_id
-    )
+    classfications = BusinessClassificationAPIAction(
+        account_id=account_id
+    ).get(id=business_classification_id)
     if not classfications:
         raise ValidationError(
             {
@@ -84,7 +75,10 @@ def validate_business_classifcation(account_id, data):
             }
         )
 
-    if industry_classification_filter_list[0]["name"] != industry_classification:
+    if (
+        industry_classification_filter_list[0]["name"]
+        != industry_classification
+    ):
         raise ValidationError(
             {
                 "industry_classification": [
@@ -108,7 +102,11 @@ class CreateIncorporationDetails(ServiceBase):
     def _validate_data(self):
         if get_incorporation_details(merchant_id=self.merchant.id):
             raise ValidationError(
-                {"detail": ErrorDetail(_("Incorporation details already exists."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Incorporation details already exists.")
+                    )
+                }
             )
         self.data = run_validator(IncorporationDetailsValidator, self.data)
         assert validate_business_classifcation(
@@ -130,7 +128,9 @@ class CreateIncorporationDetails(ServiceBase):
         raise InternalDBError(
             {
                 "detail": ErrorDetail(
-                    _("Incorporation details creation failed, please try again.")
+                    _(
+                        "Incorporation details creation failed, please try again."
+                    )
                 )
             }
         )
@@ -138,13 +138,16 @@ class CreateIncorporationDetails(ServiceBase):
     def _validate_ein_number(self, incorporation_details, ein_number):
         if not ein_number:
             return True
-        ein_inc_details = get_incorporation_details_by_ein(ein_number=ein_number)
+        ein_inc_details = get_incorporation_details_by_ein(
+            ein_number=ein_number
+        )
 
         if not ein_inc_details:
             return True
 
         if (ein_inc_details and not incorporation_details) or (
-            ein_inc_details and (ein_inc_details.id != incorporation_details.id)
+            ein_inc_details
+            and (ein_inc_details.id != incorporation_details.id)
         ):
             raise ValidationError(
                 {
@@ -169,10 +172,16 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
         self._update_incorporation_details()
 
     def _validate_data(self):
-        incorporation_details = get_incorporation_details(merchant_id=self.merchant.id)
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant.id
+        )
         if not incorporation_details:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Incorporation details did not found."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Incorporation details did not found.")
+                    )
+                }
             )
         self.incorporation_details = incorporation_details
 
@@ -207,9 +216,15 @@ class CreateControllerDetails(ServiceBase):
     def _validate_data(self):
         if get_controller_details(merchant_id=self.merchant_id):
             raise ValidationError(
-                {"detail": ErrorDetail(_("Controller details already exists."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Controller details already exists.")
+                    )
+                }
             )
-        incorporation_details = get_incorporation_details(merchant_id=self.merchant_id)
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant_id
+        )
         if not incorporation_details:
             raise ValidationError(
                 {
@@ -224,7 +239,8 @@ class CreateControllerDetails(ServiceBase):
         data = run_validator(ControllerValidator, self.data)
         title = data.get("title")
         if (
-            incorporation_details.business_type != BusinessTypes.SOLE_PROPRIETORSHIP
+            incorporation_details.business_type
+            != BusinessTypes.SOLE_PROPRIETORSHIP
             and not title
         ):
             raise ValidationError(
@@ -232,12 +248,17 @@ class CreateControllerDetails(ServiceBase):
                     "title": "Title is required for businesses other than sole proprietors"
                 }
             )
-        if incorporation_details.business_type == BusinessTypes.SOLE_PROPRIETORSHIP:
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
             data["title"] = ""
             data["passport_number"] = ""
             data["passport_country"] = ""
             if not data.get("ssn"):
-                raise ValidationError({"title": "SSN is required for sole proprietors"})
+                raise ValidationError(
+                    {"title": "SSN is required for sole proprietors"}
+                )
 
         self.data = data
         return True
@@ -267,17 +288,22 @@ class UpdateControllerDetails(CreateControllerDetails):
         self._update_controller_details()
 
     def _validate_data(self):
-        controller_details = get_controller_details(merchant_id=self.merchant_id)
+        controller_details = get_controller_details(
+            merchant_id=self.merchant_id
+        )
         if not controller_details:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Controller details did not found."))}
             )
 
-        incorporation_details = controller_details.merchant.incorporationdetails
+        incorporation_details = (
+            controller_details.merchant.incorporationdetails
+        )
         data = run_validator(ControllerValidator, self.data)
         title = data.get("title")
         if (
-            incorporation_details.business_type != BusinessTypes.SOLE_PROPRIETORSHIP
+            incorporation_details.business_type
+            != BusinessTypes.SOLE_PROPRIETORSHIP
             and not title
         ):
             raise ValidationError(
@@ -285,12 +311,17 @@ class UpdateControllerDetails(CreateControllerDetails):
                     "title": "Title is required for businesses other than sole proprietors"
                 }
             )
-        if incorporation_details.business_type == BusinessTypes.SOLE_PROPRIETORSHIP:
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
             data["title"] = ""
             data["passport_number"] = ""
             data["passport_country"] = ""
             if not data.get("ssn"):
-                raise ValidationError({"title": "SSN is required for sole proprietors"})
+                raise ValidationError(
+                    {"title": "SSN is required for sole proprietors"}
+                )
         self.data = data
         return True
 
@@ -308,7 +339,9 @@ class CreateBeneficialOwner(ServiceBase):
         return self._factory_controller_details()
 
     def _validate_data(self):
-        incorporation_details = get_incorporation_details(merchant_id=self.merchant_id)
+        incorporation_details = get_incorporation_details(
+            merchant_id=self.merchant_id
+        )
         if not incorporation_details:
             raise ValidationError(
                 {
@@ -319,11 +352,16 @@ class CreateBeneficialOwner(ServiceBase):
                     )
                 }
             )
-        if incorporation_details.business_type == BusinessTypes.SOLE_PROPRIETORSHIP:
+        if (
+            incorporation_details.business_type
+            == BusinessTypes.SOLE_PROPRIETORSHIP
+        ):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
-                        _("Beneficial owners are not required for sole proprietors.")
+                        _(
+                            "Beneficial owners are not required for sole proprietors."
+                        )
                     )
                 }
             )

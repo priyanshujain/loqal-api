@@ -6,7 +6,9 @@ from apps.user.views.merchant import (ApplyResetPasswordAPI,
                                       VerifyEmailAPI)
 
 urlpatterns = [
-    path("merchant/login/", UserLoginAPI.as_view(), name="user_login"),
+    path(
+        "merchant/login/", UserLoginAPI.as_view(), name="merchant_user_login"
+    ),
     path(
         "merchant/reset-password/request/",
         RequestResetPasswordAPI.as_view(),

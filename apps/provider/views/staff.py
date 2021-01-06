@@ -14,6 +14,7 @@ from apps.provider.serializers import (ActivateTermDocumentSerializer,
                                        RemoveTermDocumentSerializer,
                                        TermsDocumentSerializer,
                                        UpdatePaymentProviderSerializer)
+from apps.provider.services import CreateProviderWebhook
 from apps.provider.shortcuts import validate_image_data
 
 
@@ -209,6 +210,14 @@ class ListTermsAPI(StaffAPIView):
         return self.response(
             TermsDocumentSerializer(terms_document_qs, many=True).data
         )
+
+
+class CreateProviderWebhookAPI(StaffAPIView):
+    """create webhook"""
+
+    def post(self, request):
+        CreateProviderWebhook().handle()
+        return self.response()
 
 
 # TODO: Provider Fee APIs

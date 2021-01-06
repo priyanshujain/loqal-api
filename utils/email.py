@@ -30,7 +30,7 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
             file_content = f.read()
             file_name = f.name
             f.close()
-        
+
         kwarg_file_name = kwargs.get("file_name", None)
         if kwarg_file_name:
             file_name = kwarg_file_name
@@ -52,16 +52,15 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
     return response
 
 
-
 def send_email_async(to_emails, subject, content, **kwargs):
-    # if settings.APP_ENV == "local":
-    #     h = html2text.HTML2Text()
-    #     print("###################### EMAIL START ########################")
-    #     print("TO: ", to_emails)
-    #     print("SUBJECT: ", subject)
-    #     print("CONTENT: ", h.handle(content))
-    #     print("###################### EMAIL END ##########################")
-    #     return
+    if settings.APP_ENV == "local":
+        h = html2text.HTML2Text()
+        print("###################### EMAIL START ########################")
+        print("TO: ", to_emails)
+        print("SUBJECT: ", subject)
+        print("CONTENT: ", h.handle(content))
+        print("###################### EMAIL END ##########################")
+        return
 
     file_path = kwargs.get("file_path", None)
     file_name = kwargs.get("file_name", None)
@@ -80,5 +79,5 @@ def send_email_async(to_emails, subject, content, **kwargs):
             to_emails=to_emails,
             subject=subject,
             content=content,
-            file_name=file_name
+            file_name=file_name,
         )

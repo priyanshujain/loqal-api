@@ -3,6 +3,7 @@ from django.urls import path
 from apps.provider.views.staff import (ActivateTermsDocumentAPI,
                                        CreatePaymentProviderAPI,
                                        CreatePaymentProviderCredsAPI,
+                                       CreateProviderWebhookAPI,
                                        CreateTermDocumentAPI, ListTermsAPI,
                                        ProviderLogoUploadAPI,
                                        RemoveTermDocumentAPI,
@@ -45,5 +46,9 @@ urlpatterns = [
     path(
         "terms/",
         ListTermsAPI.as_view(),
+    ),
+    path(
+        "create-webhook/",
+        CreateProviderWebhookAPI.as_view(),
     ),
 ]

@@ -70,6 +70,7 @@ class APIView(View):
         if request.method in ["GET", "DELETE"]:
             self.request_data = request.GET.dict()
         else:
+            self.request_body = drf_request.body
             self.request_data = drf_request.data
 
         try:

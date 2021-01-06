@@ -1,4 +1,5 @@
-from apps.provider.lib.api import Account, Banking, Payment, Reference
+from apps.provider.lib.api import (Account, Banking, Management, Payment,
+                                   Reference)
 
 
 class APIClient(object):
@@ -14,3 +15,4 @@ class APIClient(object):
         self.banking = Banking(psp_client=self.psp_client)
         self.payment = Payment(psp_client=self.psp_client)
         self.reference = Reference(psp_client=self.psp_client)
+        self.management = Management(psp_client=self.psp_client)

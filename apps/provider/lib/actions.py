@@ -19,7 +19,9 @@ class ProviderAPIActionBase(object):
     payment_account = None
     provider = None
 
-    def __init__(self, account_id, provider_slug=IntegratedProviders.DWOLLA):
+    def __init__(
+        self, account_id=None, provider_slug=IntegratedProviders.DWOLLA
+    ):
         self.account_id = account_id
         self.provider_slug = provider_slug
 
@@ -64,8 +66,9 @@ class ProviderAPIActionBase(object):
 
     def _get_client_config(self):
         config = {}
-        account = get_account(account_id=self.account_id)
-        config["customer_id"] = account.dwolla_id
+        if self.account_id:
+            account = get_account(account_id=self.account_id)
+            config["customer_id"] = account.dwolla_id
         return config
 
     def _get_client(self):

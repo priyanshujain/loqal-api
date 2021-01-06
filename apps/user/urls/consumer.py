@@ -10,7 +10,9 @@ from apps.user.views.consumer import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                                       VerifyEmailAPI, VerifyPhoneNumberAPI)
 
 urlpatterns = [
-    path("consumer/login/", UserLoginAPI.as_view(), name="user_login"),
+    path(
+        "consumer/login/", UserLoginAPI.as_view(), name="consumer_user_login"
+    ),
     path("consumer/auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
     path(
         "consumer/auth/otp/resend/",

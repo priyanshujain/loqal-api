@@ -2,7 +2,8 @@
 This module provides a the Client interface to the Dwolla APIs.
 """
 
-from integrations.dwolla.api import Account, Auth, Banking, Payment, Reference
+from integrations.dwolla.api import (Account, Auth, Banking, Management,
+                                     Payment, Reference)
 from integrations.dwolla.config import Config
 
 __all__ = "Client"
@@ -18,6 +19,7 @@ class Client(object):
     _banking_client = None
     _payment_client = None
     _reference_client = None
+    _management_client = None
 
     def __init__(self, provider_config, client_config, request_tracker):
         self.config = Config(provider_config, client_config, request_tracker)
@@ -80,3 +82,12 @@ class Client(object):
         if self._reference_client is None:
             self._reference_client = Reference(self.config)
         return self._reference_client
+
+    @property
+    def management(self):
+        """
+        Get the management client.
+        """
+        if self._management_client is None:
+            self._management_client = Management(self.config)
+        return self._management_client

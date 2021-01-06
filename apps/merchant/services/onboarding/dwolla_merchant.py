@@ -7,7 +7,7 @@ from apps.account.options import (MerchantAccountCerficationStatus,
                                   MerchantAccountStatus)
 from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  update_beneficial_owner_status)
-from apps.merchant.options import BeneficialOwnerStatus
+from apps.merchant.options import BeneficialOwnerStatus, BusinessTypes
 from apps.merchant.serializers import OnboardingDataSerializer
 from apps.provider.lib.actions import ProviderAPIActionBase
 
@@ -132,10 +132,14 @@ class CreateDwollaMerchantAccount(ServiceBase):
                     required=True
                 )
 
-            self._create_beneficial_owner(
-                account_id=account.id,
-                data=data,
-            )
+            if (
+                merchant_account_data["incorporation_details"]["business_type"]
+                != BusinessTypes.SOLE_PROPRIETORSHIP
+            ):
+                self._create_beneficial_owner(
+                    account_id=account.id,
+                    data=data,
+                )
         return merchant
 
     def _create_beneficial_owner(self, account_id, data):
