@@ -22,7 +22,7 @@ class ConsumerAccountProfileResponse(serializers.ModelSerializer):
 
     def get_payment_account_opening_consent(self, obj):
         consent = get_payment_account_consent(
-            account_id=obj.account.id, user_id=obj.account.id
+            account_id=obj.account.id, user_id=obj.user.id
         )
         if consent:
             return True
