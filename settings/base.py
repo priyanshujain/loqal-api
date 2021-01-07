@@ -355,13 +355,14 @@ SENDGRID_API_KEY = env("SENDGRID_API_KEY")
 
 # GCS config
 GS_BUCKET_NAME = env("GS_BUCKET_NAME")
-DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 
-# AWS config 
+# AWS config
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-S3_BUCKET_NAME = env("S3_BUCKET_NAME")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+# TODO: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 
 # Plaid config
