@@ -31,7 +31,6 @@ class Session(object):
 
         # TODO: get ifconfig from IP address, need to implment maxmind geodb service
         ifconfig = {}
-
         # from cache based session
         user_agent = session["user_agent"]
         ip_address = session["ip"]

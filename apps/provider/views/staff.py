@@ -4,8 +4,12 @@
 from django.db.utils import IntegrityError
 
 from api.views import StaffAPIView, validate_serializer
+from apps.provider.dbapi import (get_all_provider_webhook,
+                                 get_provider_webhook_events)
 from apps.provider.models import (PaymentProvider, PaymentProviderCred,
                                   TermsDocument)
+from apps.provider.responses import (ListWebhookEventsResponse,
+                                     ListWebhooksResponse)
 from apps.provider.serializers import (ActivateTermDocumentSerializer,
                                        CreatePaymentProviderSerializer,
                                        CreateTermsDocumentSerializer,
@@ -220,10 +224,17 @@ class CreateProviderWebhookAPI(StaffAPIView):
         return self.response()
 
 
-# TODO: Provider Fee APIs
-# 1. Local payment fees
+class ListProviderWebhookAPI(StaffAPIView):
+    """list webhooks"""
 
-# 2. Swift ours fee
-# 3. Swift shared fees
-#
-# #########################
+    def get(self, request):
+        webhooks = get_all_provider_webhook()
+        return self.response(ListWebhooksResponse(webhooks, many=True).data)
+
+
+class ListWebhookEventsAPI(StaffAPIView):
+    """list webhook events"""
+
+    def get(self, request, webhook_id):
+        events = get_provider_webhook_events(webhook_id=webhook_id)
+        return self.response(ListWebhookEventsResponse(events, many=True).data)

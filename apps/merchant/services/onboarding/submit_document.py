@@ -12,7 +12,7 @@ from apps.box.dbapi import get_boxfile
 from apps.merchant.dbapi.onboarding import get_beneficial_owner
 from apps.merchant.options import VerificationDocumentStatus
 from apps.provider.lib.actions import ProviderAPIActionBase
-from plugins.gcs import GoogleCloudStorage
+from plugins.s3 import S3Storage
 
 from .document_req import DocumentRequirements
 
@@ -219,9 +219,9 @@ class DocumentInterface(object):
         self.boxfile_id = boxfile_id
 
     def get_file(self):
-        gcs_client = GoogleCloudStorage()
+        s3_client = S3Storage()
         box_file = get_boxfile(boxfile_id=self.boxfile_id)
-        file_content, file_name = gcs_client.write_to_string(
+        file_content, file_name = s3_client.write_to_string(
             file_path=box_file.file_path,
             encryption_key=box_file.encryption_key,
         )

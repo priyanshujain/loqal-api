@@ -4,7 +4,9 @@ from apps.provider.views.staff import (ActivateTermsDocumentAPI,
                                        CreatePaymentProviderAPI,
                                        CreatePaymentProviderCredsAPI,
                                        CreateProviderWebhookAPI,
-                                       CreateTermDocumentAPI, ListTermsAPI,
+                                       CreateTermDocumentAPI,
+                                       ListProviderWebhookAPI, ListTermsAPI,
+                                       ListWebhookEventsAPI,
                                        ProviderLogoUploadAPI,
                                        RemoveTermDocumentAPI,
                                        UpdatePaymentProviderAPI,
@@ -50,5 +52,13 @@ urlpatterns = [
     path(
         "create-webhook/",
         CreateProviderWebhookAPI.as_view(),
+    ),
+    path(
+        "active-webhooks/",
+        ListProviderWebhookAPI.as_view(),
+    ),
+    path(
+        "webhook/<int:webhook_id>/events/",
+        ListWebhookEventsAPI.as_view(),
     ),
 ]

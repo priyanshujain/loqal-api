@@ -88,6 +88,10 @@ class MerchantAccount(AbstractBaseModel):
             "Status for the merchant beneficial owner certified with dwolla."
         ),
     )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "merchant_account"
 
     def update_status(self, status, save=True):
         self.account_status = status
@@ -104,8 +108,15 @@ class MerchantAccount(AbstractBaseModel):
         if save:
             self.save()
 
-    class Meta:
-        db_table = "merchant_account"
+    def deactivate(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()
+
+    def activate(self, save=True):
+        self.is_active = True
+        if save:
+            self.save()
 
 
 class PaymentAccountOpeningConsent(BaseModel):
