@@ -15,14 +15,14 @@ class GoogleCloudStorage(object):
         )
         self._bucket = self._client.bucket(settings.GS_BUCKET_NAME)
 
-    def create_blob(self, filename, encryption_key):
+    def __create_blob(self, filename, encryption_key):
         encryption_key = base64.b64decode(encryption_key)
         blob = self._bucket.blob(filename)  # , encryption_key=encryption_key)
         return blob
 
-    def get_blob(self, file_path, encryption_key):
+    def __get_blob(self, file_path, encryption_key):
         encryption_key = base64.b64decode(encryption_key)
-        blob = self._bucket.get_blob(
+        blob = self._bucket.__get_blob(
             file_path
         )  # , encryption_key=encryption_key)
         return blob
@@ -38,7 +38,7 @@ class GoogleCloudStorage(object):
         """
         Uploads a file to a given Cloud Storage bucket.
         """
-        blob = self.create_blob(filename, encryption_key=encryption_key)
+        blob = self.__create_blob(filename, encryption_key=encryption_key)
         blob.upload_from_file(file_obj=file_obj, content_type=content_type)
 
         if signed_url:
@@ -51,7 +51,7 @@ class GoogleCloudStorage(object):
         """
         Uploads a file to a given Cloud Storage bucket.
         """
-        blob = self.create_blob(filename, encryption_key=encryption_key)
+        blob = self.__create_blob(filename, encryption_key=encryption_key)
         blob.upload_from_string(file_content, content_type=content_type)
         return True
 
@@ -59,7 +59,7 @@ class GoogleCloudStorage(object):
         """
         returns the public url to the requested object.
         """
-        blob = self.get_blob(file_path, encryption_key=encryption_key)
+        blob = self.__get_blob(file_path, encryption_key=encryption_key)
         return self.signed_url(blob)
 
     def signed_url(self, blob):
@@ -75,7 +75,7 @@ class GoogleCloudStorage(object):
         returns the public url to the requested object.
         """
         # TODO: add error check for `file_obj`
-        blob = self.get_blob(file_path, encryption_key=encryption_key)
+        blob = self.__get_blob(file_path, encryption_key=encryption_key)
         blob.download_to_file(file_obj, client=self._client)
         file_obj.seek(0)
         return file_obj
@@ -85,5 +85,5 @@ class GoogleCloudStorage(object):
         returns the public url to the requested object.
         """
         # TODO: add error check for `file_obj`
-        blob = self.get_blob(file_path, encryption_key=encryption_key)
+        blob = self.__get_blob(file_path, encryption_key=encryption_key)
         return blob.download_as_string(client=self._client), blob.name
