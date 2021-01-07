@@ -1,3 +1,8 @@
+"""
+TODO: File encryption
+1. https://github.com/marcobellaccini/pyAesCrypt/blob/master/pyAesCrypt/crypto.py
+"""
+
 import six
 from django.conf import settings
 import boto3
@@ -82,3 +87,4 @@ class S3Storage(object):
             self._bucket.download_fileobj(file_path, f)
             f.seek(0)
             return f.read()
+

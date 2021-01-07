@@ -1,3 +1,8 @@
+"""
+TODO: File encryption
+1. https://github.com/marcobellaccini/pyAesCrypt/blob/master/pyAesCrypt/crypto.py
+"""
+
 import base64
 from datetime import timedelta
 
