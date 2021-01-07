@@ -23,7 +23,6 @@ click-repl==0.1.6
 coverage==5.3.1
 cryptography==3.3.1
 cssselect2==0.4.1
-currency-cloud==5.0.1
 Cython==0.29.21
 decorator==4.4.2
 defusedxml==0.6.0
@@ -71,11 +70,9 @@ lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mypy-extensions==0.4.3
-numpy==1.19.5
 opentracing==2.4.0
 otpauth==1.0.1
 packaging==20.8
-pandas==1.2.0
 parso==0.8.1
 pathspec==0.8.1
 pexpect==4.8.0
@@ -93,6 +90,7 @@ pyasn1-modules==0.2.8
 pycodestyle==2.6.0
 pycountry==20.7.3
 pycparser==2.20
+pycurl==7.43.0.5
 pyfcm==1.5.1
 pyflakes==2.2.0
 Pygments==2.7.3
