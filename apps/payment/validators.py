@@ -124,6 +124,15 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
                     ]
                 }
             )
+        
+        if qrcode.cashier:
+            raise ValidationError(
+                {
+                    "detail": [
+                        ErrorDetail(_("Provided QR Code is already being used by another merchant."))
+                    ]
+                }
+            )
         return attrs
 
 
