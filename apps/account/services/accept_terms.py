@@ -1,8 +1,8 @@
 import os
 from tempfile import NamedTemporaryFile
 
-import pdfkit
 from django.utils.translation import gettext as _
+from weasyprint import HTML
 
 from api.helpers import run_validator
 from apps.account.dbapi import create_payment_account_consent
@@ -50,7 +50,7 @@ class DownloadTermsDocument(object):
 
     def generate(self):
         f = NamedTemporaryFile(suffix=".pdf", delete=False)
-        pdfkit.from_url(self.document_url, f.name)
+        HTML(url=self.document_url).write_pdf(f.name)
         gcs_file = store_file_to_gcs(f, f.name, "application/pdf")
         return f, create_boxfile(
             file_name=f.name,

@@ -62,6 +62,14 @@ def get_provider_webhook(webhook_id):
         return None
 
 
+def get_all_provider_webhook():
+    return ProviderWebhook.objects.filter(is_active=True)
+
+
+def get_provider_webhook_events(webhook_id):
+    return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id)
+
+
 def create_provider_webhook_event(
     webhook_id, event_payload, dwolla_id, topic, target_resource_dwolla_id
 ):

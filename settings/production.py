@@ -1,6 +1,6 @@
 from apps.provider.options import APIEnvironmentTypes
 
-from .base import *  # isort:skip
+from .staging import *  # isort:skip
 
 DEBUG = False
 
