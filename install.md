@@ -9,3 +9,4 @@
 6. python3-pip
 7. postgresql
 8. libmagic-dev
+9. wkhtmltopdf
