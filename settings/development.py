@@ -17,6 +17,7 @@ APP_NAME = "Loqal development"
 
 CORS_ORIGIN_REGEX_WHITELIST += [
     "http://localhost:3000",
+    "http://localhost:3001",
     "https://staff-dev.payloqal.com",
     "https://merchant-dev.payloqal.com",
     "https://website-dev.payloqal.com",
