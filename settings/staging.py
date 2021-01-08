@@ -15,8 +15,11 @@ API_ENV = APIEnvironmentTypes.SANDBOX
 from .base import *  # isort:skip
 
 
+
 CORS_ORIGIN_REGEX_WHITELIST += [
-    "https://app-stag.payloqal.com",
+    "https://staff-stag.payloqal.com",
+    "https://merchant-stag.payloqal.com",
+    "https://website-stag.payloqal.com",
 ]
 
 APP_NAME = "Loqal staging"
@@ -37,3 +40,5 @@ CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
 
 
 CELERY_TASK_DEFAULT_QUEUE = env("AWS_SECRET_ACCESS_KEY")
+
+NUM_PROXIES = 2

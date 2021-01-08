@@ -8,6 +8,8 @@ from apps.user.services import LoginRequest
 
 class UserLoginAPI(APIView):
     def post(self, request):
+        throttle_scope = "login"
+        
         if request.user.is_authenticated:
             raise ValidationError(
                 {"detail": ErrorDetail(_("You are already logged in."))}

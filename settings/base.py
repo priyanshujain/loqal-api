@@ -183,9 +183,7 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = (
-    ["console", "sentry"] if allow_sentry_logging else ["console"]
-)
+LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
 
 
 LOGGING = {
@@ -240,6 +238,20 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "api.throttling.UserBurstRateThrottle",
+        "api.throttling.UserSustainedRateThrottle",
+        "api.throttling.AnonBurstRateThrottle",
+        "api.throttling.AnonSustainedRateThrottle",
+        "api.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "user_burst": "60/min",
+        "user_sustained": "1000/day",
+        "anon_burst": "20/min",
+        "anon_sustained": "100/day",
+        "login": "10/min"
+    },
 }
 
 
@@ -401,9 +413,7 @@ USE_CUSTOM_BIG_INTS = False
 
 # Loqal Encryption
 LOQAL_ENCRYPTION_KEY = env("LOQAL_ENCRYPTION_KEY")
-LOQAL_ENCRYPTION_SCHEMES = (
-    ("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),
-)
+LOQAL_ENCRYPTION_SCHEMES = (("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),)
 
 
 # Max file size for avatar photo uploads

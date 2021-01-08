@@ -58,6 +58,8 @@ class ResendEmailverificationAPI(ConsumerAPIView):
 
 
 class UserLoginAPI(APIView):
+    throttle_scope = "login"
+    
     def post(self, request):
         if request.user.is_authenticated:
             raise ValidationError(

@@ -17,21 +17,21 @@ APP_NAME = "Loqal development"
 
 CORS_ORIGIN_REGEX_WHITELIST += [
     "http://localhost:3000",
-    "https://app-dev.payloqal.com",
-    "https://merchant-demo.payloqal.com",
-    "https://dev-website.payloqal.com",
+    "https://staff-dev.payloqal.com",
+    "https://merchant-dev.payloqal.com",
+    "https://website-dev.payloqal.com",
 ]
 
 
 SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
 
-SPOTLIGHT_ADMIN_EMAIL = "test@spotlightandcompany.com"
+SPOTLIGHT_ADMIN_EMAIL = "priyanshu@spotlightandcompany.com"
 
 
 CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 SESSION_COOKIE_AGE = 86400
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -40,3 +40,5 @@ CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 
 SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
+
+NUM_PROXIES = 2
