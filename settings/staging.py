@@ -34,6 +34,11 @@ MERCHANT_APP_WEB_BASE_URL = "https://merchant-dev.payloqal.com"
 DEFAULT_FROM_EMAIL = "hello@payloqal.com"
 EMAIL_SENDER_NAME = "Loqal App Team"
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://staff-stag.payloqal.com",
+    "https://merchant-stag.payloqal.com",
+    "https://website-stag.payloqal.com",
+]
 
 SESSION_COOKIE_DOMAIN=".payloqal.com"
 CSRF_COOKIE_SECURE = True
