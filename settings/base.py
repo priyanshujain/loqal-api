@@ -4,6 +4,8 @@ import django_opentracing
 import environ
 import sentry_sdk
 from corsheaders.defaults import default_headers
+from cryptography.fernet import Fernet
+from django.utils.encoding import smart_bytes
 from google.oauth2 import service_account
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
@@ -396,7 +398,12 @@ APP_NAME = env("APP_NAME", default="Spotlight")
 
 USE_CUSTOM_BIG_INTS = False
 
-SENTRY_ENCRYPTION_SCHEMES = ()
+
+# Loqal Encryption
+LOQAL_ENCRYPTION_KEY = env("LOQAL_ENCRYPTION_KEY")
+LOQAL_ENCRYPTION_SCHEMES = (
+    ("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),
+)
 
 
 # Max file size for avatar photo uploads

@@ -114,6 +114,15 @@ class UpdatePaymentProviderCredsAPI(StaffAPIView):
         return self.response()
 
 
+class GetPaymentProviderCredsAPI(StaffAPIView):
+    """get payment provider creds"""
+
+    def get(self, request, provider_id):
+        """update payment provider creds"""
+        creds = PaymentProviderCred.objects.filter(provider_id=provider_id)
+        return self.response({"is_provided": creds.exists()})
+
+
 class CreateTermDocumentAPI(StaffAPIView):
     """Upload new term document"""
 
