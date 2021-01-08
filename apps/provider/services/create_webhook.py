@@ -29,6 +29,7 @@ class CreateProviderWebhook(ServiceBase):
         }
         dwolla_response = self._send_to_dwolla(webhook_data=webhook_data)
         provider_webhook.add_dwolla_id(dwolla_id=dwolla_response["dwolla_id"])
+        return provider_webhook
 
     def _factory_provider_webhook(self):
         return create_provider_webhook(provider_id=self.provider.id)

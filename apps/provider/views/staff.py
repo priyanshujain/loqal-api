@@ -229,8 +229,8 @@ class CreateProviderWebhookAPI(StaffAPIView):
     """create webhook"""
 
     def post(self, request):
-        CreateProviderWebhook().handle()
-        return self.response()
+        webhook = CreateProviderWebhook().handle()
+        return self.response(ListWebhooksResponse(webhook).data)
 
 
 class ListProviderWebhookAPI(StaffAPIView):
