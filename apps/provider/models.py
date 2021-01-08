@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from apps.account.models import Account
 from apps.provider.options import PaymentAccountStatus
 from db.models.abstract import AbstractBaseModel
+from db.models.fields import EncryptedCharField
 from utils.shortcuts import upload_to
 
 
@@ -24,9 +25,9 @@ class PaymentProvider(AbstractBaseModel):
 class PaymentProviderCred(AbstractBaseModel):
     provider = models.ForeignKey(PaymentProvider, on_delete=models.CASCADE)
     api_environment = models.CharField(max_length=255)
-    api_password = models.CharField(max_length=255, blank=True)
-    api_key = models.CharField(max_length=255, blank=True)
-    api_login_id = models.CharField(max_length=255, blank=True)
+    api_password = EncryptedCharField(max_length=255, blank=True)
+    api_key = EncryptedCharField(max_length=255, blank=True)
+    api_login_id = EncryptedCharField(max_length=255, blank=True)
 
     class Meta:
         db_table = "payment_provider_cred"
@@ -38,7 +39,7 @@ class PaymentProviderCred(AbstractBaseModel):
 
 class PaymentProviderAuth(AbstractBaseModel):
     provider = models.OneToOneField(PaymentProvider, on_delete=models.CASCADE)
-    auth_token = models.CharField(max_length=1024)
+    auth_token = EncryptedCharField(max_length=1024)
     expires_at = models.DateTimeField()
 
     class Meta:

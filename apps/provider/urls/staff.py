@@ -5,6 +5,7 @@ from apps.provider.views.staff import (ActivateTermsDocumentAPI,
                                        CreatePaymentProviderCredsAPI,
                                        CreateProviderWebhookAPI,
                                        CreateTermDocumentAPI,
+                                       GetPaymentProviderCredsAPI,
                                        ListProviderWebhookAPI, ListTermsAPI,
                                        ListWebhookEventsAPI,
                                        ProviderLogoUploadAPI,
@@ -32,6 +33,10 @@ urlpatterns = [
     path(
         "creds/update/",
         UpdatePaymentProviderCredsAPI.as_view(),
+    ),
+    path(
+        "creds/<int:provider_id>/",
+        GetPaymentProviderCredsAPI.as_view(),
     ),
     path(
         "terms/create/",

@@ -18,7 +18,7 @@
 - Add fields for KYC related data both on models and serializers (ex. EIN number, SSN number)
 - Add phone number country to all places where we are asking for phone number from user
 - Handle all the DB errors not just by catching exception but by resloving it to an error
-
+- https://github.com/jazzband/django-defender
 
 ## Long terms
 

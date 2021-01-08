@@ -58,14 +58,18 @@ class ResendEmailverificationAPI(ConsumerAPIView):
 
 
 class UserLoginAPI(APIView):
+    throttle_scope = "login"
+    
     def post(self, request):
         if request.user.is_authenticated:
             raise ValidationError(
                 {"detail": ErrorDetail(_("You are already logged in."))}
             )
         session = request.session
+
+        # Assign the 7 days expiration period
         if session:
-            session.set_expiry(settings.SESSION_INACTIVITY_EXPIRATION_DURATION)
+            session.set_expiry(60 * 60 * 24 * 7)
 
         service_response = self._run_services(request=request)
         if service_response:

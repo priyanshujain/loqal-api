@@ -45,9 +45,9 @@ class PaymentProviderCredSerializer(serializers.Serializer):
 
     provider_id = serializers.IntegerField()
     api_environment = serializers.CharField(max_length=255)
-    api_password = serializers.CharField(max_length=255, allow_blank=True)
-    api_key = serializers.CharField(max_length=255, allow_blank=True)
-    api_login_id = serializers.CharField(max_length=255, allow_blank=True)
+    api_password = serializers.CharField(max_length=255)
+    api_key = serializers.CharField(max_length=255)
+    api_login_id = serializers.CharField(max_length=255)
 
 
 class CreateTermsDocumentSerializer(serializers.Serializer):

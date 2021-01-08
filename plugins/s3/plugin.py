@@ -12,17 +12,7 @@ from io import BytesIO
 import boto3
 import six
 from django.conf import settings
-
-
-def to_bytes(value, encoding="ascii"):
-
-    result = (
-        value.encode(encoding) if isinstance(value, six.text_type) else value
-    )
-    if isinstance(result, six.binary_type):
-        return result
-    else:
-        raise TypeError("%r could not be converted to bytes" % (value,))
+from django.utils.encoding import smart_bytes
 
 
 class S3Storage(object):
@@ -58,7 +48,7 @@ class S3Storage(object):
         """
         Uploads a file to a given S3 bucket.
         """
-        file_content = to_bytes(file_content, encoding="utf-8")
+        file_content = smart_bytes(file_content, encoding="utf-8")
         string_buffer = BytesIO(file_content)
         self._client.upload_fileobj(string_buffer, self._bucket_name, filename)
         return True
