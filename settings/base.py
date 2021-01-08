@@ -67,6 +67,7 @@ INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "django_opentracing.OpenTracingMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "config.middlewares.AddXCsrfMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -183,7 +184,9 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
+LOGGING_HANDLERS = (
+    ["console", "sentry"] if allow_sentry_logging else ["console"]
+)
 
 
 LOGGING = {
@@ -250,7 +253,7 @@ REST_FRAMEWORK = {
         "user_sustained": "1000/day",
         "anon_burst": "20/min",
         "anon_sustained": "100/day",
-        "login": "10/min"
+        "login": "10/min",
     },
 }
 
@@ -331,13 +334,6 @@ CORS_EXPOSE_HEADERS = list(default_headers) + [
 CORS_ALLOW_CREDENTIALS = True
 
 
-# Cloud storage configs.
-GS_CREDENTIAL_PATH = os.path.join(DATA_DIR, "config/credentials.json")
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-    GS_CREDENTIAL_PATH
-)
-# GS_CREDENTIALS = service_account.Credentials.from_service_account_info(json_acct_info)
-
 DJANGO_SETTINGS_MODULE = "settings"
 
 
@@ -355,20 +351,11 @@ OPENTRACING_TRACED_ATTRIBUTES = ["path", "method"]
 OPENTRACING_TRACER_CALLABLE = "opentracing.Tracer"
 
 
-# app config
-APP_BASE_URL = env("APP_BASE_URL")
-API_BASE_URL = env("API_BASE_URL")
-CONSUMER_APP_WEB_BASE_URL = env("CONSUMER_APP_WEB_BASE_URL")
-MERCHANT_APP_WEB_BASE_URL = env("MERCHANT_APP_WEB_BASE_URL")
-
 # Email configs.
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-EMAIL_SENDER_NAME = env("EMAIL_SENDER_NAME")
 SENDGRID_API_KEY = env("SENDGRID_API_KEY")
 
 
-# GCS config
-GS_BUCKET_NAME = env("GS_BUCKET_NAME")
+# s3 config
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 
@@ -413,7 +400,9 @@ USE_CUSTOM_BIG_INTS = False
 
 # Loqal Encryption
 LOQAL_ENCRYPTION_KEY = env("LOQAL_ENCRYPTION_KEY")
-LOQAL_ENCRYPTION_SCHEMES = (("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),)
+LOQAL_ENCRYPTION_SCHEMES = (
+    ("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),
+)
 
 
 # Max file size for avatar photo uploads

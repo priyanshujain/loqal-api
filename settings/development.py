@@ -15,6 +15,7 @@ from .base import *  # isort:skip
 
 APP_NAME = "Loqal development"
 
+
 CORS_ORIGIN_REGEX_WHITELIST += [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -43,3 +44,14 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
 
 NUM_PROXIES = 2
+
+
+# app config
+APP_BASE_URL = "https://merchant-dev.payloqal.com"
+API_BASE_URL = "https://api-dev.payloqal.com"
+CONSUMER_APP_WEB_BASE_URL = "https://website-dev.payloqal.com"
+MERCHANT_APP_WEB_BASE_URL = "https://merchant-dev.payloqal.com"
+
+# Email configs.
+DEFAULT_FROM_EMAIL = "donotreply@spotlightandcompany.com"
+EMAIL_SENDER_NAME = "Loqal App Team"
