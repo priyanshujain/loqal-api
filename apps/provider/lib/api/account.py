@@ -18,6 +18,12 @@ class Account(API):
             request_method=request_method, request_kwargs=kwargs
         )
 
+    def retry_merchant_account(self, **kwargs):
+        request_method = self.psp_client.account.retry_merchant_account
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )
+
     def upload_customer_document(self, **kwargs):
         request_method = self.psp_client.account.upload_customer_document
         return self.execute_request(

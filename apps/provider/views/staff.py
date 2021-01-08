@@ -4,8 +4,12 @@
 from django.db.utils import IntegrityError
 
 from api.views import StaffAPIView, validate_serializer
+from apps.provider.dbapi import (get_all_provider_webhook,
+                                 get_provider_webhook_events)
 from apps.provider.models import (PaymentProvider, PaymentProviderCred,
                                   TermsDocument)
+from apps.provider.responses import (ListWebhookEventsResponse,
+                                     ListWebhooksResponse)
 from apps.provider.serializers import (ActivateTermDocumentSerializer,
                                        CreatePaymentProviderSerializer,
                                        CreateTermsDocumentSerializer,
@@ -14,6 +18,7 @@ from apps.provider.serializers import (ActivateTermDocumentSerializer,
                                        RemoveTermDocumentSerializer,
                                        TermsDocumentSerializer,
                                        UpdatePaymentProviderSerializer)
+from apps.provider.services import CreateProviderWebhook
 from apps.provider.shortcuts import validate_image_data
 
 
@@ -107,6 +112,15 @@ class UpdatePaymentProviderCredsAPI(StaffAPIView):
             provider_id=data["provider_id"]
         ).update(**data)
         return self.response()
+
+
+class GetPaymentProviderCredsAPI(StaffAPIView):
+    """get payment provider creds"""
+
+    def get(self, request, provider_id):
+        """update payment provider creds"""
+        creds = PaymentProviderCred.objects.filter(provider_id=provider_id)
+        return self.response({"is_provided": creds.exists()})
 
 
 class CreateTermDocumentAPI(StaffAPIView):
@@ -211,10 +225,25 @@ class ListTermsAPI(StaffAPIView):
         )
 
 
-# TODO: Provider Fee APIs
-# 1. Local payment fees
+class CreateProviderWebhookAPI(StaffAPIView):
+    """create webhook"""
 
-# 2. Swift ours fee
-# 3. Swift shared fees
-#
-# #########################
+    def post(self, request):
+        CreateProviderWebhook().handle()
+        return self.response()
+
+
+class ListProviderWebhookAPI(StaffAPIView):
+    """list webhooks"""
+
+    def get(self, request):
+        webhooks = get_all_provider_webhook()
+        return self.response(ListWebhooksResponse(webhooks, many=True).data)
+
+
+class ListWebhookEventsAPI(StaffAPIView):
+    """list webhook events"""
+
+    def get(self, request, webhook_id):
+        events = get_provider_webhook_events(webhook_id=webhook_id)
+        return self.response(ListWebhookEventsResponse(events, many=True).data)

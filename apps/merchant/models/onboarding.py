@@ -21,7 +21,9 @@ __all__ = (
 class IncorporationDetails(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     legal_business_name = models.CharField(max_length=512)
-    ein_number = models.CharField(max_length=11, blank=True)
+    ein_number = models.CharField(
+        max_length=11, blank=True, null=True, default=None, unique=True
+    )
     registered_address = models.JSONField()
     business_type = ChoiceCharEnumField(max_length=32, enum_type=BusinessTypes)
     business_classification = models.CharField(max_length=64)

@@ -1,7 +1,9 @@
 import base64
 import logging
+import os
 
 import html2text
+import magic
 from celery import shared_task
 from django.conf import settings
 from sendgrid import SendGridAPIClient
@@ -19,7 +21,7 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
     message = Mail(
         from_email=(DEFAULT_FROM_EMAIL, from_name),
         to_emails=to_emails,
-        subject=f"[Spotlight]: {subject}",
+        subject=f"[Loqal App]: {subject}",
         html_content=content,
     )
     file_path = kwargs.get("file_path", None)
@@ -28,6 +30,10 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
             file_content = f.read()
             file_name = f.name
             f.close()
+
+        kwarg_file_name = kwargs.get("file_name", None)
+        if kwarg_file_name:
+            file_name = kwarg_file_name
 
         encoded_content = base64.b64encode(file_content).decode()
         attachment = Attachment()
@@ -38,6 +44,12 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
 
     sendgrid_client = SendGridAPIClient(SENDGRID_API_KEY)
     response = sendgrid_client.send(message)
+    if file_path:
+        try:
+            os.unlink(file_path)
+        except Exception:
+            pass
+    return response
 
 
 def send_email_async(to_emails, subject, content, **kwargs):
@@ -51,6 +63,7 @@ def send_email_async(to_emails, subject, content, **kwargs):
         return
 
     file_path = kwargs.get("file_path", None)
+    file_name = kwargs.get("file_name", None)
     if file_path:
         send_email.delay(
             from_name=settings.EMAIL_SENDER_NAME,
@@ -58,6 +71,7 @@ def send_email_async(to_emails, subject, content, **kwargs):
             subject=subject,
             content=content,
             file_path=file_path,
+            file_name=file_name,
         )
     else:
         send_email.delay(
@@ -65,4 +79,5 @@ def send_email_async(to_emails, subject, content, **kwargs):
             to_emails=to_emails,
             subject=subject,
             content=content,
+            file_name=file_name,
         )

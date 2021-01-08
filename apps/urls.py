@@ -21,5 +21,6 @@ urlpatterns = [
     path("api/support/", include("apps.support.urls")),
     path("api/staff/tracking/", include("apps.tracking.urls")),
     path("api/staff/provider/", include("apps.provider.urls.staff")),
+    path("api/external/provider/", include("apps.provider.urls.external")),
     path("", WelcomeAPI.as_view()),
 ]

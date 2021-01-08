@@ -59,7 +59,10 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
                 }
             )
 
-        if not ein.is_valid(ein_number):
+        if (
+            business_type != BusinessTypes.SOLE_PROPRIETORSHIP.value
+            and not ein.is_valid(ein_number)
+        ):
             raise ValidationError(
                 {
                     "ein_number": [
@@ -67,7 +70,8 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
                     ]
                 }
             )
-        attrs["ein_number"] = ein.format(ein_number)
+        if ein_number:
+            attrs["ein_number"] = ein.format(ein_number)
         return attrs
 
 

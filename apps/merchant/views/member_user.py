@@ -1,13 +1,17 @@
+import re
+
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, MerchantAPIView
-from apps.merchant.dbapi import get_account_member_by_user_id
-from apps.user.dbapi import update_user_profile
-from apps.user.responses.merchant import UserProfileResponse
-from apps.user.validators import EditProfileValidator
+from apps.merchant.dbapi import (get_account_member_by_user_id,
+                                 update_account_member)
+from apps.merchant.responses import MemberProfileResponse
+from apps.merchant.validators import EditMemberProfileValidator
+from apps.user.dbapi import get_user_by_phone
 
 
 class GetUserProfileAPI(APIView):
@@ -28,7 +32,7 @@ class GetUserProfileAPI(APIView):
         if not account_member:
             return self.response()
 
-        return self.response(UserProfileResponse(user).data)
+        return self.response(MemberProfileResponse(account_member).data)
 
 
 class UpdateUserProfileAPI(MerchantAPIView):
@@ -37,11 +41,35 @@ class UpdateUserProfileAPI(MerchantAPIView):
     """
 
     def put(self, request):
-        data = run_validator(EditProfileValidator, self.request_data)
+        data = run_validator(EditMemberProfileValidator, self.request_data)
+        account_member = request.merchant_account_member
         user = request.user
-        update_user_profile(
-            user=user,
+        phone_number = data["phone_number"]
+        assert self._validate_phone_number(
+            user=user, phone_number=phone_number
+        )
+        update_account_member(
+            user_id=user.id,
+            member_id=account_member.id,
             first_name=data["first_name"],
             last_name=data["last_name"],
+            position=data["position"],
+            phone_number=data["phone_number"],
         )
         return self.response(status=204)
+
+    def _validate_phone_number(self, user, phone_number):
+        if user.phone_number and user.phone_number == phone_number:
+            return True
+
+        if get_user_by_phone(phone_number=phone_number):
+            raise ValidationError(
+                {
+                    "phone_number": [
+                        ErrorDetail(
+                            _("A user already exists with this phone number.")
+                        )
+                    ]
+                }
+            )
+        return True

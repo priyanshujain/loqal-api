@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from apps.account.models import Account
 from apps.provider.options import PaymentAccountStatus
 from db.models.abstract import AbstractBaseModel
+from db.models.fields import EncryptedCharField
 from utils.shortcuts import upload_to
 
 
@@ -24,9 +25,9 @@ class PaymentProvider(AbstractBaseModel):
 class PaymentProviderCred(AbstractBaseModel):
     provider = models.ForeignKey(PaymentProvider, on_delete=models.CASCADE)
     api_environment = models.CharField(max_length=255)
-    api_password = models.CharField(max_length=255, blank=True)
-    api_key = models.CharField(max_length=255, blank=True)
-    api_login_id = models.CharField(max_length=255, blank=True)
+    api_password = EncryptedCharField(max_length=255, blank=True)
+    api_key = EncryptedCharField(max_length=255, blank=True)
+    api_login_id = EncryptedCharField(max_length=255, blank=True)
 
     class Meta:
         db_table = "payment_provider_cred"
@@ -38,7 +39,7 @@ class PaymentProviderCred(AbstractBaseModel):
 
 class PaymentProviderAuth(AbstractBaseModel):
     provider = models.OneToOneField(PaymentProvider, on_delete=models.CASCADE)
-    auth_token = models.CharField(max_length=1024)
+    auth_token = EncryptedCharField(max_length=1024)
     expires_at = models.DateTimeField()
 
     class Meta:
@@ -66,3 +67,44 @@ class TermsDocument(AbstractBaseModel):
 
     class Meta:
         db_table = "terms_document"
+
+
+class ProviderWebhook(AbstractBaseModel):
+    provider = models.ForeignKey(PaymentProvider, on_delete=models.CASCADE)
+    webhook_secret = models.CharField(max_length=256)
+    webhook_id = models.CharField(max_length=256, unique=True)
+    dwolla_id = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "provider_webhook"
+
+    def add_dwolla_id(self, dwolla_id, save=True):
+        """
+        docstring
+        """
+        self.dwolla_id = dwolla_id
+        if save:
+            self.save()
+
+    def deactivate(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()
+
+
+class ProviderWebhookEvent(AbstractBaseModel):
+    webhook = models.ForeignKey(ProviderWebhook, on_delete=models.CASCADE)
+    event_payload = models.JSONField(default=dict, null=True)
+    dwolla_id = models.CharField(max_length=255, blank=True)
+    is_processed = models.BooleanField(default=False)
+    topic = models.CharField(max_length=255, blank=True)
+    target_resource_dwolla_id = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "provider_webhook_event"
+
+    def mark_processed(self, save=True):
+        self.is_processed = True
+        if save:
+            self.save()

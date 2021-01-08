@@ -4,6 +4,8 @@ import django_opentracing
 import environ
 import sentry_sdk
 from corsheaders.defaults import default_headers
+from cryptography.fernet import Fernet
+from django.utils.encoding import smart_bytes
 from google.oauth2 import service_account
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
@@ -65,6 +67,7 @@ INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "django_opentracing.OpenTracingMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "config.middlewares.AddXCsrfMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -181,7 +184,9 @@ sentry_sdk.init(
 )
 
 
-LOGGING_HANDLERS = ["console", "sentry"] if allow_sentry_logging else ["console"]
+LOGGING_HANDLERS = (
+    ["console", "sentry"] if allow_sentry_logging else ["console"]
+)
 
 
 LOGGING = {
@@ -236,6 +241,20 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "api.throttling.UserBurstRateThrottle",
+        "api.throttling.UserSustainedRateThrottle",
+        "api.throttling.AnonBurstRateThrottle",
+        "api.throttling.AnonSustainedRateThrottle",
+        "api.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "user_burst": "60/min",
+        "user_sustained": "1000/day",
+        "anon_burst": "20/min",
+        "anon_sustained": "100/day",
+        "login": "10/min",
+    },
 }
 
 
@@ -275,11 +294,21 @@ CACHES = {"default": redis_config(db=1)}
 
 # CSRF_COOKIE_NAME = "lc"
 
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# TODO: look into it
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# SESSION_CACHE_ALIAS = "default"
+# SESSION_COOKIE_NAME = "session"
+
+# # FIX: Change this to json serializer and convert last_activity to timestamp
+# SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_NAME = "session"
 
-# FIX: Change this to json serializer and convert last_activity to timestamp
+# # FIX: Change this to json serializer and convert last_activity to timestamp
+# SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
 
@@ -305,12 +334,6 @@ CORS_EXPOSE_HEADERS = list(default_headers) + [
 CORS_ALLOW_CREDENTIALS = True
 
 
-# Cloud storage configs.
-GS_CREDENTIAL_PATH = os.path.join(DATA_DIR, "config/credentials.json")
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-    GS_CREDENTIAL_PATH
-)
-
 DJANGO_SETTINGS_MODULE = "settings"
 
 
@@ -328,21 +351,19 @@ OPENTRACING_TRACED_ATTRIBUTES = ["path", "method"]
 OPENTRACING_TRACER_CALLABLE = "opentracing.Tracer"
 
 
-# app config
-APP_BASE_URL = env("APP_BASE_URL")
-API_BASE_URL = env("API_BASE_URL")
-CONSUMER_APP_WEB_BASE_URL = env("CONSUMER_APP_WEB_BASE_URL")
-MERCHANT_APP_WEB_BASE_URL = env("MERCHANT_APP_WEB_BASE_URL")
-
 # Email configs.
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-EMAIL_SENDER_NAME = env("EMAIL_SENDER_NAME")
 SENDGRID_API_KEY = env("SENDGRID_API_KEY")
 
 
-# GCS config
-GS_BUCKET_NAME = env("GS_BUCKET_NAME")
-DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+# s3 config
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+
+# AWS config
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+# TODO: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 
 # Plaid config
@@ -376,7 +397,12 @@ APP_NAME = env("APP_NAME", default="Spotlight")
 
 USE_CUSTOM_BIG_INTS = False
 
-SENTRY_ENCRYPTION_SCHEMES = ()
+
+# Loqal Encryption
+LOQAL_ENCRYPTION_KEY = env("LOQAL_ENCRYPTION_KEY")
+LOQAL_ENCRYPTION_SCHEMES = (
+    ("fernet", Fernet(smart_bytes(LOQAL_ENCRYPTION_KEY))),
+)
 
 
 # Max file size for avatar photo uploads
@@ -387,7 +413,6 @@ MAX_AVATAR_SIZE = 5000000
 MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
 DEFAULT_MAX_DIGITS = 5
 DEFAULT_DECIMAL_PLACES = 2
-
 
 
 # Firebase settings

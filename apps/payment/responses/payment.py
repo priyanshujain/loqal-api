@@ -237,6 +237,9 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
     merchant = MerchantDetailsResponse(
         source="payment.order.merchant", read_only=True
     )
+    merchant_id = serializers.CharField(
+        source="payment.order.merchant.u_id", read_only=True
+    )
     bank_logo = serializers.SerializerMethodField("get_bank_logo")
     is_credit = serializers.SerializerMethodField("is_credit_transaction")
 
@@ -252,6 +255,7 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
             "merchant",
             "bank_logo",
             "is_credit",
+            "merchant_id",
         )
 
     def get_bank_logo(self, obj):
@@ -350,7 +354,10 @@ class RecentStoresResponse(serializers.ModelSerializer):
         source="payment.captured_amount", read_only=True
     )
     category = serializers.CharField(
-        source="merchant.category", read_only=True
+        source="merchant.merchantprofile.category", read_only=True
+    )
+    sub_category = serializers.CharField(
+        source="merchant.merchantprofile.sub_category", read_only=True
     )
     address = serializers.JSONField(
         source="merchant.merchantprofile.address", read_only=True
@@ -365,6 +372,7 @@ class RecentStoresResponse(serializers.ModelSerializer):
         fields = (
             "amount",
             "category",
+            "sub_category",
             "address",
             "full_name",
             "created_at",

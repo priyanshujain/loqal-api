@@ -164,7 +164,7 @@ class Http(HttpRequest):
     def __handle_authentication_errors(
         self, method, execute_request, retry, headers, api_type, authenticated
     ):
-        retry_count = 3 if retry else 1
+        retry_count = 3 if retry else 2
 
         while retry_count:
             retry_count -= 1
@@ -172,12 +172,11 @@ class Http(HttpRequest):
             if response.status_code != 401:
                 return response
 
-            if retry:
+            if retry_count:
                 self.config.reauthenticate()
                 headers = self.__build_headers(
                     authenticated=authenticated,
                     method=method,
                     api_type=api_type,
                 )
-
         return response

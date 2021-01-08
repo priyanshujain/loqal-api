@@ -51,8 +51,8 @@ class MerchantAccountSignupValidatorBase(serializers.ValidationSerializer):
 class CreateMerchantAccountValidator(MerchantAccountSignupValidatorBase):
     company_name = serializers.CharField(max_length=500)
     address = serializers.AddressSerializer()
-    category = serializers.CharField(max_length=32)
-    sub_category = serializers.CharField(max_length=32)
+    category = serializers.CharField(max_length=64)
+    sub_category = serializers.CharField(max_length=64)
     email = serializers.EmailField(max_length=254)
 
     def validate(self, attrs):

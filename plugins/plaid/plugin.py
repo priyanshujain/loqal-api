@@ -1,12 +1,6 @@
-import re
-
 from django.conf import settings
 from plaid import Client
-from plaid.api import accounts, institutions
 from plaid.errors import InvalidInputError
-from rest_framework.exceptions import ErrorDetail
-
-from integrations.exceptions import IntegrationAPIError
 
 
 class PlaidPlugin(object):

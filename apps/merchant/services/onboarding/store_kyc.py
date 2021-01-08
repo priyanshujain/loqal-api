@@ -1,3 +1,5 @@
+from re import T
+
 from django.utils.translation import gettext as _
 
 from api.exceptions import (ErrorDetail, InternalDBError, ProviderAPIException,
@@ -10,6 +12,7 @@ from apps.merchant.dbapi import (create_beneficial_owner,
                                  delete_beneficial_owner, get_beneficial_owner,
                                  get_controller_details,
                                  get_incorporation_details,
+                                 get_incorporation_details_by_ein,
                                  update_beneficial_owner,
                                  update_controller_details,
                                  update_incorporation_details)
@@ -109,6 +112,10 @@ class CreateIncorporationDetails(ServiceBase):
         assert validate_business_classifcation(
             account_id=self.merchant.account.id, data=self.data
         )
+        assert self._validate_ein_number(
+            incorporation_details=None,
+            ein_number=self.data.get("ein_number"),
+        )
         return True
 
     def _factory_incorporation_details(self):
@@ -127,6 +134,33 @@ class CreateIncorporationDetails(ServiceBase):
                 )
             }
         )
+
+    def _validate_ein_number(self, incorporation_details, ein_number):
+        if not ein_number:
+            return True
+        ein_inc_details = get_incorporation_details_by_ein(
+            ein_number=ein_number
+        )
+
+        if not ein_inc_details:
+            return True
+
+        if (ein_inc_details and not incorporation_details) or (
+            ein_inc_details
+            and (ein_inc_details.id != incorporation_details.id)
+        ):
+            raise ValidationError(
+                {
+                    "ein_number": [
+                        ErrorDetail(
+                            _(
+                                "Please check Provided EIN number again, as it is already being used with another merchant."
+                            )
+                        )
+                    ]
+                }
+            )
+        return True
 
 
 class UpdateIncorporationDetails(CreateIncorporationDetails):
@@ -154,6 +188,10 @@ class UpdateIncorporationDetails(CreateIncorporationDetails):
         self.data = run_validator(IncorporationDetailsValidator, self.data)
         assert validate_business_classifcation(
             account_id=self.merchant.account.id, data=self.data
+        )
+        assert self._validate_ein_number(
+            incorporation_details=incorporation_details,
+            ein_number=self.data.get("ein_number"),
         )
         return True
 

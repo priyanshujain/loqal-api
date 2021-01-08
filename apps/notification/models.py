@@ -1,3 +1,5 @@
+from enum import unique
+
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -5,10 +7,9 @@ from django.utils.translation import gettext as _
 
 from db.models import BaseModel
 from db.models.fields import ChoiceCharEnumField
+from plugins.fcm import FcmPlugin
 
 from .options import UserDeviceTypes
-from .tasks import (fcm_send_device_data_message,
-                    fcm_send_device_notification_message)
 
 
 class UserDevice(BaseModel):
@@ -18,7 +19,10 @@ class UserDevice(BaseModel):
 
     device_name = models.CharField(max_length=128, blank=True)
     device_id = models.CharField(
-        max_length=128, blank=True, null=True, default=None, unique=True
+        max_length=128,
+        blank=True,
+        null=True,
+        default=None,
     )
     build_number = models.CharField(max_length=32, blank=True)
     brand_name = models.CharField(max_length=128, blank=True)
@@ -32,7 +36,7 @@ class UserDevice(BaseModel):
     )
 
     device_tracking_id = models.CharField(
-        blank=True, null=True, default=None, unique=True, max_length=32
+        blank=True, null=True, default=None, max_length=32, unique=True
     )
     fcm_token = models.TextField()
     device_platform = ChoiceCharEnumField(
@@ -42,6 +46,10 @@ class UserDevice(BaseModel):
 
     class Meta:
         db_table = "user_device"
+        unique_together = (
+            "user",
+            "device_id",
+        )
 
     def save(self, *args, **kwargs):
         def id_generator():
@@ -82,8 +90,7 @@ class UserDevice(BaseModel):
         Send single notification message.
         """
 
-        result = fcm_send_device_notification_message(
-            registration_id=str(self.fcm_token),
+        result = FcmPlugin(token=self.fcm_token).send_notification(
             title=title,
             body=body,
             icon=icon,
@@ -114,8 +121,7 @@ class UserDevice(BaseModel):
         Send single data message.
         """
 
-        result = fcm_send_device_data_message(
-            registration_id=str(self.fcm_token),
+        result = FcmPlugin(token=self.fcm_token).send_data(
             condition=condition,
             collapse_key=collapse_key,
             delay_while_idle=delay_while_idle,

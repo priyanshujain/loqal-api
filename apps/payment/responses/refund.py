@@ -94,8 +94,11 @@ class SenderAcconutResponse(serializers.ModelSerializer):
 
 
 class TransactionRefundResponse(serializers.ModelSerializer):
-    payment_account = SenderAcconutResponse(
+    merchant_bank_account = SenderAcconutResponse(
         source="sender_bank_account", read_only=True
+    )
+    customer_bank_account = SenderAcconutResponse(
+        source="recipient_bank_account", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
 
@@ -108,7 +111,8 @@ class TransactionRefundResponse(serializers.ModelSerializer):
             "is_success",
             "fee_amount",
             "fee_currency",
-            "payment_account",
+            "merchant_bank_account",
+            "customer_bank_account",
             "transaction_tracking_id",
             "status",
         )
@@ -122,6 +126,9 @@ class RefundDetailsResponse(serializers.ModelSerializer):
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
+    customer = CustomerDetailsResponse(
+        source="payment.order.consumer", read_only=True
+    )
     transaction = TransactionRefundResponse(read_only=True)
 
     class Meta:
@@ -134,4 +141,5 @@ class RefundDetailsResponse(serializers.ModelSerializer):
             "transaction",
             "status",
             "amount",
+            "customer",
         )

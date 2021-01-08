@@ -1,5 +1,6 @@
 import qrcode
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
@@ -47,13 +48,13 @@ class ListSessionsAPI(LoggedInAPIView):
 
 class DeleteSessionAPI(LoggedInAPIView):
     def delete(self, request):
-        session_key = request.GET.get("session_key")
-        if not session_key:
+        session_id = request.GET.get("session_id")
+        if not session_id:
             raise ValidationError(
                 {"session_key": [ErrorDetail(_("This is required."))]}
             )
         service = Session(request=request)
-        service.delete_session(session_key=session_key)
+        service.delete_session(session_id=session_id)
         return self.response()
 
 
@@ -147,6 +148,7 @@ class UserLogoutAPI(LoggedInAPIView):
         Logout the user i.e end the session.
         """
         auth.logout(request)
+        request.user = AnonymousUser()
         return self.response()
 
 

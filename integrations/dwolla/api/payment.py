@@ -100,11 +100,9 @@ class Payment(Http):
             "fees": [
                 {
                     "_links": {
-                        "charge-to": {
-                            "href": self.cusotmer_url(
-                                account_dwolla_id=fee_bearer_dwolla_id
-                            )
-                        }
+                        "charge-to": self.cusotmer_url(
+                            account_dwolla_id=fee_bearer_dwolla_id
+                        )
                     },
                     "amount": {"value": fee_amount, "currency": fee_currency},
                 }

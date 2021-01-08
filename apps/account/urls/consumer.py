@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.account.views.consumer import (AddAccountZipCodeAPI,
+from apps.account.views.consumer import (AcceptTermsDocumentAPI,
+                                         AddAccountZipCodeAPI,
                                          ChangeAccountUsernameAPI,
                                          CheckAccountUsernameAPI,
                                          ConsumerAccountProfileAPI,
@@ -31,5 +32,10 @@ urlpatterns = [
         "consumer/username/check/",
         CheckAccountUsernameAPI.as_view(),
         name="consumer_username_check",
+    ),
+    path(
+        "consumer/accept-terms/",
+        AcceptTermsDocumentAPI.as_view(),
+        name="consumer_accept_terms",
     ),
 ]

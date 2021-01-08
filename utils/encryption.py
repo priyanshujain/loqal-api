@@ -69,7 +69,7 @@ class EncryptionManager(object):
         return force_text(scheme.decrypt(enc_data))
 
 
-default_manager = EncryptionManager(settings.SENTRY_ENCRYPTION_SCHEMES)
+default_manager = EncryptionManager(settings.LOQAL_ENCRYPTION_SCHEMES)
 
 encrypt = default_manager.encrypt
 decrypt = default_manager.decrypt

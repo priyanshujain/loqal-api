@@ -3,6 +3,8 @@ This module provides a class for account creation related calls to the dwolla AP
 """
 
 
+import re
+
 from apps.account.options import (MerchantAccountCerficationStatus,
                                   MerchantAccountStatus)
 from apps.merchant.options import BeneficialOwnerStatus, IndividualDocumentType
@@ -81,6 +83,9 @@ class Account(Http):
             retry=False,
         )
         response = response.json()
+        return self.parse_merchant_details_response(response)
+
+    def parse_merchant_details_response(self, response):
         links = response["_links"]
         is_controller_docs_required = "verify-with-document" in links
         is_business_docs_required = "verify-business-with-document" in links
@@ -107,7 +112,7 @@ class Account(Http):
 
         endpoint = "/customers"
         if is_update:
-            endpoint = f"/customer/{data['dwolla_id']}"
+            endpoint = f"/customers/{data['dwolla_id']}"
         try:
             response = self.post(
                 endpoint,
@@ -125,6 +130,25 @@ class Account(Http):
         location = response_headers["location"]
         dwolla_customer_id = location.split("/").pop()
         return self.get_merhant_account(customer_id=dwolla_customer_id)
+
+    def retry_merchant_account(self, data):
+        """
+        Retry consumer account
+        """
+        request_data = get_adapted_kyc_data(data=data)
+        try:
+            response = self.post(
+                f"/customers/{self.config.customer_id}",
+                data=request_data,
+                authenticated=True,
+                retry=False,
+            )
+        except BadRequestError as err:
+            return {
+                "status": RequestStatusTypes.ERROR,
+                "errors": err.api_errors,
+            }
+        return self.parse_merchant_details_response(response=response.json())
 
     def upload_customer_document(
         self, document_file, document_type, entity_type

@@ -107,7 +107,7 @@ def generate_encryption_key():
     #TODO: recheck for security policy and algo
     """
     key = Fernet.generate_key()
-    return base64.b64encode(key).decode("utf-8")
+    return key.decode("utf-8")
 
 
 def generate_uuid_hex():

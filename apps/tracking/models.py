@@ -88,7 +88,9 @@ class RawPspApiRequest(AbstractBaseModel):
 
 
 class PspApiRequestStorage(AbstractBaseModel):
-    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    account = models.ForeignKey(
+        Account, on_delete=models.DO_NOTHING, null=True, blank=True
+    )
     psp = models.ForeignKey(PaymentProvider, on_delete=models.DO_NOTHING)
     request = models.OneToOneField(
         RawPspApiRequest,

@@ -61,6 +61,7 @@ def get_merchant_customers(merchant_account):
     for consumer in consumers:
         payment_stats = Payment.objects.filter(
             order__consumer=consumer,
+            order__merchant=merchant_account,
             status=PaymentStatus.CAPTURED,
         ).aggregate(
             total_payment_amount=Sum("captured_amount"),

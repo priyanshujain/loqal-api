@@ -1,18 +1,18 @@
-from datetime import date
-
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import APIView, ConsumerAPIView
+from api.views import APIView, ConsumerAPIView, ConsumerPre2FaAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import (AddZipCode, ChangeAccountUsername,
                                    CheckAccountUsername, CreateConsumerAccount)
+from apps.account.services.accept_terms import AcceptTerms
 from utils.auth import login
 
 __all__ = (
     "ConsumerSignupAPI",
     "AddAccountZipCodeAPI",
     "ConsumerAccountProfileAPI",
+    "AcceptTermsDocumentAPI",
 )
 
 
@@ -48,7 +48,7 @@ class AddAccountZipCodeAPI(ConsumerAPIView):
         service.handle()
 
 
-class ConsumerAccountProfileAPI(ConsumerAPIView):
+class ConsumerAccountProfileAPI(ConsumerPre2FaAPIView):
     def get(self, request):
         consumer_account = request.consumer_account
         return self.response(
@@ -74,3 +74,9 @@ class CheckAccountUsernameAPI(ConsumerAPIView):
                 consumer_account=consumer_account, data=self.request_data
             ).handle()
         )
+
+
+class AcceptTermsDocumentAPI(ConsumerPre2FaAPIView):
+    def post(self, request):
+        AcceptTerms(request=request, data=self.request_data).handle()
+        return self.response()

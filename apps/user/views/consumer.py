@@ -11,6 +11,7 @@ from api.helpers import run_validator
 from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
                        LoggedInAPIView)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
+from apps.notification.tasks import SendEmailVerifiedNotification
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.notifications import SendConsumerResetPasswordEmail
 from apps.user.responses import UserProfileResponse
@@ -57,14 +58,18 @@ class ResendEmailverificationAPI(ConsumerAPIView):
 
 
 class UserLoginAPI(APIView):
+    throttle_scope = "login"
+
     def post(self, request):
         if request.user.is_authenticated:
             raise ValidationError(
                 {"detail": ErrorDetail(_("You are already logged in."))}
             )
         session = request.session
+
+        # Assign the 7 days expiration period
         if session:
-            session.set_expiry(settings.SESSION_INACTIVITY_EXPIRATION_DURATION)
+            session.set_expiry(60 * 60 * 24 * 7)
 
         service_response = self._run_services(request=request)
         if service_response:
@@ -184,7 +189,7 @@ class RequestResetPasswordAPI(APIView):
 
     def _run_services(self, request):
         service = RequestResetPassword(request=request, data=self.request_data)
-        service.handle()
+        return service.handle()
 
 
 class ApplyResetPasswordAPI(APIView):
@@ -199,9 +204,14 @@ class ApplyResetPasswordAPI(APIView):
 
 class VerifyEmailAPI(APIView):
     def post(self, request):
-        self._run_services()
+        self._run_services(request)
         return self.response()
 
-    def _run_services(self):
+    def _run_services(self, request):
         service = EmailVerification(data=self.request_data)
-        service.handle()
+        user = service.handle()
+        if user:
+            device_id = request.session.get("device_id")
+            SendEmailVerifiedNotification(
+                user_id=user.id, device_id=device_id
+            ).send()

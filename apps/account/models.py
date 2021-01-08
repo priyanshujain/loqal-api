@@ -3,12 +3,14 @@ from re import T
 
 from django.db import models
 from django.utils.translation import gettext as _
+from rest_framework.fields import ModelField
 
 from apps.account.options import (ConsumerAccountStatus,
                                   MerchantAccountCerficationStatus,
                                   MerchantAccountStatus)
+from apps.box.models import BoxFile
 from apps.user.models import User
-from db.models.abstract import AbstractBaseModel
+from db.models.abstract import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
 
@@ -86,6 +88,10 @@ class MerchantAccount(AbstractBaseModel):
             "Status for the merchant beneficial owner certified with dwolla."
         ),
     )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "merchant_account"
 
     def update_status(self, status, save=True):
         self.account_status = status
@@ -102,5 +108,28 @@ class MerchantAccount(AbstractBaseModel):
         if save:
             self.save()
 
+    def deactivate(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()
+
+    def activate(self, save=True):
+        self.is_active = True
+        if save:
+            self.save()
+
+
+class PaymentAccountOpeningConsent(BaseModel):
+    account = models.ForeignKey(
+        Account, on_delete=models.DO_NOTHING, editable=False
+    )
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, editable=False)
+    user_agent = models.TextField(editable=False)
+    ip_address = models.GenericIPAddressField(editable=False)
+    consent_timestamp = models.BigIntegerField(editable=False)
+    payment_term_document = models.ForeignKey(
+        BoxFile, on_delete=models.DO_NOTHING, editable=False
+    )
+
     class Meta:
-        db_table = "merchant_account"
+        db_table = "payment_account_opening_consent"

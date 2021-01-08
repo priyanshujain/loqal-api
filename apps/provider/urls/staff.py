@@ -3,7 +3,11 @@ from django.urls import path
 from apps.provider.views.staff import (ActivateTermsDocumentAPI,
                                        CreatePaymentProviderAPI,
                                        CreatePaymentProviderCredsAPI,
-                                       CreateTermDocumentAPI, ListTermsAPI,
+                                       CreateProviderWebhookAPI,
+                                       CreateTermDocumentAPI,
+                                       GetPaymentProviderCredsAPI,
+                                       ListProviderWebhookAPI, ListTermsAPI,
+                                       ListWebhookEventsAPI,
                                        ProviderLogoUploadAPI,
                                        RemoveTermDocumentAPI,
                                        UpdatePaymentProviderAPI,
@@ -31,6 +35,10 @@ urlpatterns = [
         UpdatePaymentProviderCredsAPI.as_view(),
     ),
     path(
+        "creds/<int:provider_id>/",
+        GetPaymentProviderCredsAPI.as_view(),
+    ),
+    path(
         "terms/create/",
         CreateTermDocumentAPI.as_view(),
     ),
@@ -45,5 +53,17 @@ urlpatterns = [
     path(
         "terms/",
         ListTermsAPI.as_view(),
+    ),
+    path(
+        "create-webhook/",
+        CreateProviderWebhookAPI.as_view(),
+    ),
+    path(
+        "active-webhooks/",
+        ListProviderWebhookAPI.as_view(),
+    ),
+    path(
+        "webhook/<int:webhook_id>/events/",
+        ListWebhookEventsAPI.as_view(),
     ),
 ]

@@ -25,6 +25,7 @@ class SubscribePushNotication(ServiceBase):
         else:
             user_device = self._factory_user_device(data)
         self.request.session["device_id"] = user_device.device_id
+        self.request.session.modified = True
         return user_device
 
     def _validate_data(self):

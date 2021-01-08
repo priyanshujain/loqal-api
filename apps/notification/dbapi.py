@@ -39,3 +39,7 @@ def get_device_by_id(user_id, device_id):
         )
     except UserDevice.DoesNotExist:
         return None
+
+
+def get_devices_by_user(user_id):
+    return UserDevice.objects.filter(user_id=user_id, active=True)

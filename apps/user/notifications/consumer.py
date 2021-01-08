@@ -23,7 +23,7 @@ class SendConsumerResetPasswordEmail(object):
             "path": f"{settings.CONSUMER_APP_WEB_BASE_URL}/reset-password?key={token}",
         }
         email_html = render_to_string(
-            "consumer_reset_password_email.html", render_data
+            "consumer_reset_password.html", render_data
         )
         send_email_async(
             (user.email), "Reset your loqal app password", email_html

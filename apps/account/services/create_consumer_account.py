@@ -117,7 +117,7 @@ class GenerateUsername(object):
     def generate(self):
         number = randint(11111, 99999)
         first_name_i = self.user.first_name[0].lower()
-        last_name_i = self.user.last_name[1].lower()
+        last_name_i = self.user.last_name[0].lower()
         return f"{number}@{first_name_i}{last_name_i}"
 
     def handle(self):
