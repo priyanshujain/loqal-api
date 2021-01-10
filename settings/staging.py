@@ -34,13 +34,13 @@ MERCHANT_APP_WEB_BASE_URL = "https://merchant-stag.payloqal.com"
 DEFAULT_FROM_EMAIL = "hello@payloqal.com"
 EMAIL_SENDER_NAME = "Loqal App Team"
 
-CSRF_TRUSTED_ORIGINS = [
-    "staff-stag.payloqal.com",
-    "merchant-stag.payloqal.com",
-    "website-stag.payloqal.com",
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     "staff-stag.payloqal.com",
+#     "merchant-stag.payloqal.com",
+#     "website-stag.payloqal.com",
+# ]
 
-SESSION_COOKIE_DOMAIN=".payloqal.com"
+# SESSION_COOKIE_DOMAIN=".payloqal.com"
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -50,7 +50,7 @@ SESSION_INACTIVITY_EXPIRATION_DURATION = 600
 
 
 
-# Remove 
+# Remove after app auth
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
 
@@ -70,4 +70,4 @@ SECURE_HSTS_SECONDS = 2592000
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-SECURE_REFERRER_POLICY = "same-origin"
+# SECURE_REFERRER_POLICY = "same-origin"
