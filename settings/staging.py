@@ -25,10 +25,10 @@ APP_NAME = "Loqal staging"
 
 
 # app config
-APP_BASE_URL = "https://merchant-dev.payloqal.com"
-API_BASE_URL = "https://api-dev.payloqal.com"
-CONSUMER_APP_WEB_BASE_URL = "https://website-dev.payloqal.com"
-MERCHANT_APP_WEB_BASE_URL = "https://merchant-dev.payloqal.com"
+APP_BASE_URL = "https://merchant-stag.payloqal.com"
+API_BASE_URL = "https://api-stag.payloqal.com"
+CONSUMER_APP_WEB_BASE_URL = "https://website-stag.payloqal.com"
+MERCHANT_APP_WEB_BASE_URL = "https://merchant-stag.payloqal.com"
 
 # Email configs.
 DEFAULT_FROM_EMAIL = "hello@payloqal.com"
@@ -49,6 +49,11 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_INACTIVITY_EXPIRATION_DURATION = 600
 
 
+
+# Remove 
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
 CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
     urllib.parse.quote(AWS_ACCESS_KEY_ID, safe=""),
     urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=""),
@@ -61,7 +66,7 @@ NUM_PROXIES = 2
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_SECONDS = 30
+SECURE_HSTS_SECONDS = 2592000
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"

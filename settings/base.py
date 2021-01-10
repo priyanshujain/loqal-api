@@ -67,6 +67,7 @@ INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "django_opentracing.OpenTracingMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "django_feature_policy.PermissionsPolicyMiddleware",
     "csp.middleware.CSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "config.middlewares.AddXCsrfMiddleware",
