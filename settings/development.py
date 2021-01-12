@@ -48,6 +48,11 @@ SESSION_COOKIE_AGE = 86400
 CSRF_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_SAMESITE = "Strict"
 
+
+SESSION_COOKIE_NAME = '__Secure-sessionid'
+CSRF_COOKIE_NAME = '__Secure-csrftoken'
+
+
 SESSION_COOKIE_DOMAIN=".payloqal.com"
 
 
@@ -66,3 +71,11 @@ MERCHANT_APP_WEB_BASE_URL = "https://merchant-dev.payloqal.com"
 # Email configs.
 DEFAULT_FROM_EMAIL = "donotreply@spotlightandcompany.com"
 EMAIL_SENDER_NAME = "Loqal App Team"
+
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_SECONDS = 2592000
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
