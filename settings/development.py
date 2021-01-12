@@ -25,6 +25,13 @@ CORS_ORIGIN_REGEX_WHITELIST += [
 ]
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "staff-dev.payloqal.com",
+    "merchant-dev.payloqal.com",
+    "website-dev.payloqal.com",
+]
+
+
 SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
 
 SPOTLIGHT_ADMIN_EMAIL = "priyanshu@spotlightandcompany.com"
@@ -38,10 +45,10 @@ SESSION_COOKIE_HTTPONLY = True
 
 SESSION_COOKIE_AGE = 86400
 
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Strict"
+SESSION_COOKIE_SAMESITE = "Strict"
 
-
+SESSION_COOKIE_DOMAIN=".payloqal.com"
 
 
 
