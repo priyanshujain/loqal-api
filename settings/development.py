@@ -26,6 +26,8 @@ CORS_ORIGIN_REGEX_WHITELIST += [
 
 
 CSRF_TRUSTED_ORIGINS = [
+    "localhost:3000",
+    "localhost:3001",
     "staff-dev.payloqal.com",
     "merchant-dev.payloqal.com",
     "website-dev.payloqal.com",
@@ -45,8 +47,8 @@ SESSION_COOKIE_HTTPONLY = True
 
 SESSION_COOKIE_AGE = 86400
 
-CSRF_COOKIE_SAMESITE = "Strict"
-SESSION_COOKIE_SAMESITE = "Strict"
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 
 
 SESSION_COOKIE_NAME = '__Secure-sessionid'
