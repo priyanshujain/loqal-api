@@ -43,6 +43,14 @@ class UpdateMerchantProfile(ServiceBase):
                 for category in categories
                 if category["category"] == category_name
             ]
+
+            is_primary = all(
+                [
+                    category["is_primary"]
+                    for category in categories
+                    if category["category"] == category_name
+                ]
+            )
             sub_categories = reduce(operator.concat, sub_categories)
             sub_categories = list(set(sub_categories))
             category = get_merchant_category_by_name(
@@ -53,10 +61,12 @@ class UpdateMerchantProfile(ServiceBase):
                     merchant_id=self.merchant_id,
                     category=category_name,
                     sub_categories=sub_categories,
+                    is_primary=is_primary,
                 )
             else:
                 update_merchant_category(
                     merchant_id=self.merchant_id,
                     category=category_name,
                     sub_categories=sub_categories,
+                    is_primary=is_primary,
                 )

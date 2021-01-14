@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
 from apps.box.dbapi import get_boxfile
+from apps.merchant import models
 from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
                                   MerchantOperationHours, MerchantProfile,
                                   ServiceAvailability)
@@ -20,12 +21,11 @@ __all__ = (
 
 
 class MerchantCategoryValidator(serializers.ModelSerializer):
+    is_primary = serializers.BooleanField(required=False, default=False)
+
     class Meta:
         model = MerchantCategory
-        fields = (
-            "category",
-            "sub_categories",
-        )
+        fields = ("category", "sub_categories", "is_primary")
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

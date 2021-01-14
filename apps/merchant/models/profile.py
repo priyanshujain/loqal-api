@@ -27,6 +27,7 @@ class MerchantCategory(AbstractBaseModel):
         MerchantAccount, on_delete=models.CASCADE, related_name="categories"
     )
     category = models.CharField(max_length=64)
+    is_primary = models.BooleanField(default=False)
     sub_categories = ArrayField(models.CharField(max_length=255))
 
     class Meta:

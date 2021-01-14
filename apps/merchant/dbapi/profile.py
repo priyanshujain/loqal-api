@@ -37,6 +37,7 @@ def create_merchant_profile(
         MerchantCategory.objects.create(
             merchant_id=merchant_id,
             category=category,
+            is_primary=True,
             sub_categories=[sub_category],
         )
         return profile
@@ -232,18 +233,31 @@ def get_merchant_category_by_name(merchant_id, category):
         return None
 
 
-def create_merchant_category(merchant_id, category, sub_categories):
+def create_merchant_category(
+    merchant_id, category, sub_categories, is_primary=False
+):
+    if is_primary:
+        MerchantCategory.objects.filter(merchant_id=merchant_id).update(
+            is_primary=False
+        )
     try:
         return MerchantCategory.objects.create(
             merchant_id=merchant_id,
             category=category,
             sub_categories=sub_categories,
+            is_primary=is_primary,
         )
     except IntegrityError:
         return None
 
 
-def update_merchant_category(merchant_id, category, sub_categories):
+def update_merchant_category(
+    merchant_id, category, sub_categories, is_primary=False
+):
+    if is_primary:
+        MerchantCategory.objects.filter(merchant_id=merchant_id).update(
+            is_primary=False
+        )
     return MerchantCategory.objects.filter(
         merchant_id=merchant_id, category=category
-    ).update(sub_categories=sub_categories)
+    ).update(sub_categories=sub_categories, is_primary=is_primary)
