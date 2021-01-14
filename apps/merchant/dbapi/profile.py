@@ -1,11 +1,25 @@
+import re
+from os import close
+
 from django.db.utils import IntegrityError
 
-from apps.merchant.models import MerchantProfile
+from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
+                                  MerchantProfile, ServiceAvailability)
 
 __all__ = (
     "create_merchant_profile",
     "update_merchant_profile",
     "get_merchants_by_category",
+    "get_merchant_operation_hours",
+    "update_merchant_operation_hour_by_day",
+    "get_merchant_operation_hour_by_day",
+    "create_merchant_operation_hour_by_day",
+    "get_merchant_code_protocols",
+    "update_merchant_code_protocols",
+    "create_merchant_code_protocols",
+    "get_merchant_service_availability",
+    "update_merchant_service_availability",
+    "create_merchant_service_availability",
 )
 
 
@@ -78,3 +92,129 @@ def get_merchants_by_category(category):
     return [
         merchant_profile.merchant for merchant_profile in merchant_profile_qs
     ]
+
+
+def get_merchant_operation_hours(merchant_id):
+    return MerchantOperationHours.objects.filter(merchant_id=merchant_id)
+
+
+def get_merchant_operation_hour_by_day(merchant_id, day):
+    try:
+        return MerchantOperationHours.objects.get(
+            merchant_id=merchant_id, day=day
+        )
+    except MerchantOperationHours.DoesNotExist:
+        return None
+
+
+def update_merchant_operation_hour_by_day(
+    merchant_id, day, open_time, close_time, is_closed
+):
+    return MerchantOperationHours.objects.filter(
+        merchant_id=merchant_id, day=day
+    ).update(open_time=open_time, close_time=close_time, is_closed=is_closed)
+
+
+def create_merchant_operation_hour_by_day(
+    merchant_id, day, open_time, close_time, is_closed
+):
+    try:
+        return MerchantOperationHours.objects.create(
+            merchant_id=merchant_id,
+            day=day,
+            open_time=open_time,
+            close_time=close_time,
+            is_closed=is_closed,
+        )
+    except IntegrityError:
+        return True
+
+
+def get_merchant_code_protocols(merchant_id):
+    try:
+        return CodesAndProtocols.objects.get(merchant_id=merchant_id)
+    except CodesAndProtocols.DoesNotExist:
+        return None
+
+
+def update_merchant_code_protocols(
+    merchant_id,
+    contactless_payments,
+    mask_required,
+    sanitizer_provided,
+    ourdoor_seating,
+    cleaning_frequency,
+    last_cleaned_at,
+):
+    return CodesAndProtocols.objects.filter(merchant_id=merchant_id).update(
+        contactless_payments=contactless_payments,
+        mask_required=mask_required,
+        sanitizer_provided=sanitizer_provided,
+        ourdoor_seating=ourdoor_seating,
+        cleaning_frequency=cleaning_frequency,
+        last_cleaned_at=last_cleaned_at,
+    )
+
+
+def create_merchant_code_protocols(
+    merchant_id,
+    contactless_payments,
+    mask_required,
+    sanitizer_provided,
+    ourdoor_seating,
+    cleaning_frequency,
+    last_cleaned_at,
+):
+    try:
+        return CodesAndProtocols.objects.create(
+            merchant_id=merchant_id,
+            contactless_payments=contactless_payments,
+            mask_required=mask_required,
+            sanitizer_provided=sanitizer_provided,
+            ourdoor_seating=ourdoor_seating,
+            cleaning_frequency=cleaning_frequency,
+            last_cleaned_at=last_cleaned_at,
+        )
+    except IntegrityError:
+        return True
+
+
+def get_merchant_service_availability(merchant_id):
+    try:
+        return ServiceAvailability.objects.get(merchant_id=merchant_id)
+    except ServiceAvailability.DoesNotExist:
+        return None
+
+
+def update_merchant_service_availability(
+    merchant_id,
+    curbside_pickup,
+    delivery,
+    takeout,
+    sitting_dining,
+):
+    return ServiceAvailability.objects.filter(merchant_id=merchant_id).update(
+        curbside_pickup=curbside_pickup,
+        delivery=delivery,
+        takeout=takeout,
+        sitting_dining=sitting_dining,
+    )
+
+
+def create_merchant_service_availability(
+    merchant_id,
+    curbside_pickup,
+    delivery,
+    takeout,
+    sitting_dining,
+):
+    try:
+        return ServiceAvailability.objects.create(
+            merchant_id=merchant_id,
+            curbside_pickup=curbside_pickup,
+            delivery=delivery,
+            takeout=takeout,
+            sitting_dining=sitting_dining,
+        )
+    except IntegrityError:
+        return True

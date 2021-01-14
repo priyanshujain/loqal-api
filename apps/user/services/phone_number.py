@@ -209,7 +209,6 @@ class EnrollSmsAuthenticator(object):
             else:
                 return False
 
-
         if interface.validate_otp(otp):
             self._enroll_interface(interface)
             return True

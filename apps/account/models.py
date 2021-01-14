@@ -73,8 +73,10 @@ class ConsumerAccount(AbstractBaseModel):
 
 
 class MerchantAccount(AbstractBaseModel):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
-    company_email = models.CharField(max_length=255)
+    account = models.OneToOneField(
+        Account, on_delete=models.CASCADE, null=True, blank=True
+    )
+    company_email = models.CharField(max_length=255, blank=True)
     account_status = ChoiceEnumField(
         enum_type=MerchantAccountStatus,
         default=MerchantAccountStatus.PENDING,

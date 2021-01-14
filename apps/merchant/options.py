@@ -7,6 +7,8 @@ __all__ = (
     "MemberType",
     "FeatureAcessTypes",
     "AllowedFeatureAcessTypes",
+    "BusinessDayType",
+    "CleaningFrequencyType",
 )
 
 
@@ -96,3 +98,20 @@ class BusinessDocumentType(ChoiceCharEnum):
     DRIVER_LICENSE = "driver_license", _("Driver’s License")
     US_PASSPORT = "us_passport", _("US Passport")
     NOT_APPLICABLE = "not_applicable", _("Not Applicable")
+
+
+class BusinessDayType(ChoiceCharEnum):
+    MONDAY = "mon", _("Monday")
+    TUESDAY = "tue", _("Tuesday")
+    WEDNESDAY = "wed", _("Wednesday")
+    THURSDAY = "thu", _("Thursday")
+    FRIDAY = "fri", _("Friday")
+    SATURDAY = "sat", _("Saturday")
+    SUNDAY = "sun", _("Sunday")
+
+
+class CleaningFrequencyType(ChoiceCharEnum):
+    DAILY = "daily", _("Daily")
+    TWICE_A_DAY = "twice_a_day", _("Twice a day")
+    EVERY_FOUR_HOURS = "every_four_hours", _("Every 4 hours")
+    NOT_PROVIDED = "not_provided", _("Not provided")

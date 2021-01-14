@@ -10,6 +10,7 @@ class MerchantAccountStatus(ChoiceEnum):
     RETRY = 3, _("Retry")
     SUSPENDED = 4, _("Suspended")
     DOCUMENT_REVIEW_PENDING = 5, _("Document Review Pending")
+    NON_SIGNED_UP = 6, _("Non Signed Up")
 
 
 class MerchantAccountCerficationStatus(ChoiceEnum):

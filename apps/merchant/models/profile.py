@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
 from django.utils.translation import gettext as _
@@ -5,7 +7,9 @@ from django.utils.translation import gettext as _
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
 from apps.merchant.constants import MERCHANT_CATEGORIES
+from apps.merchant.options import BusinessDayType, CleaningFrequencyType
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceCharEnumField
 from db.postgres.fields import ArrayField
 
 __all__ = (
@@ -27,8 +31,19 @@ class MerchantProfile(AbstractBaseModel):
         max_length=64,
         default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"],
     )
-    hero_image = models.ForeignKey(
-        BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
+    background_file = models.ForeignKey(
+        BoxFile,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="merchant_background_file",
+    )
+    avatar_file = models.ForeignKey(
+        BoxFile,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="merchant_avatar_file",
     )
     address = models.JSONField()
     neighborhood = models.CharField(
@@ -73,10 +88,17 @@ class MerchantProfile(AbstractBaseModel):
 
 class MerchantOperationHours(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
-    day = models.CharField(max_length=32)
-    open_time = models.TimeField()
-    close_time = models.TimeField()
+    day = ChoiceCharEnumField(max_length=3, enum_type=BusinessDayType)
+    open_time = models.TimeField(null=True)
+    close_time = models.TimeField(null=True)
     is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "merchant_operation_hours"
+        unique_together = (
+            "merchant",
+            "day",
+        )
 
 
 class CodesAndProtocols(AbstractBaseModel):
@@ -85,7 +107,12 @@ class CodesAndProtocols(AbstractBaseModel):
     mask_required = models.BooleanField(default=False)
     sanitizer_provided = models.BooleanField(default=False)
     ourdoor_seating = models.BooleanField(default=False)
-    last_cleaned_at = models.DateTimeField(auto_now=True)
+    cleaning_frequency = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=CleaningFrequencyType,
+        default=CleaningFrequencyType.NOT_PROVIDED,
+    )
+    last_cleaned_at = models.DateTimeField(null=True)
 
     class Meta:
         db_table = "merchant_codes_and_protocols"
