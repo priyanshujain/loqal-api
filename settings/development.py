@@ -25,13 +25,13 @@ CORS_ORIGIN_REGEX_WHITELIST += [
 ]
 
 
-CSRF_TRUSTED_ORIGINS = [
-    "localhost:3000",
-    "localhost:3001",
-    "staff-dev.payloqal.com",
-    "merchant-dev.payloqal.com",
-    "website-dev.payloqal.com",
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     "localhost:3000",
+#     "localhost:3001",
+#     "staff-dev.payloqal.com",
+#     "merchant-dev.payloqal.com",
+#     "website-dev.payloqal.com",
+# ]
 
 
 SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
@@ -57,9 +57,6 @@ CSRF_COOKIE_NAME = '__Secure-csrftoken'
 
 SESSION_COOKIE_DOMAIN=".payloqal.com"
 
-
-
-SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
 
 NUM_PROXIES = 2
 
