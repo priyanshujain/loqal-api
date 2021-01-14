@@ -31,7 +31,6 @@ class MerchantCodesProtocolsResponse(serializers.ModelSerializer):
     class Meta:
         model = CodesAndProtocols
         fields = (
-            "contactless_payments",
             "mask_required",
             "sanitizer_provided",
             "outdoor_seating",

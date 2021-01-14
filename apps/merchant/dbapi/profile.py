@@ -52,7 +52,6 @@ def update_merchant_profile(
     address,
     background_file_id=None,
     avatar_file_id=None,
-    neighborhood="",
     website="",
     facebook_page="",
     instagram_page="",
@@ -75,7 +74,6 @@ def update_merchant_profile(
         address=address,
         background_file_id=background_file_id,
         avatar_file_id=avatar_file_id,
-        neighborhood=neighborhood,
         website=website,
         facebook_page=facebook_page,
         instagram_page=instagram_page,
@@ -143,7 +141,6 @@ def get_merchant_code_protocols(merchant_id):
 
 def update_merchant_code_protocols(
     merchant_id,
-    contactless_payments,
     mask_required,
     sanitizer_provided,
     ourdoor_seating,
@@ -151,7 +148,6 @@ def update_merchant_code_protocols(
     last_cleaned_at,
 ):
     return CodesAndProtocols.objects.filter(merchant_id=merchant_id).update(
-        contactless_payments=contactless_payments,
         mask_required=mask_required,
         sanitizer_provided=sanitizer_provided,
         ourdoor_seating=ourdoor_seating,
@@ -162,7 +158,6 @@ def update_merchant_code_protocols(
 
 def create_merchant_code_protocols(
     merchant_id,
-    contactless_payments,
     mask_required,
     sanitizer_provided,
     ourdoor_seating,
@@ -172,7 +167,6 @@ def create_merchant_code_protocols(
     try:
         return CodesAndProtocols.objects.create(
             merchant_id=merchant_id,
-            contactless_payments=contactless_payments,
             mask_required=mask_required,
             sanitizer_provided=sanitizer_provided,
             ourdoor_seating=ourdoor_seating,

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0036_auto_20210114_1335'),
+        ("merchant", "0036_auto_20210114_1335"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='merchantcategory',
-            name='is_primary',
+            model_name="merchantcategory",
+            name="is_primary",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -59,11 +59,6 @@ class MerchantProfile(AbstractBaseModel):
         related_name="merchant_avatar_file",
     )
     address = models.JSONField()
-    neighborhood = models.CharField(
-        max_length=128,
-        blank=True,
-        help_text=_("Ex. Navy Yard"),
-    )
     website = models.URLField(blank=True)
     facebook_page = models.URLField(blank=True)
     instagram_page = models.URLField(blank=True)
@@ -128,7 +123,6 @@ class MerchantOperationHours(AbstractBaseModel):
 
 class CodesAndProtocols(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
-    contactless_payments = models.BooleanField(default=False)
     mask_required = models.BooleanField(default=False)
     sanitizer_provided = models.BooleanField(default=False)
     outdoor_seating = models.BooleanField(default=False)
@@ -144,6 +138,7 @@ class CodesAndProtocols(AbstractBaseModel):
 
 
 class ServiceAvailability(AbstractBaseModel):
+    # Add parking/ valet to the list
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     curbside_pickup = models.BooleanField(default=False)
     delivery = models.BooleanField(default=False)

@@ -129,7 +129,6 @@ class CodesAndProtocolsValidator(serializers.ModelSerializer):
     class Meta:
         model = CodesAndProtocols
         fields = (
-            "contactless_payments",
             "mask_required",
             "sanitizer_provided",
             "ourdoor_seating",
