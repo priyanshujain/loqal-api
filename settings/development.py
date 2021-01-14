@@ -52,7 +52,7 @@ SESSION_COOKIE_SAMESITE = "None"
 
 
 SESSION_COOKIE_NAME = '__Secure-sessionid'
-CSRF_COOKIE_NAME = '__Secure-csrftoken'
+# CSRF_COOKIE_NAME = '__Secure-csrftoken'
 
 
 SESSION_COOKIE_DOMAIN=".payloqal.com"
