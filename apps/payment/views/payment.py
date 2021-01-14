@@ -7,6 +7,8 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
                                 get_recent_store_orders)
+from apps.payment.notifications import (SendNewPaymentNotification,
+                                        SendRefundNotification)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
@@ -31,6 +33,10 @@ class CreatePaymentAPI(ConsumerAPIView):
             merchant_payment.transaction
         ).data
         transaction_data["tip_amount"] = merchant_payment.tip_amount
+        SendNewPaymentNotification(
+            merchant_id=merchant_payment.payment.order.merchant.id,
+            data=transaction_data,
+        ).send()
         return self.response(transaction_data, status=201)
 
 
@@ -78,7 +84,12 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        return self.response(TransactionResponse(transaction).data)
+        data = TransactionResponse(transaction).data
+        SendNewPaymentNotification(
+            merchant_id=transaction.payment.order.merchant.id,
+            data=data,
+        ).send()
+        return self.response(data)
 
 
 class RejectPaymentRequestAPI(ConsumerAPIView):
@@ -116,9 +127,11 @@ class CreateRefundPaymentAPI(MerchantAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        return self.response(
-            RefundHistoryResponse(refund_payment).data, status=201
-        )
+        data = RefundHistoryResponse(refund_payment).data
+        SendRefundNotification(
+            user_id=refund_payment.payment.order.consumer.user.id, data=data
+        ).send()
+        return self.response(data, status=201)
 
 
 class RecentStoresAPI(ConsumerAPIView):
