@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0037_merchantcategory_is_primary'),
+        ("merchant", "0037_merchantcategory_is_primary"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='codesandprotocols',
-            name='contactless_payments',
+            model_name="codesandprotocols",
+            name="contactless_payments",
         ),
     ]
