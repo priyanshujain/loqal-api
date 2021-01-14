@@ -1,10 +1,8 @@
-import re
-from os import close
-
 from django.db.utils import IntegrityError
 
-from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
-                                  MerchantProfile, ServiceAvailability)
+from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
+                                  MerchantOperationHours, MerchantProfile,
+                                  ServiceAvailability)
 
 __all__ = (
     "create_merchant_profile",
@@ -20,6 +18,9 @@ __all__ = (
     "get_merchant_service_availability",
     "update_merchant_service_availability",
     "create_merchant_service_availability",
+    "get_merchant_category_by_name",
+    "create_merchant_category",
+    "update_merchant_category",
 )
 
 
@@ -27,7 +28,7 @@ def create_merchant_profile(
     merchant_id, name, address, category, sub_category, phone_number
 ):
     try:
-        return MerchantProfile.objects.create(
+        profile = MerchantProfile.objects.create(
             merchant_id=merchant_id,
             full_name=name,
             address=address,
@@ -35,6 +36,12 @@ def create_merchant_profile(
             sub_category=sub_category,
             phone_number=phone_number,
         )
+        MerchantCategory.objects.create(
+            merchant_id=merchant_id,
+            category=category,
+            sub_categories=[sub_category],
+        )
+        return profile
     except IntegrityError:
         return None
 
@@ -44,9 +51,8 @@ def update_merchant_profile(
     about,
     full_name,
     address,
-    category,
-    sub_category,
-    hero_image=None,
+    background_file_id=None,
+    avatar_file_id=None,
     neighborhood="",
     website="",
     facebook_page="",
@@ -68,9 +74,8 @@ def update_merchant_profile(
         about=about,
         full_name=full_name,
         address=address,
-        category=category,
-        sub_category=sub_category,
-        hero_image=hero_image,
+        background_file_id=background_file_id,
+        avatar_file_id=avatar_file_id,
         neighborhood=neighborhood,
         website=website,
         facebook_page=facebook_page,
@@ -218,3 +223,29 @@ def create_merchant_service_availability(
         )
     except IntegrityError:
         return True
+
+
+def get_merchant_category_by_name(merchant_id, category):
+    try:
+        return MerchantCategory.objects.get(
+            merchant_id=merchant_id, category=category
+        )
+    except MerchantCategory.DoesNotExist:
+        return None
+
+
+def create_merchant_category(merchant_id, category, sub_categories):
+    try:
+        return MerchantCategory.objects.create(
+            merchant_id=merchant_id,
+            category=category,
+            sub_categories=sub_categories,
+        )
+    except IntegrityError:
+        return None
+
+
+def update_merchant_category(merchant_id, category, sub_categories):
+    return MerchantCategory.objects.filter(
+        merchant_id=merchant_id, category=category
+    ).update(sub_categories=sub_categories)

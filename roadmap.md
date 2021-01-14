@@ -26,3 +26,7 @@
 
 - add ISO4217 validator
 - Do not allow some special characters like `/` in loqal ID, only allow `@`, `#`, `.` etc.
+
+### DB
+
+- Make editable false on foreign keys

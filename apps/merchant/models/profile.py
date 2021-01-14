@@ -1,4 +1,5 @@
 from collections import defaultdict
+from enum import unique
 
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
@@ -17,20 +18,29 @@ __all__ = (
     "MerchantOperationHours",
     "CodesAndProtocols",
     "ServiceAvailability",
+    "MerchantCategory",
 )
+
+
+class MerchantCategory(AbstractBaseModel):
+    merchant = models.ForeignKey(
+        MerchantAccount, on_delete=models.CASCADE, related_name="categories"
+    )
+    category = models.CharField(max_length=64)
+    sub_categories = ArrayField(models.CharField(max_length=255))
+
+    class Meta:
+        db_table = "merchant_category"
+        unique_together = (
+            "merchant",
+            "category",
+        )
 
 
 class MerchantProfile(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=256)
     about = models.TextField(blank=True)
-    category = models.CharField(
-        max_length=64, default=MERCHANT_CATEGORIES[0]["category_slug"]
-    )
-    sub_category = models.CharField(
-        max_length=64,
-        default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"],
-    )
     background_file = models.ForeignKey(
         BoxFile,
         on_delete=models.DO_NOTHING,

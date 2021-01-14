@@ -1,7 +1,9 @@
 from api import serializers
 from apps.account.models import MerchantAccount
-from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
-                                  MerchantProfile, ServiceAvailability)
+from apps.merchant.constants import categories
+from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
+                                  MerchantOperationHours, MerchantProfile,
+                                  ServiceAvailability)
 
 __all__ = (
     "MerchantProfileResponse",
@@ -11,10 +13,29 @@ __all__ = (
 )
 
 
+class MerchantCategoryResponse(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantCategory
+        fields = (
+            "category",
+            "sub_categories",
+        )
+
+
 class MerchantProfileResponse(serializers.ModelSerializer):
+    avatar_file_id = serializers.IntegerField(
+        source="avatar_file.id", read_only=True
+    )
+    background_file_id = serializers.IntegerField(
+        source="background_file.id", read_only=True
+    )
+    categories = MerchantCategoryResponse(
+        source="merchant.categories", many=True, read_only=True
+    )
+
     class Meta:
         model = MerchantProfile
-        exclude = ("merchant",)
+        exclude = ("merchant", "avatar_file", "background_file")
 
 
 class MerchantOperationHoursResponse(serializers.ModelSerializer):

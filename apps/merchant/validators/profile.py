@@ -1,6 +1,14 @@
+from django.utils.translation import gettext as _
+
 from api import serializers
-from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
-                                  MerchantProfile, ServiceAvailability)
+from api.exceptions import ErrorDetail, ValidationError
+from apps.box.dbapi import get_boxfile
+from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
+                                  MerchantOperationHours, MerchantProfile,
+                                  ServiceAvailability)
+from apps.merchant.models.profile import MerchantCategory
+from apps.merchant.shortcuts import (validate_profile_image_type,
+                                     validate_subcategory)
 
 __all__ = (
     "MerchantProfileValidator",
@@ -10,7 +18,38 @@ __all__ = (
 )
 
 
+class MerchantCategoryValidator(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantCategory
+        fields = (
+            "category",
+            "sub_categories",
+        )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        category = attrs["category"]
+        sub_categories = attrs["sub_categories"]
+
+        for sub_category in sub_categories:
+            if not validate_subcategory(
+                category=category, sub_category=sub_category
+            ):
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            _(f"Invalid category {category}/ {sub_category}.")
+                        )
+                    }
+                )
+        return attrs
+
+
 class MerchantProfileValidator(serializers.ModelSerializer):
+    categories = serializers.ListField(required=True, allow_empty=False)
+    background_file_id = serializers.IntegerField(required=False)
+    avatar_file_id = serializers.IntegerField(required=False)
+
     class Meta:
         model = MerchantProfile
         exclude = (
@@ -23,7 +62,55 @@ class MerchantProfileValidator(serializers.ModelSerializer):
             "created_by",
             "updated_by",
             "deleted_by",
+            "background_file",
+            "avatar_file",
         )
+
+    def _validate_file(self, boxfile_id, field_key):
+        boxfile = get_boxfile(boxfile_id=boxfile_id)
+        if not boxfile:
+            raise ValidationError(
+                {field_key: [ErrorDetail(_("Given file is not valid."))]}
+            )
+        if boxfile.in_use:
+            raise ValidationError(
+                {
+                    field_key: [
+                        ErrorDetail(_("Given file is already being used."))
+                    ]
+                }
+            )
+        if not validate_profile_image_type(boxfile.content_type):
+            raise ValidationError(
+                {field_key: [ErrorDetail(_("Given file type is not valid."))]}
+            )
+        if boxfile.document_type != "merchant_profile":
+            raise ValidationError(
+                {
+                    field_key: [
+                        ErrorDetail(
+                            _("Document type should be merchant_profile.")
+                        )
+                    ]
+                }
+            )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        categories = attrs["categories"]
+        for category in categories:
+            MerchantCategoryValidator(data=category).is_valid(
+                raise_exception=True
+            )
+
+        avatar_file_id = attrs.get("avatar_file_id")
+        if avatar_file_id:
+            self._validate_file(avatar_file_id, "avatar_file_id")
+        background_file_id = attrs.get("background_file_id")
+        if background_file_id:
+            self._validate_file(background_file_id, "background_file_id")
+
+        return attrs
 
 
 class MerchantOperationHoursValidator(serializers.ModelSerializer):

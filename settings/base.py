@@ -256,6 +256,7 @@ REST_FRAMEWORK = {
         "anon_sustained": "100/day",
         "login": "10/min",
     },
+    "NON_FIELD_ERRORS_KEY": "detail",
 }
 
 

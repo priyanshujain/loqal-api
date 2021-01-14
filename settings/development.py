@@ -51,11 +51,13 @@ CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
 
 
-SESSION_COOKIE_NAME = '__Secure-sessionid'
+SESSION_COOKIE_NAME = "__Secure-sessionid"
+
+# TODO: it's not working and throwing error
 # CSRF_COOKIE_NAME = '__Secure-csrftoken'
 
 
-SESSION_COOKIE_DOMAIN=".payloqal.com"
+SESSION_COOKIE_DOMAIN = ".payloqal.com"
 
 
 NUM_PROXIES = 2

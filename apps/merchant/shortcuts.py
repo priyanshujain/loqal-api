@@ -1,3 +1,5 @@
+import re
+
 from apps.merchant.constants import MERCHANT_CATEGORIES
 
 
@@ -16,3 +18,7 @@ def validate_category(category):
         if merchant_category["category_slug"] == category:
             return True
     return False
+
+
+def validate_profile_image_type(content_type):
+    return "image" in content_type
