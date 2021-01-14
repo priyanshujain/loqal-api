@@ -210,10 +210,6 @@ MERCHANT_CATEGORIES = [
                 "slug": "stationery-printing-and-writing-paper",
             },
             {
-                "name": "Video games and systems",
-                "slug": "video-games-and-systems",
-            },
-            {
                 "name": "Arts and crafts",
                 "slug": "arts-and-crafts",
             },
@@ -278,7 +274,6 @@ MERCHANT_CATEGORIES = [
                 "name": "Insurance - life and annuity",
                 "slug": "insurance-life-and-annuity",
             },
-            {"name": "Other medical care", "slug": "medical-care"},
         ],
     },
     {
