@@ -57,6 +57,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
     )
+    amount = serializers.CharField(read_only=True)
 
     class Meta:
         model = Transaction
