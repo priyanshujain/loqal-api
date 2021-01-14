@@ -10,13 +10,13 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
 from apps.payment.notifications import (SendNewPaymentNotification,
                                         SendRefundNotification)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
                                     RefundHistoryResponse,
                                     TransactionDetailsResponse,
                                     TransactionHistoryResponse,
-                                    TransactionResponse,
-                                    MerchantTransactionHistoryResponse)
+                                    TransactionResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
@@ -36,7 +36,9 @@ class CreatePaymentAPI(ConsumerAPIView):
         transaction_data["tip_amount"] = merchant_payment.tip_amount
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
-            data=MerchantTransactionHistoryResponse(merchant_payment.transaction).data,
+            data=MerchantTransactionHistoryResponse(
+                merchant_payment.transaction
+            ).data,
         ).send()
         return self.response(transaction_data, status=201)
 
@@ -88,7 +90,7 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         data = TransactionResponse(transaction).data
         SendNewPaymentNotification(
             merchant_id=transaction.payment.order.merchant.id,
-            data=data,
+            data=MerchantTransactionHistoryResponse(transaction).data,
         ).send()
         return self.response(data)
 
