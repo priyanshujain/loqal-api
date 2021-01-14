@@ -6,8 +6,13 @@ from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.responses import MerchantDetailsResponse
 from apps.merchant.responses import \
     MerchantDetailsResponse as MerchantFullDetailsResponse
+from apps.merchant.services import StoreSearch
 
-__all__ = ("MerchantBasicDetailsAPI",)
+__all__ = (
+    "MerchantBasicDetailsAPI",
+    "MerchantDetailsAPI",
+    "MerchantSearchAPI",
+)
 
 
 class MerchantBasicDetailsAPI(ConsumerAPIView):
@@ -40,3 +45,11 @@ class MerchantDetailsAPI(ConsumerAPIView):
         return self.response(
             MerchantFullDetailsResponse(merchant_account).data
         )
+
+
+class MerchantSearchAPI(ConsumerAPIView):
+    def get(self, request):
+        merchants = StoreSearch(
+            data=self.request_data, consumer=request.consumer_account
+        ).handle()
+        return self.response(merchants)

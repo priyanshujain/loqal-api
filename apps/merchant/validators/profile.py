@@ -15,6 +15,7 @@ __all__ = (
     "MerchantOperationHoursValidator",
     "CodesAndProtocolsValidator",
     "ServiceAvailabilityValidator",
+    "StoreSearchValidator",
 )
 
 
@@ -151,3 +152,10 @@ class ServiceAvailabilityValidator(serializers.ModelSerializer):
             "takeout",
             "sitting_dining",
         )
+
+
+class StoreSearchValidator(serializers.ValidationSerializer):
+    category = serializers.CharField(required=False)
+    keyword = serializers.CharField(required=False)
+    latitude = serializers.FloatField(required=False)
+    longitude = serializers.FloatField(required=False)

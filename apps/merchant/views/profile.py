@@ -40,7 +40,7 @@ class GetMerchantProfileAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
         try:
-            merchant_profile = merchant_account.merchantprofile
+            merchant_profile = merchant_account.profile
         except AttributeError:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid merchant profile."))}

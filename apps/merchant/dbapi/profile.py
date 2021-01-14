@@ -32,8 +32,6 @@ def create_merchant_profile(
             merchant_id=merchant_id,
             full_name=name,
             address=address,
-            category=category,
-            sub_category=sub_category,
             phone_number=phone_number,
         )
         MerchantCategory.objects.create(

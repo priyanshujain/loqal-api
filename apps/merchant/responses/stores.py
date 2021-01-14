@@ -3,7 +3,7 @@ from apps.account.models import MerchantAccount
 from apps.merchant.models import (CodesAndProtocols, MerchantOperationHours,
                                   MerchantProfile, ServiceAvailability)
 
-__all__ = ("CategoryMerchantListResponse",)
+__all__ = ("CategoryMerchantListResponse", "StoreSearchResponse")
 
 
 class MerchantBasicProfileResponse(serializers.ModelSerializer):
@@ -51,9 +51,7 @@ class MerchantServicesResponse(serializers.ModelSerializer):
 
 
 class CategoryMerchantListResponse(serializers.ModelSerializer):
-    profile = MerchantBasicProfileResponse(
-        source="merchantprofile", read_only=True
-    )
+    profile = MerchantBasicProfileResponse(source="profile", read_only=True)
     hours = MerchantOperatingHoursResponse(
         source="merchantoperationhours", read_only=True
     )
@@ -71,4 +69,34 @@ class CategoryMerchantListResponse(serializers.ModelSerializer):
             "hours",
             "codes_and_protocols",
             "services",
+        )
+
+
+class StoreSearchResponse(serializers.ModelSerializer):
+    uid = serializers.UUIDField(source="u_id", read_only=True)
+    full_name = serializers.CharField(
+        source="profile.full_name", read_only=True
+    )
+    about = serializers.CharField(source="profile.about", read_only=True)
+    address = serializers.JSONField(source="profile.address", read_only=True)
+    codes_and_protocols = MerchantCodesProtocolsResponse(
+        source="codesandprotocols", read_only=True
+    )
+    services = MerchantServicesResponse(
+        source="serviceavailability", read_only=True
+    )
+    hours = MerchantOperatingHoursResponse(
+        source="merchantoperationhours", read_only=True
+    )
+
+    class Meta:
+        model = MerchantAccount
+        fields = (
+            "uid",
+            "full_name",
+            "about",
+            "address",
+            "codes_and_protocols",
+            "services",
+            "hours",
         )

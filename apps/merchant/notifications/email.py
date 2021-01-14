@@ -16,7 +16,7 @@ class MemberSignupInviteEmail:
         first_name = self.invite.first_name
 
         try:
-            company_name = self.invite.merchant.merchantprofile.full_name
+            company_name = self.invite.merchant.profile.full_name
         except AttributeError:
             company_name = "your company's loqal account"
         # Sending invited client email.

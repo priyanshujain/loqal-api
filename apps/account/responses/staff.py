@@ -8,7 +8,7 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
         source="account_status.label", read_only=True
     )
     full_name = serializers.CharField(
-        source="merchantprofile.full_name", read_only=True
+        source="profile.full_name", read_only=True
     )
     uid = serializers.UUIDField(source="u_id", read_only=True)
     account_id = serializers.IntegerField(source="account.id", read_only=True)

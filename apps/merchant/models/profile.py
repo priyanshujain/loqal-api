@@ -1,5 +1,4 @@
-from collections import defaultdict
-from enum import unique
+import math
 
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
@@ -9,6 +8,7 @@ from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
 from apps.merchant.constants import MERCHANT_CATEGORIES
 from apps.merchant.options import BusinessDayType, CleaningFrequencyType
+from apps.merchant.shortcuts import coordinate_distance
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.postgres.fields import ArrayField
@@ -38,7 +38,9 @@ class MerchantCategory(AbstractBaseModel):
 
 
 class MerchantProfile(AbstractBaseModel):
-    merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
+    merchant = models.OneToOneField(
+        MerchantAccount, on_delete=models.CASCADE, related_name="profile"
+    )
     full_name = models.CharField(max_length=256)
     about = models.TextField(blank=True)
     background_file = models.ForeignKey(
@@ -95,6 +97,18 @@ class MerchantProfile(AbstractBaseModel):
     class Meta:
         db_table = "merchant_profile"
 
+    def distance(self, latitude, longitude):
+        if not self.address:
+            return 0
+        address_lat = self.address.get("latitude")
+        address_lon = self.address.get("longitude")
+
+        if not (address_lon and address_lat):
+            return None
+        return math.fabs(
+            coordinate_distance(latitude, longitude, address_lat, address_lon)
+        )
+
 
 class MerchantOperationHours(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
@@ -116,7 +130,7 @@ class CodesAndProtocols(AbstractBaseModel):
     contactless_payments = models.BooleanField(default=False)
     mask_required = models.BooleanField(default=False)
     sanitizer_provided = models.BooleanField(default=False)
-    ourdoor_seating = models.BooleanField(default=False)
+    outdoor_seating = models.BooleanField(default=False)
     cleaning_frequency = ChoiceCharEnumField(
         max_length=32,
         enum_type=CleaningFrequencyType,
