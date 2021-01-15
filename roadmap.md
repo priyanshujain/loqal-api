@@ -7,7 +7,7 @@
 - Email verification mandatory on Merchant APIs and consumer payment APIs
 - Add conditions for disabled merchant/ user
 - Build feature for disabling a user account on admin
-
+- Show request ID on 500 error
 
 ## Medium term
 
@@ -16,6 +16,18 @@
 - Handle all the DB errors not just by catching exception but by resloving it to an error
 - https://github.com/jazzband/django-defender
 - Add error logging 
+- Error formatting 
+```
+str     message:            A developer-friendly error message. Not
+                            safe for programmatic use.
+str     type:               A broad categorization of the error,
+                            corresponding to the error class.
+str     code:               An error code for programmatic use.
+str     display_message:    A user-friendly error message. Not safe
+                            for programmatic use. May be None.
+list    causes:             A list of reasons explaining why the
+                            error happened.
+```
 
 
 ## Long terms
