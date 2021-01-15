@@ -1,6 +1,5 @@
 from django.utils.translation import gettext as _
 
-import api
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
@@ -37,6 +36,7 @@ class CreateBankAccount(ServiceBase):
             bank_logo_base64=bank_logo_base64,
             name=account_name,
         )
+        bank_account.set_verified()
 
         plaid_processor_token = plaid_item["plaid_processor_token"]
         dwolla_account_data = self._send_to_dwolla(

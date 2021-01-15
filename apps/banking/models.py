@@ -4,6 +4,9 @@ from django.db import models
 
 from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel
+from db.models.fields import ChoiceCharEnumField
+
+from .options import BankAccountStatus
 
 
 class BankAccount(AbstractBaseModel):
@@ -18,10 +21,30 @@ class BankAccount(AbstractBaseModel):
     is_disabled = models.BooleanField(default=False)
     is_primary = models.BooleanField(default=True)
     dwolla_id = models.CharField(max_length=255, blank=True)
+    status = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=BankAccountStatus,
+        default=BankAccountStatus.PENDING,
+    )
+
+    class Meta:
+        db_table = "bank_account"
 
     def add_dwolla_id(self, dwolla_id):
         self.dwolla_id = dwolla_id
         self.save()
 
-    class Meta:
-        db_table = "bank_account"
+    def set_verified(self, save=True):
+        self.status = BankAccountStatus.VERIFIED
+        if save:
+            self.save()
+
+    def set_reverification(self, save=True):
+        self.status = BankAccountStatus.REVERIFICATION_REQUIRED
+        if save:
+            self.save()
+
+    def set_username_changed(self, save=True):
+        self.status = BankAccountStatus.USERNAME_CHANGED
+        if save:
+            self.save()

@@ -1,4 +1,3 @@
-from apps.merchant.services.profile import codes_and_protocols
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -14,6 +13,7 @@ from apps.merchant.services import (UpdateCodesAndProtocols,
                                     UpdateMerchantProfile,
                                     UpdateOperationHours,
                                     UpdateServiceAvailability)
+from apps.merchant.services.profile import codes_and_protocols
 
 __all__ = (
     "UpdateMerchantProfileAPI",

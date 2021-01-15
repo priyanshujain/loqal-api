@@ -5,7 +5,9 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account
+from apps.banking.options import BankAccountStatus
 from plugins.plaid import PlaidPlugin
+from plugins.plaid.errors import PlaidBankUsernameExpired, PlaidReAuth
 
 __all__ = ("ValidateBankBalance",)
 
@@ -30,6 +32,15 @@ class ValidateBankBalance(object):
                 }
             )
 
+        if sender_bank_account.status != BankAccountStatus.VERIFIED:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "Bank account is not verified, please verify your bank account."
+                    )
+                }
+            )
+
         receiver_bank_account = get_bank_account(
             account_id=self.receiver_account_id
         )
@@ -38,7 +49,34 @@ class ValidateBankBalance(object):
                 {"detail": ErrorDetail("Receiver account is not active yet.")}
             )
 
-        balance = self._check_balance(bank_account=sender_bank_account)
+        try:
+            balance = self._check_balance(bank_account=sender_bank_account)
+        except PlaidReAuth:
+            sender_bank_account.set_reverification()
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Bank account access expired, please re-authenticate your bank account."
+                        )
+                    ),
+                    "code": "PLAID_REVERIFICATION_REQUIRED",
+                }
+            )
+        except PlaidBankUsernameExpired:
+            sender_bank_account.set_username_changed()
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Bank account user expired, please "
+                            "contact your bank or our support team for further assitance."
+                        )
+                    ),
+                    "code": "BANK_USERNAME_CHANGED",
+                }
+            )
+
         min_required_balance = self.total_amount + Decimal(
             settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
         )

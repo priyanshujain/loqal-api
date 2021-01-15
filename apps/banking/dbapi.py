@@ -8,6 +8,7 @@ from apps.banking.models import BankAccount
 __all__ = (
     "create_bank_account",
     "get_bank_account",
+    "update_bank_account",
 )
 
 
@@ -48,3 +49,13 @@ def get_bank_account(account_id):
         )
     except BankAccount.DoesNotExist:
         return None
+
+
+def update_bank_account(bank_account_id, plaid_access_token, plaid_account_id):
+    """
+    dbapi to updates a bank account instance.
+    """
+    return BankAccount.objects.filter(id=bank_account_id).update(
+        plaid_access_token=plaid_access_token,
+        plaid_account_id=plaid_account_id,
+    )

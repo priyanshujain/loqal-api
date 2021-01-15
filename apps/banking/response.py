@@ -5,6 +5,9 @@ __all__ = ("BankAccountResponse",)
 
 
 class BankAccountResponse(serializers.ModelSerializer):
+    status_label = serializers.CharField(source="status.label", read_only=True)
+    status_value = serializers.CharField(source="status.value", read_only=True)
+
     class Meta:
         model = BankAccount
         fields = (
@@ -16,4 +19,6 @@ class BankAccountResponse(serializers.ModelSerializer):
             "currency",
             "created_at",
             "name",
+            "status_label",
+            "status_value",
         )

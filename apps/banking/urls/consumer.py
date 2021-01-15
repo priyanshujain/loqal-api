@@ -1,13 +1,19 @@
 from django.urls import path
 
 from apps.banking.views.consumer import (CreateBankAccountAPI,
-                                         GetBankAccountAPI, PlaidLinkTokenAPI)
+                                         GetBankAccountAPI, PlaidLinkTokenAPI,
+                                         ReAuthBankAccountAPI)
 
 urlpatterns = [
     path(
         "consumer/accounts/create/",
         CreateBankAccountAPI.as_view(),
         name="create_consumer_bank_account",
+    ),
+    path(
+        "merchant/accounts/reauth/",
+        ReAuthBankAccountAPI.as_view(),
+        name="reauth_consumer_bank_account",
     ),
     path(
         "consumer/accounts/plaid-token/",
