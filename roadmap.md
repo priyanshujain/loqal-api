@@ -1,15 +1,10 @@
 # ROADMAP
 
-- Implement Idempotency key feature in all API calls (Ref: dwolla)
-- Add logging 
 
+## Short term
 
-
-
-- Password validation using django password validators
+- Replace all uid or u_id type reponse keys
 - Email verification mandatory on Merchant APIs and consumer payment APIs
-- Verify EIN using python-stdnum
-
 
 
 
@@ -19,8 +14,13 @@
 - Add phone number country to all places where we are asking for phone number from user
 - Handle all the DB errors not just by catching exception but by resloving it to an error
 - https://github.com/jazzband/django-defender
+- Add error logging 
+
 
 ## Long terms
+
+- Implement Idempotency key feature in all API calls (Ref: dwolla)
+
 
 ### Validators
 
