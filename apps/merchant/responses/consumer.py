@@ -39,6 +39,9 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
         source="profile.avatar_file.id", read_only=True
     )
     address = serializers.JSONField(source="profile.address", read_only=True)
+    is_loqal_enabled = serializers.BooleanField(
+        source="account", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount
@@ -50,6 +53,7 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
             "categories",
             "avatar_file_id",
             "address",
+            "is_loqal_enabled",
         )
 
 
@@ -138,6 +142,9 @@ class MerchantFullDetailsResponse(serializers.ModelSerializer):
         source="serviceavailability", read_only=True
     )
     address = serializers.JSONField(source="profile.address", read_only=True)
+    is_loqal_enabled = serializers.BooleanField(
+        source="account", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount
@@ -150,6 +157,7 @@ class MerchantFullDetailsResponse(serializers.ModelSerializer):
             "codes_and_protocols",
             "services",
             "hours",
+            "is_loqal_enabled",
         )
 
 
@@ -168,6 +176,9 @@ class CategoryMerchantListResponse(serializers.ModelSerializer):
     categories = MerchantCategoryResponse(
         source="merchant.categories", many=True, read_only=True
     )
+    is_loqal_enabled = serializers.BooleanField(
+        source="account", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount
@@ -178,6 +189,7 @@ class CategoryMerchantListResponse(serializers.ModelSerializer):
             "codes_and_protocols",
             "services",
             "categories",
+            "is_loqal_enabled",
         )
 
 
@@ -201,6 +213,9 @@ class StoreSearchResponse(serializers.ModelSerializer):
         source="merchantoperationhours_set", many=True, read_only=True
     )
     merchant_id = serializers.CharField(source="u_id", read_only=True)
+    is_loqal_enabled = serializers.BooleanField(
+        source="account", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount
@@ -214,4 +229,5 @@ class StoreSearchResponse(serializers.ModelSerializer):
             "hours",
             "categories",
             "merchant_id",
+            "is_loqal_enabled",
         )

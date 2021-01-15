@@ -6,6 +6,7 @@ __all__ = (
     "create_merchant_account",
     "get_merchant_account",
     "get_merchant_account_by_uid",
+    "create_non_loqal_merchant_account",
 )
 
 
@@ -19,6 +20,10 @@ def create_merchant_account(company_email):
     except IntegrityError:
         account.delete()
         return None
+
+
+def create_non_loqal_merchant_account():
+    return MerchantAccount.objects.create()
 
 
 def get_merchant_account(merchant_id):
