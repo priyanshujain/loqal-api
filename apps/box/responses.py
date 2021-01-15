@@ -9,4 +9,5 @@ class BoxFileResponse(serializers.ModelSerializer):
             "file_name",
             "content_type",
             "document_type",
+            "file_path",
         )
