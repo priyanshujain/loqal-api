@@ -23,7 +23,7 @@ __all__ = (
 
 
 class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
-    uid = serializers.UUIDField(source="u_id", read_only=True)
+    merchant_id = serializers.CharField(source="u_id", read_only=True)
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
@@ -40,7 +40,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantAccount
         fields = (
-            "uid",
+            "merchant_id",
             "full_name",
             "about",
             "category",
@@ -120,7 +120,7 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
     user = ConsumerResponse(
         source="sender.account.consumeraccount", read_only=True
     )
-    uid = serializers.CharField(source="u_id", read_only=True)
+    transaction_id = serializers.CharField(source="u_id", read_only=True)
     status = serializers.CharField(source="status.label", read_only=True)
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True
@@ -133,7 +133,7 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
         model = Transaction
         fields = (
             "id",
-            "uid",
+            "transaction_id",
             "created_at",
             "user",
             "amount",

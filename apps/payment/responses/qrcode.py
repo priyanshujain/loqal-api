@@ -64,7 +64,7 @@ class QrCodeMerchantDetailsResponse(serializers.ModelSerializer):
     account_status = serializers.CharField(
         source="account_status.label", read_only=True
     )
-    uid = serializers.UUIDField(source="u_id", read_only=True)
+    merchant_id = serializers.CharField(source="u_id", read_only=True)
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
@@ -82,7 +82,7 @@ class QrCodeMerchantDetailsResponse(serializers.ModelSerializer):
         model = MerchantAccount
         fields = (
             "account_status",
-            "uid",
+            "merchant_id",
             "full_name",
             "about",
             "category",

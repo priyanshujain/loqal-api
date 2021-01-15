@@ -23,10 +23,21 @@ class RoleInfoResponse(serializers.ModelSerializer):
 class MemberInviteResponse(serializers.ModelSerializer):
     invite_id = serializers.IntegerField(source="id", read_only=True)
     role = RoleInfoResponse(read_only=True)
+    merchant_id = serializers.IntegerField(
+        source="merchant.id", read_only=True
+    )
 
     class Meta:
         model = MemberInvite
-        fields = "__all__"
+        fields = (
+            "merchant_id",
+            "first_name",
+            "last_name",
+            "email",
+            "position",
+            "invite_id",
+            "role",
+        )
 
 
 class MemberInviteDetailsResponse(serializers.ModelSerializer):
@@ -38,11 +49,19 @@ class MemberInviteDetailsResponse(serializers.ModelSerializer):
 
     class Meta:
         model = MemberInvite
-        fields = "__all__"
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "position",
+            "invite_id",
+            "role",
+            "company_name",
+        )
 
 
 class AccountMemberResponse(serializers.ModelSerializer):
-    member_id = serializers.IntegerField(source="id", read_only=True)
+    member_id = serializers.IntegerField(source="merchant.id", read_only=True)
     first_name = serializers.CharField(
         source="user.first_name", read_only=True
     )
@@ -68,7 +87,23 @@ class AccountMemberResponse(serializers.ModelSerializer):
 
 class FeatureAccessRoleResponse(serializers.ModelSerializer):
     role_id = serializers.IntegerField(source="id", read_only=True)
+    merchant_id = serializers.IntegerField(
+        source="merchant.id", read_only=True
+    )
 
     class Meta:
         model = FeatureAccessRole
-        fields = "__all__"
+        fields = (
+            "merchant_id",
+            "role_name",
+            "description",
+            "team_and_roles",
+            "beneficiaries",
+            "transactions",
+            "banking",
+            "settings",
+            "is_super_admin",
+            "is_standard_user",
+            "is_editable",
+            "role_id",
+        )

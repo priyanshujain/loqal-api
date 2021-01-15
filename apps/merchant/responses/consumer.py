@@ -194,7 +194,6 @@ class CategoryMerchantListResponse(serializers.ModelSerializer):
 
 
 class StoreSearchResponse(serializers.ModelSerializer):
-    uid = serializers.UUIDField(source="u_id", read_only=True)
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
@@ -220,7 +219,6 @@ class StoreSearchResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantAccount
         fields = (
-            "uid",
             "full_name",
             "about",
             "address",
