@@ -31,7 +31,7 @@ class UpdateMerchantProfileAPI(MerchantAPIView):
         merchant_account = request.merchant_account
         # TODO: 1. create a separate API for updating hero image
         UpdateMerchantProfile(
-            merchant_id=merchant_account.id, data=self.request_data
+            merchant=merchant_account, data=self.request_data
         ).handle()
         return self.response(status=204)
 

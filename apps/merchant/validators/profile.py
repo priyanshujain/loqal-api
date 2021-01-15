@@ -21,7 +21,7 @@ __all__ = (
 
 
 class MerchantCategoryValidator(serializers.ModelSerializer):
-    is_primary = serializers.BooleanField(required=False, default=False)
+    is_primary = serializers.BooleanField(default=False)
 
     class Meta:
         model = MerchantCategory
@@ -99,10 +99,12 @@ class MerchantProfileValidator(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         categories = attrs["categories"]
+        updated_categories = []
         for category in categories:
-            MerchantCategoryValidator(data=category).is_valid(
-                raise_exception=True
-            )
+            s = MerchantCategoryValidator(data=category)
+            s.is_valid(raise_exception=True)
+            updated_categories.append(s.data)
+        attrs["categories"] = updated_categories
 
         avatar_file_id = attrs.get("avatar_file_id")
         if avatar_file_id:

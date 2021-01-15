@@ -21,6 +21,7 @@ __all__ = (
     "get_merchant_category_by_name",
     "create_merchant_category",
     "update_merchant_category",
+    "get_merchant_category_by_merchant",
 )
 
 
@@ -225,6 +226,10 @@ def get_merchant_category_by_name(merchant_id, category):
         )
     except MerchantCategory.DoesNotExist:
         return None
+
+
+def get_merchant_category_by_merchant(merchant_id):
+    return MerchantCategory.objects.filter(merchant_id=merchant_id)
 
 
 def create_merchant_category(

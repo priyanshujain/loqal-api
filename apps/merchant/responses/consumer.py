@@ -19,6 +19,7 @@ class MerchantCategoryResponse(serializers.ModelSerializer):
         fields = (
             "category",
             "sub_categories",
+            "is_primary",
         )
 
 
@@ -94,15 +95,6 @@ class MerchantServicesResponse(serializers.ModelSerializer):
             "delivery",
             "takeout",
             "sitting_dining",
-        )
-
-
-class MerchantCategoryResponse(serializers.ModelSerializer):
-    class Meta:
-        model = MerchantCategory
-        fields = (
-            "category",
-            "sub_categories",
         )
 
 

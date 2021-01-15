@@ -16,10 +16,7 @@ __all__ = (
 class MerchantCategoryResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantCategory
-        fields = (
-            "category",
-            "sub_categories",
-        )
+        fields = ("category", "sub_categories", "is_primary")
 
 
 class MerchantProfileResponse(serializers.ModelSerializer):
