@@ -5,7 +5,8 @@
 
 - Replace all uid or u_id type reponse keys
 - Email verification mandatory on Merchant APIs and consumer payment APIs
-
+- Add conditions for disabled merchant/ user
+- Build feature for disabling a user account on admin
 
 
 ## Medium term
