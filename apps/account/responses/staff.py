@@ -3,7 +3,9 @@ from apps.account.models import MerchantAccount
 
 
 class MerchantAccountProfileResponse(serializers.ModelSerializer):
-    zip_code = serializers.CharField(source="account.zip_code", read_only=True)
+    zip_code = serializers.CharField(
+        source="profile.address.zip_code", read_only=True
+    )
     account_status = serializers.CharField(
         source="account_status.label", read_only=True
     )
@@ -24,4 +26,5 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             "uid",
             "full_name",
             "account_id",
+            "is_active",
         )

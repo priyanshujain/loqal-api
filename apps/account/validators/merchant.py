@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 
 from api import serializers
 from api.exceptions import ErrorDetail, ValidationError
+from apps.account.dbapi import merchant
 from apps.merchant.shortcuts import validate_subcategory
 from apps.user.dbapi import get_user_by_phone
 from lib.auth import password_validation
@@ -11,6 +12,7 @@ __all__ = (
     "CreateMerchantAccountValidator",
     "MerchantAccountSignupValidatorBase",
     "CreateNonLoqalMerchantValidator",
+    "EnableDisableMerchantValidator",
 )
 
 
@@ -109,3 +111,7 @@ class CreateNonLoqalMerchantValidator(serializers.ValidationSerializer):
                 }
             )
         return attrs
+
+
+class EnableDisableMerchantValidator(serializers.ValidationSerializer):
+    merchant_id = serializers.UUIDField()
