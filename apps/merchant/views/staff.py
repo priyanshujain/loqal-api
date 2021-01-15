@@ -76,6 +76,8 @@ class GetMerchantOperationHoursAPI(StaffBaseMerchantAPI):
         operation_hours = get_merchant_operation_hours(
             merchant_id=merchant_account.id
         )
+        if not operation_hours:
+            return self.response()
         return self.response(
             MerchantOperationHoursResponse(operation_hours, many=True).data
         )
@@ -96,6 +98,8 @@ class GetCodesAndProtocolsAPI(StaffBaseMerchantAPI):
         code_protocols = get_merchant_code_protocols(
             merchant_id=merchant_account.id
         )
+        if not code_protocols:
+            return self.response()
         return self.response(CodesAndProtocolsResponse(code_protocols).data)
 
 

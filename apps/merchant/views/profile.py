@@ -1,3 +1,4 @@
+from apps.merchant.services.profile import codes_and_protocols
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -63,6 +64,8 @@ class GetMerchantOperationHoursAPI(MerchantAPIView):
         operation_hours = get_merchant_operation_hours(
             merchant_id=merchant_account.id
         )
+        if not operation_hours:
+            return self.response()
         return self.response(
             MerchantOperationHoursResponse(operation_hours, many=True).data
         )
@@ -83,6 +86,8 @@ class GetCodesAndProtocolsAPI(MerchantAPIView):
         code_protocols = get_merchant_code_protocols(
             merchant_id=merchant_account.id
         )
+        if not code_protocols:
+            return self.response()
         return self.response(CodesAndProtocolsResponse(code_protocols).data)
 
 
