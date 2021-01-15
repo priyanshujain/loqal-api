@@ -1,3 +1,6 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from api.exceptions import NotAuthenticated, PermissionDenied
 from apps.account.dbapi import get_consumer_account
 
@@ -8,6 +11,10 @@ class ConsumerAPIView(APIAccessLogView):
     """
     ConsumerAPIView
     """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConsumerAPIView, self).dispatch(request, *args, **kwargs)
 
     def initialize_request(self, request, *args, **kwargs):
         """
@@ -42,6 +49,12 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
     """
     ConsumerAPIView
     """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConsumerPre2FaAPIView, self).dispatch(
+            request, *args, **kwargs
+        )
 
     def initialize_request(self, request, *args, **kwargs):
         """

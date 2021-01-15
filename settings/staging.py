@@ -19,6 +19,7 @@ CORS_ORIGIN_REGEX_WHITELIST += [
     "https://staff-stag.payloqal.com",
     "https://merchant-stag.payloqal.com",
     "https://website-stag.payloqal.com",
+    "https://api-sandbox.dwolla.com",
 ]
 
 APP_NAME = "Loqal staging"

@@ -22,6 +22,7 @@ CORS_ORIGIN_REGEX_WHITELIST += [
     "https://staff-dev.payloqal.com",
     "https://merchant-dev.payloqal.com",
     "https://website-dev.payloqal.com",
+    "https://api-sandbox.dwolla.com",
 ]
 
 
