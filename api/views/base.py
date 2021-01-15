@@ -267,12 +267,17 @@ class APIAccessLogView(APIView):
             )
             if self._clean_credentials(query_params) == {}:
                 self.log.update({"query_params": self.log["data"]})
+
+            access_log = None
             try:
-                self.handle_log()
+                access_log = self.handle_log()
             except Exception:
                 # ensure that all exceptions raised by handle_log
                 # doesn't prevent API call to continue as expected
                 logger.exception("Logging API call raise exception!")
+
+            if access_log:
+                response["X-Request-Id"] = access_log.u_id
 
         return response
 
@@ -363,7 +368,7 @@ class APIAccessLogView(APIView):
         return data
 
     def handle_log(self):
-        create_api_access_log(**self.log)
+        return create_api_access_log(**self.log)
 
 
 class LoggedInAPIView(APIAccessLogView):
