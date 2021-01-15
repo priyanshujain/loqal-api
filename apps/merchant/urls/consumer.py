@@ -1,19 +1,18 @@
 from django.urls import path
 
-from apps.merchant.views.consumer import (MerchantBasicDetailsAPI,
-                                          MerchantDetailsAPI,
-                                          MerchantSearchAPI)
-from apps.merchant.views.stores import ListCategoryMerchantsAPI
+from apps.merchant.views.consumer import (ListCategoryMerchantsAPI,
+                                          MerchantBasicDetailsAPI,
+                                          MerchantSearchAPI, StoreDetailsAPI)
 
 urlpatterns = [
     path(
-        "basic-info/",
+        "details/<uuid:merchant_id>/basic-info/",
         MerchantBasicDetailsAPI.as_view(),
-        name="business_basic_details",
+        name="store_basic_details",
     ),
     path(
-        "details/<uuid:merchant_id>",
-        MerchantDetailsAPI.as_view(),
+        "details/<uuid:merchant_id>/",
+        StoreDetailsAPI.as_view(),
         name="store_details",
     ),
     path(
