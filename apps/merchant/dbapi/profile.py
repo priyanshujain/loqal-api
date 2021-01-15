@@ -144,14 +144,14 @@ def update_merchant_code_protocols(
     merchant_id,
     mask_required,
     sanitizer_provided,
-    ourdoor_seating,
+    outdoor_seating,
     cleaning_frequency,
     last_cleaned_at,
 ):
     return CodesAndProtocols.objects.filter(merchant_id=merchant_id).update(
         mask_required=mask_required,
         sanitizer_provided=sanitizer_provided,
-        ourdoor_seating=ourdoor_seating,
+        outdoor_seating=outdoor_seating,
         cleaning_frequency=cleaning_frequency,
         last_cleaned_at=last_cleaned_at,
     )
@@ -161,7 +161,7 @@ def create_merchant_code_protocols(
     merchant_id,
     mask_required,
     sanitizer_provided,
-    ourdoor_seating,
+    outdoor_seating,
     cleaning_frequency,
     last_cleaned_at,
 ):
@@ -170,7 +170,7 @@ def create_merchant_code_protocols(
             merchant_id=merchant_id,
             mask_required=mask_required,
             sanitizer_provided=sanitizer_provided,
-            ourdoor_seating=ourdoor_seating,
+            outdoor_seating=outdoor_seating,
             cleaning_frequency=cleaning_frequency,
             last_cleaned_at=last_cleaned_at,
         )

@@ -133,7 +133,7 @@ class CodesAndProtocolsValidator(serializers.ModelSerializer):
         fields = (
             "mask_required",
             "sanitizer_provided",
-            "ourdoor_seating",
+            "outdoor_seating",
             "cleaning_frequency",
             "last_cleaned_at",
         )
