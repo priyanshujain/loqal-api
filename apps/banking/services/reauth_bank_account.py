@@ -38,7 +38,7 @@ class ReAuthBankAccount(ServiceBase):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
-                        _("plaid_public_token has been expired.")
+                        _("Invalid credentials/ bank account does not match.")
                     )
                 }
             )
@@ -47,9 +47,22 @@ class ReAuthBankAccount(ServiceBase):
         }
 
     def _validate_data(self):
-        return run_validator(
+        data = run_validator(
             validator=CreateBankAccountValidator, data=self.data
         )
+
+        if self.bank_account.plaid_account_id != data["plaid_account_id"]:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Please select the same bank account you have added previously."
+                        )
+                    )
+                }
+            )
+
+        return data
 
     def _update_bank_account(
         self,
