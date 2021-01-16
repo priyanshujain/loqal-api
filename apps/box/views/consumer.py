@@ -28,10 +28,11 @@ class CreateFileAPI(FileAPI):
             raise error
 
         source_file = data["source_file"]
-        if not validate_file_format(source_file):
-            raise ValidationError(
-                {"source_file": [ErrorDetail(_("Unsupported file format."))]}
-            )
+        # TODO: check file type using content
+        # if not validate_file_format(source_file):
+        #     raise ValidationError(
+        #         {"source_file": [ErrorDetail(_("Unsupported file format."))]}
+        #     )
 
         gcs_file = store_file_to_gcs(
             source_file, source_file.name, source_file.content_type
