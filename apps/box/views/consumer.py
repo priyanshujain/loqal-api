@@ -4,8 +4,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.views import LoggedInAPIView
 from apps.box.models import BoxFile
 from apps.box.responses import BoxFileResponse
-from apps.box.shortcut import validate_file_format
-from apps.box.tasks import get_file_from_gcs, store_file_to_gcs
+from apps.box.shortcut import fix_mimetype_file, validate_file_format
+from apps.box.tasks import get_file_from_fss, store_file_to_fss
 from apps.box.validators import BoxFileForm
 
 
@@ -28,13 +28,13 @@ class CreateFileAPI(FileAPI):
             raise error
 
         source_file = data["source_file"]
-        # TODO: check file type using content
-        # if not validate_file_format(source_file):
-        #     raise ValidationError(
-        #         {"source_file": [ErrorDetail(_("Unsupported file format."))]}
-        #     )
+        source_file = fix_mimetype_file(source_file)
+        if not validate_file_format(source_file):
+            raise ValidationError(
+                {"source_file": [ErrorDetail(_("Unsupported file format."))]}
+            )
 
-        gcs_file = store_file_to_gcs(
+        gcs_file = store_file_to_fss(
             source_file, source_file.name, source_file.content_type
         )
 
@@ -72,6 +72,8 @@ class FetchFileUrlAPI(LoggedInAPIView):
             )
 
         box_file_data = BoxFileResponse(box_file).data
-        box_file_data["signed_url"] = get_file_from_gcs(box_file_data)
-        del box_file_data["encryption_key"]
+        box_file_data["signed_url"] = get_file_from_fss(
+            file_path=box_file.file_path,
+            encryption_key=box_file.encryption_key,
+        )
         return self.response(box_file_data)

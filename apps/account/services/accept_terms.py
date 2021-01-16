@@ -9,7 +9,7 @@ from apps.account.dbapi import create_payment_account_consent
 from apps.account.notifications import SendConsumerTermsEmail
 from apps.account.validators import PaymentAccountOpeningConsentValidator
 from apps.box.dbapi import create_boxfile
-from apps.box.tasks import store_file_to_gcs
+from apps.box.tasks import store_file_to_fss
 
 __all__ = ("AcceptTerms",)
 
@@ -51,7 +51,7 @@ class DownloadTermsDocument(object):
     def generate(self):
         f = NamedTemporaryFile(suffix=".pdf", delete=False)
         HTML(url=self.document_url).write_pdf(f.name)
-        gcs_file = store_file_to_gcs(f, f.name, "application/pdf")
+        gcs_file = store_file_to_fss(f, f.name, "application/pdf")
         return f, create_boxfile(
             file_name=f.name,
             file_path=gcs_file["file_name"],

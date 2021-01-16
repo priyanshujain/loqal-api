@@ -61,9 +61,8 @@ class MerchantBasicProfileResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantProfile
         fields = (
-            "category",
-            "sub_category",
             "full_name",
+            "address",
         )
 
 

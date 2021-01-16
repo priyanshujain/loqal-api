@@ -50,6 +50,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
         )
 
 
+# TODO: fix categories
 class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
     merchant = PaymentRequestMerchantDetailsResponse(
         source="account.merchantaccount", read_only=True
