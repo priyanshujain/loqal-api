@@ -92,15 +92,8 @@ class PaymentProcess(ChoiceEnum):
 class DisputeStatus(ChoiceEnum):
     OPEN = 0, _("Open")
     INTERNAL_REVIEW = 1, _("Internal Review")
-    BANK_REVIEW = 2, _("BANK_REVIEW")
-    CHARGEBACK_ACCEPTED = 3, _("Chargeback Accepted")
-    CHARGEBACK_REJECTED = 4, _("Chargeback Rejected")
-
-
-class DisputeStatus(ChoiceEnum):
-    OPEN = 0, _("Open")
-    INTERNAL_REVIEW = 1, _("Internal Review")
-    BANK_REVIEW = 2, _("BANK_REVIEW")
+    BANK_REVIEW = 2, _("Bank Review")
+    MERCHANT_REVIEW = 5, _("Merchany Review")
     CHARGEBACK_ACCEPTED = 3, _("Chargeback Accepted")
     CHARGEBACK_REJECTED = 4, _("Chargeback Rejected")
 
@@ -108,6 +101,7 @@ class DisputeStatus(ChoiceEnum):
 class DisputeType(ChoiceCharEnum):
     CHARGEBACK = "chargeback", _("Chargeback")
     FRAUD = "fraud", _("Fraud")
+    RETRIEVAL = "retrieval", _("Retrieval")
 
 
 class DisputeReasonType(ChoiceCharEnum):
@@ -115,4 +109,18 @@ class DisputeReasonType(ChoiceCharEnum):
         "Money has not reached to merchant"
     )
     PAID_TWICE = "paid_twice", _("Paid twice for the order")
+    MORE_DETAILS_REQUIRED = "more_details_required", _(
+        "Require more details on transaction"
+    )
+    DID_NOT_PERFORM = "did_not_perform", _(
+        "I did not perform this transaction"
+    )
     OTHER = "other", _("Other issues")
+
+
+class DisputeReasonTypeMap:
+    MONEY_NOT_REACHED = DisputeType.CHARGEBACK
+    PAID_TWICE = DisputeType.CHARGEBACK
+    MORE_DETAILS_REQUIRED = DisputeType.RETRIEVAL
+    DID_NOT_PERFORM = DisputeType.FRAUD
+    OTHER = DisputeType.RETRIEVAL

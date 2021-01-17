@@ -4,6 +4,7 @@ class ApplyBankingWebhook(object):
 
     def handle(self):
         topic = self.event.topic
+        # event_payload, dwolla_id, is_processed, target_resource_dwolla_id
 
         if topic == "customer_funding_source_added":
             # A funding source was added to a Customer.
