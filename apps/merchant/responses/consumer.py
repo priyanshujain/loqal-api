@@ -161,7 +161,7 @@ class MerchantFullDetailsResponse(serializers.ModelSerializer):
 
 
 class CategoryMerchantListResponse(serializers.ModelSerializer):
-    profile = MerchantBasicProfileResponse(source="profile", read_only=True)
+    profile = MerchantBasicProfileResponse(read_only=True)
     hours = MerchantOperatingHoursResponse(
         source="merchantoperationhours_set", many=True, read_only=True
     )
