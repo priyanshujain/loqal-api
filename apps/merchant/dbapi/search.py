@@ -7,7 +7,7 @@ def get_all_merchants():
     return MerchantAccount.objects.filter(is_active=True)
 
 
-def get_merchants_by_category(merchant_qs, category):
+def get_merchant_qs_by_category(merchant_qs, category):
     return merchant_qs.filter(categories__category=category)
 
 

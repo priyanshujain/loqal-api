@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (get_all_merchants, get_merchants_by_category,
+from apps.merchant.dbapi import (get_all_merchants, get_merchant_qs_by_category,
                                  merchant_search_by_keyword)
 from apps.merchant.responses import StoreSearchResponse
 from apps.merchant.shortcuts import validate_category
@@ -31,7 +31,7 @@ class StoreSearch(ServiceBase):
                     }
                 )
 
-            merchants = get_merchants_by_category(
+            merchants = get_merchant_qs_by_category(
                 merchant_qs=merchants, category=category
             )
 
@@ -54,7 +54,9 @@ class StoreSearch(ServiceBase):
                 )
             merchants_response.append(merchant_res)
 
-        return sorted(merchants_response, key=lambda t: t["distance"])
+        if longitude and latitude:
+            return sorted(merchants_response, key=lambda t: t["distance"])
+        return merchants_response
 
     def _validate_data(self):
         data = run_validator(StoreSearchValidator, self.data)
