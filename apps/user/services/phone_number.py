@@ -177,6 +177,7 @@ class EnrollSmsAuthenticator(object):
                 }
             )
         interface.phone_number = phone_number
+        interface.phone_number_country = self.user.phone_number_country
         return interface
 
     def request_enrollment(self):

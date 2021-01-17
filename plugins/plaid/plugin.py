@@ -151,11 +151,11 @@ class PlaidPlugin(object):
             )
         except ItemError as err:
             if err.code == "ITEM_LOGIN_REQUIRED":
-                raise PlaidReAuth()
+                raise PlaidReAuth
             elif err.code == "ITEM_NO_ERROR":
                 return self.get_balance(access_token, account_id)
             elif err.code == "INVALID_UPDATED_USERNAME":
-                raise PlaidBankUsernameExpired()
+                raise PlaidBankUsernameExpired
             return
 
         if accounts and len(accounts) > 0:

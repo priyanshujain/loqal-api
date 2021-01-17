@@ -420,3 +420,9 @@ DEFAULT_DECIMAL_PLACES = 2
 # Firebase settings
 FCM_SERVER_KEY = env("FCM_SERVER_KEY")
 FCM_SERVER = "https://fcm.googleapis.com/fcm/send"
+
+
+# Twilio settings
+TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
+DEFAULT_PHONE_REGION = "IN"
