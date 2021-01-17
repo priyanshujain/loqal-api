@@ -1,13 +1,9 @@
 from django.db.utils import IntegrityError
 
-from apps.merchant.models import (
-    CodesAndProtocols,
-    MerchantCategory,
-    MerchantOperationHours,
-    MerchantProfile,
-    ServiceAvailability,
-)
 from apps.account.models import MerchantAccount
+from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
+                                  MerchantOperationHours, MerchantProfile,
+                                  ServiceAvailability)
 
 __all__ = (
     "create_merchant_profile",
@@ -96,7 +92,9 @@ def update_merchant_profile(
 
 
 def get_merchants_by_category(category):
-    return MerchantAccount.objects.filter(is_active=True, categories__category=category)
+    return MerchantAccount.objects.filter(
+        is_active=True, categories__category=category
+    )
 
 
 def get_merchant_operation_hours(merchant_id):
@@ -105,7 +103,9 @@ def get_merchant_operation_hours(merchant_id):
 
 def get_merchant_operation_hour_by_day(merchant_id, day):
     try:
-        return MerchantOperationHours.objects.get(merchant_id=merchant_id, day=day)
+        return MerchantOperationHours.objects.get(
+            merchant_id=merchant_id, day=day
+        )
     except MerchantOperationHours.DoesNotExist:
         return None
 
@@ -221,7 +221,9 @@ def create_merchant_service_availability(
 
 def get_merchant_category_by_name(merchant_id, category):
     try:
-        return MerchantCategory.objects.get(merchant_id=merchant_id, category=category)
+        return MerchantCategory.objects.get(
+            merchant_id=merchant_id, category=category
+        )
     except MerchantCategory.DoesNotExist:
         return None
 
@@ -230,7 +232,9 @@ def get_merchant_category_by_merchant(merchant_id):
     return MerchantCategory.objects.filter(merchant_id=merchant_id)
 
 
-def create_merchant_category(merchant_id, category, sub_categories, is_primary=False):
+def create_merchant_category(
+    merchant_id, category, sub_categories, is_primary=False
+):
     if is_primary:
         MerchantCategory.objects.filter(merchant_id=merchant_id).update(
             is_primary=False
@@ -246,7 +250,9 @@ def create_merchant_category(merchant_id, category, sub_categories, is_primary=F
         return None
 
 
-def update_merchant_category(merchant_id, category, sub_categories, is_primary=False):
+def update_merchant_category(
+    merchant_id, category, sub_categories, is_primary=False
+):
     if is_primary:
         MerchantCategory.objects.filter(merchant_id=merchant_id).update(
             is_primary=False

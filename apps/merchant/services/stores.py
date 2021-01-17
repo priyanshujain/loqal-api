@@ -3,7 +3,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (get_all_merchants, get_merchant_qs_by_category,
+from apps.merchant.dbapi import (get_all_merchants,
+                                 get_merchant_qs_by_category,
                                  merchant_search_by_keyword)
 from apps.merchant.responses import StoreSearchResponse
 from apps.merchant.shortcuts import validate_category

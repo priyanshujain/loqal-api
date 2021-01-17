@@ -128,9 +128,7 @@ class MerchantFullDetailsResponse(serializers.ModelSerializer):
         source="profile.full_name", read_only=True
     )
     profile = MerchantProfileResponse(read_only=True)
-    categories = MerchantCategoryResponse(
-        source="categories", many=True, read_only=True
-    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     hours = MerchantOperatingHoursResponse(
         source="merchantoperationhours_set", many=True, read_only=True
     )
@@ -172,9 +170,7 @@ class CategoryMerchantListResponse(serializers.ModelSerializer):
         source="serviceavailability", read_only=True
     )
     merchant_id = serializers.CharField(source="u_id", read_only=True)
-    categories = MerchantCategoryResponse(
-        source="categories", many=True, read_only=True
-    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     is_loqal_enabled = serializers.BooleanField(
         source="account", read_only=True
     )
