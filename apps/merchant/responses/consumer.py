@@ -192,9 +192,7 @@ class StoreSearchResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
-    categories = MerchantCategoryResponse(
-        source="merchant.categories", many=True, read_only=True
-    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     about = serializers.CharField(source="profile.about", read_only=True)
     address = serializers.JSONField(source="profile.address", read_only=True)
     codes_and_protocols = MerchantCodesProtocolsResponse(
