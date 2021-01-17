@@ -8,6 +8,7 @@
 - Add conditions for disabled merchant/ user
 - Build feature for disabling a user account on admin
 - Show request ID on 500 error
+- Add twilio sms error conditions
 
 ## Medium term
 
