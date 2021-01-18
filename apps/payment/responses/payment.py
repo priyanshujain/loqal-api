@@ -7,6 +7,7 @@ from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
                                  PaymentRequest, Refund, Transaction)
 from apps.payment.options import PaymentProcess
+from apps.merchant.models import MerchantCategory
 
 __all__ = (
     "TransactionResponse",
@@ -21,6 +22,15 @@ __all__ = (
     "RecentStoresResponse",
 )
 
+class MerchantCategoryResponse(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantCategory
+        fields = (
+            "category",
+            "sub_categories",
+            "is_primary",
+        )
+
 
 class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
     merchant_id = serializers.CharField(source="u_id", read_only=True)
@@ -28,10 +38,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
         source="profile.full_name", read_only=True
     )
     about = serializers.CharField(source="profile.about", read_only=True)
-    category = serializers.CharField(source="profile.category", read_only=True)
-    sub_category = serializers.CharField(
-        source="profile.sub_category", read_only=True
-    )
+    categories = MerchantCategoryResponse(source="categories", read_only=True)
     hero_image = serializers.CharField(
         source="profile.hero_image", read_only=True
     )
@@ -43,8 +50,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
             "merchant_id",
             "full_name",
             "about",
-            "category",
-            "sub_category",
+            "categories",
             "hero_image",
             "address",
         )
@@ -207,15 +213,12 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
-    category = serializers.CharField(source="profile.category", read_only=True)
-    sub_category = serializers.CharField(
-        source="profile.sub_category", read_only=True
-    )
+    categories = MerchantCategoryResponse(source="categories", read_only=True)
     address = serializers.JSONField(source="profile.address", read_only=True)
 
     class Meta:
         model = MerchantAccount
-        fields = ("full_name", "category", "sub_category", "address")
+        fields = ("full_name", "categories", "address")
 
 
 class TransactionHistoryResponse(serializers.ModelSerializer):
@@ -344,17 +347,14 @@ class RecentStoresResponse(serializers.ModelSerializer):
     amount = serializers.CharField(
         source="payment.captured_amount", read_only=True
     )
-    category = serializers.CharField(
-        source="merchant.profile.category", read_only=True
-    )
-    sub_category = serializers.CharField(
-        source="merchant.profile.sub_category", read_only=True
-    )
     address = serializers.JSONField(
         source="merchant.profile.address", read_only=True
     )
     full_name = serializers.CharField(
         source="merchant.profile.full_name", read_only=True
+    )
+    categories = MerchantCategoryResponse(
+        source="merchant.categories", many=True, read_only=True
     )
     merchant_id = serializers.CharField(source="merchant.u_id", read_only=True)
 
@@ -362,8 +362,7 @@ class RecentStoresResponse(serializers.ModelSerializer):
         model = Order
         fields = (
             "amount",
-            "category",
-            "sub_category",
+            "categories",
             "address",
             "full_name",
             "created_at",
