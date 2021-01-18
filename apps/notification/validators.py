@@ -4,7 +4,7 @@ from apps.notification.options import UserDeviceTypes
 
 __all__ = (
     "RegisterUserDeviceValidator",
-    "UpdateUserDeviceTokenValidator",
+    "UnSubscribeUserDeviceValidator",
 )
 
 
@@ -24,3 +24,11 @@ class RegisterUserDeviceValidator(serializers.ModelSerializer):
             "device_platform",
             "manufacturer",
         )
+
+
+class UnSubscribeUserDeviceValidator(serializers.ModelSerializer):
+    device_id = serializers.CharField()
+
+    class Meta:
+        model = UserDevice
+        fields = ("device_id",)
