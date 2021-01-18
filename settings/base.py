@@ -250,7 +250,8 @@ REST_FRAMEWORK = {
         "api.throttling.ScopedRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "user_burst": "60/min",
+        # TODO: change it back to 60/min
+        "user_burst": "600/min",
         "user_sustained": "1000/day",
         "anon_burst": "20/min",
         "anon_sustained": "100/day",
