@@ -38,7 +38,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
         source="profile.full_name", read_only=True
     )
     about = serializers.CharField(source="profile.about", read_only=True)
-    categories = MerchantCategoryResponse(source="categories", read_only=True)
+    categories = MerchantCategoryResponse(read_only=True)
     hero_image = serializers.CharField(
         source="profile.hero_image", read_only=True
     )
@@ -213,7 +213,7 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
-    categories = MerchantCategoryResponse(source="categories", read_only=True)
+    categories = MerchantCategoryResponse(read_only=True)
     address = serializers.JSONField(source="profile.address", read_only=True)
 
     class Meta:
