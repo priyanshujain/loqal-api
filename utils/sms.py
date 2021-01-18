@@ -16,7 +16,9 @@ def format_phone(phone_number, phone_number_country):
     )
 
 
-def send_sms(body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REGION):
+def send_sms(
+    body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REGION
+):
     phone_from = format_phone(
         settings.LOQAL_SMS_PHONE_NUMBER,
         settings.LOQAL_SMS_PHONE_NUMBER_COUNTRY,
@@ -30,6 +32,6 @@ def send_sms(body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REG
         print("CONTENT: ", body)
         print("###################### SMS END ##########################")
         return True
-    
+
     twilio = TwilioPlugin()
     return twilio.send_text_message(phone_to, phone_from, body)

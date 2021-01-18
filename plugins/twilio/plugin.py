@@ -61,6 +61,10 @@ class TwilioPlugin(object):
         """
         phone_to = clean_phone(phone_to)
         phone_from = clean_phone(phone_from)
-        message = self._client.messages.create(to=phone_to, from_=phone_from, body=body)
-        import pdb; pdb.set_trace()
+        message = self._client.messages.create(
+            to=phone_to, from_=phone_from, body=body
+        )
+        import pdb
+
+        pdb.set_trace()
         return message
