@@ -61,7 +61,7 @@ class MemberInviteDetailsResponse(serializers.ModelSerializer):
 
 
 class AccountMemberResponse(serializers.ModelSerializer):
-    member_id = serializers.IntegerField(source="merchant.id", read_only=True)
+    member_id = serializers.IntegerField(source="id", read_only=True)
     first_name = serializers.CharField(
         source="user.first_name", read_only=True
     )
