@@ -57,9 +57,11 @@ class AssignQrCode(ServiceBase):
         if not merchant_member:
             raise ValidationError(
                 {
-                    "cashier_id": ErrorDetail(
-                        _("Cashier does not belong to the merchant.")
-                    )
+                    "cashier_id": [
+                        ErrorDetail(
+                            _("Cashier does not belong to the merchant.")
+                        )
+                    ]
                 }
             )
         return data
