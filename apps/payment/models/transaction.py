@@ -5,17 +5,11 @@ from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (
-    ChargeStatus,
-    DisputeReasonType,
-    DisputeStatus,
-    DisputeType,
-    PaymentStatus,
-    TransactionEventType,
-    TransactionStatus,
-    TransactionType,
-    TransactionFailureReasonType,
-)
+from apps.payment.options import (ChargeStatus, DisputeReasonType,
+                                  DisputeStatus, DisputeType, PaymentStatus,
+                                  TransactionEventType,
+                                  TransactionFailureReasonType,
+                                  TransactionStatus, TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -171,17 +165,26 @@ class Transaction(AbstractBaseModel):
         if save:
             self.save()
 
+    def set_payment_failed(self):
+        self.payment.failed_payment()
+
     def set_balance_check_failed(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = TransactionFailureReasonType.BALANCE_CHECK_FAILED
+        self.failure_reason_type = (
+            TransactionFailureReasonType.BALANCE_CHECK_FAILED
+        )
         self.failure_reason_message = "There is error from your Bank while checking balace. Please check your connected bank account and try again."
+        self.set_payment_failed()
         if save:
             self.save()
 
     def set_insufficient_balance(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = TransactionFailureReasonType.INSUFFICIENT_BALANCE
+        self.failure_reason_type = (
+            TransactionFailureReasonType.INSUFFICIENT_BALANCE
+        )
         self.failure_reason_message = "The money in your account is not enough for this payment. Check account balance and try again."
+        self.set_payment_failed()
         if save:
             self.save()
 

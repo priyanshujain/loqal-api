@@ -3,16 +3,11 @@ from decimal import Decimal
 from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.banking.models import BankAccount
-from apps.order.models import Order
-from apps.payment.models import (
-    DirectMerchantPayment,
-    Payment,
-    PaymentRequest,
-    Refund,
-    Transaction,
-)
-from apps.payment.options import PaymentProcess
 from apps.merchant.models import MerchantCategory
+from apps.order.models import Order
+from apps.payment.models import (DirectMerchantPayment, Payment,
+                                 PaymentRequest, Refund, Transaction)
+from apps.payment.options import PaymentProcess
 
 __all__ = (
     "TransactionResponse",
@@ -296,8 +291,12 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     banks_details = serializers.SerializerMethodField("get_bank_details")
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
     is_credit = serializers.SerializerMethodField("is_credit_transaction")
-    failure_reason_type_label = serializers.CharField(source="failure_reason_type.label", read_only=True)
-    failure_reason_type_value = serializers.CharField(source="failure_reason_type.value", read_only=True)
+    failure_reason_type_label = serializers.CharField(
+        source="failure_reason_type.label", read_only=True
+    )
+    failure_reason_type_value = serializers.CharField(
+        source="failure_reason_type.value", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -382,7 +381,6 @@ class RecentStoresResponse(serializers.ModelSerializer):
         )
 
 
-
 class TransactionErrorDetailsResponse(serializers.ModelSerializer):
     payment_status = serializers.CharField(
         source="payment.status.label", read_only=True
@@ -393,8 +391,12 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
     merchant = MerchantDetailsResponse(
         source="payment.order.merchant", read_only=True
     )
-    failure_reason_type_label = serializers.CharField(source="failure_reason_type.label", read_only=True)
-    failure_reason_type_value = serializers.CharField(source="failure_reason_type.value", read_only=True)
+    failure_reason_type_label = serializers.CharField(
+        source="failure_reason_type.label", read_only=True
+    )
+    failure_reason_type_value = serializers.CharField(
+        source="failure_reason_type.value", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -406,7 +408,6 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
             "payment_tracking_id",
             "is_success",
             "merchant",
-            "tip_amount",
             "is_disputed",
             "failure_reason_type_label",
             "failure_reason_type_value",

@@ -18,7 +18,7 @@ class CheckBankBalance(object):
             balance = self._check_balance(bank_account=bank_account)
         except PlaidReAuth:
             bank_account.set_reverification()
-            raise ValidationError(
+            return None, ValidationError(
                 {
                     "detail": ErrorDetail(
                         _(
@@ -30,7 +30,7 @@ class CheckBankBalance(object):
             )
         except PlaidBankUsernameExpired:
             bank_account.set_username_changed()
-            raise ValidationError(
+            return None, ValidationError(
                 {
                     "detail": ErrorDetail(
                         _(
@@ -54,6 +54,10 @@ class CheckBankBalance(object):
         )
         if balance is None:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Balance check failed, please try again."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Balance check failed, please try again.")
+                    )
+                }
             )
         return balance

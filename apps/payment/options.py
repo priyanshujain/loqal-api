@@ -10,7 +10,9 @@ FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
 
 class TransactionType(ChoiceCharEnum):
     PAYMENT_REQUEST = "payment_request", _("Payment Request")
-    DIRECT_MERCHANT_PAYMENT = "direct_merchant_payment", _("Direct Merchant Payment")
+    DIRECT_MERCHANT_PAYMENT = "direct_merchant_payment", _(
+        "Direct Merchant Payment"
+    )
     REFUND_PAYMENT = "refund_payment", _("Refund Payment")
     OTHER = "other", _("Other")
 
@@ -120,12 +122,16 @@ class DisputeType(ChoiceCharEnum):
 
 
 class DisputeReasonType(ChoiceCharEnum):
-    MONEY_NOT_REACHED = "money_not_reached", _("Money has not reached to merchant")
+    MONEY_NOT_REACHED = "money_not_reached", _(
+        "Money has not reached to merchant"
+    )
     PAID_TWICE = "paid_twice", _("Paid twice for the order")
     MORE_DETAILS_REQUIRED = "more_details_required", _(
         "Require more details on transaction"
     )
-    DID_NOT_PERFORM = "did_not_perform", _("I did not perform this transaction")
+    DID_NOT_PERFORM = "did_not_perform", _(
+        "I did not perform this transaction"
+    )
     OTHER = "other", _("Other issues")
 
 

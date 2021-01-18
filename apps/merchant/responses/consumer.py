@@ -32,8 +32,7 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
         source="profile.full_name", read_only=True
     )
     about = serializers.CharField(source="profile.about", read_only=True)
-    categories = MerchantCategoryResponse(many=True, read_only=True
-    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     avatar_file_id = serializers.CharField(
         source="profile.avatar_file.id", read_only=True
     )

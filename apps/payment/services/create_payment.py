@@ -1,17 +1,19 @@
 from decimal import Decimal
 
-from django.utils.translation import gettext as _
 from django.conf import settings
+from django.utils.translation import gettext as _
+
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.payment.dbapi import create_transaction
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   FACILITATION_FEES_PERCENTAGE,
                                   TransactionType)
+from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
+
 from .check_bank_balance import CheckBankBalance
-from apps.payment.responses import TransactionErrorDetailsResponse
 
 __all__ = ("CreatePayment",)
 
@@ -41,10 +43,14 @@ class CreatePayment(ServiceBase):
 
     def handle(self):
         transaction = self._factory_transaction()
-        balance, error = CheckBankBalance(bank_account=self.sender_bank_account)
+        balance, error = CheckBankBalance(
+            bank_account=self.sender_bank_account
+        ).validate()
         if error:
             transaction.set_balance_check_failed()
-            error.details["data"] = TransactionErrorDetailsResponse(transaction).data
+            error.details["data"] = TransactionErrorDetailsResponse(
+                transaction
+            ).data
             raise error
         min_required_balance = self.total_amount + Decimal(
             settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
@@ -56,7 +62,7 @@ class CreatePayment(ServiceBase):
                     "detail": ErrorDetail(
                         "You need minimum $100 excess of given amount to make a payment."
                     ),
-                    "data": TransactionErrorDetailsResponse(transaction).data
+                    "data": TransactionErrorDetailsResponse(transaction).data,
                 }
             )
 
