@@ -130,11 +130,13 @@ class CreateRefundPaymentAPI(MerchantAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        data = RefundHistoryResponse(refund_payment).data
+        data = TransactionHistoryResponse(refund_payment.transaction).data
         SendRefundNotification(
             user_id=refund_payment.payment.order.consumer.user.id, data=data
         ).send()
-        return self.response(data, status=201)
+        return self.response(
+            RefundHistoryResponse(refund_payment).data, status=201
+        )
 
 
 class RecentStoresAPI(ConsumerAPIView):
