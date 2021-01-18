@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.utils.translation import gettext as _
-
+from django.conf import settings
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.payment.dbapi import create_transaction
@@ -11,7 +11,7 @@ from apps.payment.options import (FACILITATION_FEES_CURRENCY,
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
 from .check_bank_balance import CheckBankBalance
-
+from apps.payment.responses import TransactionErrorDetailsResponse
 
 __all__ = ("CreatePayment",)
 
@@ -44,7 +44,22 @@ class CreatePayment(ServiceBase):
         balance, error = CheckBankBalance(bank_account=self.sender_bank_account)
         if error:
             transaction.set_balance_check_failed()
-        
+            error.details["data"] = TransactionErrorDetailsResponse(transaction).data
+            raise error
+        min_required_balance = self.total_amount + Decimal(
+            settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+        )
+        if balance < min_required_balance:
+            transaction.set_insufficient_balance()
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "You need minimum $100 excess of given amount to make a payment."
+                    ),
+                    "data": TransactionErrorDetailsResponse(transaction).data
+                }
+            )
+
         dwolla_response = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(
             dwolla_id=dwolla_response["dwolla_transfer_id"],
@@ -53,7 +68,6 @@ class CreatePayment(ServiceBase):
             amount_towards_order=self.amount_towards_order,
         )
         return transaction
-
 
     def _factory_transaction(self):
         payment = self.order.payment

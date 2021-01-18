@@ -88,7 +88,7 @@ class Transaction(AbstractBaseModel):
         default=TransactionFailureReasonType.NA,
     )
     failure_reason_message = models.CharField(max_length=512, blank=True)
-    is_sender_failure = models.NullBooleanField(null=True, default=None)
+    is_sender_failure = models.BooleanField(null=True, default=None)
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )

@@ -19,6 +19,7 @@ __all__ = (
     "TransactionHistoryResponse",
     "TransactionDetailsResponse",
     "RecentStoresResponse",
+    "TransactionErrorDetailsResponse",
 )
 
 
@@ -286,6 +287,8 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     banks_details = serializers.SerializerMethodField("get_bank_details")
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
     is_credit = serializers.SerializerMethodField("is_credit_transaction")
+    failure_reason_type_label = serializers.CharField(source="failure_reason_type.label", read_only=True)
+    failure_reason_type_value = serializers.CharField(source="failure_reason_type.value", read_only=True)
 
     class Meta:
         model = Transaction
@@ -301,6 +304,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "is_credit",
             "tip_amount",
             "is_disputed",
+            "failure_reason_type_label",
+            "failure_reason_type_value",
+            "failure_reason_message",
         )
 
     def get_bank_details(self, obj):
@@ -368,4 +374,36 @@ class RecentStoresResponse(serializers.ModelSerializer):
             "full_name",
             "created_at",
             "merchant_id",
+        )
+
+
+
+class TransactionErrorDetailsResponse(serializers.ModelSerializer):
+    payment_status = serializers.CharField(
+        source="payment.status.label", read_only=True
+    )
+    payment_tracking_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
+    merchant = MerchantDetailsResponse(
+        source="payment.order.merchant", read_only=True
+    )
+    failure_reason_type_label = serializers.CharField(source="failure_reason_type.label", read_only=True)
+    failure_reason_type_value = serializers.CharField(source="failure_reason_type.value", read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = (
+            "created_at",
+            "amount",
+            "currency",
+            "payment_status",
+            "payment_tracking_id",
+            "is_success",
+            "merchant",
+            "tip_amount",
+            "is_disputed",
+            "failure_reason_type_label",
+            "failure_reason_type_value",
+            "failure_reason_message",
         )
