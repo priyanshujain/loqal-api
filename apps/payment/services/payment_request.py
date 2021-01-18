@@ -21,7 +21,7 @@ from apps.payment.validators import (ApprovePaymentRequestValidator,
 from apps.provider.options import DEFAULT_CURRENCY
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = (
     "CreatePaymentRequest",
@@ -120,17 +120,15 @@ class ApprovePaymentRequest(ServiceBase):
             )
 
         total_amount = payment_request.amount + data["tip_amount"]
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.account_id,
             receiver_account_id=merchant_account.account.id,
-            total_amount=total_amount,
         ).validate()
 
         transaction = CreatePayment(
             account_id=self.account_id,
             ip_address=self.ip_address,
             sender_bank_account=banking_data["sender_bank_account"],
-            sender_bank_balance=banking_data["sender_bank_balance"],
             receiver_bank_account=banking_data["receiver_bank_account"],
             order=payment_request.payment.order,
             total_amount=total_amount,

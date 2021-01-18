@@ -106,6 +106,11 @@ class Payment(AbstractBaseModel):
         if save:
             self.save()
 
+    def failed_payment(self, save=True):
+        self.status = PaymentStatus.FAILED
+        if save:
+            self.save()
+
 
 class PaymentEvent(AbstractBaseModel):
     payment = models.ForeignKey(

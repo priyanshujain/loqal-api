@@ -15,7 +15,7 @@ from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = ("DirectMerchantPayment",)
 
@@ -38,7 +38,6 @@ class DirectMerchantPayment(ServiceBase):
             account_id=self.consumer_account.id,
             ip_address=self.ip_address,
             sender_bank_account=payment_data["sender_bank_account"],
-            sender_bank_balance=payment_data["sender_bank_balance"],
             receiver_bank_account=payment_data["receiver_bank_account"],
             order=merhcant_payment.payment.order,
             total_amount=total_amount,
@@ -97,10 +96,9 @@ class DirectMerchantPayment(ServiceBase):
         else:
             payment_qrcode_id = None
 
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.consumer_account.account.id,
             receiver_account_id=merchant_account.account.id,
-            total_amount=data["amount"] + data["tip_amount"],
         ).validate()
 
         return {
@@ -111,7 +109,6 @@ class DirectMerchantPayment(ServiceBase):
             "payment_qrcode_id": payment_qrcode_id,
             "sender_bank_account": banking_data["sender_bank_account"],
             "receiver_bank_account": banking_data["receiver_bank_account"],
-            "sender_bank_balance": banking_data["sender_bank_balance"],
         }
 
     def _factory_merchant_payment(self, payment_data):

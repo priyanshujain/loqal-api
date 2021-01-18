@@ -10,7 +10,7 @@ from apps.payment.options import RefundType, TransactionType
 from apps.payment.validators import CreateRefundValidator
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = ("CreateRefund",)
 
@@ -32,7 +32,6 @@ class CreateRefund(ServiceBase):
             account_id=self.merchant_account.id,
             ip_address=self.ip_address,
             sender_bank_account=payment_data["sender_bank_account"],
-            sender_bank_balance=payment_data["sender_bank_balance"],
             receiver_bank_account=payment_data["receiver_bank_account"],
             order=order,
             total_amount=refund_payment.amount,
@@ -78,10 +77,9 @@ class CreateRefund(ServiceBase):
 
         # FIXME: check for the amount to be less than total of all previous refunds
 
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.merchant_account.account.id,
             receiver_account_id=payment.order.consumer.account.id,
-            total_amount=data["amount"],
         ).validate()
 
         return {
@@ -89,7 +87,6 @@ class CreateRefund(ServiceBase):
             "amount": data["amount"],
             "sender_bank_account": banking_data["sender_bank_account"],
             "receiver_bank_account": banking_data["receiver_bank_account"],
-            "sender_bank_balance": banking_data["sender_bank_balance"],
         }
 
     def _factory_refund_payment(self, payment_data):

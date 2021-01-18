@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
+from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
 from apps.payment.options import (ChargeStatus, DisputeReasonType,
                                   DisputeStatus, DisputeType, PaymentStatus,
-                                  TransactionEventType, TransactionStatus,
-                                  TransactionType)
+                                  TransactionEventType,
+                                  TransactionFailureReasonType,
+                                  TransactionStatus, TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -37,7 +39,14 @@ class Transaction(AbstractBaseModel):
     sender_balance_at_checkout = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
-        default=0,
+        null=True,
+        default=None,
+    )
+    min_access_balance_required = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        null=True,
+        default=None,
     )
     payment = models.ForeignKey(
         Payment,
@@ -67,6 +76,13 @@ class Transaction(AbstractBaseModel):
     status = ChoiceEnumField(
         enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
     )
+    failure_reason_type = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=TransactionFailureReasonType,
+        default=TransactionFailureReasonType.NA,
+    )
+    failure_reason_message = models.CharField(max_length=512, blank=True)
+    is_sender_failure = models.BooleanField(null=True, default=None)
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
@@ -84,6 +100,7 @@ class Transaction(AbstractBaseModel):
         default=TransactionType.DIRECT_MERCHANT_PAYMENT,
     )
     dwolla_id = models.CharField(max_length=255, blank=True)
+    ach_return_code = models.CharField(max_length=255, blank=True)
     individual_ach_id = models.CharField(
         max_length=32, null=True, blank=True, default=None, unique=True
     )
@@ -145,6 +162,29 @@ class Transaction(AbstractBaseModel):
 
     def enable_disputed(self, save=True):
         self.is_disputed = True
+        if save:
+            self.save()
+
+    def set_payment_failed(self):
+        self.payment.failed_payment()
+
+    def set_balance_check_failed(self, save=True):
+        self.is_sender_failure = True
+        self.failure_reason_type = (
+            TransactionFailureReasonType.BALANCE_CHECK_FAILED
+        )
+        self.failure_reason_message = "There is error from your Bank while checking balace. Please check your connected bank account and try again."
+        self.set_payment_failed()
+        if save:
+            self.save()
+
+    def set_insufficient_balance(self, save=True):
+        self.is_sender_failure = True
+        self.failure_reason_type = (
+            TransactionFailureReasonType.INSUFFICIENT_BALANCE
+        )
+        self.failure_reason_message = "The money in your account is not enough for this payment. Check account balance and try again."
+        self.set_payment_failed()
         if save:
             self.save()
 

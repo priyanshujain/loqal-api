@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
@@ -8,8 +9,11 @@ from apps.payment.dbapi import create_transaction
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   FACILITATION_FEES_PERCENTAGE,
                                   TransactionType)
+from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
+
+from .check_bank_balance import CheckBankBalance
 
 __all__ = ("CreatePayment",)
 
@@ -20,7 +24,6 @@ class CreatePayment(ServiceBase):
         account_id,
         ip_address,
         sender_bank_account,
-        sender_bank_balance,
         receiver_bank_account,
         order,
         total_amount,
@@ -31,7 +34,6 @@ class CreatePayment(ServiceBase):
         self.account_id = account_id
         self.ip_address = ip_address
         self.sender_bank_account = sender_bank_account
-        self.sender_bank_balance = sender_bank_balance
         self.receiver_bank_account = receiver_bank_account
         self.order = order
         self.total_amount = total_amount
@@ -40,8 +42,30 @@ class CreatePayment(ServiceBase):
         self.amount_towards_order = amount_towards_order
 
     def handle(self):
-        assert self._validate_data()
         transaction = self._factory_transaction()
+        balance, error = CheckBankBalance(
+            bank_account=self.sender_bank_account
+        ).validate()
+        if error:
+            transaction.set_balance_check_failed()
+            error.details["data"] = TransactionErrorDetailsResponse(
+                transaction
+            ).data
+            raise error
+        min_required_balance = self.total_amount + Decimal(
+            settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+        )
+        if balance < min_required_balance:
+            transaction.set_insufficient_balance()
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "You need minimum $100 excess of given amount to make a payment."
+                    ),
+                    "data": TransactionErrorDetailsResponse(transaction).data,
+                }
+            )
+
         dwolla_response = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(
             dwolla_id=dwolla_response["dwolla_transfer_id"],
@@ -50,37 +74,6 @@ class CreatePayment(ServiceBase):
             amount_towards_order=self.amount_towards_order,
         )
         return transaction
-
-    def _validate_data(self):
-        if not self.sender_bank_account:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Sender bank account is not valid."))}
-            )
-        if not self.sender_bank_balance:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Sender bank balance is not valid."))}
-            )
-        if not self.receiver_bank_account:
-            raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Receiver bank account is not valid.")
-                    )
-                }
-            )
-        if not self.order:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Order is not valid."))}
-            )
-        if not self.total_amount:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Amount is not valid."))}
-            )
-        if not self.fee_bearer_account:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Fee bearer account is not valid."))}
-            )
-        return True
 
     def _factory_transaction(self):
         payment = self.order.payment
@@ -91,7 +84,6 @@ class CreatePayment(ServiceBase):
         return create_transaction(
             sender_bank_account_id=self.sender_bank_account.id,
             recipient_bank_account_id=self.receiver_bank_account.id,
-            sender_balance_at_checkout=self.sender_bank_balance,
             amount=self.total_amount,
             currency=DEFAULT_CURRENCY,
             fee_bearer_account_id=self.fee_bearer_account.id,

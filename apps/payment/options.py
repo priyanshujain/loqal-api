@@ -17,6 +17,23 @@ class TransactionType(ChoiceCharEnum):
     OTHER = "other", _("Other")
 
 
+class TransactionFailureReasonType(ChoiceCharEnum):
+    TRANSACTION_LIMIT_EXCEEDED = "transaction_limit_exceeded", _(
+        "Transaction limit exceeded."
+    )
+    BALANCE_CHECK_FAILED = "balance_check_failed", _("Balance check failed.")
+    INSUFFICIENT_BALANCE = "insufficient_balance", _("Insufficient Balance.")
+    PROVIDER_PAYMENT_SERVICE_FAILED = "provider_payment_service_failed", _(
+        "Provider payment service failed."
+    )
+    INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
+        "Internal payment service failed."
+    )
+    ACH_RETURN = "ach_return", _("ACH return.")
+    OTHER = "other", _("Other")
+    NA = "na", _("NA")
+
+
 class TransactionStatus(ChoiceEnum):
     NOT_SENT = 0, _("Not Sent")
     PENDING = 1, _("Pending")
