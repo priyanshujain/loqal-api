@@ -29,7 +29,7 @@ str     display_message:    A user-friendly error message. Not safe
 list    causes:             A list of reasons explaining why the
                             error happened.
 ```
-
+- Add IP address logging (Ref. Sentry)
 
 ## Long terms
 
