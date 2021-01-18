@@ -4,8 +4,13 @@ from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.banking.models import BankAccount
 from apps.order.models import Order
-from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction)
+from apps.payment.models import (
+    DirectMerchantPayment,
+    Payment,
+    PaymentRequest,
+    Refund,
+    Transaction,
+)
 from apps.payment.options import PaymentProcess
 from apps.merchant.models import MerchantCategory
 
@@ -21,6 +26,7 @@ __all__ = (
     "TransactionDetailsResponse",
     "RecentStoresResponse",
 )
+
 
 class MerchantCategoryResponse(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +44,7 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
         source="profile.full_name", read_only=True
     )
     about = serializers.CharField(source="profile.about", read_only=True)
-    categories = MerchantCategoryResponse(read_only=True)
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     hero_image = serializers.CharField(
         source="profile.hero_image", read_only=True
     )
@@ -213,7 +219,7 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
         source="profile.full_name", read_only=True
     )
-    categories = MerchantCategoryResponse(read_only=True)
+    categories = MerchantCategoryResponse(many=True, read_only=True)
     address = serializers.JSONField(source="profile.address", read_only=True)
 
     class Meta:
