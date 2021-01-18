@@ -10,11 +10,26 @@ FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
 
 class TransactionType(ChoiceCharEnum):
     PAYMENT_REQUEST = "payment_request", _("Payment Request")
-    DIRECT_MERCHANT_PAYMENT = "direct_merchant_payment", _(
-        "Direct Merchant Payment"
-    )
+    DIRECT_MERCHANT_PAYMENT = "direct_merchant_payment", _("Direct Merchant Payment")
     REFUND_PAYMENT = "refund_payment", _("Refund Payment")
     OTHER = "other", _("Other")
+
+
+class TransactionFailureReasonType(ChoiceCharEnum):
+    TRANSACTION_LIMIT_EXCEEDED = "transaction_limit_exceeded", _(
+        "Transaction limit exceeded."
+    )
+    BALANCE_CHECK_FAILED = "balance_check_failed", _("Balance check failed.")
+    INSUFFICIENT_BALANCE = "insufficient_balance", _("Insufficient Balance.")
+    PROVIDER_PAYMENT_SERVICE_FAILED = "provider_payment_service_failed", _(
+        "Provider payment service failed."
+    )
+    INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
+        "Internal payment service failed."
+    )
+    ACH_RETURN = "ach_return", _("ACH return.")
+    OTHER = "other", _("Other")
+    NA = "na", _("NA")
 
 
 class TransactionStatus(ChoiceEnum):
@@ -105,16 +120,12 @@ class DisputeType(ChoiceCharEnum):
 
 
 class DisputeReasonType(ChoiceCharEnum):
-    MONEY_NOT_REACHED = "money_not_reached", _(
-        "Money has not reached to merchant"
-    )
+    MONEY_NOT_REACHED = "money_not_reached", _("Money has not reached to merchant")
     PAID_TWICE = "paid_twice", _("Paid twice for the order")
     MORE_DETAILS_REQUIRED = "more_details_required", _(
         "Require more details on transaction"
     )
-    DID_NOT_PERFORM = "did_not_perform", _(
-        "I did not perform this transaction"
-    )
+    DID_NOT_PERFORM = "did_not_perform", _("I did not perform this transaction")
     OTHER = "other", _("Other issues")
 
 

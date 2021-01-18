@@ -5,23 +5,28 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import (get_consumer_account_by_phone_number,
-                                get_consumer_account_by_username)
+from apps.account.dbapi import (
+    get_consumer_account_by_phone_number,
+    get_consumer_account_by_username,
+)
 from apps.banking.dbapi import get_bank_account
 from apps.order.dbapi import create_payment_request_order
-from apps.payment.dbapi import (create_payment, create_payment_request,
-                                get_payment_reqeust_by_id)
-from apps.payment.dbapi.events import (capture_payment_event,
-                                       initiate_payment_event)
-from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
-                                  TransactionType)
-from apps.payment.validators import (ApprovePaymentRequestValidator,
-                                     CreatePaymentRequestValidator,
-                                     RejectPaymentRequestValidator)
+from apps.payment.dbapi import (
+    create_payment,
+    create_payment_request,
+    get_payment_reqeust_by_id,
+)
+from apps.payment.dbapi.events import capture_payment_event, initiate_payment_event
+from apps.payment.options import PaymentProcess, PaymentRequestStatus, TransactionType
+from apps.payment.validators import (
+    ApprovePaymentRequestValidator,
+    CreatePaymentRequestValidator,
+    RejectPaymentRequestValidator,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = (
     "CreatePaymentRequest",
@@ -51,9 +56,7 @@ class CreatePaymentRequest(ServiceBase):
                 phone_number=phone_number
             )
         else:
-            consumer_account = get_consumer_account_by_username(
-                username=loqal_id
-            )
+            consumer_account = get_consumer_account_by_username(username=loqal_id)
 
         bank_account = get_bank_account(account_id=self.account_id)
         if not bank_account:
@@ -69,9 +72,7 @@ class CreatePaymentRequest(ServiceBase):
         try:
             merchant_account = bank_account.account.merchantaccount
         except AttributeError:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid account."))}
-            )
+            raise ValidationError({"detail": ErrorDetail(_("Invalid account."))})
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id
@@ -120,17 +121,15 @@ class ApprovePaymentRequest(ServiceBase):
             )
 
         total_amount = payment_request.amount + data["tip_amount"]
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.account_id,
             receiver_account_id=merchant_account.account.id,
-            total_amount=total_amount,
         ).validate()
 
         transaction = CreatePayment(
             account_id=self.account_id,
             ip_address=self.ip_address,
             sender_bank_account=banking_data["sender_bank_account"],
-            sender_bank_balance=banking_data["sender_bank_balance"],
             receiver_bank_account=banking_data["receiver_bank_account"],
             order=payment_request.payment.order,
             total_amount=total_amount,

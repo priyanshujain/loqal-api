@@ -3,7 +3,7 @@ Payments relted db operations.
 """
 
 from decimal import Decimal
-
+from django.conf import settings
 from django.db.models import Count, Q, Sum
 from django.db.utils import IntegrityError
 
@@ -45,7 +45,6 @@ def create_payment(
 def create_transaction(
     sender_bank_account_id,
     recipient_bank_account_id,
-    sender_balance_at_checkout,
     amount,
     currency,
     fee_bearer_account_id,
@@ -54,6 +53,7 @@ def create_transaction(
     payment_id,
     customer_ip_address,
     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+    min_access_balance_required=Decimal(settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED)
 ):
     """
     dbapi for creating new transaction.
@@ -62,7 +62,6 @@ def create_transaction(
         return Transaction.objects.create(
             sender_bank_account_id=sender_bank_account_id,
             recipient_bank_account_id=recipient_bank_account_id,
-            sender_balance_at_checkout=sender_balance_at_checkout,
             amount=Decimal(amount),
             currency=currency,
             fee_bearer_account_id=fee_bearer_account_id,
@@ -71,6 +70,7 @@ def create_transaction(
             payment_id=payment_id,
             customer_ip_address=customer_ip_address,
             transaction_type=transaction_type,
+            min_access_balance_required=min_access_balance_required,
         )
     except IntegrityError:
         return None
