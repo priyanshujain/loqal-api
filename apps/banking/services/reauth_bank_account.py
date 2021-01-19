@@ -4,7 +4,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.banking.dbapi import update_bank_account
-from apps.banking.validators import CreateBankAccountValidator
+from apps.banking.validators import ReauthBankAccountValidator
 from plugins.plaid import PlaidPlugin
 
 
@@ -17,7 +17,7 @@ class ReAuthBankAccount(ServiceBase):
         data = self._validate_data()
         plaid_item = self._process_plaid_token(data=data)
         plaid_access_token = plaid_item["plaid_access_token"]
-        plaid_account_id = data["plaid_account_id"]
+        plaid_account_id = self.bank_account.plaid_account_id
 
         self._update_bank_account(
             plaid_access_token=plaid_access_token,
@@ -27,7 +27,6 @@ class ReAuthBankAccount(ServiceBase):
 
     def _process_plaid_token(self, data):
         plaid_public_token = data["plaid_public_token"]
-        plaid_account_id = data["plaid_account_id"]
 
         plaid = PlaidPlugin()
         access_token = plaid.exchange_public_token(
@@ -47,20 +46,8 @@ class ReAuthBankAccount(ServiceBase):
 
     def _validate_data(self):
         data = run_validator(
-            validator=CreateBankAccountValidator, data=self.data
+            validator=ReauthBankAccountValidator, data=self.data
         )
-
-        if self.bank_account.plaid_account_id != data["plaid_account_id"]:
-            raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _(
-                            "Please select the same bank account you have added previously."
-                        )
-                    )
-                }
-            )
-
         return data
 
     def _update_bank_account(
