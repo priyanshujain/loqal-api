@@ -48,7 +48,7 @@ class CreatePayment(ServiceBase):
         ).validate()
         if error:
             transaction.set_balance_check_failed()
-            error.details["data"] = TransactionErrorDetailsResponse(
+            error.detail["data"] = TransactionErrorDetailsResponse(
                 transaction
             ).data
             raise error

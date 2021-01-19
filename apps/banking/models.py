@@ -48,3 +48,4 @@ class BankAccount(AbstractBaseModel):
         self.status = BankAccountStatus.USERNAME_CHANGED
         if save:
             self.save()
+

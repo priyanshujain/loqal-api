@@ -129,7 +129,7 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
     user = ConsumerResponse(
         source="sender.account.consumeraccount", read_only=True
     )
-    transaction_id = serializers.CharField(source="u_id", read_only=True)
+    transaction_id = serializers.CharField(source="transaction_tracking_id", read_only=True)
     status = serializers.CharField(source="status.label", read_only=True)
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True

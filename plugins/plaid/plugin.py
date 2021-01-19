@@ -1,3 +1,4 @@
+from typing import Iterable
 from django.conf import settings
 from plaid import Client
 from plaid.errors import InvalidInputError, ItemError
@@ -159,3 +160,9 @@ class PlaidPlugin(object):
         if accounts and len(accounts) > 0:
             return float(accounts[0]["balances"]["available"])
         return None
+
+    def sandbox_reset_login(self, access_token):
+        try:
+            self._client.Sandbox.item.reset_login(access_token)
+        except ItemError:
+            raise PlaidReAuth
