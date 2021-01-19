@@ -56,7 +56,7 @@ class ReAuthBankAccount(ServiceBase):
         plaid_account_id,
     ):
         update_bank_account(
-            account_id=self.bank_account.id,
+            bank_account_id=self.bank_account.id,
             plaid_access_token=plaid_access_token,
             plaid_account_id=plaid_account_id,
         )
