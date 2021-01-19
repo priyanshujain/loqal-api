@@ -19,12 +19,11 @@ class ReAuthBankAccount(ServiceBase):
         plaid_access_token = plaid_item["plaid_access_token"]
         plaid_account_id = data["plaid_account_id"]
 
-        bank_account = self._update_bank_account(
+        self._update_bank_account(
             plaid_access_token=plaid_access_token,
             plaid_account_id=plaid_account_id,
         )
-        bank_account.set_verified()
-        return bank_account
+        self.bank_account.set_verified()
 
     def _process_plaid_token(self, data):
         plaid_public_token = data["plaid_public_token"]
@@ -69,9 +68,8 @@ class ReAuthBankAccount(ServiceBase):
         plaid_access_token,
         plaid_account_id,
     ):
-        bank_account = update_bank_account(
+        update_bank_account(
             account_id=self.bank_account.id,
             plaid_access_token=plaid_access_token,
             plaid_account_id=plaid_account_id,
         )
-        return bank_account
