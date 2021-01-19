@@ -71,5 +71,5 @@ class ReAuthBankAccountAPI(ConsumerAPIView):
 
         bank_account = ReAuthBankAccount(
             bank_account=bank_account, data=self.request_data
-        )
+        ).handle()
         return self.response()
