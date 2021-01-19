@@ -406,6 +406,7 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
             "currency",
             "payment_status",
             "payment_tracking_id",
+            "transaction_tracking_id",
             "is_success",
             "merchant",
             "is_disputed",
