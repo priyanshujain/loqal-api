@@ -1,6 +1,7 @@
 class ApplyBankingWebhook(object):
-    def __init__(self, event):
+    def __init__(self, event, customer_account):
         self.event = event
+        self.customer_account = customer_account
 
     def handle(self):
         topic = self.event.topic

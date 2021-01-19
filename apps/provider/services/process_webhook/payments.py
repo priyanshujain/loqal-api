@@ -1,15 +1,28 @@
-class ApplyOnboardingWebhook(object):
-    def __init__(self, event):
+from apps.payment.dbapi.webhoooks import get_transaction 
+from apps.account.dbapi.webhooks import get_account
+from api.exceptions import ValidationError, ErrorDetail
+
+
+class ApplyPaymentWebhook(object):
+    def __init__(self, event, customer_account):
         self.event = event
+        self.customer_account = customer_account
 
     def handle(self):
         topic = self.event.topic
+        transaction_dwolla_id = self.event.target_resource_dwolla_id
+        transaction = get_transaction(dwolla_id=transaction_dwolla_id)
+        if not transaction:
+            raise ValidationError({"detail": ErrorDetail("Invalid resource id for transfer.")})
+        
 
         if topic == "customer_bank_transfer_created":
             # A bank transfer was created for a Customer. Represents funds moving either
             # from a verified Customer’s bank to the Dwolla network or from the
             # Dwolla network to a verified Customer’s bank.
-            pass
+            #
+            # Note: As in our case only recevier is the verified customer we will assume it for receiver 
+            transaction.mark_receiver_bank_trasfer_created()
 
         if topic == "customer_bank_transfer_creation_failed":
             # An attempt to initiate a transfer to a verified Customer’s bank was made,
@@ -18,7 +31,7 @@ class ApplyOnboardingWebhook(object):
             # Dwolla will fail to create a transaction intended for a verified
             # Customer’s bank if the funds available in the balance are less than
             # the transfer amount.
-            pass
+            transaction.mark_receiver_bank_trasfer_failed()
 
         if topic == "customer_bank_transfer_cancelled":
             # A pending Customer bank transfer has been cancelled, and will not process further.

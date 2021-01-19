@@ -29,7 +29,9 @@ class TransactionFailureReasonType(ChoiceCharEnum):
     INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
         "Internal payment service failed."
     )
-    ACH_RETURN = "ach_return", _("ACH return.")
+    PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", ("Pre transfer ACH return on source bank")
+    PRE_DESTINATION_ACH_FAILED = "pre_destination_ach_failed", ("Pre transfer ACH return on destination bank")
+    PS_SOURCE_TRANSFER_FAILED = "ps_source_transfer_failed", _("Post settlement ACH return on source bank")
     OTHER = "other", _("Other")
     NA = "na", _("NA")
 
@@ -41,6 +43,12 @@ class TransactionStatus(ChoiceEnum):
     FAILED = 3, _("Failed")
     CANCELLED = 4, _("Cancelled")
     INTERNAL_PSP_ERROR = 5, _("Internal PSP Error")
+    ACH_FAILED = 6, _("Failed due to ACH failure")
+    COMPLETED = 7, _("Completed")
+    SENDER_BANK_TRANSFER_CREATED = 8, _("Sender bank transfer created")
+    SENDER_BANK_TRANSFER_FAILED = 9, _("Sender bank transfer failed")
+    RECEIVER_BANK_TRANSFER_CREATED = 10, _("Receiver bank transfer created")
+    RECEIVER_BANK_TRANSFER_FAILED = 11, _("Receiver bank transfer failed")
 
 
 class TransactionEventType(ChoiceEnum):

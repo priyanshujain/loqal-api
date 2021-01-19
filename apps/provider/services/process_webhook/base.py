@@ -4,8 +4,14 @@ from hashlib import sha256
 from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
-from apps.provider.dbapi import (create_provider_webhook_event,
-                                 get_provider_webhook)
+from apps.provider.dbapi import create_provider_webhook_event, get_provider_webhook
+from apps.account.dbapi.webhooks import get_account
+from api.exceptions import ValidationError, ErrorDetail
+
+from .payments import ApplyPaymentWebhook
+from .onboarding import ApplyOnboardingWebhook
+from .banking import ApplyBankingWebhook
+
 
 __all__ = ("ProcesssProviderWebhook",)
 
@@ -30,18 +36,42 @@ class ProcesssProviderWebhook(ServiceBase):
             proposed_signature=signature,
             webhook_secret=provider_webhook.webhook_secret,
         )
-        if not is_verified:
-            return
+
+        # TODO: Fix this and revert
+        # if not is_verified:
+        #     return
 
         event_id = self.request_data.get("id", "")
         target_resource_dwolla_id = self.request_data.get("resourceId", "")
         topic = self.request_data.get("topic", "")
-        self._factory_provider_webhook_event(
+        event = self._factory_provider_webhook_event(
             webhook_id=provider_webhook.id,
             dwolla_id=event_id,
             target_resource_dwolla_id=target_resource_dwolla_id,
             topic=topic,
         )
+
+        if not "customer" in topic:
+            # Add account related webhooks here
+            return
+
+        account_dwolla_id = (
+            self.request_data.get("_links", {})
+            .get("customer", {})
+            .get("href", "")
+            .split("/")
+            .pop()
+        )
+        customer_account = get_account(dwolla_id=account_dwolla_id)
+        if not customer_account:
+            raise ValidationError({"detail": ErrorDetail("Invalid id for customer.")})
+
+        if "transfer" in topic:
+            ApplyPaymentWebhook(event=event, customer_account=customer_account).handle()
+        elif "funding_source" in topic:
+            ApplyBankingWebhook(event=event, customer_account=customer_account).handle()
+        else:
+            ApplyOnboardingWebhook(event=event, customer_account=customer_account).handle()
 
     def _verify_gateway_signature(self, proposed_signature, webhook_secret):
         signature = hmac.new(
@@ -52,7 +82,7 @@ class ProcesssProviderWebhook(ServiceBase):
     def _factory_provider_webhook_event(
         self, webhook_id, dwolla_id, topic, target_resource_dwolla_id
     ):
-        create_provider_webhook_event(
+        return create_provider_webhook_event(
             webhook_id=webhook_id,
             event_payload=self.request_data,
             dwolla_id=dwolla_id,

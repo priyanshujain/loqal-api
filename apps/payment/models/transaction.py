@@ -1,15 +1,22 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.base import ModelStateFieldsCacheDescriptor
 from django.utils.crypto import get_random_string
 from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (ChargeStatus, DisputeReasonType,
-                                  DisputeStatus, DisputeType, PaymentStatus,
-                                  TransactionEventType,
-                                  TransactionFailureReasonType,
-                                  TransactionStatus, TransactionType)
+from apps.payment.options import (
+    ChargeStatus,
+    DisputeReasonType,
+    DisputeStatus,
+    DisputeType,
+    PaymentStatus,
+    TransactionEventType,
+    TransactionFailureReasonType,
+    TransactionStatus,
+    TransactionType,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -63,7 +70,11 @@ class Transaction(AbstractBaseModel):
     )
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     fee_bearer_account = models.ForeignKey(
-        Account, null=True, blank=True, on_delete=models.SET_NULL
+        Account,
+        related_name="paid_for_transactions",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     fee_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -76,6 +87,8 @@ class Transaction(AbstractBaseModel):
     status = ChoiceEnumField(
         enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
     )
+
+    # failure related
     failure_reason_type = ChoiceCharEnumField(
         max_length=32,
         enum_type=TransactionFailureReasonType,
@@ -83,6 +96,26 @@ class Transaction(AbstractBaseModel):
     )
     failure_reason_message = models.CharField(max_length=512, blank=True)
     is_sender_failure = models.BooleanField(null=True, default=None)
+
+    # ACH return related
+    ach_return_code = models.CharField(max_length=32, blank=True)
+    ach_return_description = models.CharField(max_length=255, blank=True)
+    ach_return_explaination = models.CharField(max_length=255, blank=True)
+    ach_return_bank_account = models.ForeignKey(
+        BankAccount,
+        on_delete=models.SET_NULL,
+        related_name="ach_return_transactions",
+        null=True,
+        blank=True,
+    )
+    ach_return_account = models.ForeignKey(
+        Account,
+        on_delete=models.SET_NULL,
+        related_name="ach_return_transactions",
+        null=True,
+        blank=True,
+    )
+
     correlation_id = models.CharField(
         default=generate_uuid_hex, editable=False, unique=True, max_length=40
     )
@@ -170,9 +203,7 @@ class Transaction(AbstractBaseModel):
 
     def set_balance_check_failed(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = (
-            TransactionFailureReasonType.BALANCE_CHECK_FAILED
-        )
+        self.failure_reason_type = TransactionFailureReasonType.BALANCE_CHECK_FAILED
         self.failure_reason_message = "There is error from your Bank while checking balace. Please check your connected bank account and try again."
         self.set_payment_failed()
         if save:
@@ -180,11 +211,76 @@ class Transaction(AbstractBaseModel):
 
     def set_insufficient_balance(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = (
-            TransactionFailureReasonType.INSUFFICIENT_BALANCE
-        )
+        self.failure_reason_type = TransactionFailureReasonType.INSUFFICIENT_BALANCE
         self.failure_reason_message = "The money in your account is not enough for this payment. Check account balance and try again."
         self.set_payment_failed()
+        if save:
+            self.save()
+
+    def mark_processed(self, save=True):
+        self.status = TransactionStatus.PROCESSED
+        if save:
+            self.save()
+
+    def mark_failed(self, save=True):
+        self.status = TransactionStatus.FAILED
+        if save:
+            self.save()
+
+    def mark_ach_failed(self, save=True):
+        self.status = TransactionStatus.ACH_FAILED
+        if save:
+            self.save()
+
+    def mark_cancelled(self, save=True):
+        self.status = TransactionStatus.CANCELLED
+        if save:
+            self.save()
+
+    def mark_completed(self, save=True):
+        self.status = TransactionStatus.PROCESSED
+        if save:
+            self.save()
+
+    def mark_psp_error(self, save=True):
+        self.status = TransactionStatus.INTERNAL_PSP_ERROR
+        if save:
+            self.save()
+
+    def mark_sender_bank_trasfer_created(self, save=True):
+        self.status = TransactionStatus.SENDER_BANK_TRANSFER_CREATED
+        if save:
+            self.save()
+
+    def mark_sender_bank_trasfer_failed(self, save=True):
+        self.status = TransactionStatus.SENDER_BANK_TRANSFER_FAILED
+        if save:
+            self.save()
+
+    def mark_receiver_bank_trasfer_created(self, save=True):
+        self.status = TransactionStatus.RECEIVER_BANK_TRANSFER_CREATED
+        if save:
+            self.save()
+
+    def mark_receiver_bank_trasfer_failed(self, save=True):
+        self.status = TransactionStatus.RECEIVER_BANK_TRANSFER_FAILED
+        if save:
+            self.save()
+
+    def log_ach_return(
+        self,
+        ach_return_code,
+        ach_return_description,
+        ach_return_explaination,
+        ach_return_bank_account,
+        ach_return_account,
+        save=True,
+    ):
+        self.ach_return_code = ach_return_code
+        self.ach_return_description = ach_return_description
+        self.ach_return_explaination = ach_return_explaination
+        self.ach_return_bank_account = ach_return_bank_account
+        self.ach_return_account = ach_return_account
         if save:
             self.save()
 
