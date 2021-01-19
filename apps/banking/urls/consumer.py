@@ -11,7 +11,7 @@ urlpatterns = [
         name="create_consumer_bank_account",
     ),
     path(
-        "merchant/accounts/reauth/",
+        "consumer/accounts/reauth/",
         ReAuthBankAccountAPI.as_view(),
         name="reauth_consumer_bank_account",
     ),
