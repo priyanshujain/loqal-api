@@ -6,7 +6,7 @@ from apps.banking.models import BankAccount
 from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction)
+                                 PaymentRequest, Refund, Transaction, transaction)
 from apps.payment.options import PaymentProcess
 
 __all__ = (
@@ -397,6 +397,7 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
     failure_reason_type_value = serializers.CharField(
         source="failure_reason_type.value", read_only=True
     )
+    transaction_id = serializers.CharField(source="transaction_tracking_id", read_only=True)
 
     class Meta:
         model = Transaction
@@ -406,7 +407,7 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
             "currency",
             "payment_status",
             "payment_tracking_id",
-            "transaction_tracking_id",
+            "transaction_id",
             "is_success",
             "merchant",
             "is_disputed",
