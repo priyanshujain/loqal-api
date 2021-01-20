@@ -1,4 +1,5 @@
 from typing import Iterable
+
 from django.conf import settings
 from plaid import Client
 from plaid.errors import InvalidInputError, ItemError
@@ -56,7 +57,9 @@ class PlaidPlugin(object):
             data["products"] = ["auth"]
 
         try:
-            self._link_token = self._client.LinkToken.create(data).get("link_token")
+            self._link_token = self._client.LinkToken.create(data).get(
+                "link_token"
+            )
         except InvalidInputError:
             return None
         return self._link_token
@@ -98,7 +101,9 @@ class PlaidPlugin(object):
         #     "numbers"
         # ]
         try:
-            auth_data = self._client.Auth.get(access_token, account_ids=[account_id])
+            auth_data = self._client.Auth.get(
+                access_token, account_ids=[account_id]
+            )
         except InvalidInputError:
             return None
         accounts = auth_data["accounts"]
@@ -116,7 +121,9 @@ class PlaidPlugin(object):
             if account["account_id"] == account_id:
                 bank_account["account_number"] = account.get("account")
                 bank_account["aba_routing_number"] = account.get("routing")
-                bank_account["wire_routing_number"] = account.get("wire_routing")
+                bank_account["wire_routing_number"] = account.get(
+                    "wire_routing"
+                )
         return bank_account
 
     def get_institution(self, institution_id):

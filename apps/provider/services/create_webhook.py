@@ -25,7 +25,7 @@ class CreateProviderWebhook(ServiceBase):
         webhook_url = urljoin(settings.API_BASE_URL, webhook_path)
         webhook_data = {
             "webhook_url": webhook_url,
-            "webhook_secret": provider_webhook.webhook_id,
+            "webhook_secret": provider_webhook.webhook_secret,
         }
         dwolla_response = self._send_to_dwolla(webhook_data=webhook_data)
         provider_webhook.add_dwolla_id(dwolla_id=dwolla_response["dwolla_id"])

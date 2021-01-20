@@ -6,7 +6,8 @@ from apps.banking.models import BankAccount
 from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction, transaction)
+                                 PaymentRequest, Refund, Transaction,
+                                 transaction)
 from apps.payment.options import PaymentProcess
 
 __all__ = (
@@ -129,7 +130,9 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
     user = ConsumerResponse(
         source="sender.account.consumeraccount", read_only=True
     )
-    transaction_id = serializers.CharField(source="transaction_tracking_id", read_only=True)
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
+    )
     status = serializers.CharField(source="status.label", read_only=True)
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True
@@ -397,7 +400,9 @@ class TransactionErrorDetailsResponse(serializers.ModelSerializer):
     failure_reason_type_value = serializers.CharField(
         source="failure_reason_type.value", read_only=True
     )
-    transaction_id = serializers.CharField(source="transaction_tracking_id", read_only=True)
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
+    )
 
     class Meta:
         model = Transaction

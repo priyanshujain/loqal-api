@@ -6,17 +6,13 @@ from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (
-    ChargeStatus,
-    DisputeReasonType,
-    DisputeStatus,
-    DisputeType,
-    PaymentStatus,
-    TransactionEventType,
-    TransactionFailureReasonType,
-    TransactionStatus,
-    TransactionType,
-)
+from apps.payment.options import (ChargeStatus, DisputeReasonType,
+                                  DisputeStatus, DisputeType, PaymentStatus,
+                                  TransactionEventType,
+                                  TransactionFailureReasonType,
+                                  TransactionReceiverStatus,
+                                  TransactionSenderStatus, TransactionStatus,
+                                  TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -84,13 +80,25 @@ class Transaction(AbstractBaseModel):
     fee_currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     is_success = models.BooleanField(default=False)
     is_disputed = models.BooleanField(default=False)
+
+    # Statuses
     status = ChoiceEnumField(
         enum_type=TransactionStatus, default=TransactionStatus.NOT_SENT
+    )
+    sender_status = ChoiceCharEnumField(
+        enum_type=TransactionSenderStatus,
+        max_length=128,
+        default=TransactionSenderStatus.NOT_STARTED,
+    )
+    receiver_status = ChoiceCharEnumField(
+        enum_type=TransactionReceiverStatus,
+        max_length=128,
+        default=TransactionReceiverStatus.NOT_STARTED,
     )
 
     # failure related
     failure_reason_type = ChoiceCharEnumField(
-        max_length=32,
+        max_length=128,
         enum_type=TransactionFailureReasonType,
         default=TransactionFailureReasonType.NA,
     )
@@ -203,7 +211,9 @@ class Transaction(AbstractBaseModel):
 
     def set_balance_check_failed(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = TransactionFailureReasonType.BALANCE_CHECK_FAILED
+        self.failure_reason_type = (
+            TransactionFailureReasonType.BALANCE_CHECK_FAILED
+        )
         self.failure_reason_message = "There is error from your Bank while checking balace. Please check your connected bank account and try again."
         self.set_payment_failed()
         if save:
@@ -211,7 +221,9 @@ class Transaction(AbstractBaseModel):
 
     def set_insufficient_balance(self, save=True):
         self.is_sender_failure = True
-        self.failure_reason_type = TransactionFailureReasonType.INSUFFICIENT_BALANCE
+        self.failure_reason_type = (
+            TransactionFailureReasonType.INSUFFICIENT_BALANCE
+        )
         self.failure_reason_message = "The money in your account is not enough for this payment. Check account balance and try again."
         self.set_payment_failed()
         if save:
@@ -227,43 +239,23 @@ class Transaction(AbstractBaseModel):
         if save:
             self.save()
 
-    def mark_ach_failed(self, save=True):
-        self.status = TransactionStatus.ACH_FAILED
-        if save:
-            self.save()
-
     def mark_cancelled(self, save=True):
         self.status = TransactionStatus.CANCELLED
         if save:
             self.save()
 
-    def mark_completed(self, save=True):
-        self.status = TransactionStatus.PROCESSED
+    def mark_sender_completed(self, save=True):
+        self.status = TransactionStatus.SENDER_COMPLETED
         if save:
             self.save()
 
     def mark_psp_error(self, save=True):
-        self.status = TransactionStatus.INTERNAL_PSP_ERROR
+        self.status = TransactionStatus.UNKNOWN_PSP_ERROR
         if save:
             self.save()
 
-    def mark_sender_bank_trasfer_created(self, save=True):
-        self.status = TransactionStatus.SENDER_BANK_TRANSFER_CREATED
-        if save:
-            self.save()
-
-    def mark_sender_bank_trasfer_failed(self, save=True):
-        self.status = TransactionStatus.SENDER_BANK_TRANSFER_FAILED
-        if save:
-            self.save()
-
-    def mark_receiver_bank_trasfer_created(self, save=True):
-        self.status = TransactionStatus.RECEIVER_BANK_TRANSFER_CREATED
-        if save:
-            self.save()
-
-    def mark_receiver_bank_trasfer_failed(self, save=True):
-        self.status = TransactionStatus.RECEIVER_BANK_TRANSFER_FAILED
+    def mark_internal_error(self, save=True):
+        self.status = TransactionStatus.INTERNAL_ERROR
         if save:
             self.save()
 

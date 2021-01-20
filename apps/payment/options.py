@@ -29,9 +29,19 @@ class TransactionFailureReasonType(ChoiceCharEnum):
     INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
         "Internal payment service failed."
     )
-    PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", ("Pre transfer ACH return on source bank")
-    PRE_DESTINATION_ACH_FAILED = "pre_destination_ach_failed", ("Pre transfer ACH return on destination bank")
-    PS_SOURCE_TRANSFER_FAILED = "ps_source_transfer_failed", _("Post settlement ACH return on source bank")
+    PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", (
+        "Pre transfer ACH return on source bank"
+    )
+    PRE_DESTINATION_ACH_FAILED = "pre_destination_ach_failed", (
+        "Pre transfer ACH return on destination bank"
+    )
+    PRE_SETTLEMENT_INSUFFICIENT_BALANCE_AT_DESTINATION = (
+        "pre_settlement_insufficient_balance_at_destination",
+        ("Pre transfer ACH return on destination bank"),
+    )
+    PS_SOURCE_TRANSFER_FAILED = "ps_source_transfer_failed", _(
+        "Post settlement ACH return on source bank"
+    )
     OTHER = "other", _("Other")
     NA = "na", _("NA")
 
@@ -42,13 +52,118 @@ class TransactionStatus(ChoiceEnum):
     PROCESSED = 2, _("Processed")
     FAILED = 3, _("Failed")
     CANCELLED = 4, _("Cancelled")
-    INTERNAL_PSP_ERROR = 5, _("Internal PSP Error")
-    ACH_FAILED = 6, _("Failed due to ACH failure")
-    COMPLETED = 7, _("Completed")
-    SENDER_BANK_TRANSFER_CREATED = 8, _("Sender bank transfer created")
-    SENDER_BANK_TRANSFER_FAILED = 9, _("Sender bank transfer failed")
-    RECEIVER_BANK_TRANSFER_CREATED = 10, _("Receiver bank transfer created")
-    RECEIVER_BANK_TRANSFER_FAILED = 11, _("Receiver bank transfer failed")
+    UNKNOWN_PSP_ERROR = 5, _("Unknown PSP Error")
+    INTERNAL_ERROR = 6, _("Internal Error")
+    SENDER_COMPLETED = 7, _("Sender Completed")
+
+
+class TransactionSenderStatus(ChoiceCharEnum):
+    # UVC: unverified customer, VC: verified customer
+    NOT_STARTED = "not_started", _("Not started")
+    UVC_BANK_TRANSFER_CREATED = "uvc_bank_transfer_created", _(
+        "Transfer created from bank"
+    )
+    UVC_BANK_TRANSFER_FAILED = "uvc_bank_transfer_failed", _(
+        "Bank transfer failed"
+    )
+    UVC_BANK_TRANSFER_COMPLETED = "uvc_bank_transfer_completed", _(
+        "Sender Transfer Completed"
+    )
+    UVC_BANK_TRANSFER_CANCELLED = "uvc_bank_transfer_cancelled", _(
+        "Sender bank transfer Cancelled"
+    )
+    VC_BALANCE_TRANSFER_CREATED = "vc_bank_transfer_created", _(
+        "Transfer created from balance"
+    )
+    VC_BANK_TRANSFER_CREATED = "vc_bank_transfer_created", _(
+        "Sender bank transfer created"
+    )
+    VC_BANK_TRANSFER_CREATION_FAILED = "vc_bank_transfer_creation_failed", _(
+        "Bank transfer creation failed"
+    )
+    VC_BANK_TRANSFER_CANCELLED = "vc_bank_transfer_failed", _(
+        "Bank transfer cancelled"
+    )
+    VC_BANK_TRANSFER_FAILED = "vc_bank_transfer_failed", _(
+        "Bank transfer failed"
+    )
+    VC_BANK_TRANSFER_COMPLETED = "vc_bank_transfer_completed", _(
+        "Sender Transfer Completed"
+    )
+    VC_FROM_BALANCE_TRANSFER_CREATED = "vc_from_balance_transfer_created", _(
+        "From Balance transfer created"
+    )
+    VC_FROM_BALANCE_TRANSFER_CANCELLED = (
+        "vc_from_balance_transfer_cancelled",
+        _("From Balance transfer cancelled"),
+    )
+    VC_FROM_BALANCE_TRANSFER_FAILED = "vc_from_balance_transfer_failed", _(
+        "From Balance transfer failed"
+    )
+    VC_FROM_BALANCE_TRANSFER_COMPLETED = (
+        "vc_from_balance_transfer_completed",
+        _("From Balance transfer completed"),
+    )
+    VC_TO_BALANCE_TRANSFER_CANCELLED = "vc_to_balance_transfer_cancelled", _(
+        "To Balance transfer cancelled"
+    )
+    VC_TO_BALANCE_TRANSFER_FAILED = "vc_to_balance_transfer_failed", _(
+        "To Balance transfer failed"
+    )
+
+
+class TransactionReceiverStatus(ChoiceCharEnum):
+    # UVC: unverified customer, VC: verified customer
+    NOT_STARTED = "not_started", _("Not started")
+    VC_TO_BALANCE_TRANSFER_CREATED = "vc_to_balance_transfer_created", _(
+        "To Balance transfer created"
+    )
+    VC_TO_BALANCE_TRANSFER_CANCELLED = "vc_to_balance_transfer_cancelled", _(
+        "To Balance transfer cancelled"
+    )
+    VC_TO_BALANCE_TRANSFER_FAILED = "vc_to_balance_transfer_failed", _(
+        "To Balance transfer failed"
+    )
+    VC_TO_BALANCE_TRANSFER_COMPLETED = "vc_to_balance_transfer_completed", _(
+        "Receiver Balance Received"
+    )
+    VC_FROM_BALANCE_TRANSFER_CREATED = "vc_from_balance_transfer_created", _(
+        "From Balance transfer created"
+    )
+    VC_FROM_BALANCE_TRANSFER_CANCELLED = (
+        "vc_from_balance_transfer_cancelled",
+        _("From Balance transfer cancelled"),
+    )
+    VC_FROM_BALANCE_TRANSFER_FAILED = "vc_from_balance_transfer_failed", _(
+        "From Balance transfer failed"
+    )
+    VC_BANK_TRANSFER_CREATED = "vc_bank_transfer_created", _(
+        "Bank transfer created"
+    )
+    VC_BANK_TRANSFER_CREATION_FAILED = "vc_bank_transfer_creation_failed", _(
+        "Bank transfer creation failed"
+    )
+    VC_BANK_TRANSFER_CANCELLED = "vc_bank_transfer_cancelled", _(
+        "Bank transfer Cancelled"
+    )
+    VC_BANK_TRANSFER_FAILED = "vc_bank_transfer_failed", _(
+        "Bank transfer failed"
+    )
+    VC_BANK_TRANSFER_COMPLETED = "vc_bank_transfer_completed", _(
+        "Bank transfer completed"
+    )
+    UVC_BANK_TRANSFER_CREATED = "uvc_bank_transfer_created", _(
+        "Bank transfer Created"
+    )
+    UVC_BANK_TRANSFER_CANCELLED = "uvc_bank_transfer_cancelled", _(
+        "Bank transfer Cancelled"
+    )
+    UVC_BANK_TRANSFER_FAILED = "uvc_bank_transfer_failed", _(
+        "Bank transfer failed"
+    )
+    UVC_BANK_TRANSFER_COMPLETED = "uvc_bank_transfer_completed", _(
+        "Bank transfer completed"
+    )
 
 
 class TransactionEventType(ChoiceEnum):

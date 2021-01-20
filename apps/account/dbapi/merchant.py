@@ -11,7 +11,8 @@ __all__ = (
 
 
 def create_merchant_account(company_email):
-    account = Account.objects.create()
+    # FIX: Move it to webhooks when onoboarding marks it verified
+    account = Account.objects.create(is_verified_dwolla_customer=True)
     try:
         return MerchantAccount.objects.create(
             account=account,

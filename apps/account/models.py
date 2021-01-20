@@ -26,6 +26,7 @@ class Account(AbstractBaseModel):
         max_length=40, default=generate_uuid_hex, editable=False, unique=True
     )
     dwolla_id = models.CharField(max_length=64, blank=True)
+    is_verified_dwolla_customer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     zip_code = models.CharField(max_length=5, blank=True)
 

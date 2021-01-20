@@ -1,9 +1,7 @@
 from django.urls import path
 
-from apps.banking.views.sandbox import (
-    ConsumerReAuthBankAccountAPI,
-    MerchantReAuthBankAccountAPI,
-)
+from apps.banking.views.sandbox import (ConsumerReAuthBankAccountAPI,
+                                        MerchantReAuthBankAccountAPI)
 
 urlpatterns = [
     path(
