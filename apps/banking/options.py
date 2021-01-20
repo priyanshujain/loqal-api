@@ -11,3 +11,13 @@ class BankAccountStatus(ChoiceCharEnum):
     )
     SUSPENDED = "suspended", _("Suspended")
     USERNAME_CHANGED = "username_changed", _("Username Changed")
+
+
+class DwollaFundingSourceStatus(ChoiceCharEnum):
+    NA = "na", _("NA")
+    ADDED = "added", _("Added")
+    REMOVED = "removed", _("Removed")
+    VERIFIED = "verified", _("Verified")
+    UNVERIFIED = "unverified", _("Unverified")
+    NEGATIVE_BALANCE = "negative_balance", _("Negative Balance")
+    UPDATED = "updated", _("Updated")

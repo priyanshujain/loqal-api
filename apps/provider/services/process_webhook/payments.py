@@ -1,7 +1,5 @@
-from datetime import date
-
 from api.exceptions import ErrorDetail, ValidationError
-from apps.payment.dbapi.webhoooks import get_transaction
+from apps.payment.dbapi.webhoooks import get_transaction_by_dwolla_id
 from apps.payment.options import (TransactionFailureReasonType,
                                   TransactionReceiverStatus,
                                   TransactionSenderStatus, TransactionStatus)
@@ -17,7 +15,9 @@ class ApplyPaymentWebhook(object):
     def handle(self):
         topic = self.event.topic
         transaction_dwolla_id = self.event.target_resource_dwolla_id
-        transaction = get_transaction(dwolla_id=transaction_dwolla_id)
+        transaction = get_transaction_by_dwolla_id(
+            dwolla_id=transaction_dwolla_id
+        )
         if not transaction:
             raise ValidationError(
                 {"detail": ErrorDetail("Invalid resource id for transfer.")}
@@ -228,3 +228,4 @@ class ApplyPaymentWebhook(object):
                     TransactionSenderStatus.UVC_BANK_TRANSFER_COMPLETED
                 )
             transaction.save()
+        self.event.mark_processed()

@@ -26,7 +26,7 @@ class ValidateBankAccount(object):
                 }
             )
 
-        if sender_bank_account.status != BankAccountStatus.VERIFIED:
+        if sender_bank_account.plaid_status != BankAccountStatus.VERIFIED:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(

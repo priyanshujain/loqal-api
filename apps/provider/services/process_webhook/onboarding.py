@@ -95,3 +95,5 @@ class ApplyOnboardingWebhook(object):
         if topic == "customer_beneficial_owner_verified":
             # A beneficial owner has been verified.
             pass
+
+        # self.event.mark_processed()

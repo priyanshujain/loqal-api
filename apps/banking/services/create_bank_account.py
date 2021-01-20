@@ -36,7 +36,7 @@ class CreateBankAccount(ServiceBase):
             bank_logo_base64=bank_logo_base64,
             name=account_name,
         )
-        bank_account.set_verified()
+        bank_account.set_plaid_verified()
 
         plaid_processor_token = plaid_item["plaid_processor_token"]
         dwolla_account_data = self._send_to_dwolla(

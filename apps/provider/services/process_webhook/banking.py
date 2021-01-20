@@ -1,3 +1,10 @@
+from api.exceptions import ErrorDetail, ValidationError
+from apps.banking.dbapi import get_bank_account_by_dwolla_id
+from apps.banking.options import DwollaFundingSourceStatus
+
+from .tasks import record_payment_failure
+
+
 class ApplyBankingWebhook(object):
     def __init__(self, event, customer_account):
         self.event = event
@@ -5,26 +12,41 @@ class ApplyBankingWebhook(object):
 
     def handle(self):
         topic = self.event.topic
+        dwolla_id = self.event.target_resource_dwolla_id
+        bank_account = get_bank_account_by_dwolla_id(dwolla_id=dwolla_id)
+        if not bank_account:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "Invalid resource id for funding source."
+                    )
+                }
+            )
+
         # event_payload, dwolla_id, is_processed, target_resource_dwolla_id
 
         if topic == "customer_funding_source_added":
             # A funding source was added to a Customer.
-            pass
+            bank_account.dwolla_status = DwollaFundingSourceStatus.ADDED
+            bank_account.save()
 
         if topic == "customer_funding_source_removed":
             # A funding source was removed from a Customer.
-            pass
+            bank_account.dwolla_status = DwollaFundingSourceStatus.REMOVED
+            bank_account.save()
 
         if topic == "customer_funding_source_verified":
             # A Customer’s funding source was marked as verified.
-            pass
+            bank_account.dwolla_status = DwollaFundingSourceStatus.VERIFIED
+            bank_account.save()
 
         if topic == "customer_funding_source_unverified":
             # A funding source has been systematically unverified.
             # This is generally a result of a transfer failure. View our developer resource
             # article(https://developers.dwolla.com/resources/bank-transfer-workflow/transfer-failures.html)
             # to learn more.
-            pass
+            bank_account.dwolla_status = DwollaFundingSourceStatus.UNVERIFIED
+            bank_account.save()
 
         if topic == "customer_funding_source_negative":
             # A Customer’s balance has gone negative. You are responsible for ensuring a zero or
@@ -33,11 +55,17 @@ class ApplyBankingWebhook(object):
             # for making the Dwolla Customer account whole. Dwolla will notify you via a webhook
             # and separate email of the negative balance. If no action is taken, Dwolla will
             # debit your attached billing source.
-            pass
+            # TODO: send an email to admin
+            bank_account.dwolla_status = (
+                DwollaFundingSourceStatus.NEGATIVE_BALANCE
+            )
+            bank_account.save()
 
         if topic == "customer_funding_source_updated":
             # A Customer’s funding source has been updated. This can also be fired as a
             # result of a correction after a bank transfer processes. For example, a
             # financial institution can issue a correction to change the bank account
             # type from checking to savings.
-            pass
+            bank_account.dwolla_status = DwollaFundingSourceStatus.UPDATED
+            bank_account.save()
+        self.event.mark_processed()

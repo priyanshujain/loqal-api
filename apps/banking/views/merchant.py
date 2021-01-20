@@ -65,7 +65,7 @@ class ReAuthBankAccountAPI(MerchantAPIView):
                 {"detail": ErrorDetail("Bank account does not exist.")}
             )
 
-        if bank_account.status == BankAccountStatus.VERIFIED:
+        if bank_account.plaid_status == BankAccountStatus.VERIFIED:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(

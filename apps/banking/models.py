@@ -6,7 +6,7 @@ from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 
-from .options import BankAccountStatus
+from .options import BankAccountStatus, DwollaFundingSourceStatus
 
 
 class BankAccount(AbstractBaseModel):
@@ -21,7 +21,12 @@ class BankAccount(AbstractBaseModel):
     is_disabled = models.BooleanField(default=False)
     is_primary = models.BooleanField(default=True)
     dwolla_id = models.CharField(max_length=255, blank=True)
-    status = ChoiceCharEnumField(
+    dwolla_funding_source_status = ChoiceCharEnumField(
+        enum_type=DwollaFundingSourceStatus,
+        default=DwollaFundingSourceStatus.NA,
+        max_length=32,
+    )
+    plaid_status = ChoiceCharEnumField(
         max_length=32,
         enum_type=BankAccountStatus,
         default=BankAccountStatus.PENDING,
@@ -34,17 +39,17 @@ class BankAccount(AbstractBaseModel):
         self.dwolla_id = dwolla_id
         self.save()
 
-    def set_verified(self, save=True):
-        self.status = BankAccountStatus.VERIFIED
+    def set_plaid_verified(self, save=True):
+        self.plaid_status = BankAccountStatus.VERIFIED
         if save:
             self.save()
 
-    def set_reverification(self, save=True):
-        self.status = BankAccountStatus.REVERIFICATION_REQUIRED
+    def set_plaid_reverification(self, save=True):
+        self.plaid_status = BankAccountStatus.REVERIFICATION_REQUIRED
         if save:
             self.save()
 
     def set_username_changed(self, save=True):
-        self.status = BankAccountStatus.USERNAME_CHANGED
+        self.plaid_status = BankAccountStatus.USERNAME_CHANGED
         if save:
             self.save()

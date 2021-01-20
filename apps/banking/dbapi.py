@@ -9,6 +9,7 @@ __all__ = (
     "create_bank_account",
     "get_bank_account",
     "update_bank_account",
+    "get_bank_account_by_dwolla_id",
 )
 
 
@@ -59,3 +60,15 @@ def update_bank_account(bank_account_id, plaid_access_token, plaid_account_id):
         plaid_access_token=plaid_access_token,
         plaid_account_id=plaid_account_id,
     )
+
+
+def get_bank_account_by_dwolla_id(dwolla_id):
+    """
+    dbapi to get bank account for a given dwolla_id
+    """
+    try:
+        return BankAccount.objects.get(
+            dwolla_id=dwolla_id,
+        )
+    except BankAccount.DoesNotExist:
+        return None
