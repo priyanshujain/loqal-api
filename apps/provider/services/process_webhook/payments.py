@@ -147,7 +147,7 @@ class ApplyPaymentWebhook(object):
                 )
             else:
                 transaction.receiver_status = (
-                    TransactionSenderStatus.UVC_BANK_TRANSFER_CREATED
+                    TransactionReceiverStatus.UVC_BANK_TRANSFER_CREATED
                 )
             transaction.save()
 
@@ -172,7 +172,7 @@ class ApplyPaymentWebhook(object):
                 )
             else:
                 transaction.receiver_status = (
-                    TransactionSenderStatus.UVC_BANK_TRANSFER_CANCELLED
+                    TransactionReceiverStatus.UVC_BANK_TRANSFER_CANCELLED
                 )
             transaction.save()
 
@@ -198,7 +198,7 @@ class ApplyPaymentWebhook(object):
                 )
             else:
                 transaction.receiver_status = (
-                    TransactionSenderStatus.UVC_BANK_TRANSFER_FAILED
+                    TransactionReceiverStatus.UVC_BANK_TRANSFER_FAILED
                 )
             failure_details = record_payment_failure(transaction, at_source)
             if not failure_details:
@@ -225,7 +225,7 @@ class ApplyPaymentWebhook(object):
             else:
                 transaction.status = TransactionStatus.PROCESSED
                 transaction.receiver_status = (
-                    TransactionSenderStatus.UVC_BANK_TRANSFER_COMPLETED
+                    TransactionReceiverStatus.UVC_BANK_TRANSFER_COMPLETED
                 )
             transaction.save()
         self.event.mark_processed()

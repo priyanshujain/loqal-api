@@ -87,7 +87,9 @@ class ProcesssProviderWebhook(ServiceBase):
         self, proposed_signature, webhook_secret, payload_body
     ):
         signature = hmac.new(
-            webhook_secret.encode("utf-8"), payload_body.encode("utf-8"), sha256
+            webhook_secret.encode("utf-8"),
+            payload_body.encode("utf-8"),
+            sha256,
         ).hexdigest()
         return hmac.compare_digest(signature, proposed_signature)
 
