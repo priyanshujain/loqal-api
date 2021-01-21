@@ -17,7 +17,7 @@ class CheckBankBalance(object):
         try:
             balance = self._check_balance(bank_account=bank_account)
         except PlaidReAuth:
-            bank_account.set_reverification()
+            bank_account.set_plaid_reverification()
             return None, ValidationError(
                 {
                     "detail": ErrorDetail(
