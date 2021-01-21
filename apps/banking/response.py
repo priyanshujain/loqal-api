@@ -5,8 +5,9 @@ __all__ = ("BankAccountResponse",)
 
 
 class BankAccountResponse(serializers.ModelSerializer):
-    status_label = serializers.CharField(source="status.label", read_only=True)
-    status_value = serializers.CharField(source="status.value", read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(
+        source="dwolla_funding_source_status", read_only=True
+    )
 
     class Meta:
         model = BankAccount
@@ -19,6 +20,5 @@ class BankAccountResponse(serializers.ModelSerializer):
             "currency",
             "created_at",
             "name",
-            "status_label",
-            "status_value",
+            "status",
         )
