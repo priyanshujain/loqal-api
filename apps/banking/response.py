@@ -8,6 +8,7 @@ class BankAccountResponse(serializers.ModelSerializer):
     status = serializers.ChoiceCharEnumSerializer(
         source="dwolla_funding_source_status", read_only=True
     )
+    plaid_status = serializers.ChoiceCharEnumSerializer(read_only=True)
 
     class Meta:
         model = BankAccount
@@ -21,4 +22,5 @@ class BankAccountResponse(serializers.ModelSerializer):
             "created_at",
             "name",
             "status",
+            "plaid_status",
         )
