@@ -24,7 +24,7 @@ def safe_filename(filename):
     filename = secure_filename(filename)
     date = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
     basename, extension = os.path.splitext(filename)
-    return "{0}-{1}-{2}.{3}".format(basename, date, uuid4().hex, extension)
+    return "{0}-{1}-{2}{3}".format(basename, date, uuid4().hex, extension)
 
 
 def generate_encryption_key():

@@ -229,7 +229,11 @@ class DocumentInterface(object):
         f = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
         f.write(file_content)
         self.files.append(f)
-        return f
+        return {
+            "file": f,
+            "file_name": box_file.file_name,
+            "content_type": box_file.content_type,
+        }
 
     def delete_temp_files(self):
         for file in self.files:
