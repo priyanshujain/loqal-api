@@ -188,14 +188,6 @@ class Account(Http):
         file = document_file["file"]
         file_name = document_file["file_name"]
         content_type = document_file["content_type"]
-        (
-            "source_file",
-            (
-                "images.jpeg",
-                open("/home/priyanshu/Downloads/images.jpeg", "rb"),
-                "image/jpeg",
-            ),
-        )
         try:
             response = self.post(
                 endpoint,
