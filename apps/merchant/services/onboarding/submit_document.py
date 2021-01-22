@@ -228,6 +228,7 @@ class DocumentInterface(object):
         _, file_extension = os.path.splitext(file_name)
         f = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
         f.write(file_content)
+        f.seek(0)
         self.files.append(f)
         return {
             "file": f,
