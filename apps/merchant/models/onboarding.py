@@ -7,19 +7,58 @@ from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
                                    BusinessTypes, IndividualDocumentType,
                                    VerificationDocumentStatus)
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
-from utils.shortcuts import generate_uuid_hex
+from db.models.fields import ChoiceCharEnumField
 
 __all__ = (
-    "IncorporationConsent",
     "IncorporationDetails",
     "ControllerDetails",
     "BeneficialOwner",
+    "IncorporationVerificationDocument",
+    "ControllerVerificationDocument",
+    "OwnerVerificationDocument",
 )
 
 
+class VerificationDocumentBase(AbstractBaseModel):
+    all_failure_reasons = models.JSONField(default=dict)
+    failure_reason = models.CharField(max_length=128, blank=True)
+    document_type = ChoiceCharEnumField(
+        max_length=32,
+        default=IndividualDocumentType.NOT_APPLICABLE,
+        enum_type=IndividualDocumentType,
+    )
+    document_file = models.ForeignKey(
+        BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
+    )
+    status = ChoiceCharEnumField(
+        max_length=128,
+        enum_type=VerificationDocumentStatus,
+        default=VerificationDocumentStatus.NOT_APPLICABLE,
+        help_text=_("Status for the verification document with dwolla."),
+    )
+    dwolla_id = models.CharField(max_length=64, blank=True)
+
+    def update_status(self, status, save=True):
+        self.status = status
+        if save:
+            self.save()
+
+    def add_dwolla_id(self, dwolla_id, save=True):
+        self.dwolla_id = dwolla_id
+        self.status = VerificationDocumentStatus.PENDING_REVIEW
+        if save:
+            self.save()
+
+    class Meta:
+        abstract = True
+
+
 class IncorporationDetails(AbstractBaseModel):
-    merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
+    merchant = models.OneToOneField(
+        MerchantAccount,
+        related_name="incorporation_details",
+        on_delete=models.CASCADE,
+    )
     legal_business_name = models.CharField(max_length=512)
     ein_number = models.CharField(
         max_length=11, blank=True, null=True, default=None, unique=True
@@ -31,25 +70,6 @@ class IncorporationDetails(AbstractBaseModel):
     industry_classification = models.CharField(max_length=64)
     industry_classification_id = models.CharField(max_length=64)
     verification_document_required = models.BooleanField(default=False)
-    verification_document_type = ChoiceCharEnumField(
-        max_length=32,
-        default=BusinessDocumentType.NOT_APPLICABLE,
-        enum_type=BusinessDocumentType,
-    )
-    verification_document_file = models.ForeignKey(
-        BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
-    )
-    verification_document_status = ChoiceEnumField(
-        enum_type=VerificationDocumentStatus,
-        default=VerificationDocumentStatus.NOT_APPLICABLE,
-        help_text=_("Status for the verification document with dwolla."),
-    )
-    dwolla_document_id = models.CharField(max_length=64, blank=True)
-
-    def update_verification_document_status(self, status, save=True):
-        self.verification_document_status = status
-        if save:
-            self.save()
 
     def update_verification_document_required(self, required, save=True):
         self.verification_document_required = required
@@ -57,30 +77,37 @@ class IncorporationDetails(AbstractBaseModel):
         if save:
             self.save()
 
-    def add_dwolla_document_id(self, dwolla_id, save=True):
-        self.dwolla_document_id = dwolla_id
-        self.verification_document_status = (
-            VerificationDocumentStatus.PENDING_REVIEW
-        )
-        if save:
-            self.save()
-
     class Meta:
         db_table = "merchant_onboarding_incorporation_details"
 
 
-class IncorporationConsent(AbstractBaseModel):
-    merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=256)
-    last_name = models.CharField(max_length=256)
-    email = models.CharField(max_length=256)
-    ip_address = models.GenericIPAddressField()
-    dwolla_correlation_id = models.CharField(
-        max_length=40, default=generate_uuid_hex, editable=False, unique=True
+class IncorporationVerificationDocument(VerificationDocumentBase):
+    incorporation_details = models.ForeignKey(
+        IncorporationDetails,
+        related_name="documents",
+        on_delete=models.CASCADE,
+    )
+    document_type = ChoiceCharEnumField(
+        max_length=32,
+        default=BusinessDocumentType.NOT_APPLICABLE,
+        enum_type=BusinessDocumentType,
     )
 
     class Meta:
-        db_table = "merchant_onboarding_incorporation_consent"
+        db_table = "inc_details_verification_document"
+
+
+class OnboardingConsent(AbstractBaseModel):
+    merchant = models.ForeignKey(
+        MerchantAccount,
+        related_name="onboarding_consents",
+        on_delete=models.CASCADE,
+    )
+    full_name = models.CharField(max_length=256)
+    ip_address = models.GenericIPAddressField()
+
+    class Meta:
+        db_table = "merchant_onboarding_consent"
 
 
 class IndividualBase(AbstractBaseModel):
@@ -94,40 +121,17 @@ class IndividualBase(AbstractBaseModel):
     # TODO: Apply an enum validator for country code
     passport_country = models.CharField(max_length=2, blank=True)
     passport_number = models.CharField(max_length=32, blank=True)
-    verification_document_type = ChoiceCharEnumField(
-        max_length=32,
-        default=IndividualDocumentType.NOT_APPLICABLE,
-        enum_type=IndividualDocumentType,
-    )
-    verification_document_file = models.ForeignKey(
-        BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
-    )
-    verification_document_status = ChoiceEnumField(
-        enum_type=VerificationDocumentStatus,
-        default=VerificationDocumentStatus.NOT_APPLICABLE,
-        help_text=_("Status for the verification document with dwolla."),
-    )
-    dwolla_document_id = models.CharField(max_length=64, blank=True)
-
-    def update_verification_document_status(self, status, save=True):
-        self.verification_document_status = status
-        if save:
-            self.save()
-
-    def add_dwolla_document_id(self, dwolla_id, save=True):
-        self.dwolla_document_id = dwolla_id
-        self.verification_document_status = (
-            VerificationDocumentStatus.PENDING_REVIEW
-        )
-        if save:
-            self.save()
 
     class Meta:
         abstract = True
 
 
 class ControllerDetails(IndividualBase):
-    merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
+    merchant = models.OneToOneField(
+        MerchantAccount,
+        related_name="controller_details",
+        on_delete=models.CASCADE,
+    )
     title = models.CharField(max_length=256, blank=True)
     verification_document_required = models.BooleanField(default=False)
 
@@ -142,9 +146,14 @@ class ControllerDetails(IndividualBase):
 
 
 class BeneficialOwner(IndividualBase):
-    merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
+    merchant = models.ForeignKey(
+        MerchantAccount,
+        related_name="beneficial_owners",
+        on_delete=models.CASCADE,
+    )
     dwolla_id = models.CharField(max_length=64, blank=True)
-    status = ChoiceEnumField(
+    status = ChoiceCharEnumField(
+        max_length=128,
         enum_type=BeneficialOwnerStatus,
         default=BeneficialOwnerStatus.PENDING,
         help_text=_("Status for the beneficial owner with dwolla."),
@@ -163,15 +172,26 @@ class BeneficialOwner(IndividualBase):
         update status
         """
         self.status = status
-        if (
-            status == BeneficialOwnerStatus.DOCUMENT_PENDING
-            and not self.verification_document_file
-        ):
-            self.verification_document_status = (
-                VerificationDocumentStatus.PENDING
-            )
         if save:
             self.save()
 
     class Meta:
         db_table = "merchant_onboarding_beneficial_owner"
+
+
+class OwnerVerificationDocument(VerificationDocumentBase):
+    owner = models.ForeignKey(
+        BeneficialOwner, related_name="documents", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "owner_verification_document"
+
+
+class ControllerVerificationDocument(VerificationDocumentBase):
+    controller = models.ForeignKey(
+        ControllerDetails, related_name="documents", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "controller_verification_document"

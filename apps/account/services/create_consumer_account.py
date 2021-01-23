@@ -83,7 +83,12 @@ class CreateConsumerAccount(ServiceBase):
         psp_action = CreateConsumerAccountAPIAction(account_id=account.id)
         response = psp_action.create(data=psp_req_data)
         dwolla_customer_id = response["dwolla_customer_id"]
-        account.add_dwolla_id(dwolla_id=dwolla_customer_id)
+        status = response["status"]
+        verification_status = response["verification_status"]
+        account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
+        account.update_status(
+            status=status, verification_status=verification_status
+        )
 
     def _send_verfication_email(self, user):
         SendConsumerAccountVerifyEmail(user=user).send()
@@ -106,6 +111,7 @@ class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
+            "verification_status": response["data"].get("verification_status"),
             "dwolla_customer_id": response["data"]["dwolla_customer_id"],
         }
 

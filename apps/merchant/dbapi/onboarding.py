@@ -3,7 +3,10 @@ import re
 from django.db import IntegrityError
 
 from apps.merchant.models import (BeneficialOwner, ControllerDetails,
-                                  IncorporationDetails)
+                                  ControllerVerificationDocument,
+                                  IncorporationDetails,
+                                  IncorporationVerificationDocument,
+                                  OwnerVerificationDocument)
 from apps.merchant.options import VerificationDocumentStatus
 
 __all__ = (
@@ -19,9 +22,18 @@ __all__ = (
     "delete_beneficial_owner",
     "update_beneficial_owner_status",
     "get_all_beneficial_owners",
+    "create_beneficial_owner_document",
+    "create_controller_document",
+    "create_business_document",
     "update_beneficial_owner_document",
     "update_controller_document",
     "update_business_document",
+    "get_beneficial_owner_document",
+    "get_controller_document",
+    "get_business_document",
+    "get_merchant_beneficial_owner_document",
+    "get_merchant_controller_document",
+    "get_merchant_business_document",
     "get_incorporation_details_by_ein",
 )
 
@@ -150,31 +162,110 @@ def update_beneficial_owner_status(beneficial_owner_id, dwolla_id, status):
     beneficial_owner.update_status(status=status)
 
 
+def create_beneficial_owner_document(
+    owner_id, document_file_id, document_type
+):
+    try:
+        return OwnerVerificationDocument.objects.create(
+            owner_id=owner_id,
+            document_type=document_type,
+            document_file_id=document_file_id,
+            status=VerificationDocumentStatus.UPLOADED,
+        )
+    except IntegrityError:
+        return None
+
+
+def create_controller_document(controller_id, document_file_id, document_type):
+    try:
+        return ControllerVerificationDocument.objects.create(
+            controller_id=controller_id,
+            document_type=document_type,
+            document_file_id=document_file_id,
+            status=VerificationDocumentStatus.UPLOADED,
+        )
+    except IntegrityError:
+        return None
+
+
+def create_business_document(
+    incorporation_details_id, document_file_id, document_type
+):
+    try:
+        return IncorporationVerificationDocument.objects.create(
+            incorporation_details_id=incorporation_details_id,
+            document_type=document_type,
+            document_file_id=document_file_id,
+            status=VerificationDocumentStatus.UPLOADED,
+        )
+    except IntegrityError:
+        return None
+
+
 def update_beneficial_owner_document(
-    beneficial_owner_id, verification_document_id, verification_document_type
+    document_id, document_file_id, document_type
 ):
-    BeneficialOwner.objects.filter(id=beneficial_owner_id).update(
-        verification_document_type=verification_document_type,
-        verification_document_file_id=verification_document_id,
-        verification_document_status=VerificationDocumentStatus.UPLOADED,
+    OwnerVerificationDocument.objects.filter(u_id=document_id).update(
+        document_type=document_type,
+        document_file_id=document_file_id,
+        status=VerificationDocumentStatus.UPLOADED,
     )
 
 
-def update_controller_document(
-    merchant_id, verification_document_id, verification_document_type
-):
-    ControllerDetails.objects.filter(merchant_id=merchant_id).update(
-        verification_document_type=verification_document_type,
-        verification_document_file_id=verification_document_id,
-        verification_document_status=VerificationDocumentStatus.UPLOADED,
+def update_controller_document(document_id, document_file_id, document_type):
+    ControllerVerificationDocument.objects.filter(u_id=document_id).update(
+        document_type=document_type,
+        document_file_id=document_file_id,
+        status=VerificationDocumentStatus.UPLOADED,
     )
 
 
-def update_business_document(
-    merchant_id, verification_document_id, verification_document_type
-):
-    IncorporationDetails.objects.filter(merchant_id=merchant_id).update(
-        verification_document_type=verification_document_type,
-        verification_document_file_id=verification_document_id,
-        verification_document_status=VerificationDocumentStatus.UPLOADED,
+def update_business_document(document_id, document_file_id, document_type):
+    IncorporationVerificationDocument.objects.filter(u_id=document_id).update(
+        document_type=document_type,
+        document_file_id=document_file_id,
+        status=VerificationDocumentStatus.UPLOADED,
+    )
+
+
+def get_beneficial_owner_document(document_id, owner_id):
+    try:
+        return OwnerVerificationDocument.objects.get(
+            u_id=document_id, owner_id=owner_id
+        )
+    except OwnerVerificationDocument.DoesNotExist:
+        return None
+
+
+def get_controller_document(document_id, controller_id):
+    try:
+        return ControllerVerificationDocument.objects.get(
+            u_id=document_id, controller_id=controller_id
+        )
+    except ControllerVerificationDocument.DoesNotExist:
+        return None
+
+
+def get_business_document(document_id, incorporation_details_id):
+    try:
+        return IncorporationVerificationDocument.objects.get(
+            u_id=document_id, incorporation_details_id=incorporation_details_id
+        )
+    except IncorporationVerificationDocument.DoesNotExist:
+        return None
+
+
+def get_merchant_beneficial_owner_document(owner_id):
+    return OwnerVerificationDocument.objects.filter(owner_id=owner_id)
+
+
+def get_merchant_controller_document(controller_id):
+    return ControllerVerificationDocument.objects.filter(
+        controller_id=controller_id
+    )
+
+
+def get_merchant_business_document(incorporation_details_id):
+    return IncorporationVerificationDocument.objects.filter(
+        incorporation_details_id=incorporation_details_id
     )

@@ -13,7 +13,7 @@ class MerchantAccountStatus(ChoiceEnum):
     NON_SIGNED_UP = 6, _("Non Signed Up")
 
 
-class MerchantAccountCerficationStatus(ChoiceEnum):
+class AccountCerficationStatus(ChoiceEnum):
     PENDING = 0, _("Pending")
     UNCERTIFIED = 1, _("Uncertified")
     RECERTIFY = 2, _("Recertify")

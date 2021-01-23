@@ -297,7 +297,7 @@ class UpdateControllerDetails(CreateControllerDetails):
             )
 
         incorporation_details = (
-            controller_details.merchant.incorporationdetails
+            controller_details.merchant.incorporation_details
         )
         data = run_validator(ControllerValidator, self.data)
         title = data.get("title")

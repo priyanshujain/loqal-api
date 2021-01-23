@@ -25,9 +25,11 @@ class ApplyPaymentWebhook(object):
         sender_account = transaction.sender_bank_account.account
 
         if topic == "customer_bank_transfer_created":
-            # A bank transfer was created for a Customer. Represents funds moving either
-            # from a verified Customer’s bank to the Dwolla network or from the
-            # Dwolla network to a verified Customer’s bank.
+            """
+            A bank transfer was created for a Customer. Represents funds moving either
+            from a verified Customer’s bank to the Dwolla network or from the
+            Dwolla network to a verified Customer’s bank.
+            """
             if self.customer_account.is_verified_dwolla_customer:
                 if sender_account.id == self.customer_account.id:
                     transaction.sender_status = (
@@ -41,12 +43,14 @@ class ApplyPaymentWebhook(object):
                     transaction.save()
 
         if topic == "customer_bank_transfer_creation_failed":
-            # An attempt to initiate a transfer to a verified Customer’s bank was made,
-            # but failed. Transfers initiated to a verified Customer’s bank must pass
-            # through the verified Customer’s balance before being sent to a receiving bank.
-            # Dwolla will fail to create a transaction intended for a verified
-            # Customer’s bank if the funds available in the balance are less than
-            # the transfer amount.
+            """
+            An attempt to initiate a transfer to a verified Customer’s bank was made,
+            but failed. Transfers initiated to a verified Customer’s bank must pass
+            through the verified Customer’s balance before being sent to a receiving bank.
+            Dwolla will fail to create a transaction intended for a verified
+            Customer’s bank if the funds available in the balance are less than
+            the transfer amount.
+            """
             transaction.status = TransactionStatus.FAILED
             transaction.is_sender_failure = False
             transaction.failure_reason_type = (
@@ -68,10 +72,12 @@ class ApplyPaymentWebhook(object):
             transaction.save()
 
         if topic == "customer_bank_transfer_cancelled":
-            # A pending Customer bank transfer has been cancelled, and will not process further.
-            # Represents a cancellation of funds either transferring from a verified
-            # Customer’s bank to the Dwolla network or from the Dwolla network to a
-            # verified Customer’s bank.
+            """
+            A pending Customer bank transfer has been cancelled, and will not process further.
+            Represents a cancellation of funds either transferring from a verified
+            Customer’s bank to the Dwolla network or from the Dwolla network to a
+            verified Customer’s bank.
+            """
             transaction.status = TransactionStatus.CANCELLED
             if self.customer_account.is_verified_dwolla_customer:
                 if sender_account.id == self.customer_account.id:
@@ -87,12 +93,13 @@ class ApplyPaymentWebhook(object):
             # TODO: Trigger an email to admin if any transaction is cancelled
 
         if topic == "customer_bank_transfer_failed":
-            # A Customer bank transfer failed to clear successfully. Usually,
-            # this is a result of an ACH failure (insufficient funds, etc.).
-            # Represents funds failing to clear either from a verified
-            # Customer’s bank to the Dwolla network or from the Dwolla
-            # network to a verified Customer’s bank.
-            # NOTE: As in our case only recevier is the verified customer we will assume it for receiver
+            """
+            A Customer bank transfer failed to clear successfully. Usually,
+            this is a result of an ACH failure (insufficient funds, etc.).
+            Represents funds failing to clear either from a verified
+            Customer’s bank to the Dwolla network or from the Dwolla
+            network to a verified Customer’s bank.
+            """
             at_source = False
             if self.customer_account.is_verified_dwolla_customer:
                 if sender_account.id == self.customer_account.id:
@@ -110,10 +117,11 @@ class ApplyPaymentWebhook(object):
                 transaction.save()
 
         if topic == "customer_bank_transfer_completed":
-            # A bank transfer that was created for a Customer has cleared successfully.
-            # Represents funds clearing either from a verified Customer’s bank to the
-            # Dwolla network or from the Dwolla network to a verified Customer’s bank.
-            # NOTE: As in our case only recevier is the verified customer we will assume it for receiver
+            """
+            A bank transfer that was created for a Customer has cleared successfully.
+            Represents funds clearing either from a verified Customer’s bank to the
+            Dwolla network or from the Dwolla network to a verified Customer’s bank.
+            """
             if self.customer_account.is_verified_dwolla_customer:
                 if sender_account.id == self.customer_account.id:
                     transaction.sender_status = (
@@ -129,8 +137,10 @@ class ApplyPaymentWebhook(object):
                     transaction.save()
 
         if topic == "customer_transfer_created":
-            # A transfer was created for a Customer. Represents funds transferring from a
-            # verified Customer’s balance or unverified Customer’s bank
+            """
+            A transfer was created for a Customer. Represents funds transferring from a
+            verified Customer’s balance or unverified Customer’s bank
+            """
             if sender_account.id == self.customer_account.id:
                 if self.customer_account.is_verified_dwolla_customer:
                     # FIX: check with dwolla on this event
@@ -152,9 +162,11 @@ class ApplyPaymentWebhook(object):
             transaction.save()
 
         if topic == "customer_transfer_cancelled":
-            # A pending transfer has been cancelled, and will not process further.
-            # Represents a cancellation of funds transferring either to an unverified
-            # Customer’s bank or to a verified Customer’s balance.
+            """
+            A pending transfer has been cancelled, and will not process further.
+            Represents a cancellation of funds transferring either to an unverified
+            Customer’s bank or to a verified Customer’s balance.
+            """
             transaction.status = TransactionStatus.CANCELLED
             if sender_account.id == self.customer_account.id:
                 if self.customer_account.is_verified_dwolla_customer:
@@ -177,9 +189,11 @@ class ApplyPaymentWebhook(object):
             transaction.save()
 
         if topic == "customer_transfer_failed":
-            # A Customer transfer failed to clear successfully. Represents funds
-            # failing to clear either to an unverified Customer’s bank or to a
-            # verified Customer’s balance.
+            """
+            A Customer transfer failed to clear successfully. Represents funds
+            failing to clear either to an unverified Customer’s bank or to a
+            verified Customer’s balance.
+            """
             at_source = False
             if sender_account.id == self.customer_account.id:
                 at_source = True
@@ -205,8 +219,10 @@ class ApplyPaymentWebhook(object):
                 transaction.save()
 
         if topic == "customer_transfer_completed":
-            # A Customer transfer has cleared successfully. Represents funds clearing
-            # either to an unverified Customer’s bank or to a verified Customer’s balance.
+            """
+            A Customer transfer has cleared successfully. Represents funds clearing
+            either to an unverified Customer’s bank or to a verified Customer’s balance.
+            """
             if sender_account.id == self.customer_account.id:
                 if self.customer_account.is_verified_dwolla_customer:
                     # FIX: check with dwolla on this event

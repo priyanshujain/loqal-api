@@ -4,7 +4,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
-from apps.account.options import MerchantAccountStatus
+from apps.account.options import DwollaCustomerStatus
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
                                 get_payment_qrcode)
@@ -68,7 +68,10 @@ class DirectMerchantPayment(ServiceBase):
                 }
             )
 
-        if merchant_account.account_status != MerchantAccountStatus.VERIFIED:
+        if (
+            merchant_account.account.dwolla_verification_status
+            != DwollaCustomerStatus.VERIFIED
+        ):
             raise ValidationError(
                 {
                     "merchant_id": ErrorDetail(

@@ -5,9 +5,9 @@ This module provides a class for account creation related calls to the dwolla AP
 
 import re
 
-from apps.account.options import (DwollaCustomerStatus,
-                                  DwollaCustomerVerificationStatus,
-                                  MerchantAccountCerficationStatus)
+from apps.account.options import (AccountCerficationStatus,
+                                  DwollaCustomerStatus,
+                                  DwollaCustomerVerificationStatus)
 from apps.merchant.options import BeneficialOwnerStatus, IndividualDocumentType
 from integrations.dwolla.adapters.kyc import (get_adapted_benficial_owner,
                                               get_adapted_kyc_data)
@@ -41,9 +41,9 @@ class BeneficialOwnerStatusMap:
 
 
 class BeneficialOwnerCertificationStatusMap:
-    uncertified = MerchantAccountCerficationStatus.UNCERTIFIED
-    recertify = MerchantAccountCerficationStatus.RECERTIFY
-    certified = MerchantAccountCerficationStatus.CERTIFIED
+    uncertified = AccountCerficationStatus.UNCERTIFIED
+    recertify = AccountCerficationStatus.RECERTIFY
+    certified = AccountCerficationStatus.CERTIFIED
 
 
 INDIVIDUAL_DUCUMENT_MAP = {
@@ -102,6 +102,18 @@ class Account(Http):
                 AccountVerificationStatusMap, response["status"]
             ),
         }
+
+    def get_customer_account(self):
+        """
+        get customer account
+        """
+
+        response = self.get(
+            f"/customers/{self.config.customer_id}",
+            authenticated=True,
+            retry=False,
+        )
+        return self.parse_merchant_details_response(response=response.json())
 
     def parse_merchant_details_response(self, response):
         links = response["_links"]

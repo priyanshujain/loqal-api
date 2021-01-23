@@ -9,7 +9,7 @@ from apps.provider.options import TermsDocumentTypes
 from integrations.options import IntegratedProviders
 
 
-class CreatePaymentProviderSerializer(serializers.Serializer):
+class CreatePaymentProviderSerializer(serializers.ValidationSerializer):
     """Validate new payment provider object"""
 
     provider_slug = serializers.ChoiceField(
@@ -40,7 +40,7 @@ class ProviderLogoUploadForm(forms.Form):
     paymentprovider_id = forms.IntegerField()
 
 
-class PaymentProviderCredSerializer(serializers.Serializer):
+class PaymentProviderCredSerializer(serializers.ValidationSerializer):
     """Validate payment provider credentials fields"""
 
     provider_id = serializers.IntegerField()
@@ -50,7 +50,7 @@ class PaymentProviderCredSerializer(serializers.Serializer):
     api_login_id = serializers.CharField(max_length=255)
 
 
-class CreateTermsDocumentSerializer(serializers.Serializer):
+class CreateTermsDocumentSerializer(serializers.ValidationSerializer):
     """Create term document serializer"""
 
     provider_id = serializers.IntegerField()
@@ -62,13 +62,13 @@ class CreateTermsDocumentSerializer(serializers.Serializer):
     country = serializers.CharField(max_length=2)
 
 
-class RemoveTermDocumentSerializer(serializers.Serializer):
+class RemoveTermDocumentSerializer(serializers.ValidationSerializer):
     """remove terms document, validate id"""
 
     termdocument_id = serializers.IntegerField()
 
 
-class ActivateTermDocumentSerializer(serializers.Serializer):
+class ActivateTermDocumentSerializer(serializers.ValidationSerializer):
     """activate terms document, validate id"""
 
     termdocument_id = serializers.IntegerField()

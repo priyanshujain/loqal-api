@@ -10,6 +10,7 @@ from apps.provider.dbapi import (create_provider_webhook_event,
                                  get_provider_webhook)
 
 from .banking import ApplyBankingWebhook
+from .beneficial_owners import ApplyBeneficialOwnerWebhook
 from .onboarding import ApplyOnboardingWebhook
 from .payments import ApplyPaymentWebhook
 
@@ -78,6 +79,10 @@ class ProcesssProviderWebhook(ServiceBase):
             ApplyBankingWebhook(
                 event=event, customer_account=customer_account
             ).handle()
+        elif "beneficial_owner" in topic:
+            ApplyBeneficialOwnerWebhook(
+                event=event, customer_account=customer_account
+            )
         else:
             ApplyOnboardingWebhook(
                 event=event, customer_account=customer_account

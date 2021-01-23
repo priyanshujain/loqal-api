@@ -1,17 +1,18 @@
 import uuid
-from re import T
+from re import I, T
 
 from django.db import models
 from django.utils.translation import gettext as _
 from rest_framework.fields import ModelField
 
-from apps.account.options import (ConsumerAccountStatus,
-                                  MerchantAccountCerficationStatus,
+from apps.account.options import (AccountCerficationStatus,
+                                  ConsumerAccountStatus, DwollaCustomerStatus,
+                                  DwollaCustomerVerificationStatus,
                                   MerchantAccountStatus)
 from apps.box.models import BoxFile
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel, BaseModel
-from db.models.fields import ChoiceEnumField
+from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
 
 __all__ = (
@@ -26,23 +27,68 @@ class Account(AbstractBaseModel):
         max_length=40, default=generate_uuid_hex, editable=False, unique=True
     )
     dwolla_id = models.CharField(max_length=64, blank=True)
+    dwolla_customer_status = ChoiceCharEnumField(
+        max_length=64,
+        enum_type=DwollaCustomerStatus,
+        default=DwollaCustomerStatus.NOT_SENT,
+        help_text=_("Status for the account with dwolla."),
+    )
+    dwolla_customer_verification_status = ChoiceCharEnumField(
+        max_length=64,
+        enum_type=DwollaCustomerVerificationStatus,
+        default=DwollaCustomerVerificationStatus.NOT_SENT,
+        help_text=_("Status for the consumer account with dwolla."),
+    )
+    is_certification_required = models.BooleanField(default=None, null=True)
+    certification_status = ChoiceEnumField(
+        enum_type=AccountCerficationStatus,
+        default=AccountCerficationStatus.PENDING,
+        help_text=_(
+            "Status for the merchant beneficial owner certified with dwolla."
+        ),
+    )
     is_verified_dwolla_customer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     zip_code = models.CharField(max_length=5, blank=True)
 
-    def add_dwolla_id(self, dwolla_id):
+    def add_dwolla_id(self, dwolla_id, save=True):
         """
         docstring
         """
         self.dwolla_id = dwolla_id
-        self.save()
+        if save:
+            self.save()
 
-    def add_zip_code(self, zip_code):
+    def update_status(self, status=None, verification_status=None, save=True):
+        """
+        docstring
+        """
+        if status:
+            self.dwolla_customer_status = status
+        if verification_status:
+            self.dwolla_customer_verification_status = verification_status
+        if not (status or verification_status):
+            return
+        if save:
+            self.save()
+
+    def update_certification_status(self, status, save=True):
+        self.certification_status = status
+        if save:
+            self.save()
+
+    def update_certification_required(self, required, save=True):
+        self.is_certification_required = required
+        if save:
+            self.save()
+
+    def add_zip_code(self, zip_code, save=True):
         """
         docstring
         """
         self.zip_code = zip_code
-        self.save()
+        if save:
+            self.save()
 
     class Meta:
         db_table = "account"
@@ -85,8 +131,8 @@ class MerchantAccount(AbstractBaseModel):
     )
     is_certification_required = models.BooleanField(default=None, null=True)
     certification_status = ChoiceEnumField(
-        enum_type=MerchantAccountCerficationStatus,
-        default=MerchantAccountCerficationStatus.PENDING,
+        enum_type=AccountCerficationStatus,
+        default=AccountCerficationStatus.PENDING,
         help_text=_(
             "Status for the merchant beneficial owner certified with dwolla."
         ),
@@ -98,16 +144,6 @@ class MerchantAccount(AbstractBaseModel):
 
     def update_status(self, status, save=True):
         self.account_status = status
-        if save:
-            self.save()
-
-    def update_certification_status(self, status, save=True):
-        self.certification_status = status
-        if save:
-            self.save()
-
-    def update_certification_required(self, required, save=True):
-        self.is_certification_required = required
         if save:
             self.save()
 

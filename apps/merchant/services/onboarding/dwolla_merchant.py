@@ -3,7 +3,9 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
-from apps.account.options import (MerchantAccountCerficationStatus,
+from apps.account.options import (AccountCerficationStatus,
+                                  DwollaCustomerStatus,
+                                  DwollaCustomerVerificationStatus,
                                   MerchantAccountStatus)
 from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  update_beneficial_owner_status)
@@ -24,12 +26,12 @@ class CreateDwollaMerchantAccount(ServiceBase):
 
     def handle(self):
         data, merchant = self._prepare_data()
-        merchant = self._create_dwolla_acconut(data=data, merchant=merchant)
+        merchant = self._create_dwolla_account(data=data, merchant=merchant)
         if (
             self.is_all_verified
             and merchant.is_certification_required
             and merchant.certification_status
-            != MerchantAccountCerficationStatus.CERTIFIED
+            != AccountCerficationStatus.CERTIFIED
         ):
             self._certify_beneficial_owners(merchant=merchant)
         return merchant
@@ -59,7 +61,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
                 }
             )
         account = merchant.account
-        if merchant.account_status == MerchantAccountStatus.DOCUMENT_PENDING:
+        if account.dwolla_customer_status == DwollaCustomerStatus.DOCUMENT:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -70,7 +72,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
                     )
                 }
             )
-        if merchant.account_status == MerchantAccountStatus.SUSPENDED:
+        if account.dwolla_customer_status == DwollaCustomerStatus.SUSPENDED:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -80,30 +82,40 @@ class CreateDwollaMerchantAccount(ServiceBase):
                     )
                 }
             )
+        if account.dwolla_customer_status == DwollaCustomerStatus.DEACTIVATED:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "The account has been deactivated, please contact our support team."
+                        )
+                    )
+                }
+            )
         return True
 
-    def _create_dwolla_acconut(self, data, merchant):
+    def _create_dwolla_account(self, data, merchant):
         merchant_account_data = {
             "incorporation_details": data["incorporation_details"],
             "controller_details": data["controller_details"],
         }
         account = merchant.account
         is_account_update = False
-        if merchant.account_status == MerchantAccountStatus.RETRY:
+        if account.dwolla_customer_status == DwollaCustomerStatus.RETRY:
             is_account_update = True
             merchant_account_data["dwolla_id"] = account.dwolla_id
-
-        if merchant.account_status == MerchantAccountStatus.VERIFIED:
+        elif account.dwolla_customer_status == DwollaCustomerStatus.VERIFIED:
             self._create_beneficial_owner(
                 account_id=account.id,
                 data=data,
             )
-        else:
+        elif account.dwolla_customer_status == DwollaCustomerStatus.NOT_SENT:
             dwolla_response = DwollaCreateMerchantAccountAPIAction(
                 account_id=account.id
             ).create(data=merchant_account_data, is_update=is_account_update)
             dwolla_customer_id = dwolla_response["dwolla_customer_id"]
             dwolla_status = dwolla_response["status"]
+            dwolla_verification_status = dwolla_response["verification_status"]
             is_certification_required = dwolla_response[
                 "is_certification_required"
             ]
@@ -114,20 +126,23 @@ class CreateDwollaMerchantAccount(ServiceBase):
                 "business_document_required"
             ]
 
-            account.add_dwolla_id(dwolla_id=dwolla_customer_id)
-            merchant.update_status(status=dwolla_status)
-            merchant.update_certification_required(
+            account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
+            account.update_status(
+                status=dwolla_status,
+                verification_status=dwolla_verification_status,
+            )
+            account.update_certification_required(
                 required=is_certification_required
             )
             if dwolla_status != MerchantAccountStatus.VERIFIED:
                 self.is_all_verified = False
 
             if controller_document_required:
-                controller = merchant.controllerdetails
+                controller = merchant.controller_details
                 controller.update_verification_document_required(required=True)
 
             if business_document_required:
-                incorporation_details = merchant.incorporationdetails
+                incorporation_details = merchant.incorporation_details
                 incorporation_details.update_verification_document_required(
                     required=True
                 )
@@ -154,7 +169,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
             ):
                 continue
             if beneficial_owner["status"] == BeneficialOwnerStatus.INCOMPLETE:
-                is_account_update = True
+                is_ba_update = True
             ba_response = DwollaAddBeneficialOwnerAPIAction(
                 account_id=account_id
             ).create(
@@ -174,7 +189,9 @@ class CreateDwollaMerchantAccount(ServiceBase):
         certification = DwollaCertifyBeneficialOwnerAPIAction(
             account_id=merchant.account.id
         ).certify()
-        merchant.update_certification_status(status=certification["status"])
+        merchant.account.update_certification_status(
+            status=certification["status"]
+        )
 
 
 class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
@@ -202,6 +219,7 @@ class DwollaCreateMerchantAccountAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
+            "verification_status": response["data"].get("verification_status"),
             "dwolla_customer_id": response["data"].get("dwolla_customer_id"),
             "is_certification_required": response["data"].get(
                 "is_certification_required"

@@ -1,5 +1,6 @@
 from django.utils.translation import gettext as _
 
+from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
 from apps.merchant.dbapi import (get_all_beneficial_owners,
                                  get_controller_details,
@@ -23,7 +24,15 @@ class DocumentRequirements(ServiceBase):
         )
         for beneficial_owner in beneficial_owners:
             if not beneficial_owner.dwolla_id:
-                continue
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            "Please re-submit data before uploading documents. "
+                            "If you need further help please contact our "
+                            "support team."
+                        )
+                    }
+                )
             if (
                 beneficial_owner.status
                 == BeneficialOwnerStatus.DOCUMENT_PENDING
@@ -49,24 +58,11 @@ class DocumentRequirements(ServiceBase):
             merchant_id=self.merchant.id
         )
         if incorporation_details.verification_document_required:
-            inc_details = {
-                "verification_document_status": incorporation_details.verification_document_status.label
-            }
-            if incorporation_details.verification_document_file:
-                inc_details["verification_document_file"] = {
-                    "id": incorporation_details.verification_document_file.id,
-                    "file_name": incorporation_details.verification_document_file.file_name,
-                }
-                inc_details[
-                    "verification_document_type"
-                ] = incorporation_details.verification_document_type.label
+            inc_details = {}
+            inc_details["documents"] = self._documents_detail(
+                incorporation_details.documents
+            )
             if self.internal:
-                inc_details[
-                    "verification_document_type"
-                ] = incorporation_details.verification_document_type
-                inc_details[
-                    "verification_document_status"
-                ] = incorporation_details.verification_document_status
                 inc_details["orm_object"] = incorporation_details
             inc_details[
                 "acceptable_document_types"
@@ -98,26 +94,34 @@ class DocumentRequirements(ServiceBase):
             "first_name": individual_obj.first_name,
             "last_name": individual_obj.last_name,
             "id": individual_obj.id,
-            "verification_document_status": individual_obj.verification_document_status.label,
             "acceptable_document_types": [
                 {"document_type_label": v, "document_type_value": k}
                 for k, v in IndividualDocumentType.choices
                 if IndividualDocumentType.NOT_APPLICABLE.value != k
             ],
         }
-        if individual_obj.verification_document_file:
-            req_details["verification_document_file"] = {
-                "id": individual_obj.verification_document_file.id,
-                "file_name": individual_obj.verification_document_file.file_name,
-            }
-            req_details[
-                "verification_document_type"
-            ] = individual_obj.verification_document_type.label
-            if self.internal:
-                req_details[
-                    "verification_document_type"
-                ] = individual_obj.verification_document_type
-                req_details[
-                    "verification_document_status"
-                ] = individual_obj.verification_document_status
+        req_details["documents"] = self._documents_detail(
+            individual_obj.documents
+        )
         return req_details
+
+    def _documents_detail(self, documents):
+        documents_data = []
+        for document in documents.all():
+            documents_data.append(
+                {
+                    "document_id": document.u_id,
+                    "document_type": {
+                        "label": document.document_type.label,
+                        "value": document.document_type.value,
+                    },
+                    "document_file_id": document.document_file.id,
+                    "status": {
+                        "label": document.status.label,
+                        "value": document.status.value,
+                    },
+                    "failure_reason": document.failure_reason,
+                    "all_failure_reasons": document.all_failure_reasons,
+                }
+            )
+        return documents_data

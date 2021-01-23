@@ -24,8 +24,11 @@ class MerchantCategoryResponse(serializers.ModelSerializer):
 
 
 class MerchantBasicDetailsResponse(serializers.ModelSerializer):
-    account_status = serializers.CharField(
-        source="account_status.label", read_only=True
+    account_status = serializers.ChoiceCharEnumSerializer(
+        source="account.dwolla_customer_status", read_only=True
+    )
+    account_verification_status = serializers.ChoiceCharEnumSerializer(
+        source="account.dwolla_customer_verification_status", read_only=True
     )
     merchant_id = serializers.CharField(source="u_id", read_only=True)
     full_name = serializers.CharField(
@@ -45,6 +48,7 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
         model = MerchantAccount
         fields = (
             "account_status",
+            "account_verification_status",
             "merchant_id",
             "full_name",
             "about",

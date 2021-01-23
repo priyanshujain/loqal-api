@@ -2,7 +2,6 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.serializers import *
 
 
-
 class BaseSerializer(Serializer):
     def get_fields(self):
         """

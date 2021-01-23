@@ -62,23 +62,20 @@ class AllowedFeatureAcessTypes:
     ]
 
 
-class BeneficialOwnerStatus(ChoiceEnum):
-    PENDING = 0, _("Pending")
-    VERIFIED = 1, _("Verified")
-    DOCUMENT_PENDING = 2, _("Document Pending")
-    INCOMPLETE = 3, _("Incomplete")
+class BeneficialOwnerStatus(ChoiceCharEnum):
+    PENDING = "pending", _("Pending")
+    VERIFIED = "verified", _("Verified")
+    DOCUMENT_PENDING = "document_pending", _("Document Pending")
+    INCOMPLETE = "incomplete", _("Incomplete")
 
 
-class VerificationDocumentStatus(ChoiceEnum):
-    PENDING = 0, _("Pending")
-    VERIFIED = 1, _("Verified")
-    INCOMPLETE = 2, _("Incomplete")
-    RETRY = 3, _("Retry")
-    NOT_APPLICABLE = 4, _("Not Applicable")
-    UPLOADED = 5, _("Uploaded")
-    SUBMITTED = 6, _("Submitted")
-    PENDING_REVIEW = 7, _("Pending for review")
-    REVIEWED = 8, _("Reviewed")
+class VerificationDocumentStatus(ChoiceCharEnum):
+    PENDING = "pending", _("Pending")
+    VERIFIED = "verified", _("Verified")
+    NOT_APPLICABLE = "not_applicable", _("Not Applicable")
+    UPLOADED = "uploaded", _("Uploaded")
+    PENDING_REVIEW = "pending_review", _("Pending for review")
+    FAILED = "failed", _("Failed")
 
 
 class IndividualDocumentType(ChoiceCharEnum):
