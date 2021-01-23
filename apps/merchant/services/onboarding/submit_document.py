@@ -45,7 +45,7 @@ class SubmitDocuments(ServiceBase):
             if not documents.exists():
                 return True
             elif (
-                documents.all.filter(
+                documents.all().filter(
                     Q(status=VerificationDocumentStatus.FAILED)
                     | Q(status=VerificationDocumentStatus.PENDING)
                 ).count()
