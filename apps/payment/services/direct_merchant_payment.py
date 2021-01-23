@@ -69,7 +69,7 @@ class DirectMerchantPayment(ServiceBase):
             )
 
         if (
-            merchant_account.account.dwolla_verification_status
+            merchant_account.account.dwolla_customer_status
             != DwollaCustomerStatus.VERIFIED
         ):
             raise ValidationError(
