@@ -27,6 +27,7 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             "company_email",
             "full_name",
             "account_id",
+            "merchant_id",
             "is_active",
             "account_status",
             "account_verification_status",
