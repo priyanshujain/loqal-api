@@ -6,6 +6,7 @@ __all__ = (
     "ChoiceField",
     "UUIDField",
     "DictField",
+    "EnumChoiceField",
 )
 
 
@@ -28,3 +29,16 @@ class DictField(DictField):
         ),
         "empty": _("This JSON dictionary may not be empty."),
     }
+
+
+class EnumChoiceField(ChoiceField):
+    def __init__(self, enum_type, **kwargs):
+        self.choices = enum_type.choices
+        self.enum_choices = {str(key): value for key, value in enum_type.attrs}
+        super().__init__(choices=self.choices, **kwargs)
+
+    def to_representation(self, value):
+        if value in ("", None):
+            return value
+        value = self.choice_strings_to_values.get(str(value), value)
+        return self.enum_choices.get(value, value)

@@ -27,6 +27,7 @@ class IncorporationVerificationDocumentResponse(serializers.ModelSerializer):
     document_file = BoxFileResponse(read_only=True)
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     document_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    document_id = serializers.CharField(source="u_id")
 
     class Meta:
         model = IncorporationVerificationDocument
@@ -35,6 +36,7 @@ class IncorporationVerificationDocumentResponse(serializers.ModelSerializer):
             "failure_reason",
             "document_type",
             "document_file",
+            "document_id",
             "status",
         )
 
@@ -50,6 +52,7 @@ class OwnerVerificationDocumentResponse(
             "document_type",
             "document_file_id",
             "status",
+            "document_id",
         )
 
 
@@ -64,6 +67,7 @@ class ControllerVerificationDocumentResponse(
             "document_type",
             "document_file",
             "status",
+            "document_id",
         )
 
 

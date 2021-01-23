@@ -203,29 +203,29 @@ def create_business_document(
 
 
 def update_beneficial_owner_document(
-    document_id, document_file_id, document_type
+    document, document_file_id, document_type
 ):
-    OwnerVerificationDocument.objects.filter(u_id=document_id).update(
-        document_type=document_type,
-        document_file_id=document_file_id,
-        status=VerificationDocumentStatus.UPLOADED,
-    )
+    document.document_type = document_type
+    document.document_file_id = document_file_id
+    document.status = VerificationDocumentStatus.UPLOADED
+    document.save()
+    return document
 
 
-def update_controller_document(document_id, document_file_id, document_type):
-    ControllerVerificationDocument.objects.filter(u_id=document_id).update(
-        document_type=document_type,
-        document_file_id=document_file_id,
-        status=VerificationDocumentStatus.UPLOADED,
-    )
+def update_controller_document(document, document_file_id, document_type):
+    document.document_type = document_type
+    document.document_file_id = document_file_id
+    document.status = VerificationDocumentStatus.UPLOADED
+    document.save()
+    return document
 
 
-def update_business_document(document_id, document_file_id, document_type):
-    IncorporationVerificationDocument.objects.filter(u_id=document_id).update(
-        document_type=document_type,
-        document_file_id=document_file_id,
-        status=VerificationDocumentStatus.UPLOADED,
-    )
+def update_business_document(document, document_file_id, document_type):
+    document.document_type = document_type
+    document.document_file_id = document_file_id
+    document.status = VerificationDocumentStatus.UPLOADED
+    document.save()
+    return document
 
 
 def get_beneficial_owner_document(document_id, owner_id):

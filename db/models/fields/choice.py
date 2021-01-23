@@ -51,6 +51,10 @@ class ChoiceEnumMeta(enum.EnumMeta):
         return [(k.value, k.label) for k in cls]
 
     @property
+    def attrs(cls):
+        return [(k.value, k) for k in cls]
+
+    @property
     def default(cls):
         try:
             return next(iter(cls))

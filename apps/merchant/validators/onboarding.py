@@ -192,18 +192,16 @@ class DocumentFileValidator(serializers.ValidationSerializer):
 
 class BeneficialOwnerDocumentValidator(DocumentFileValidator):
     beneficial_owner_id = serializers.IntegerField()
-    document_type = serializers.ChoiceField(
-        choices=IndividualDocumentType.choices
+    document_type = serializers.EnumChoiceField(
+        enum_type=IndividualDocumentType
     )
 
 
 class ControllerDocumentValidator(DocumentFileValidator):
-    document_type = serializers.ChoiceField(
-        choices=IndividualDocumentType.choices
+    document_type = serializers.EnumChoiceField(
+        enum_type=IndividualDocumentType
     )
 
 
 class BusinessDocumentValidator(DocumentFileValidator):
-    document_type = serializers.ChoiceField(
-        choices=BusinessDocumentType.choices
-    )
+    document_type = serializers.EnumChoiceField(enum_type=BusinessDocumentType)

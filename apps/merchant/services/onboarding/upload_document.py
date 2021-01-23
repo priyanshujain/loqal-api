@@ -47,10 +47,9 @@ class BusinessDocumentUpload(ServiceBase):
         document_type = data["document_type"]
         incorporation_details = data["incorporation_details"]
         document = data.get("document")
-        document_id = data.get("document_id")
         if document:
-            update_business_document(
-                document_id=document_id,
+            document = update_business_document(
+                document=document,
                 document_file_id=document_file_id,
                 document_type=document_type,
             )
@@ -89,7 +88,7 @@ class BusinessDocumentUpload(ServiceBase):
         if (
             incorporation_details.business_type
             != BusinessTypes.SOLE_PROPRIETORSHIP
-            and document_type != BusinessDocumentType.EIN_LETTER.value
+            and document_type != BusinessDocumentType.EIN_LETTER
         ):
             raise ValidationError(
                 {
@@ -139,7 +138,12 @@ class BusinessDocumentUpload(ServiceBase):
             document_id=document_id,
             incorporation_details_id=incorporation_details.id,
         )
-        data["document"] = document
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data
 
 
@@ -154,10 +158,9 @@ class ControllerDocumentUpload(ServiceBase):
         document_type = data["document_type"]
         controller_details = data["controller_details"]
         document = data.get("document")
-        document_id = data.get("document_id")
         if document:
-            update_controller_document(
-                document_id=document_id,
+            document = update_controller_document(
+                document=document,
                 document_file_id=document_file_id,
                 document_type=document_type,
             )
@@ -225,7 +228,12 @@ class ControllerDocumentUpload(ServiceBase):
         document = get_controller_document(
             document_id=document_id, controller_id=controller_details.id
         )
-        data["document"] = document
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data
 
 
@@ -240,10 +248,9 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
         document_type = data["document_type"]
         beneficial_owner_id = data["beneficial_owner_id"]
         document = data.get("document")
-        document_id = data.get("document_id")
         if document:
-            update_beneficial_owner_document(
-                document_id=document_id,
+            document = update_beneficial_owner_document(
+                document=document,
                 document_file_id=document_file_id,
                 document_type=document_type,
             )
@@ -316,5 +323,10 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
         document = get_beneficial_owner_document(
             document_id=document_id, owner_id=benenficial_owner.id
         )
-        data["document"] = document
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data
