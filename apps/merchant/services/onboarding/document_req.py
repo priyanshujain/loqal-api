@@ -115,7 +115,10 @@ class DocumentRequirements(ServiceBase):
                         "label": document.document_type.label,
                         "value": document.document_type.value,
                     },
-                    "document_file_id": document.document_file.id,
+                    "document_file": {
+                        "id": document.document_file.id,
+                        "file_name": document.document_file.file_name,
+                    },
                     "status": {
                         "label": document.status.label,
                         "value": document.status.value,

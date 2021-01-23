@@ -23,6 +23,7 @@ from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
 from apps.merchant.validators import (BeneficialOwnerDocumentValidator,
                                       BusinessDocumentValidator,
                                       ControllerDocumentValidator)
+from apps.payment.options import RefundType
 
 __all__ = (
     "BusinessDocumentUpload",
@@ -61,7 +62,7 @@ class BusinessDocumentUpload(ServiceBase):
             )
         boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
-        return True
+        return document
 
     def _validate_data(self):
         data = run_validator(BusinessDocumentValidator, data=self.data)
@@ -168,7 +169,7 @@ class ControllerDocumentUpload(ServiceBase):
             )
         boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
-        return True
+        return document
 
     def _validate_data(self):
         data = run_validator(ControllerDocumentValidator, data=self.data)
@@ -254,6 +255,7 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
             )
         boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
+        return document
 
     def _validate_data(self):
         data = run_validator(BeneficialOwnerDocumentValidator, data=self.data)

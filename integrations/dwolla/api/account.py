@@ -5,6 +5,8 @@ This module provides a class for account creation related calls to the dwolla AP
 
 import re
 
+from django.db.models.deletion import RESTRICT
+
 from apps.account.options import (AccountCerficationStatus,
                                   DwollaCustomerStatus,
                                   DwollaCustomerVerificationStatus)
@@ -342,4 +344,20 @@ class Account(Http):
             "status": getattr(
                 BeneficialOwnerCertificationStatusMap, response["status"]
             ),
+        }
+
+    def get_customer_document(self, document_id):
+        """
+        get customer document
+        """
+
+        response = self.get(
+            f"/documents/{document_id}",
+            authenticated=True,
+            retry=False,
+        )
+        response = response.json()
+        return {
+            "failure_reason": response.get("failureReason", ""),
+            "all_failure_reasons": response.get("allFailureReasons", []),
         }

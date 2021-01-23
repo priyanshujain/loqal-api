@@ -184,28 +184,28 @@ class DocumentRequirementsAPI(MerchantAPIView):
 class UpdateBusinessVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BusinessDocumentUpload(
+        document = BusinessDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response({"document_id": document.u_id})
 
 
 class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        ControllerDocumentUpload(
+        document = ControllerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response({"document_id": document.u_id})
 
 
 class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BeneficialOwnerDocumentUpload(
+        document = BeneficialOwnerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response({"document_id": document.u_id})
 
 
 class SubmitDocumentAPI(MerchantAPIView):

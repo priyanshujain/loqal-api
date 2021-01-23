@@ -1,5 +1,8 @@
+from types import ClassMethodDescriptorType
+
 from api import serializers
 from apps.account.models import MerchantAccount
+from apps.box.models import BoxFile
 from apps.merchant.models import (BeneficialOwner, ControllerDetails,
                                   ControllerVerificationDocument,
                                   IncorporationDetails,
@@ -9,10 +12,14 @@ from apps.merchant.models import (BeneficialOwner, ControllerDetails,
 __all__ = ("OnboardingDataResponse",)
 
 
+class BoxFileResponse(serializers.ModelSerializer):
+    class Meta:
+        model = BoxFile
+        fields = ("id", "file_name")
+
+
 class IncorporationVerificationDocumentResponse(serializers.ModelSerializer):
-    document_file_id = serializers.IntegerField(
-        source="document_file.id", read_only=True
-    )
+    document_file = BoxFileResponse(read_only=True)
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     document_type = serializers.ChoiceCharEnumSerializer(read_only=True)
 
@@ -22,7 +29,7 @@ class IncorporationVerificationDocumentResponse(serializers.ModelSerializer):
             "all_failure_reasons",
             "failure_reason",
             "document_type",
-            "document_file_id",
+            "document_file",
             "status",
         )
 
@@ -50,21 +57,13 @@ class ControllerVerificationDocumentResponse(
             "all_failure_reasons",
             "failure_reason",
             "document_type",
-            "document_file_id",
+            "document_file",
             "status",
         )
 
 
 class IncorporationDetailsResponse(serializers.ModelSerializer):
-    verification_document_status = serializers.CharField(
-        source="verification_document_status.label", read_only=True
-    )
-    business_type = serializers.CharField(
-        source="business_type.value", read_only=True
-    )
-    business_type_label = serializers.CharField(
-        source="business_type.label", read_only=True
-    )
+    business_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     documents = IncorporationVerificationDocumentResponse(
         many=True, read_only=True
     )
@@ -85,7 +84,7 @@ class ControllerDetailsResponse(serializers.ModelSerializer):
 
 
 class BeneficialOwnerResponse(serializers.ModelSerializer):
-    status = serializers.CharField(source="status.label", read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     documents = OwnerVerificationDocumentResponse(many=True, read_only=True)
 
     class Meta:

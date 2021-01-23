@@ -171,14 +171,14 @@ class DocumentFileValidator(serializers.ValidationSerializer):
                     ]
                 }
             )
-        # if boxfile.in_use:
-        #     raise ValidationError(
-        #         {
-        #             "document_file_id": [
-        #                 ErrorDetail(_("Given file is already being used."))
-        #             ]
-        #         }
-        #     )
+        if boxfile.in_use:
+            raise ValidationError(
+                {
+                    "document_file_id": [
+                        ErrorDetail(_("Given file is already being used."))
+                    ]
+                }
+            )
         if boxfile.document_type != document_type:
             raise ValidationError(
                 {
