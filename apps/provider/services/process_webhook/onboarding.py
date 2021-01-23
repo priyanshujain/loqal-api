@@ -1,5 +1,10 @@
 from apps.account.options import (DwollaCustomerStatus,
                                   DwollaCustomerVerificationStatus)
+from apps.merchant.dbapi.webhooks import (get_controller_document,
+                                          get_incorporation_document)
+from apps.merchant.options import VerificationDocumentStatus
+
+from .tasks import get_document_failure_details
 
 
 class ApplyOnboardingWebhook(object):
@@ -70,6 +75,17 @@ class ApplyOnboardingWebhook(object):
                 status=DwollaCustomerStatus.DOCUMENT,
                 verification_status=DwollaCustomerVerificationStatus.DOCUMENT_FAILED,
             )
+            document_id = self.event.target_resource_dwolla_id
+            failure_details = get_document_failure_details(
+                document_id=document_id
+            )
+            document = get_incorporation_document(dwolla_id=document_id)
+            if not document:
+                document = get_controller_document(dwolla_id=document_id)
+            document.add_failure_reason(
+                failure_reason=failure_details["failure_reason"],
+                all_failure_reasons=failure_details["all_failure_reasons"],
+            )
 
         if topic == "customer_verification_document_approved":
             """
@@ -79,6 +95,11 @@ class ApplyOnboardingWebhook(object):
                 status=DwollaCustomerStatus.DOCUMENT,
                 verification_status=DwollaCustomerVerificationStatus.DOCUMENT_APPROVED,
             )
+            document_id = self.event.target_resource_dwolla_id
+            document = get_incorporation_document(dwolla_id=document_id)
+            if not document:
+                document = get_controller_document(dwolla_id=document_id)
+            document.update_status(status=VerificationDocumentStatus.VERIFIED)
 
         if topic == "customer_reverification_needed":
             """

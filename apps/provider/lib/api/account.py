@@ -53,3 +53,9 @@ class Account(API):
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )
+
+    def get_customer_document(self, **kwargs):
+        request_method = self.psp_client.account.get_customer_document
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )

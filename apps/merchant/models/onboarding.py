@@ -49,6 +49,15 @@ class VerificationDocumentBase(AbstractBaseModel):
         if save:
             self.save()
 
+    def add_failure_reason(
+        self, failure_reason, all_failure_reasons, save=True
+    ):
+        self.status = VerificationDocumentStatus.FAILED
+        self.failure_reason = failure_reason
+        self.all_failure_reasons = all_failure_reasons
+        if save:
+            self.save()
+
     class Meta:
         abstract = True
 

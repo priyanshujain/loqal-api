@@ -1,10 +1,14 @@
+from apps.merchant.dbapi.webhooks import get_owner_document
 from apps.merchant.options import BeneficialOwnerStatus
+
+from .tasks import get_document_failure_details
 
 
 class ApplyBeneficialOwnerWebhook(object):
-    def __init__(self, event, customer_account):
+    def __init__(self, event, customer_account, beneficial_owner):
         self.event = event
         self.customer_account = customer_account
+        self.beneficial_owner = beneficial_owner
 
     def handle(self):
         topic = self.event.topic
@@ -27,7 +31,9 @@ class ApplyBeneficialOwnerWebhook(object):
             Additional documentation is needed to verify an individual
             beneficial owner.
             """
-            pass
+            self.beneficial_owner.update_status(
+                status=BeneficialOwnerStatus.DOCUMENT_PENDING
+            )
 
         if topic == "customer_beneficial_owner_verification_document_uploaded":
             """
@@ -39,7 +45,15 @@ class ApplyBeneficialOwnerWebhook(object):
             """
             A verification document has been rejected for a beneficial owner.
             """
-            pass
+            document_id = self.event.target_resource_dwolla_id
+            failure_details = get_document_failure_details(
+                document_id=document_id
+            )
+            document = get_owner_document(dwolla_id=document_id)
+            document.add_failure_reason(
+                failure_reason=failure_details["failure_reason"],
+                all_failure_reasons=failure_details["all_failure_reasons"],
+            )
 
         if topic == "customer_beneficial_owner_verification_document_approved":
             """
@@ -60,6 +74,8 @@ class ApplyBeneficialOwnerWebhook(object):
             """
             A beneficial owner has been verified.
             """
-            pass
+            self.beneficial_owner.update_status(
+                status=BeneficialOwnerStatus.VERIFIED
+            )
 
         self.event.mark_processed()

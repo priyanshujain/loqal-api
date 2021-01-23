@@ -51,6 +51,30 @@ class GetFundingSourceDetailsAPIAction(ProviderAPIActionBase):
         return response["data"]
 
 
+class GetFailedDocumentDetailsAPIAction(ProviderAPIActionBase):
+    def get(self, document_id):
+        response = self.client.account.get_customer_document(
+            document_id=document_id
+        )
+        if self.get_errors(response):
+            raise ProviderAPIException(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "Banking service failed, Please try "
+                            "again. If the problem persists please "
+                            "contact our support team."
+                        )
+                    )
+                }
+            )
+        return response["data"]
+
+
+def get_document_failure_details(document_id):
+    return GetFailedDocumentDetailsAPIAction().get(document_id=document_id)
+
+
 def get_bank_account(funding_source_id):
     return GetFundingSourceDetailsAPIAction().get(
         funding_source_id=funding_source_id

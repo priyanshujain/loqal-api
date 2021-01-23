@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi.webhooks import get_account_by_dwolla_id
+from apps.merchant.dbapi.webhooks import get_beneficial_owner_by_dwolla_id
 from apps.provider.dbapi import (create_provider_webhook_event,
                                  get_provider_webhook)
 
@@ -80,8 +81,20 @@ class ProcesssProviderWebhook(ServiceBase):
                 event=event, customer_account=customer_account
             ).handle()
         elif "beneficial_owner" in topic:
+            beneficial_owner_id = (
+                self.request_data.get("_links", {})
+                .get("beneficial-owner", {})
+                .get("href", "")
+                .split("/")
+                .pop()
+            )
+            beneficial_owner = get_beneficial_owner_by_dwolla_id(
+                dwolla_id=beneficial_owner_id
+            )
             ApplyBeneficialOwnerWebhook(
-                event=event, customer_account=customer_account
+                event=event,
+                customer_account=customer_account,
+                beneficial_owner=beneficial_owner,
             )
         else:
             ApplyOnboardingWebhook(

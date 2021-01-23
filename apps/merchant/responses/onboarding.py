@@ -22,7 +22,7 @@ class IncorporationVerificationDocumentResponse(serializers.ModelSerializer):
             "all_failure_reasons",
             "failure_reason",
             "document_type",
-            "document_file",
+            "document_file_id",
             "status",
         )
 
@@ -36,7 +36,7 @@ class OwnerVerificationDocumentResponse(
             "all_failure_reasons",
             "failure_reason",
             "document_type",
-            "document_file",
+            "document_file_id",
             "status",
         )
 
@@ -50,7 +50,7 @@ class ControllerVerificationDocumentResponse(
             "all_failure_reasons",
             "failure_reason",
             "document_type",
-            "document_file",
+            "document_file_id",
             "status",
         )
 
