@@ -1,8 +1,13 @@
+from django.utils import datastructures
+
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
 from apps.account.responses.merchant import MerchantAccountProfileResponse
 from apps.merchant.options import BusinessDocumentType, IndividualDocumentType
-from apps.merchant.responses import OnboardingDataResponse
+from apps.merchant.responses import (ControllerVerificationDocumentResponse,
+                                     IncorporationVerificationDocumentResponse,
+                                     OnboardingDataResponse,
+                                     OwnerVerificationDocumentResponse)
 from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     BusinessDocumentUpload,
                                     ControllerDocumentUpload,
@@ -187,7 +192,9 @@ class UpdateBusinessVerificationDocumentAPI(MerchantAPIView):
         document = BusinessDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response({"document_id": document.u_id})
+        return self.response(
+            IncorporationVerificationDocumentResponse(document).data
+        )
 
 
 class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
@@ -196,7 +203,9 @@ class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
         document = ControllerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response({"document_id": document.u_id})
+        return self.response(
+            ControllerVerificationDocumentResponse(document).data
+        )
 
 
 class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
@@ -205,7 +214,7 @@ class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
         document = BeneficialOwnerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response({"document_id": document.u_id})
+        return self.response(OwnerVerificationDocumentResponse(document).data)
 
 
 class SubmitDocumentAPI(MerchantAPIView):

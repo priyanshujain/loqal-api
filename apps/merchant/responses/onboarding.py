@@ -9,7 +9,12 @@ from apps.merchant.models import (BeneficialOwner, ControllerDetails,
                                   IncorporationVerificationDocument,
                                   OwnerVerificationDocument)
 
-__all__ = ("OnboardingDataResponse",)
+__all__ = (
+    "OnboardingDataResponse",
+    "IncorporationVerificationDocumentResponse",
+    "OwnerVerificationDocumentResponse",
+    "ControllerVerificationDocumentResponse",
+)
 
 
 class BoxFileResponse(serializers.ModelSerializer):

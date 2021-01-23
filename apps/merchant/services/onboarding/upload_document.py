@@ -55,7 +55,7 @@ class BusinessDocumentUpload(ServiceBase):
                 document_type=document_type,
             )
         else:
-            create_business_document(
+            document = create_business_document(
                 incorporation_details_id=incorporation_details.id,
                 document_file_id=document_file_id,
                 document_type=document_type,
@@ -162,7 +162,7 @@ class ControllerDocumentUpload(ServiceBase):
                 document_type=document_type,
             )
         else:
-            create_controller_document(
+            document = create_controller_document(
                 controller_id=controller_details.id,
                 document_file_id=document_file_id,
                 document_type=document_type,
@@ -248,7 +248,7 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
                 document_type=document_type,
             )
         else:
-            create_beneficial_owner_document(
+            document = create_beneficial_owner_document(
                 owner_id=beneficial_owner_id,
                 document_file_id=document_file_id,
                 document_type=document_type,
