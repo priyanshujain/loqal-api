@@ -32,10 +32,13 @@ class SubmitDocuments(ServiceBase):
             merchant=self.merchant, internal=True
         ).handle()
         beneficial_owners = required_docs.get("beneficial_owners", [])
-        controller = required_docs.get("controller", {}).get("orm_object")
-        incorporation = required_docs.get("incorporation", {}).get(
-            "orm_object"
-        )
+        controller = required_docs.get("controller", {})
+        if controller:
+            controller = controller.get("orm_object")
+        incorporation = required_docs.get("incorporation", {})
+        if incorporation:
+            incorporation = incorporation.get("orm_object")
+
         all_docs_uploaded = True
 
         def check_if_document_upload_required(documents):
