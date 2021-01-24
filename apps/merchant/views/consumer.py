@@ -9,6 +9,7 @@ from apps.merchant.responses import (CategoryMerchantListResponse,
                                      MerchantFullDetailsResponse)
 from apps.merchant.services import StoreSearch
 from apps.merchant.shortcuts import validate_category
+from apps.merchant.tasks import check_if_merchant_account_ready
 
 __all__ = (
     "MerchantBasicDetailsAPI",
@@ -26,9 +27,11 @@ class MerchantBasicDetailsAPI(ConsumerAPIView):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid merchant."))}
             )
-        return self.response(
-            MerchantBasicDetailsResponse(merchant_account).data
+        data = MerchantBasicDetailsResponse(merchant_account).data
+        data["is_merchant_account_ready"] = check_if_merchant_account_ready(
+            merchant=merchant_account
         )
+        return self.response(data)
 
 
 class MerchantSearchAPI(ConsumerAPIView):
@@ -66,6 +69,8 @@ class StoreDetailsAPI(ConsumerAPIView):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid merchant."))}
             )
-        return self.response(
-            MerchantFullDetailsResponse(merchant_account).data
+        data = MerchantFullDetailsResponse(merchant_account).data
+        data["is_merchant_account_ready"] = check_if_merchant_account_ready(
+            merchant=merchant_account
         )
+        return self.response(data)

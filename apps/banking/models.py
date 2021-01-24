@@ -1,5 +1,3 @@
-from os import name
-
 from django.db import models
 
 from apps.account.models import Account
@@ -41,6 +39,7 @@ class BankAccount(AbstractBaseModel):
         self.save()
 
     def set_dwolla_removed(self):
+        self.dwolla_status = DwollaFundingSourceStatus.REMOVED
         self.is_dwolla_removed = True
         self.is_primary = False
         self.is_disabled = True
@@ -55,6 +54,19 @@ class BankAccount(AbstractBaseModel):
         self.plaid_status = BankAccountStatus.REVERIFICATION_REQUIRED
         if save:
             self.save()
+
+    def is_payment_allowed(self):
+        if not self.is_primary:
+            return False
+        elif self.is_disabled:
+            return False
+        elif self.is_dwolla_removed:
+            return False
+        elif self.dwolla_status != DwollaFundingSourceStatus.VERIFIED:
+            return False
+        elif self.plaid_status != BankAccountStatus.VERIFIED:
+            return False
+        return True
 
     def set_username_changed(self, save=True):
         self.plaid_status = BankAccountStatus.USERNAME_CHANGED

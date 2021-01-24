@@ -36,8 +36,7 @@ class ApplyBankingWebhook(object):
             """
             A funding source was removed from a Customer.
             """
-            bank_account.dwolla_status = DwollaFundingSourceStatus.REMOVED
-            bank_account.save()
+            bank_account.set_dwolla_removed()
 
         if topic == "customer_funding_source_verified":
             """
