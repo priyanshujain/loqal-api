@@ -16,6 +16,7 @@ __all__ = (
     "LoginRequest",
     "SmsOtpAuth",
     "ResendSmsOtpAuth",
+    "AfterLogin",
 )
 
 
@@ -158,10 +159,11 @@ class ResendSmsOtpAuth(object):
 
 
 class AfterLogin(object):
-    def __init__(self, request, user):
+    def __init__(self, request, user, send_alert=True):
         self.user = user
         self.request = request
 
     def handle(self):
         Session(request=self.request).create_session(user=self.user)
-        SendLoginAlert(user=self.user, session=self.request.session).send()
+        if self.send_alert:
+            SendLoginAlert(user=self.user, session=self.request.session).send()

@@ -1,15 +1,17 @@
 from datetime import timedelta
+from importlib import import_module
 
 import six
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
-from django.db.models.query_utils import select_related_descend
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from apps.box.models import BoxFile
+from apps.notification.models import UserDevice
 from apps.user.options import UserType
 from db.models.base import BaseModel
 from db.models.fields import (BoundedPositiveIntegerField,
@@ -243,6 +245,13 @@ class Authenticator(BaseModel):
 
 class UserSession(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_device = models.ForeignKey(
+        UserDevice,
+        related_name="user_sessions",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     session_key = models.TextField()
     user_agent = models.CharField(max_length=512)
     ip_address = models.GenericIPAddressField()
@@ -272,6 +281,22 @@ class UserSession(BaseModel):
         self.last_activity = now()
         self.is_expired = True
         self.save()
+
+    @property
+    def is_active(self):
+        engine = import_module(settings.SESSION_ENGINE)
+        session_store = engine.SessionStore
+        session = session_store(self.session_key)
+        if session._session:
+            return True
+        self.is_expired = True
+        self.save()
+        return False
+
+    def add_user_device(self, user_device, save=True):
+        self.user_device = user_device
+        if save:
+            self.save()
 
     class Meta:
         db_table = "user_session"

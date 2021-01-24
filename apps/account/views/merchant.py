@@ -6,6 +6,7 @@ from api.views import APIView, MerchantAPIView
 from apps.account.responses import MerchantAccountProfileResponse
 from apps.account.services import CreateMerchantAccount
 from apps.account.validators import CreateMerchantAccountValidator
+from apps.user.services import AfterLogin
 from utils.auth import login
 
 __all__ = (
@@ -29,6 +30,9 @@ class MerchantSignupAPI(APIView):
         service = CreateMerchantAccount(data=data)
         account_member = service.handle()
         login(request=self.request, user=account_member.user)
+        AfterLogin(
+            request=self.request, user=account_member.user, send_alert=False
+        )
 
 
 class MerchantProfileAPI(MerchantAPIView):

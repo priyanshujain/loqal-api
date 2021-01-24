@@ -6,6 +6,7 @@ from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import (AddZipCode, ChangeAccountUsername,
                                    CheckAccountUsername, CreateConsumerAccount)
 from apps.account.services.accept_terms import AcceptTerms
+from apps.user.services import AfterLogin
 from utils.auth import login
 
 __all__ = (
@@ -34,6 +35,7 @@ class ConsumerSignupAPI(APIView):
         consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request, user=user)
+        AfterLogin(request=self.request, user=user, send_alert=False)
 
 
 class AddAccountZipCodeAPI(ConsumerAPIView):

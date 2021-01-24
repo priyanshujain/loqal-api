@@ -10,6 +10,7 @@ class SubscribePushNoticationAPI(LoggedInAPIView):
     def post(self, request):
         user_device = SubscribePushNotication(
             request=request,
+            user_session=self.user_session,
             data=self.request_data,
         ).handle()
         return self.response(RegisterUserDeviceResponse(user_device).data)
