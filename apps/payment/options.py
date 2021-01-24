@@ -18,8 +18,11 @@ class TransactionType(ChoiceCharEnum):
 
 
 class TransactionFailureReasonType(ChoiceCharEnum):
-    TRANSACTION_LIMIT_EXCEEDED = "transaction_limit_exceeded", _(
-        "Transaction limit exceeded."
+    TRANSACTION_DAILY_LIMIT_EXCEEDED = "transaction_daily_limit_exceeded", _(
+        "Transaction daily limit exceeded."
+    )
+    TRANSACTION_WEEKLY_LIMIT_EXCEEDED = "transaction_weekly_limit_exceeded", _(
+        "Transaction weekly limit exceeded."
     )
     BALANCE_CHECK_FAILED = "balance_check_failed", _("Balance check failed.")
     INSUFFICIENT_BALANCE = "insufficient_balance", _("Insufficient Balance.")

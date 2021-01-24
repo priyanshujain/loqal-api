@@ -41,7 +41,7 @@ class UserIP(BaseModel):
             )
 
         UserIP.objects.update_or_create(
-            user=user, ip_address=ip_address, **values
+            defaults=values, user=user, ip_address=ip_address
         )
         cache.set(cache_key, 1, 300)
 

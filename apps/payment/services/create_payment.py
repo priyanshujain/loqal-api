@@ -5,15 +5,17 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
-from apps.payment.dbapi import create_transaction
+from apps.payment.dbapi import create_transaction, get_sender_pending_total
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   FACILITATION_FEES_PERCENTAGE,
                                   TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
+from utils.types import to_str
 
 from .check_bank_balance import CheckBankBalance
+from .check_transfer_limits import CheckTransferLimit
 
 __all__ = ("CreatePayment",)
 
@@ -52,8 +54,13 @@ class CreatePayment(ServiceBase):
                 transaction
             ).data
             raise error
-        min_required_balance = self.total_amount + Decimal(
-            settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+        pending_sender_total = get_sender_pending_total(
+            sender_bank_account_id=self.sender_bank_account.id
+        )
+        min_required_balance = (
+            pending_sender_total
+            + self.total_amount
+            + Decimal(settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED)
         )
         if balance < min_required_balance:
             transaction.set_insufficient_balance()
@@ -65,6 +72,16 @@ class CreatePayment(ServiceBase):
                     "data": TransactionErrorDetailsResponse(transaction).data,
                 }
             )
+        if (
+            self.order.consumer.account.id
+            == self.sender_bank_account.account.id
+        ):
+            error = self._check_transaction_limits(transaction)
+            if error:
+                error.detail["data"] = TransactionErrorDetailsResponse(
+                    transaction
+                ).data
+                raise error
 
         dwolla_response = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(
@@ -74,6 +91,20 @@ class CreatePayment(ServiceBase):
             amount_towards_order=self.amount_towards_order,
         )
         return transaction
+
+    def _check_transaction_limits(self, transaction):
+        try:
+            CheckTransferLimit(
+                bank_account=self.sender_bank_account, amount=self.total_amount
+            )
+        except ValidationError as err:
+            code = to_str(err.detail.get("code"))
+            if code == "WEEKLY_LIMIT_EXCEEDED":
+                transaction.set_weekly_limit_exceeded()
+                return err
+            if code == "DAILY_LIMIT_EXCEEDED":
+                transaction.set_daily_limit_exceeded()
+                return err
 
     def _factory_transaction(self):
         payment = self.order.payment

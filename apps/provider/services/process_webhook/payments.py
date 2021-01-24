@@ -128,6 +128,7 @@ class ApplyPaymentWebhook(object):
                         TransactionSenderStatus.VC_BANK_TRANSFER_COMPLETED
                     )
                     transaction.status = TransactionStatus.SENDER_COMPLETED
+                    transaction.complete_sender_transfer(save=False)
                     transaction.save()
                 else:
                     transaction.status = TransactionStatus.PROCESSED

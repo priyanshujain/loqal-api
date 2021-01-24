@@ -7,6 +7,7 @@ from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
 from apps.merchant.services import CreateDefaultRoles
+from apps.payment.dbapi import create_payment_register
 from apps.user.dbapi import create_user, get_user_by_email
 
 __all__ = ("CreateMerchantAccount",)
@@ -60,7 +61,11 @@ class CreateMerchantAccount(ServiceBase):
             sub_category=self._sub_category,
             phone_number=self._contact_number,
         )
+        self._factory_payment_register(account_id=merchant_account.account.id)
         return merchant_account
+
+    def _factory_payment_register(self, account_id):
+        create_payment_register(account_id=account_id)
 
     def _factory_user(self):
         return create_user(

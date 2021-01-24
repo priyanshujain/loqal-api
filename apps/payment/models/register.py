@@ -11,7 +11,7 @@ __all__ = ("PaymentRegister",)
 
 
 class PaymentRegister(AbstractBaseModel):
-    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    account = models.OneToOneField(Account, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     daily_send_limit = models.FloatField(default=500.0)
     weekly_send_limit = models.FloatField(default=5000.0)

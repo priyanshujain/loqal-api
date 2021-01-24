@@ -6,8 +6,9 @@ from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (ChargeStatus, DisputeReasonType,
-                                  DisputeStatus, DisputeType, PaymentStatus,
+from apps.payment.options import (FACILITATION_FEES_CURRENCY, ChargeStatus,
+                                  DisputeReasonType, DisputeStatus,
+                                  DisputeType, PaymentStatus,
                                   TransactionEventType,
                                   TransactionFailureReasonType,
                                   TransactionReceiverStatus,
@@ -95,6 +96,7 @@ class Transaction(AbstractBaseModel):
         max_length=128,
         default=TransactionReceiverStatus.NOT_STARTED,
     )
+    is_sender_tranfer_pending = models.BooleanField(default=True)
 
     # failure related
     failure_reason_type = ChoiceCharEnumField(
@@ -187,6 +189,11 @@ class Transaction(AbstractBaseModel):
         if save:
             self.save()
 
+    def complete_sender_transfer(self, save=True):
+        self.is_sender_tranfer_pending = False
+        if save:
+            self.save()
+
     def save(self, *args, **kwargs):
         def id_generator():
             return get_random_string(
@@ -225,6 +232,26 @@ class Transaction(AbstractBaseModel):
             TransactionFailureReasonType.INSUFFICIENT_BALANCE
         )
         self.failure_reason_message = "The money in your account is not enough for this payment. Check account balance and try again."
+        self.set_payment_failed()
+        if save:
+            self.save()
+
+    def set_daily_limit_exceeded(self, save=True):
+        self.is_sender_failure = True
+        self.failure_reason_type = (
+            TransactionFailureReasonType.TRANSACTION_DAILY_LIMIT_EXCEEDED
+        )
+        self.failure_reason_message = "You have reached the Loqal payment limit($5000/week). Please try again after 24 hours."
+        self.set_payment_failed()
+        if save:
+            self.save()
+
+    def set_weekly_limit_exceeded(self, save=True):
+        self.is_sender_failure = True
+        self.failure_reason_type = (
+            TransactionFailureReasonType.TRANSACTION_WEEKLY_LIMIT_EXCEEDED
+        )
+        self.failure_reason_message = "You have reached the Loqal payment limit($5000/week). Please try again after 24 hours."
         self.set_payment_failed()
         if save:
             self.save()

@@ -162,6 +162,7 @@ class AfterLogin(object):
     def __init__(self, request, user, send_alert=True):
         self.user = user
         self.request = request
+        self.send_alert = send_alert
 
     def handle(self):
         Session(request=self.request).create_session(user=self.user)

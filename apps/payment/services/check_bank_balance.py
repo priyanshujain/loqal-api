@@ -1,5 +1,4 @@
 from django.utils.translation import gettext as _
-from rest_framework.fields import BooleanField
 
 from api.exceptions import ErrorDetail, ValidationError
 from plugins.plaid import PlaidPlugin

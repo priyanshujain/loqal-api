@@ -10,3 +10,9 @@ def to_int(num):
         return 0
     else:
         return int(num)
+
+
+def to_str(s):
+    if s is None:
+        return ""
+    return str(s)
