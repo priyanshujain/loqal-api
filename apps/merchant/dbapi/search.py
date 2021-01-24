@@ -19,4 +19,4 @@ def merchant_search_by_keyword(merchant_qs, keyword):
         | Q(categories__category__icontains=category_keyword)
         | Q(profile__about__icontains=keyword)
         | Q(categories__sub_categories__icontains=sub_category_keyword)
-    )
+    ).distinct()
