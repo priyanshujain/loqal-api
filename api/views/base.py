@@ -18,6 +18,7 @@ from api.exceptions import (APIException, AuthenticationFailed,
                             NotAuthenticated, ParseError, PermissionDenied,
                             UnsupportedMediaType, ValidationError)
 from apps.tracking.dbapi import create_api_access_log
+from apps.tracking.models import UserIP
 from apps.user.dbapi import get_session
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ class APIView(View):
     )
     renderer_classes = (JSONRenderer,)
     skip_request_logging = False
+    user_session = None
 
     def __init__(self, **args):
         self.started_at = timezone.now()
@@ -102,6 +104,7 @@ class APIView(View):
                 current_session.update_latest(
                     last_activity=session["last_activity"]
                 )
+                self.user_session = current_session
 
     def finalize_response(self, request, response, *args, **kwargs):
 
@@ -136,6 +139,10 @@ class APIView(View):
         if not self.response_count is None:
             response["X-Total"] = int(self.response_count)
 
+        if request.user.is_authenticated:
+            UserIP.log(
+                request.user, request.ip, request.session["cf_ip_country"]
+            )
         return response
 
     def response(self, data=None, total=0, status=200):

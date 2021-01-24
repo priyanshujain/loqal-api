@@ -34,7 +34,7 @@ list    causes:             A list of reasons explaining why the
 ## Long terms
 
 - Implement Idempotency key feature in all API calls (Ref: dwolla)
-
+- Encrypt user session key in sessions table
 
 ### Validators
 
