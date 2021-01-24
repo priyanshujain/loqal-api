@@ -20,6 +20,7 @@ class BankAccount(AbstractBaseModel):
     currency = models.CharField(max_length=3, default="USD")
     is_disabled = models.BooleanField(default=False)
     is_primary = models.BooleanField(default=True)
+    is_dwolla_removed = models.BooleanField(default=False)
     dwolla_id = models.CharField(max_length=255, blank=True)
     dwolla_funding_source_status = ChoiceCharEnumField(
         enum_type=DwollaFundingSourceStatus,
@@ -37,6 +38,12 @@ class BankAccount(AbstractBaseModel):
 
     def add_dwolla_id(self, dwolla_id):
         self.dwolla_id = dwolla_id
+        self.save()
+
+    def set_dwolla_removed(self):
+        self.is_dwolla_removed = True
+        self.is_primary = False
+        self.is_disabled = True
         self.save()
 
     def set_plaid_verified(self, save=True):

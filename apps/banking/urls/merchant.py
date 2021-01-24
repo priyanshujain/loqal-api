@@ -2,13 +2,19 @@ from django.urls import path
 
 from apps.banking.views.merchant import (CreateBankAccountAPI,
                                          GetBankAccountAPI, PlaidLinkTokenAPI,
-                                         ReAuthBankAccountAPI)
+                                         ReAuthBankAccountAPI,
+                                         RemoveBankAccountAPI)
 
 urlpatterns = [
     path(
         "merchant/accounts/create/",
         CreateBankAccountAPI.as_view(),
         name="create_merchant_bank_account",
+    ),
+    path(
+        "merchant/accounts/remove/",
+        RemoveBankAccountAPI.as_view(),
+        name="remove_merchant_bank_account",
     ),
     path(
         "merchant/accounts/reauth/",

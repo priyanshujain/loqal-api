@@ -23,3 +23,15 @@ class Banking(API):
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )
+
+    def remove_bank_account(self, **kwargs):
+        request_method = self.psp_client.banking.remove_bank_account
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )
+
+    def update_bank_account(self, **kwargs):
+        request_method = self.psp_client.banking.update_bank_account
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )

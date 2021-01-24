@@ -10,6 +10,7 @@ __all__ = (
     "get_bank_account",
     "update_bank_account",
     "get_bank_account_by_dwolla_id",
+    "get_bank_accounts",
 )
 
 
@@ -47,9 +48,20 @@ def get_bank_account(account_id):
         return BankAccount.objects.get(
             account_id=account_id,
             is_primary=True,
+            is_dwolla_removed=False,
+            is_disabled=False,
         )
     except BankAccount.DoesNotExist:
         return None
+
+
+def get_bank_accounts(account_id):
+    """
+    dbapi to get all bank accounts for a given account
+    """
+    return BankAccount.objects.filter(
+        account_id=account_id, is_dwolla_removed=False, is_disabled=False
+    )
 
 
 def update_bank_account(bank_account_id, plaid_access_token, plaid_account_id):
@@ -67,8 +79,6 @@ def get_bank_account_by_dwolla_id(dwolla_id):
     dbapi to get bank account for a given dwolla_id
     """
     try:
-        return BankAccount.objects.get(
-            dwolla_id=dwolla_id,
-        )
+        return BankAccount.objects.get(dwolla_id=dwolla_id)
     except BankAccount.DoesNotExist:
         return None

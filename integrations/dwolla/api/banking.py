@@ -60,3 +60,36 @@ class Banking(Http):
         except NotFoundError:
             return None
         return response.json()
+
+    def remove_bank_account(self, funding_source_id):
+        """
+        remove bank account (Funding source)
+        """
+        try:
+            response = self.post(
+                f"/funding-sources/{funding_source_id}",
+                data={"removed": True},
+                authenticated=True,
+                retry=False,
+            )
+        except NotFoundError:
+            return {"is_sucess": False}
+        response = response.json()
+        if response["removed"] == True:
+            return {"is_success": True}
+        else:
+            return {"is_success": False}
+
+    def update_bank_account(self, funding_source_id):
+        """
+        remove bank account (Funding source)
+        """
+        try:
+            response = self.post(
+                f"/funding-sources/{funding_source_id}",
+                authenticated=True,
+                retry=False,
+            )
+        except NotFoundError:
+            return None
+        return response.json()
