@@ -222,11 +222,11 @@ def create_refund_payment(
 
 
 def get_merchant_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(account_id=account_id)
+    return PaymentRequest.objects.filter(account_from_id=account_id)
 
 
 def get_consumer_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(requested_to_id=account_id)
+    return PaymentRequest.objects.filter(account_to_id=account_id)
 
 
 def get_payment_reqeust_by_id(payment_request_id, account_to_id):
