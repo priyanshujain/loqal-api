@@ -10,8 +10,8 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
 from apps.payment.notifications import (SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
                                         SendRefundNotification)
-from apps.payment.notifications.consumer import \
-    SendNewPaymentRequestNotification
+from apps.payment.notifications.consumer import (
+    SendNewPaymentRequestNotification, SendRejectRequestNotification)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
@@ -109,9 +109,16 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
 class RejectPaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        RejectPaymentRequest(
+        payment_request = RejectPaymentRequest(
             account_id=account_id, data=self.request_data
         ).handle()
+        SendRejectRequestNotification(
+            merchant_id=payment_request.payment.order.merchant.id,
+            data={
+                "payment_request_id": payment_request.u_id,
+                "payment_id": payment_request.payment.payment_tracking_id,
+            },
+        ).send()
         return self.response()
 
 
