@@ -138,7 +138,7 @@ def create_beneficial_owner(merchant_id, **kwargs):
 
 
 def update_beneficial_owner(merchant_id, beneficial_owner_id, **kwargs):
-    return ControllerDetails.objects.filter(
+    return BeneficialOwner.objects.filter(
         id=beneficial_owner_id, merchant_id=merchant_id
     ).update(**kwargs)
 
