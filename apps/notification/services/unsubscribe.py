@@ -22,7 +22,7 @@ class UnSubscribePushNotication(ServiceBase):
             user_id=self.user.id, device_id=device_id
         )
         if user_device:
-            user_device.update_fcm_token(fcm_token=data["fcm_token"])
+            user_device.inactivate_device()
         else:
             raise ValidationError(
                 {

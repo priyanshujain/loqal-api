@@ -1,4 +1,5 @@
-from apps.notification.dbapi import get_device_by_id, get_devices_by_user
+from apps.notification.dbapi import (get_active_device_by_id,
+                                     get_devices_by_user)
 
 __all__ = (
     "NotificationBase",
@@ -25,7 +26,7 @@ class NotificationBase(object):
                         self.send_single_message(device)
             return True
 
-        device = get_device_by_id(
+        device = get_active_device_by_id(
             user_id=self.user_id, device_id=self.device_id
         )
         if not device:

@@ -34,6 +34,13 @@ def register_user_device(
 
 def get_device_by_id(user_id, device_id):
     try:
+        return UserDevice.objects.get(user_id=user_id, device_id=device_id)
+    except UserDevice.DoesNotExist:
+        return None
+
+
+def get_active_device_by_id(user_id, device_id):
+    try:
         return UserDevice.objects.get(
             user_id=user_id, device_id=device_id, active=True
         )
