@@ -31,7 +31,7 @@ class AccountStatusMap:
 class AccountVerificationStatusMap:
     unverified = DwollaCustomerVerificationStatus.UNVERIFIED
     verified = DwollaCustomerVerificationStatus.VERIFIED
-    retry = DwollaCustomerVerificationStatus.REVERIFICATION_NEEDED
+    retry = DwollaCustomerVerificationStatus.RETRY
     document = DwollaCustomerVerificationStatus.DOCUMENT_NEEDED
     suspended = DwollaCustomerVerificationStatus.SUSPENDED
 
@@ -173,6 +173,7 @@ class Account(Http):
         """
         Retry consumer account
         """
+        # import pdb; pdb.set_trace()
         request_data = get_adapted_kyc_data(data=data)
         try:
             response = self.post(

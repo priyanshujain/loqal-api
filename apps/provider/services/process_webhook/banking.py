@@ -29,7 +29,9 @@ class ApplyBankingWebhook(object):
             """
             A funding source was added to a Customer.
             """
-            bank_account.dwolla_status = DwollaFundingSourceStatus.ADDED
+            bank_account.dwolla_funding_source_status = (
+                DwollaFundingSourceStatus.ADDED
+            )
             bank_account.save()
 
         if topic == "customer_funding_source_removed":
@@ -42,7 +44,9 @@ class ApplyBankingWebhook(object):
             """
             A Customer’s funding source was marked as verified.
             """
-            bank_account.dwolla_status = DwollaFundingSourceStatus.VERIFIED
+            bank_account.dwolla_funding_source_status = (
+                DwollaFundingSourceStatus.VERIFIED
+            )
             bank_account.save()
 
         if topic == "customer_funding_source_unverified":
@@ -52,7 +56,9 @@ class ApplyBankingWebhook(object):
             article(https://developers.dwolla.com/resources/bank-transfer-workflow/transfer-failures.html)
             to learn more.
             """
-            bank_account.dwolla_status = DwollaFundingSourceStatus.UNVERIFIED
+            bank_account.dwolla_funding_source_status = (
+                DwollaFundingSourceStatus.UNVERIFIED
+            )
             bank_account.save()
 
         if topic == "customer_funding_source_negative":
@@ -65,7 +71,7 @@ class ApplyBankingWebhook(object):
             debit your attached billing source.
             """
             # TODO: send an email to admin
-            bank_account.dwolla_status = (
+            bank_account.dwolla_funding_source_status = (
                 DwollaFundingSourceStatus.NEGATIVE_BALANCE
             )
             bank_account.save()
@@ -77,6 +83,8 @@ class ApplyBankingWebhook(object):
             financial institution can issue a correction to change the bank account
             type from checking to savings.
             """
-            bank_account.dwolla_status = DwollaFundingSourceStatus.UPDATED
+            bank_account.dwolla_funding_source_status = (
+                DwollaFundingSourceStatus.UPDATED
+            )
             bank_account.save()
         self.event.mark_processed()

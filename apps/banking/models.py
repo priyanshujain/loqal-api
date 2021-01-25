@@ -34,12 +34,15 @@ class BankAccount(AbstractBaseModel):
     class Meta:
         db_table = "bank_account"
 
-    def add_dwolla_id(self, dwolla_id):
+    def add_dwolla_id(self, dwolla_id, status=None, save=True):
         self.dwolla_id = dwolla_id
-        self.save()
+        if status:
+            self.dwolla_funding_source_status = status
+        if save:
+            self.save()
 
     def set_dwolla_removed(self):
-        self.dwolla_status = DwollaFundingSourceStatus.REMOVED
+        self.dwolla_funding_source_status = DwollaFundingSourceStatus.REMOVED
         self.is_dwolla_removed = True
         self.is_primary = False
         self.is_disabled = True
@@ -62,7 +65,10 @@ class BankAccount(AbstractBaseModel):
             return False
         elif self.is_dwolla_removed:
             return False
-        elif self.dwolla_status != DwollaFundingSourceStatus.VERIFIED:
+        elif (
+            self.dwolla_funding_source_status
+            != DwollaFundingSourceStatus.VERIFIED
+        ):
             return False
         elif self.plaid_status != BankAccountStatus.VERIFIED:
             return False

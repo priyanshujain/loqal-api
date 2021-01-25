@@ -21,7 +21,6 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
         model = MerchantAccount
         fields = (
             "created_at",
-            "id",
             "zip_code",
             "company_email",
             "account_status",

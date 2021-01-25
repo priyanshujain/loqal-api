@@ -45,7 +45,10 @@ class CreateBankAccount(ServiceBase):
         dwolla_funding_source_id = dwolla_account_data[
             "dwolla_funding_source_id"
         ]
-        bank_account.add_dwolla_id(dwolla_id=dwolla_funding_source_id)
+        status = dwolla_account_data["status"]
+        bank_account.add_dwolla_id(
+            dwolla_id=dwolla_funding_source_id, status=status
+        )
         return bank_account
 
     def _validate_data(self):
@@ -136,4 +139,5 @@ class CreateBankAccountAPIAction(ProviderAPIActionBase):
             "dwolla_funding_source_id": response["data"][
                 "dwolla_funding_source_id"
             ],
+            "status": response["data"]["status"],
         }

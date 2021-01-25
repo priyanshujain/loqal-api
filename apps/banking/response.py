@@ -9,11 +9,12 @@ class BankAccountResponse(serializers.ModelSerializer):
         source="dwolla_funding_source_status", read_only=True
     )
     plaid_status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    bank_account_id = serializers.CharField(source="u_id", read_only=True)
 
     class Meta:
         model = BankAccount
         fields = (
-            "id",
+            "bank_account_id",
             "account_number_suffix",
             "bank_name",
             "bank_logo_base64",
