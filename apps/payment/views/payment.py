@@ -8,7 +8,10 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_merchant_payment_reqeust,
                                 get_recent_store_orders)
 from apps.payment.notifications import (SendNewPaymentNotification,
+                                        SendNewPaymentRequestNotification,
                                         SendRefundNotification)
+from apps.payment.notifications.consumer import \
+    SendNewPaymentRequestNotification
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
@@ -74,9 +77,12 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         payment_request = CreatePaymentRequest(
             account_id=account_id, data=self.request_data
         ).handle()
-        return self.response(
-            PaymentRequestResponse(payment_request).data, status=201
-        )
+        data = PaymentRequestResponse(payment_request).data
+        SendNewPaymentRequestNotification(
+            user_id=request.user.id,
+            data=data,
+        ).send()
+        return self.response(data, status=201)
 
 
 class ApprovePaymentRequestAPI(ConsumerAPIView):
