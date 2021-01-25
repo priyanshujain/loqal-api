@@ -99,9 +99,9 @@ class Account(Http):
         )
         return {
             "dwolla_customer_id": dwolla_customer_id,
-            "status": getattr(AccountStatusMap, response["status"]),
+            "status": getattr(AccountStatusMap, customer_details["status"]),
             "verification_status": getattr(
-                AccountVerificationStatusMap, response["status"]
+                AccountVerificationStatusMap, customer_details["status"]
             ),
         }
 
