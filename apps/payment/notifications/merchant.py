@@ -35,13 +35,12 @@ class SendNewPaymentNotification(object):
 
 class SendSingleRejectRequestNotification(NotificationBase):
     def send_single_message(self, device):
-        device.send_notification_message(
-            title="New payment recieved",
-            body="Click to view payment details",
+        device.send_data_message(
             data_message={
-                "action": "NEW_PAYMENT",
+                "action": "PAYMENT_REQUEST_REJECTED",
                 "payload": self.data,
             },
+            content_available=True,
         )
 
 
