@@ -180,6 +180,7 @@ class RejectPaymentRequest(ServiceBase):
         payment_request = self._validate_data()
         payment_request.reject()
         cancelled_payment_event(payment_id=payment_request.payment.id)
+        return payment_request
 
     def _validate_data(self):
         data = run_validator(RejectPaymentRequestValidator, data=self.data)
