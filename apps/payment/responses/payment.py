@@ -42,8 +42,8 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
     )
     about = serializers.CharField(source="profile.about", read_only=True)
     categories = MerchantCategoryResponse(many=True, read_only=True)
-    hero_image = serializers.CharField(
-        source="profile.hero_image", read_only=True
+    avatar_file_id = serializers.CharField(
+        source="profile.avatar_file.id", read_only=True
     )
     address = serializers.JSONField(source="profile.address", read_only=True)
 
@@ -54,22 +54,23 @@ class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
             "full_name",
             "about",
             "categories",
-            "hero_image",
             "address",
+            "avatar_file_id",
         )
 
 
 # TODO: fix categories
 class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
     merchant = PaymentRequestMerchantDetailsResponse(
-        source="account.merchantaccount", read_only=True
+        source="account_from.merchant", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
+    payment_request_id = serializers.CharField(source="u_id", read_only=True)
 
     class Meta:
         model = PaymentRequest
         fields = (
-            "id",
+            "payment_request_id",
             "created_at",
             "merchant",
             "amount",
@@ -80,10 +81,13 @@ class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
 
 class ConsumerBasicInfoResponse(serializers.ModelSerializer):
     first_name = serializers.CharField(
-        source="consumeraccount.user.first_name", read_only=True
+        source="consumer.user.first_name", read_only=True
     )
     last_name = serializers.CharField(
-        source="consumeraccount.user.last_name", read_only=True
+        source="consumer.user.last_name", read_only=True
+    )
+    loqal_id = serializers.CharField(
+        source="consumer.username", read_only=True
     )
 
     class Meta:
@@ -91,22 +95,28 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
         fields = (
             "first_name",
             "last_name",
+            "loqal_id",
         )
 
 
 class PaymentRequestResponse(serializers.ModelSerializer):
     status = serializers.CharField(source="status.label", read_only=True)
     account_to = ConsumerBasicInfoResponse(read_only=True)
+    payment_request_id = serializers.CharField(source="u_id", read_only=True)
+    payment_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
 
     class Meta:
         model = PaymentRequest
         fields = (
-            "id",
             "account_to",
             "created_at",
             "amount",
             "currency",
             "status",
+            "payment_id",
+            "payment_request_id",
         )
 
 
@@ -127,9 +137,7 @@ class ConsumerResponse(serializers.ModelSerializer):
 
 
 class MerchantTransactionResponse(serializers.ModelSerializer):
-    user = ConsumerResponse(
-        source="sender.account.consumeraccount", read_only=True
-    )
+    user = ConsumerResponse(source="sender.account.consumer", read_only=True)
     transaction_id = serializers.CharField(
         source="transaction_tracking_id", read_only=True
     )

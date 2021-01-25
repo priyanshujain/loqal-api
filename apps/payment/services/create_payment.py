@@ -2,10 +2,13 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.utils.translation import gettext as _
+from django.utils.translation import ungettext
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.payment.dbapi import create_transaction, get_sender_pending_total
+from apps.payment.dbapi.events import (failed_payment_event,
+                                       failed_refund_payment_event)
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   FACILITATION_FEES_PERCENTAGE,
                                   TransactionType)
@@ -53,7 +56,7 @@ class CreatePayment(ServiceBase):
             error.detail["data"] = TransactionErrorDetailsResponse(
                 transaction
             ).data
-            raise error
+            self._send_error(error, transaction)
         pending_sender_total = get_sender_pending_total(
             sender_bank_account_id=self.sender_bank_account.id
         )
@@ -64,7 +67,7 @@ class CreatePayment(ServiceBase):
         )
         if balance < min_required_balance:
             transaction.set_insufficient_balance()
-            raise ValidationError(
+            error = ValidationError(
                 {
                     "detail": ErrorDetail(
                         "You need minimum $100 excess of given amount to make a payment."
@@ -72,6 +75,7 @@ class CreatePayment(ServiceBase):
                     "data": TransactionErrorDetailsResponse(transaction).data,
                 }
             )
+            self._send_error(error, transaction)
         if (
             self.order.consumer.account.id
             == self.sender_bank_account.account.id
@@ -81,7 +85,7 @@ class CreatePayment(ServiceBase):
                 error.detail["data"] = TransactionErrorDetailsResponse(
                     transaction
                 ).data
-                raise error
+                self._send_error(error, transaction)
 
         dwolla_response = self._send_to_dwolla(transaction=transaction)
         transaction.add_dwolla_id(
@@ -91,6 +95,22 @@ class CreatePayment(ServiceBase):
             amount_towards_order=self.amount_towards_order,
         )
         return transaction
+
+    def _send_error(self, error, transaction):
+        if (
+            self.order.consumer.account.id
+            == self.sender_bank_account.account.id
+        ):
+            failed_payment_event(
+                payment_id=transaction.payment.id,
+                transaction_tracking_id=transaction.transaction_tracking_id,
+            )
+        else:
+            failed_refund_payment_event(
+                payment_id=transaction.payment.id,
+                transaction_tracking_id=transaction.transaction_tracking_id,
+            )
+        raise error
 
     def _check_transaction_limits(self, transaction):
         try:

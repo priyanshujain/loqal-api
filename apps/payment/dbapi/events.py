@@ -9,6 +9,12 @@ def initiate_payment_event(payment_id):
     )
 
 
+def cancelled_payment_event(payment_id):
+    PaymentEvent.objects.create(
+        payment_id=payment_id, event_type=PaymentEventType.PAYMENT_CANCELLED
+    )
+
+
 def capture_payment_event(payment_id, transaction_tracking_id):
     PaymentEvent.objects.create(
         payment_id=payment_id,
@@ -21,6 +27,14 @@ def failed_payment_event(payment_id, transaction_tracking_id):
     PaymentEvent.objects.create(
         payment_id=payment_id,
         event_type=PaymentEventType.PAYMENT_FAILED,
+        parameters={"transaction_tracking_id": transaction_tracking_id},
+    )
+
+
+def failed_refund_payment_event(payment_id, transaction_tracking_id):
+    PaymentEvent.objects.create(
+        payment_id=payment_id,
+        event_type=PaymentEventType.REFUND_FAILED,
         parameters={"transaction_tracking_id": transaction_tracking_id},
     )
 

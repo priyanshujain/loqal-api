@@ -95,7 +95,9 @@ class Account(AbstractBaseModel):
 
 
 class ConsumerAccount(AbstractBaseModel):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(
+        Account, related_name="consumer", on_delete=models.CASCADE
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     username = models.CharField(
         max_length=32, default=None, null=True, unique=True
@@ -121,7 +123,11 @@ class ConsumerAccount(AbstractBaseModel):
 
 class MerchantAccount(AbstractBaseModel):
     account = models.OneToOneField(
-        Account, on_delete=models.CASCADE, null=True, blank=True
+        Account,
+        related_name="merchant",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     company_email = models.CharField(max_length=255, blank=True)
     account_status = ChoiceEnumField(

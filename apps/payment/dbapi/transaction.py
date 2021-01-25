@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db.models import Sum
 from django.db.utils import IntegrityError
 
@@ -13,11 +15,14 @@ __all__ = (
 
 
 def get_sender_pending_total(sender_bank_account_id):
-    return Transaction.objects.filter(
-        sender_bank_account_id=sender_bank_account_id,
-        is_sender_tranfer_pending=True,
-        is_success=True,
-    ).aggregate(total=Sum("amount"))["total"]
+    return (
+        Transaction.objects.filter(
+            sender_bank_account_id=sender_bank_account_id,
+            is_sender_tranfer_pending=True,
+            is_success=True,
+        ).aggregate(total=Sum("amount"))["total"]
+        or Decimal(0.0)
+    )
 
 
 def create_dispute_transaction(transaction_id, reason_type, reason_message):

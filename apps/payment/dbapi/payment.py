@@ -12,7 +12,8 @@ from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
-from apps.payment.options import PaymentStatus, TransactionType
+from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
+                                  TransactionType)
 from utils.types import to_float
 
 
@@ -167,7 +168,6 @@ def create_payment_request(
     payment_id,
     amount,
     currency,
-    order_id,
 ):
     """
     dbapi for creating new payment request.
@@ -179,7 +179,6 @@ def create_payment_request(
             payment_id=payment_id,
             amount=Decimal(amount),
             currency=currency,
-            order_id=order_id,
         )
     except IntegrityError:
         return None
@@ -221,18 +220,24 @@ def create_refund_payment(
         return None
 
 
-def get_merchant_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(account_from_id=account_id)
+def get_merchant_payment_reqeust(account_id, is_pending=False):
+    qs = PaymentRequest.objects.filter(account_from_id=account_id)
+    if is_pending:
+        qs = qs.filter(status=PaymentRequestStatus.REQUEST_SENT)
+    return qs
 
 
-def get_consumer_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(account_to_id=account_id)
+def get_consumer_payment_reqeust(account_id, is_pending=False):
+    qs = PaymentRequest.objects.filter(account_to_id=account_id)
+    if is_pending:
+        qs = qs.filter(status=PaymentRequestStatus.REQUEST_SENT)
+    return qs
 
 
-def get_payment_reqeust_by_id(payment_request_id, account_to_id):
+def get_payment_reqeust_by_uid(payment_request_id, account_to_id):
     try:
         return PaymentRequest.objects.get(
-            id=payment_request_id, account_to_id=account_to_id
+            u_id=payment_request_id, account_to_id=account_to_id
         )
     except PaymentRequest.DoesNotExist:
         return None

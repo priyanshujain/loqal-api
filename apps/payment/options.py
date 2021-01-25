@@ -191,6 +191,8 @@ class PaymentEventType(ChoiceEnum):
     PAYMENT_PARTIALLY_REFUNDED = 3, _("Partially Refunded")
     PAYMENT_FULLY_REFUNDED = 4, _("Fully Refunded")
     PAYMENT_DISPUTED = 5, _("Payment Disputed")
+    REFUND_FAILED = 6, _("Refund Failed")
+    PAYMENT_CANCELLED = 7, _("Payment Cancelled")
 
 
 class PaymentRequestStatus(ChoiceEnum):

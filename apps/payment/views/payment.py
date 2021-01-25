@@ -82,17 +82,22 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class ApprovePaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        transaction = ApprovePaymentRequest(
+        payment_request = ApprovePaymentRequest(
             account_id=account_id,
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        data = TransactionResponse(transaction).data
+        transaction_data = TransactionHistoryResponse(
+            payment_request.transaction
+        ).data
+        transaction_data["tip_amount"] = payment_request.tip_amount
         SendNewPaymentNotification(
-            merchant_id=transaction.payment.order.merchant.id,
-            data=MerchantTransactionHistoryResponse(transaction).data,
+            merchant_id=payment_request.payment.order.merchant.id,
+            data=MerchantTransactionHistoryResponse(
+                payment_request.transaction
+            ).data,
         ).send()
-        return self.response(data)
+        return self.response(transaction_data)
 
 
 class RejectPaymentRequestAPI(ConsumerAPIView):
@@ -107,7 +112,13 @@ class RejectPaymentRequestAPI(ConsumerAPIView):
 class ListMerchantPaymentRequestAPI(MerchantAPIView):
     def get(self, request):
         account_id = request.account.id
-        payment_requests = get_merchant_payment_reqeust(account_id=account_id)
+        pending = self.request_data.get("pending")
+        is_pending = False
+        if pending == "true":
+            is_pending = True
+        payment_requests = get_merchant_payment_reqeust(
+            account_id=account_id, is_pending=is_pending
+        )
         return self.response(
             PaymentRequestResponse(payment_requests, many=True).data
         )
@@ -116,7 +127,13 @@ class ListMerchantPaymentRequestAPI(MerchantAPIView):
 class ListConsumerPaymentRequestAPI(ConsumerAPIView):
     def get(self, request):
         account_id = request.account.id
-        payment_requests = get_consumer_payment_reqeust(account_id=account_id)
+        pending = self.request_data.get("pending")
+        is_pending = False
+        if pending == "true":
+            is_pending = True
+        payment_requests = get_consumer_payment_reqeust(
+            account_id=account_id, is_pending=is_pending
+        )
         return self.response(
             ConsumerPaymentRequestResponse(payment_requests, many=True).data
         )

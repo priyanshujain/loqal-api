@@ -20,7 +20,6 @@ class PaymentValidatorBase(serializers.ValidationSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         amount = attrs.get("amount")
-        tip_amount = attrs.get("tip_amount")
 
         if amount < 1.00:
             raise ValidationError(
@@ -141,7 +140,7 @@ class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
 
 
 class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
-    payment_request_id = serializers.IntegerField()
+    payment_request_id = serializers.UUIDField()
     tip_amount = serializers.DecimalField(
         min_value=0,
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -151,7 +150,7 @@ class ApprovePaymentRequestValidator(serializers.ValidationSerializer):
 
 
 class RejectPaymentRequestValidator(serializers.ValidationSerializer):
-    payment_request_id = serializers.IntegerField()
+    payment_request_id = serializers.UUIDField()
 
 
 class CreateRefundValidator(serializers.ValidationSerializer):
