@@ -173,7 +173,6 @@ class Account(Http):
         """
         Retry consumer account
         """
-        # import pdb; pdb.set_trace()
         request_data = get_adapted_kyc_data(data=data)
         try:
             response = self.post(

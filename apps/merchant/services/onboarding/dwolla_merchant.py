@@ -3,10 +3,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
-from apps.account.options import (AccountCerficationStatus,
-                                  DwollaCustomerStatus,
-                                  DwollaCustomerVerificationStatus,
-                                  MerchantAccountStatus)
+from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  update_beneficial_owner_status)
 from apps.merchant.options import BeneficialOwnerStatus, BusinessTypes
@@ -29,8 +26,8 @@ class CreateDwollaMerchantAccount(ServiceBase):
         merchant = self._create_dwolla_account(data=data, merchant=merchant)
         if (
             self.is_all_verified
-            and merchant.is_certification_required
-            and merchant.certification_status
+            and merchant.account.is_certification_required
+            and merchant.account.certification_status
             != AccountCerficationStatus.CERTIFIED
         ):
             self._certify_beneficial_owners(merchant=merchant)
@@ -109,7 +106,9 @@ class CreateDwollaMerchantAccount(ServiceBase):
                 account_id=account.id,
                 data=data,
             )
-        elif account.dwolla_customer_status == DwollaCustomerStatus.NOT_SENT:
+        if is_account_update or (
+            account.dwolla_customer_status == DwollaCustomerStatus.NOT_SENT
+        ):
             dwolla_response = DwollaCreateMerchantAccountAPIAction(
                 account_id=account.id
             ).create(data=merchant_account_data, is_update=is_account_update)
@@ -134,7 +133,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
             account.update_certification_required(
                 required=is_certification_required
             )
-            if dwolla_status != MerchantAccountStatus.VERIFIED:
+            if dwolla_status != DwollaCustomerStatus.VERIFIED:
                 self.is_all_verified = False
 
             if controller_document_required:

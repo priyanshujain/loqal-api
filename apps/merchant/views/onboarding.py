@@ -10,6 +10,7 @@ from apps.merchant.responses import (ControllerVerificationDocumentResponse,
                                      OwnerVerificationDocumentResponse)
 from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     BusinessDocumentUpload,
+                                    CertifyDwollaMerchantAccount,
                                     ControllerDocumentUpload,
                                     CreateBeneficialOwner,
                                     CreateControllerDetails,
@@ -221,6 +222,13 @@ class SubmitDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
         SubmitDocuments(merchant=merchant_account).handle()
+        return self.response()
+
+
+class CertifyOwnershipAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        CertifyDwollaMerchantAccount(merchant=merchant_account).handle()
         return self.response()
 
 
