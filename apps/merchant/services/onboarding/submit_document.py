@@ -7,13 +7,15 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.options import DwollaCustomerVerificationStatus
+from apps.account.options import (AccountCerficationStatus,
+                                  DwollaCustomerVerificationStatus)
 from apps.box.dbapi import get_boxfile
 from apps.merchant.dbapi.onboarding import get_beneficial_owner
 from apps.merchant.options import VerificationDocumentStatus
 from apps.provider.lib.actions import ProviderAPIActionBase
 from plugins.s3 import S3Storage
 
+from .certify_ownership import CertifyDwollaMerchantAccount
 from .document_req import DocumentRequirements
 
 __all__ = ("SubmitDocuments",)
@@ -25,7 +27,13 @@ class SubmitDocuments(ServiceBase):
 
     def handle(self):
         upload_required_docs = self._validate_data()
-        return self._upload_docs(required_docs=upload_required_docs)
+        self._upload_docs(required_docs=upload_required_docs)
+        if (
+            self.merchant.account.is_certification_required
+            and self.merchant.account.certification_status
+            != AccountCerficationStatus.CERTIFIED
+        ):
+            CertifyDwollaMerchantAccount(self.merchant).handle()
 
     def _validate_data(self):
         required_docs = DocumentRequirements(
