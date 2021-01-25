@@ -9,9 +9,8 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_recent_store_orders)
 from apps.payment.notifications import (SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
-                                        SendRefundNotification)
-from apps.payment.notifications.consumer import (
-    SendNewPaymentRequestNotification, SendRejectRequestNotification)
+                                        SendRefundNotification,
+                                        SendRejectRequestNotification)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
