@@ -67,6 +67,7 @@ class UserDevice(BaseModel):
 
     def update_fcm_token(self, fcm_token, save=True):
         self.fcm_token = fcm_token
+        self.active = True
         if save:
             self.save()
 
