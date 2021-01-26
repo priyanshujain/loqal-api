@@ -2,27 +2,37 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView, MerchantAPIView
-from apps.payment.dbapi import (get_consumer_payment_reqeust,
-                                get_consumer_transaction,
-                                get_consumer_transactions,
-                                get_merchant_payment_reqeust,
-                                get_recent_store_orders)
-from apps.payment.notifications import (SendApproveRequestNotification,
-                                        SendNewPaymentNotification,
-                                        SendNewPaymentRequestNotification,
-                                        SendRefundNotification,
-                                        SendRejectRequestNotification)
-from apps.payment.responses import (ConsumerPaymentRequestResponse,
-                                    MerchantTransactionHistoryResponse,
-                                    PaymentRequestResponse,
-                                    RecentStoresResponse,
-                                    RefundHistoryResponse,
-                                    TransactionDetailsResponse,
-                                    TransactionHistoryResponse,
-                                    TransactionResponse)
-from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
-                                   CreateRefund, DirectMerchantPayment,
-                                   RejectPaymentRequest)
+from apps.payment.dbapi import (
+    get_consumer_payment_reqeust,
+    get_consumer_transaction,
+    get_consumer_transactions,
+    get_merchant_payment_reqeust,
+    get_recent_store_orders,
+)
+from apps.payment.notifications import (
+    SendApproveRequestNotification,
+    SendNewPaymentNotification,
+    SendNewPaymentRequestNotification,
+    SendRefundNotification,
+    SendRejectRequestNotification,
+)
+from apps.payment.responses import (
+    ConsumerPaymentRequestResponse,
+    MerchantTransactionHistoryResponse,
+    PaymentRequestResponse,
+    RecentStoresResponse,
+    RefundHistoryResponse,
+    TransactionDetailsResponse,
+    TransactionHistoryResponse,
+    TransactionResponse,
+)
+from apps.payment.services import (
+    ApprovePaymentRequest,
+    CreatePaymentRequest,
+    CreateRefund,
+    DirectMerchantPayment,
+    RejectPaymentRequest,
+)
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -33,15 +43,11 @@ class CreatePaymentAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        transaction_data = TransactionHistoryResponse(
-            merchant_payment.transaction
-        ).data
+        transaction_data = TransactionHistoryResponse(merchant_payment.transaction).data
         transaction_data["tip_amount"] = merchant_payment.tip_amount
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
-            data=MerchantTransactionHistoryResponse(
-                merchant_payment.transaction
-            ).data,
+            data=MerchantTransactionHistoryResponse(merchant_payment.transaction).data,
         ).send()
         return self.response(transaction_data, status=201)
 
@@ -49,12 +55,8 @@ class CreatePaymentAPI(ConsumerAPIView):
 class PaymentHistoryAPI(ConsumerAPIView):
     def get(self, request):
         consumer_account = request.consumer_account
-        transactions = get_consumer_transactions(
-            consumer_account=consumer_account
-        )
-        return self.response(
-            TransactionHistoryResponse(transactions, many=True).data
-        )
+        transactions = get_consumer_transactions(consumer_account=consumer_account)
+        return self.response(TransactionHistoryResponse(transactions, many=True).data)
 
 
 class TransactionDetailsAPI(ConsumerAPIView):
@@ -65,9 +67,7 @@ class TransactionDetailsAPI(ConsumerAPIView):
             transaction_tracking_id=transaction_id,
         )
         if not transaction:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid transaction_id."))}
-            )
+            raise ValidationError({"detail": ErrorDetail(_("Invalid transaction_id."))})
         return self.response(TransactionDetailsResponse(transaction).data)
 
 
@@ -77,12 +77,11 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         payment_request = CreatePaymentRequest(
             account_id=account_id, data=self.request_data
         ).handle()
-        data = PaymentRequestResponse(payment_request).data
         SendNewPaymentRequestNotification(
             user_id=payment_request.account_to.consumer.user.id,
-            data=data,
+            data=ConsumerPaymentRequestResponse(payment_request).data,
         ).send()
-        return self.response(data, status=201)
+        return self.response(PaymentRequestResponse(payment_request).data, status=201)
 
 
 class ApprovePaymentRequestAPI(ConsumerAPIView):
@@ -93,15 +92,11 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        transaction_data = TransactionHistoryResponse(
-            payment_request.transaction
-        ).data
+        transaction_data = TransactionHistoryResponse(payment_request.transaction).data
         transaction_data["tip_amount"] = payment_request.tip_amount
         SendNewPaymentNotification(
             merchant_id=payment_request.payment.order.merchant.id,
-            data=MerchantTransactionHistoryResponse(
-                payment_request.transaction
-            ).data,
+            data=MerchantTransactionHistoryResponse(payment_request.transaction).data,
         ).send()
         SendApproveRequestNotification(
             merchant_id=payment_request.payment.order.merchant.id,
@@ -139,9 +134,7 @@ class ListMerchantPaymentRequestAPI(MerchantAPIView):
         payment_requests = get_merchant_payment_reqeust(
             account_id=account_id, is_pending=is_pending
         )
-        return self.response(
-            PaymentRequestResponse(payment_requests, many=True).data
-        )
+        return self.response(PaymentRequestResponse(payment_requests, many=True).data)
 
 
 class ListConsumerPaymentRequestAPI(ConsumerAPIView):
@@ -171,9 +164,7 @@ class CreateRefundPaymentAPI(MerchantAPIView):
         SendRefundNotification(
             user_id=refund_payment.payment.order.consumer.user.id, data=data
         ).send()
-        return self.response(
-            RefundHistoryResponse(refund_payment).data, status=201
-        )
+        return self.response(RefundHistoryResponse(refund_payment).data, status=201)
 
 
 class RecentStoresAPI(ConsumerAPIView):
