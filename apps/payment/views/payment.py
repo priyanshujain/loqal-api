@@ -106,7 +106,7 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         SendApproveRequestNotification(
             merchant_id=payment_request.payment.order.merchant.id,
             data={
-                "payment_request_id": payment_request.u_id,
+                "payment_request_id": str(payment_request.u_id),
                 "payment_id": payment_request.payment.payment_tracking_id,
             },
         ).send()
@@ -122,7 +122,7 @@ class RejectPaymentRequestAPI(ConsumerAPIView):
         SendRejectRequestNotification(
             merchant_id=payment_request.payment.order.merchant.id,
             data={
-                "payment_request_id": payment_request.u_id,
+                "payment_request_id": str(payment_request.u_id),
                 "payment_id": payment_request.payment.payment_tracking_id,
             },
         ).send()
