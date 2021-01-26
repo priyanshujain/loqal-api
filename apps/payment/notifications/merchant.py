@@ -5,6 +5,7 @@ __all__ = (
     "SendNewPaymentNotification",
     "SendRefundNotification",
     "SendRejectRequestNotification",
+    "SendApproveRequestNotification",
 )
 
 
@@ -53,6 +54,30 @@ class SendRejectRequestNotification(object):
         members = get_members_by_account(merchant_id=self.merchant_id)
         for member in members:
             SendSingleRejectRequestNotification(
+                user_id=member.user.id, data=self.data
+            ).send()
+
+
+class SendSingleApproveRequestNotification(NotificationBase):
+    def send_single_message(self, device):
+        device.send_data_message(
+            data_message={
+                "action": "PAYMENT_REQUEST_APPROVED",
+                "payload": self.data,
+            },
+            content_available=True,
+        )
+
+
+class SendApproveRequestNotification(object):
+    def __init__(self, merchant_id, data):
+        self.merchant_id = merchant_id
+        self.data = data
+
+    def send(self):
+        members = get_members_by_account(merchant_id=self.merchant_id)
+        for member in members:
+            SendSingleApproveRequestNotification(
                 user_id=member.user.id, data=self.data
             ).send()
 
