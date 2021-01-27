@@ -35,6 +35,8 @@ list    causes:             A list of reasons explaining why the
 
 - Implement Idempotency key feature in all API calls (Ref: dwolla)
 - Encrypt user session key in sessions table
+- Check file upload hash for onboarding docs (https://stackoverflow.com/questions/22058048/hashing-a-file-in-python)
+- 
 
 ### Validators
 

@@ -193,6 +193,12 @@ class Account(Http):
     ):
         """
         Upload verification document for a customer
+        # FIX:  b'{"code": "DuplicateResource",
+        #  "message": "Document already exists.",
+        #  "_links": {"about": {
+        # "href": "https://api-sandbox.dwolla.com/documents/8186c853-9b57-45c1-8f3f-81a37cd00f61",
+        #  "type": "application/vnd.dwolla.v1.hal+json", "resource-type": "document"}}}'
+ 
         """
         if entity_type == "business":
             document_type = "other"
