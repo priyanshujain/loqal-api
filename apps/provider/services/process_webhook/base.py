@@ -50,7 +50,7 @@ class ProcesssProviderWebhook(ServiceBase):
         timestamp = self.request_data.get("timestamp", "")
         event_timestamp = timezone.now()
         if timestamp:
-            event_timestamp = parser.parse(event_timestamp)
+            event_timestamp = parser.parse(timestamp)
 
         event = self._factory_provider_webhook_event(
             webhook_id=provider_webhook.id,
