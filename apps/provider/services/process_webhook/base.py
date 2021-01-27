@@ -108,7 +108,12 @@ class ProcesssProviderWebhook(ServiceBase):
         return hmac.compare_digest(signature, proposed_signature)
 
     def _factory_provider_webhook_event(
-        self, webhook_id, dwolla_id, topic, target_resource_dwolla_id
+        self,
+        webhook_id,
+        dwolla_id,
+        topic,
+        target_resource_dwolla_id,
+        event_timestamp,
     ):
         return create_provider_webhook_event(
             webhook_id=webhook_id,
@@ -116,4 +121,5 @@ class ProcesssProviderWebhook(ServiceBase):
             dwolla_id=dwolla_id,
             topic=topic,
             target_resource_dwolla_id=target_resource_dwolla_id,
+            event_timestamp=event_timestamp,
         )
