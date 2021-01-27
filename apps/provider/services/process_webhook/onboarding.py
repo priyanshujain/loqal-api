@@ -106,10 +106,11 @@ class ApplyOnboardingWebhook(object):
             Incomplete information was received for a Customer;
             updated information is needed to verify the Customer.
             """
-            self.customer_account.update_status(
-                status=DwollaCustomerStatus.RETRY,
-                verification_status=DwollaCustomerVerificationStatus.REVERIFICATION_NEEDED,
-            )
+            # self.customer_account.update_status(
+            #     status=DwollaCustomerStatus.RETRY,
+            #     verification_status=DwollaCustomerVerificationStatus.REVERIFICATION_NEEDED,
+            # )
+            self.customer_account.set_reverification_needed()
 
         if topic == "customer_verified":
             """

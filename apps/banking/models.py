@@ -1,4 +1,6 @@
+from typing import Text
 from django.db import models
+from django.db.models.expressions import F
 
 from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel

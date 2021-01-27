@@ -29,10 +29,11 @@ class ApplyBankingWebhook(object):
             """
             A funding source was added to a Customer.
             """
-            bank_account.dwolla_funding_source_status = (
-                DwollaFundingSourceStatus.ADDED
-            )
-            bank_account.save()
+            # bank_account.dwolla_funding_source_status = (
+            #     DwollaFundingSourceStatus.ADDED
+            # )
+            # bank_account.save()
+            pass
 
         if topic == "customer_funding_source_removed":
             """

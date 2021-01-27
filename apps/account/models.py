@@ -40,6 +40,7 @@ class Account(AbstractBaseModel):
         help_text=_("Status for the consumer account with dwolla."),
     )
     is_certification_required = models.BooleanField(default=None, null=True)
+    is_reverification_needed = models.BooleanField(default=False)
     certification_status = ChoiceEnumField(
         enum_type=AccountCerficationStatus,
         default=AccountCerficationStatus.PENDING,
@@ -79,6 +80,11 @@ class Account(AbstractBaseModel):
 
     def update_certification_required(self, required, save=True):
         self.is_certification_required = required
+        if save:
+            self.save()
+    
+    def set_reverification_needed(self, save=False):
+        self.is_reverification_needed = True
         if save:
             self.save()
 
