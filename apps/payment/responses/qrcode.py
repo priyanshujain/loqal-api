@@ -83,8 +83,8 @@ class QrCodeMerchantDetailsResponse(serializers.ModelSerializer):
     )
     about = serializers.CharField(source="profile.about", read_only=True)
     categories = MerchantCategoryResponse(many=True, read_only=True)
-    hero_image = serializers.CharField(
-        source="profile.hero_image", read_only=True
+    avatar_file_id = serializers.CharField(
+        source="profile.avatar_file.id", read_only=True
     )
     address = serializers.JSONField(source="profile.address", read_only=True)
 
@@ -97,6 +97,6 @@ class QrCodeMerchantDetailsResponse(serializers.ModelSerializer):
             "full_name",
             "about",
             "categories",
-            "hero_image",
+            "avatar_file_id",
             "address",
         )
