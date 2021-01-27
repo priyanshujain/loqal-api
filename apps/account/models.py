@@ -82,7 +82,7 @@ class Account(AbstractBaseModel):
         self.is_certification_required = required
         if save:
             self.save()
-    
+
     def set_reverification_needed(self, save=False):
         self.is_reverification_needed = True
         if save:

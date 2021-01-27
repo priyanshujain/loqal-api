@@ -1,4 +1,5 @@
 from typing import Text
+
 from django.db import models
 from django.db.models.expressions import F
 

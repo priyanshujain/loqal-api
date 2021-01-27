@@ -143,7 +143,6 @@ class Transaction(AbstractBaseModel):
         default=TransactionType.DIRECT_MERCHANT_PAYMENT,
     )
     dwolla_id = models.CharField(max_length=255, blank=True)
-    ach_return_code = models.CharField(max_length=255, blank=True)
     individual_ach_id = models.CharField(
         max_length=32, null=True, blank=True, default=None, unique=True
     )

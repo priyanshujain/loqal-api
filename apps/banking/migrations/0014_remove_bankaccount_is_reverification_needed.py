@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('banking', '0013_bankaccount_is_reverification_needed'),
+        ("banking", "0013_bankaccount_is_reverification_needed"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='bankaccount',
-            name='is_reverification_needed',
+            model_name="bankaccount",
+            name="is_reverification_needed",
         ),
     ]
