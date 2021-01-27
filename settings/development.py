@@ -86,4 +86,10 @@ LOQAL_SMS_PHONE_NUMBER = "4122183340"
 LOQAL_SMS_PHONE_NUMBER_COUNTRY = "US"
 
 
-REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+        "user_burst": "600000/min",
+        "user_sustained": "10000000/day",
+        "anon_burst": "200000/min",
+        "anon_sustained": "100000/day",
+        "login": "100000/min",
+    }
