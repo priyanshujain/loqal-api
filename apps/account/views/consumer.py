@@ -35,7 +35,7 @@ class ConsumerSignupAPI(APIView):
         consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request, user=user)
-        AfterLogin(request=self.request, user=user, send_alert=False)
+        AfterLogin(request=self.request, user=user, send_alert=False).handle()
 
 
 class AddAccountZipCodeAPI(ConsumerAPIView):

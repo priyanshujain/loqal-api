@@ -33,7 +33,7 @@ class MerchantSignupAPI(APIView):
         login(request=self.request, user=account_member.user)
         AfterLogin(
             request=self.request, user=account_member.user, send_alert=False
-        )
+        ).handle()
 
 
 class MerchantProfileAPI(MerchantAPIView):

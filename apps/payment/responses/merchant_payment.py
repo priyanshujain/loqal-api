@@ -139,7 +139,7 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
         source="charge_status.label", read_only=True
     )
     payment_status = serializers.CharField(
-        source="payment_status.label", read_only=True
+        source="status.label", read_only=True
     )
     order_amount = serializers.CharField(
         source="order.total_net_amount", read_only=True
