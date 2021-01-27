@@ -11,8 +11,9 @@ __all__ = ("CertifyDwollaMerchantAccount",)
 class CertifyDwollaMerchantAccount(ServiceBase):
     is_all_verified = True
 
-    def __init__(self, merchant):
+    def __init__(self, merchant, raise_error=True):
         self.merchant = merchant
+        self.raise_error = raise_error
 
     def handle(self):
         merchant = self.merchant
@@ -23,11 +24,17 @@ class CertifyDwollaMerchantAccount(ServiceBase):
             and merchant.account.certification_status
             != AccountCerficationStatus.CERTIFIED
         ):
-            self._certify_beneficial_owners(merchant=merchant)
+            try:
+                self._certify_beneficial_owners(merchant=merchant)
+            except ProviderAPIException as error:
+                if self.raise_error:
+                    raise error
         else:
-            raise ValidationError(
+            error = ValidationError(
                 {"detail": ErrorDetail(_("Certification is not required."))}
             )
+            if self.raise_error:
+                raise error
         return merchant
 
     def _certify_beneficial_owners(self, merchant):

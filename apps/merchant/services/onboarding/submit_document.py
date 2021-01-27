@@ -33,7 +33,9 @@ class SubmitDocuments(ServiceBase):
             and self.merchant.account.certification_status
             != AccountCerficationStatus.CERTIFIED
         ):
-            CertifyDwollaMerchantAccount(self.merchant).handle()
+            CertifyDwollaMerchantAccount(
+                self.merchant, raise_error=False
+            ).handle()
 
     def _validate_data(self):
         required_docs = DocumentRequirements(
