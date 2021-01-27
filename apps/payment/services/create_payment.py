@@ -110,6 +110,10 @@ class CreatePayment(ServiceBase):
                 payment_id=transaction.payment.id,
                 transaction_tracking_id=transaction.transaction_tracking_id,
             )
+        try:
+            error.transaction = transaction
+        except Exception:
+            pass
         raise error
 
     def _check_transaction_limits(self, transaction):

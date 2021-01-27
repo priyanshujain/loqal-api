@@ -107,9 +107,10 @@ class Payment(AbstractBaseModel):
             self.save()
 
     def failed_payment(self, save=True):
-        self.status = PaymentStatus.FAILED
-        if save:
-            self.save()
+        if self.status == PaymentStatus.IN_PROGRESS:
+            self.status = PaymentStatus.FAILED
+            if save:
+                self.save()
 
 
 class PaymentEvent(AbstractBaseModel):

@@ -28,30 +28,38 @@ class CreateRefund(ServiceBase):
         )
         order = payment_data["order"]
 
-        transaction = CreatePayment(
-            account_id=self.merchant_account.id,
-            ip_address=self.ip_address,
-            sender_bank_account=payment_data["sender_bank_account"],
-            receiver_bank_account=payment_data["receiver_bank_account"],
-            order=order,
-            total_amount=refund_payment.amount,
-            amount_towards_order=refund_payment.amount,
-            fee_bearer_account=self.merchant_account.account,
-            transaction_type=TransactionType.REFUND_PAYMENT,
-        ).handle()
-        if refund_payment.refund_type == RefundType.PARTIAL:
-            partial_refund_payment_event(
-                payment_id=transaction.payment.id,
-                refund_tracking_id=refund_payment.refund_tracking_id,
-                amount=transaction.amount,
-            )
-        if refund_payment.refund_type == RefundType.FULL:
-            full_refund_payment_event(
-                payment_id=transaction.payment.id,
-                refund_tracking_id=refund_payment.refund_tracking_id,
-            )
-        refund_payment.add_transaction(transaction=transaction)
-        return refund_payment
+        try:
+            transaction = CreatePayment(
+                account_id=self.merchant_account.id,
+                ip_address=self.ip_address,
+                sender_bank_account=payment_data["sender_bank_account"],
+                receiver_bank_account=payment_data["receiver_bank_account"],
+                order=order,
+                total_amount=refund_payment.amount,
+                amount_towards_order=refund_payment.amount,
+                fee_bearer_account=self.merchant_account.account,
+                transaction_type=TransactionType.REFUND_PAYMENT,
+            ).handle()
+            if refund_payment.refund_type == RefundType.PARTIAL:
+                partial_refund_payment_event(
+                    payment_id=transaction.payment.id,
+                    refund_tracking_id=refund_payment.refund_tracking_id,
+                    amount=transaction.amount,
+                )
+            if refund_payment.refund_type == RefundType.FULL:
+                full_refund_payment_event(
+                    payment_id=transaction.payment.id,
+                    refund_tracking_id=refund_payment.refund_tracking_id,
+                )
+            refund_payment.add_transaction(transaction=transaction)
+            return refund_payment
+        except ValidationError as error:
+            try:
+                transaction = error.transaction
+                refund_payment.set_refund_failed(transaction=transaction)
+            except AttributeError:
+                refund_payment.set_refund_failed()
+            raise error
 
     def _validate_data(self):
         data = run_validator(CreateRefundValidator, self.data)

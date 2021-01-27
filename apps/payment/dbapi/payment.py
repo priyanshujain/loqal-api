@@ -9,16 +9,11 @@ from django.db.models import Count, Q, Sum
 from django.db.utils import IntegrityError
 
 from apps.order.models import Order
-from apps.payment.models import (
-    DirectMerchantPayment,
-    Payment,
-    PaymentQrCode,
-    PaymentRegister,
-    PaymentRequest,
-    Refund,
-    Transaction,
-)
-from apps.payment.options import PaymentRequestStatus, PaymentStatus, TransactionType
+from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
+                                 PaymentRegister, PaymentRequest, Refund,
+                                 Transaction)
+from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
+                                  TransactionType)
 from utils.types import to_float
 
 
@@ -60,7 +55,9 @@ def create_transaction(
     payment_id,
     customer_ip_address,
     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
-    min_access_balance_required=Decimal(settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED),
+    min_access_balance_required=Decimal(
+        settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+    ),
 ):
     """
     dbapi for creating new transaction.
@@ -120,7 +117,9 @@ def get_payment_qrcode_by_id(qrcode_id, merchant_id):
     get QR code by qrcode_id and merchant_id
     """
     try:
-        return PaymentQrCode.objects.get(qrcode_id=qrcode_id, merchant_id=merchant_id)
+        return PaymentQrCode.objects.get(
+            qrcode_id=qrcode_id, merchant_id=merchant_id
+        )
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -149,7 +148,9 @@ def get_cashier_qrcode(merchant_id, cashier_id):
     Get QR code for a cashier
     """
     try:
-        return PaymentQrCode.objects.get(merchant_id=merchant_id, cashier_id=cashier_id)
+        return PaymentQrCode.objects.get(
+            merchant_id=merchant_id, cashier_id=cashier_id
+        )
     except PaymentQrCode.DoesNotExist:
         return None
 
@@ -269,7 +270,9 @@ def get_merchant_transactions(merchant_account):
 
 def get_consumer_transaction(consumer_account, transaction_tracking_id):
     transactions = get_consumer_transactions(consumer_account=consumer_account)
-    transactions = transactions.filter(transaction_tracking_id=transaction_tracking_id)
+    transactions = transactions.filter(
+        transaction_tracking_id=transaction_tracking_id
+    )
     if not transactions.exists():
         return None
     return transactions.first()

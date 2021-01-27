@@ -184,7 +184,8 @@ class Transaction(AbstractBaseModel):
 
     def set_internal_error(self, save=True):
         self.status = TransactionStatus.INTERNAL_PSP_ERROR
-        self.payment.status = PaymentStatus.FAILED
+        if self.payment.status == PaymentStatus.IN_PROGRESS:
+            self.payment.status = PaymentStatus.FAILED
         self.payment.save()
         if save:
             self.save()
