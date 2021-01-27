@@ -1,7 +1,7 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.banking.models import BankAccount
-from apps.payment.models import Refund, Transaction
+from apps.payment.models import Refund, Transaction, TransactionEvent
 
 
 class BankAcconutResponse(serializers.ModelSerializer):
@@ -30,6 +30,19 @@ class ConsumerResponse(serializers.ModelSerializer):
         )
 
 
+class TransactionEventResponse(serializers.ModelSerializer):
+    event_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+
+    class Meta:
+        model = TransactionEvent
+        fields = (
+            "created_at",
+            "event_timestamp",
+            "event_type",
+            "parameters",
+        )
+
+
 class SettlementDetailsResponse(serializers.ModelSerializer):
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
@@ -43,6 +56,7 @@ class SettlementDetailsResponse(serializers.ModelSerializer):
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     sender_status = serializers.ChoiceCharEnumSerializer(read_only=True)
     receiver_status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    events = TransactionEventResponse(many=True, read_only=True)
 
     class Meta:
         model = Transaction
@@ -68,6 +82,7 @@ class SettlementDetailsResponse(serializers.ModelSerializer):
             "status",
             "sender_status",
             "receiver_status",
+            "events",
         )
 
     def get_bank_details(self, obj):

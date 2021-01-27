@@ -1,6 +1,8 @@
 import hmac
 from hashlib import sha256
 
+from dateutil import parser
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -45,11 +47,17 @@ class ProcesssProviderWebhook(ServiceBase):
         event_id = self.request_data.get("id", "")
         target_resource_dwolla_id = self.request_data.get("resourceId", "")
         topic = self.request_data.get("topic", "")
+        timestamp = self.request_data.get("timestamp", "")
+        event_timestamp = timezone.now()
+        if timestamp:
+            event_timestamp = parser.parse(event_timestamp)
+
         event = self._factory_provider_webhook_event(
             webhook_id=provider_webhook.id,
             dwolla_id=event_id,
             target_resource_dwolla_id=target_resource_dwolla_id,
             topic=topic,
+            event_timestamp=event_timestamp,
         )
 
         if not "customer" in topic:

@@ -71,7 +71,12 @@ def get_provider_webhook_events(webhook_id):
 
 
 def create_provider_webhook_event(
-    webhook_id, event_payload, dwolla_id, topic, target_resource_dwolla_id
+    webhook_id,
+    event_payload,
+    dwolla_id,
+    topic,
+    target_resource_dwolla_id,
+    event_timestamp,
 ):
     try:
         return ProviderWebhookEvent.objects.create(
@@ -79,6 +84,7 @@ def create_provider_webhook_event(
             event_payload=event_payload,
             dwolla_id=dwolla_id,
             topic=topic,
+            event_timestamp=event_timestamp,
             target_resource_dwolla_id=target_resource_dwolla_id,
         )
     except IntegrityError:

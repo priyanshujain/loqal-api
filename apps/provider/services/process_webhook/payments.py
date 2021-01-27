@@ -1,6 +1,8 @@
 from api.exceptions import ErrorDetail, ValidationError
+from apps.payment.dbapi import create_transaction_event
 from apps.payment.dbapi.webhoooks import get_transaction_by_dwolla_id
-from apps.payment.options import (TransactionFailureReasonType,
+from apps.payment.options import (TransactionEventType,
+                                  TransactionFailureReasonType,
                                   TransactionReceiverStatus,
                                   TransactionSenderStatus, TransactionStatus)
 
@@ -22,6 +24,7 @@ class ApplyPaymentWebhook(object):
             raise ValidationError(
                 {"detail": ErrorDetail("Invalid resource id for transfer.")}
             )
+        self.transaction = transaction
         sender_account = transaction.sender_bank_account.account
 
         if topic == "customer_bank_transfer_created":
@@ -36,11 +39,17 @@ class ApplyPaymentWebhook(object):
                         TransactionSenderStatus.VC_BANK_TRANSFER_CREATED
                     )
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_BANK_TRANSFER_CREATED
+                    )
                 else:
                     transaction.receiver_status = (
                         TransactionReceiverStatus.VC_BANK_TRANSFER_CREATED
                     )
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_CREATED
+                    )
 
         if topic == "customer_bank_transfer_creation_failed":
             """
@@ -70,6 +79,9 @@ class ApplyPaymentWebhook(object):
                 TransactionReceiverStatus.VC_BANK_TRANSFER_CREATION_FAILED
             )
             transaction.save()
+            self._create_event(
+                event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_CREATION_FAILED
+            )
 
         if topic == "customer_bank_transfer_cancelled":
             """
@@ -85,11 +97,17 @@ class ApplyPaymentWebhook(object):
                         TransactionSenderStatus.VC_BANK_TRANSFER_CANCELLED
                     )
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_BANK_TRANSFER_CANCELLED
+                    )
                 else:
                     transaction.receiver_status = (
                         TransactionReceiverStatus.VC_BANK_TRANSFER_CANCELLED
                     )
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_CANCELLED
+                    )
             # TODO: Trigger an email to admin if any transaction is cancelled
 
         if topic == "customer_bank_transfer_failed":
@@ -107,9 +125,15 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_BANK_TRANSFER_FAILED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_BANK_TRANSFER_FAILED
+                    )
                 else:
                     transaction.receiver_status = (
                         TransactionReceiverStatus.VC_BANK_TRANSFER_FAILED
+                    )
+                    self._create_event(
+                        event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_FAILED
                     )
 
             failure_details = record_payment_failure(transaction, at_source)
@@ -130,12 +154,18 @@ class ApplyPaymentWebhook(object):
                     transaction.status = TransactionStatus.SENDER_COMPLETED
                     transaction.complete_sender_transfer(save=False)
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_BANK_TRANSFER_COMPLETED
+                    )
                 else:
                     transaction.status = TransactionStatus.PROCESSED
                     transaction.receiver_status = (
                         TransactionReceiverStatus.VC_BANK_TRANSFER_COMPLETED
                     )
                     transaction.save()
+                    self._create_event(
+                        event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_COMPLETED
+                    )
 
         if topic == "customer_transfer_created":
             """
@@ -148,17 +178,29 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_FROM_BALANCE_TRANSFER_CREATED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_FROM_BALANCE_TRANSFER_CREATED
+                    )
                 else:
                     transaction.sender_status = (
                         TransactionSenderStatus.UVC_BANK_TRANSFER_CREATED
+                    )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_UVC_BANK_TRANSFER_CREATED
                     )
             elif self.customer_account.is_verified_dwolla_customer:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_CREATED
                 )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_CREATEDD
+                )
             else:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.UVC_BANK_TRANSFER_CREATED
+                )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_UVC_BANK_TRANSFER_CREATED
                 )
             transaction.save()
 
@@ -175,17 +217,29 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_FROM_BALANCE_TRANSFER_CANCELLED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_FROM_BALANCE_TRANSFER_CANCELLED
+                    )
                 else:
                     transaction.sender_status = (
                         TransactionSenderStatus.UVC_BANK_TRANSFER_CANCELLED
+                    )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_UVC_BANK_TRANSFER_CANCELLED
                     )
             elif self.customer_account.is_verified_dwolla_customer:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_CANCELLED
                 )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_CANCELLED
+                )
             else:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.UVC_BANK_TRANSFER_CANCELLED
+                )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_UVC_BANK_TRANSFER_CANCELLED
                 )
             transaction.save()
 
@@ -203,17 +257,29 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_FROM_BALANCE_TRANSFER_FAILED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_FROM_BALANCE_TRANSFER_FAILED
+                    )
                 else:
                     transaction.sender_status = (
                         TransactionSenderStatus.UVC_BANK_TRANSFER_FAILED
+                    )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_UVC_BANK_TRANSFER_FAILED
                     )
             elif self.customer_account.is_verified_dwolla_customer:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_FAILED
                 )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_FAILED
+                )
             else:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.UVC_BANK_TRANSFER_FAILED
+                )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_UVC_BANK_TRANSFER_FAILED
                 )
             failure_details = record_payment_failure(transaction, at_source)
             if not failure_details:
@@ -231,18 +297,38 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_FROM_BALANCE_TRANSFER_COMPLETED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_VC_FROM_BALANCE_TRANSFER_COMPLETED
+                    )
                 else:
                     transaction.sender_status = (
                         TransactionSenderStatus.UVC_BANK_TRANSFER_COMPLETED
                     )
+                    self._create_event(
+                        event_type=TransactionEventType.SENDER_UVC_BANK_TRANSFER_COMPLETED
+                    )
             elif self.customer_account.is_verified_dwolla_customer:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_COMPLETED
+                )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_COMPLETED
                 )
             else:
                 transaction.status = TransactionStatus.PROCESSED
                 transaction.receiver_status = (
                     TransactionReceiverStatus.UVC_BANK_TRANSFER_COMPLETED
                 )
+                self._create_event(
+                    event_type=TransactionEventType.RECEIVER_UVC_BANK_TRANSFER_COMPLETED
+                )
             transaction.save()
         self.event.mark_processed()
+
+    def _create_event(self, event_type, parameters={}):
+        create_transaction_event(
+            transaction_id=self.transaction.id,
+            event_timestamp=self.event.event_timestamp,
+            event_type=event_type,
+            parameters=parameters,
+        )

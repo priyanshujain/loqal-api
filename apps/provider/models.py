@@ -100,6 +100,7 @@ class ProviderWebhookEvent(AbstractBaseModel):
     is_processed = models.BooleanField(default=False)
     topic = models.CharField(max_length=255, blank=True)
     target_resource_dwolla_id = models.CharField(max_length=255, blank=True)
+    event_timestamp = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "provider_webhook_event"

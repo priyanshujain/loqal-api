@@ -24,6 +24,7 @@ from .payment import Payment
 __all__ = (
     "Transaction",
     "DisputeTransaction",
+    "TransactionEvent",
 )
 
 
@@ -311,7 +312,10 @@ class TransactionEvent(AbstractBaseModel):
         related_name="events",
         on_delete=models.CASCADE,
     )
-    event_type = ChoiceEnumField(enum_type=TransactionEventType)
+    event_timestamp = models.DateTimeField(null=True, blank=True)
+    event_type = ChoiceCharEnumField(
+        max_length=128, enum_type=TransactionEventType
+    )
     parameters = models.JSONField(blank=True, default=dict)
 
     class Meta:
