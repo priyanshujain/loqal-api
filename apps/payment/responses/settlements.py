@@ -53,6 +53,7 @@ class SettlementDetailsResponse(serializers.ModelSerializer):
     consumer = ConsumerResponse(
         source="payment.order.consumer", read_only=True
     )
+    transaction_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     sender_status = serializers.ChoiceCharEnumSerializer(read_only=True)
     receiver_status = serializers.ChoiceCharEnumSerializer(read_only=True)
@@ -83,6 +84,7 @@ class SettlementDetailsResponse(serializers.ModelSerializer):
             "sender_status",
             "receiver_status",
             "events",
+            "transaction_type",
         )
 
     def get_bank_details(self, obj):
