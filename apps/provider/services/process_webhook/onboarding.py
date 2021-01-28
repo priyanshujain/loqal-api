@@ -63,7 +63,7 @@ class ApplyOnboardingWebhook(object):
             A verification document was uploaded for a Customer.
             """
             self.customer_account.update_status(
-                status=DwollaCustomerStatus.DOCUMENT,
+                status=None,
                 verification_status=DwollaCustomerVerificationStatus.DOCUMENT_UPLOADED,
             )
 
