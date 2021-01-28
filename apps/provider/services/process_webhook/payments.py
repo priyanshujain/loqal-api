@@ -193,7 +193,7 @@ class ApplyPaymentWebhook(object):
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_CREATED
                 )
                 self._create_event(
-                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_CREATEDD
+                    event_type=TransactionEventType.RECEIVER_VC_TO_BALANCE_TRANSFER_CREATED
                 )
             else:
                 transaction.receiver_status = (
