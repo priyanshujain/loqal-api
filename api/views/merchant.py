@@ -20,6 +20,10 @@ class MerchantAPIView(APIAccessLogView):
         if not user.is_authenticated:
             exception_message = "User is not authenticated."
 
+        if user.is_disabled:
+            exception_message = "Your account has been de-activated. Please contact our support team."
+            exception_class = PermissionDenied
+
         merchant_account_member = get_account_member_by_user_id(
             user_id=user.id
         )
