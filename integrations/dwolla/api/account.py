@@ -268,9 +268,11 @@ class Account(Http):
                 "errors": err.api_errors,
             }
 
-        response_headers = response.headers
-        location = response_headers["location"]
-        beneficial_owner_id = location.split("/").pop()
+        beneficial_owner_id = data.get("dwolla_id")
+        if not is_update:
+            response_headers = response.headers
+            location = response_headers["location"]
+            beneficial_owner_id = location.split("/").pop()
 
         return self.get_beneficial_owner(
             beneficial_owner_id=beneficial_owner_id
