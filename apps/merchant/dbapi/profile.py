@@ -93,7 +93,7 @@ def update_merchant_profile(
 
 def get_merchants_by_category(category):
     return MerchantAccount.objects.filter(
-        is_active=True, categories__category=category
+        account__is_active=True, categories__category=category
     )
 
 

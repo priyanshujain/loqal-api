@@ -60,7 +60,9 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(ConsumerPre2FaAPIView, self).dispatch(request, *args, **kwargs)
+        return super(ConsumerPre2FaAPIView, self).dispatch(
+            request, *args, **kwargs
+        )
 
     def initialize_request(self, request, *args, **kwargs):
         """

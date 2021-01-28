@@ -4,7 +4,7 @@ from apps.account.models import MerchantAccount
 
 
 def get_all_merchants():
-    return MerchantAccount.objects.filter(is_active=True)
+    return MerchantAccount.objects.filter(account__is_active=True)
 
 
 def get_merchant_qs_by_category(merchant_qs, category):
