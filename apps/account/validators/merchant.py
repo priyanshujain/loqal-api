@@ -12,7 +12,7 @@ __all__ = (
     "CreateMerchantAccountValidator",
     "MerchantAccountSignupValidatorBase",
     "CreateNonLoqalMerchantValidator",
-    "EnableDisableMerchantValidator",
+    "EnableDisableAccountValidator",
 )
 
 
@@ -113,5 +113,5 @@ class CreateNonLoqalMerchantValidator(serializers.ValidationSerializer):
         return attrs
 
 
-class EnableDisableMerchantValidator(serializers.ValidationSerializer):
-    merchant_id = serializers.UUIDField()
+class EnableDisableAccountValidator(serializers.ValidationSerializer):
+    account_id = serializers.IntegerField()

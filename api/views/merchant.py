@@ -30,6 +30,10 @@ class MerchantAPIView(APIAccessLogView):
             request.merchant_account = merchant_account_member.merchant
             request.account = request.merchant_account.account
 
+            if not request.account.is_active:
+                exception_message = "Your account has been de-activated. Please contact our support team."
+                exception_class = PermissionDenied
+
         drf_request = super().initialize_request(request, *args, **kwargs)
         if exception_message:
             raise exception_class(detail=exception_message)

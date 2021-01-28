@@ -7,6 +7,7 @@ __all__ = (
     "get_merchant_account",
     "get_merchant_account_by_uid",
     "create_non_loqal_merchant_account",
+    "get_account_by_id",
 )
 
 
@@ -31,6 +32,13 @@ def get_merchant_account(merchant_id):
     try:
         return MerchantAccount.objects.get(id=merchant_id)
     except MerchantAccount.DoesNotExist:
+        return None
+
+
+def get_account_by_id(account_id):
+    try:
+        return Account.objects.get(id=account_id)
+    except Account.DoesNotExist:
         return None
 
 

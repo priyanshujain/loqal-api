@@ -96,6 +96,16 @@ class Account(AbstractBaseModel):
         if save:
             self.save()
 
+    def deactivate(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()
+
+    def activate(self, save=True):
+        self.is_active = True
+        if save:
+            self.save()
+
     class Meta:
         db_table = "account"
 
@@ -136,36 +146,12 @@ class MerchantAccount(AbstractBaseModel):
         blank=True,
     )
     company_email = models.CharField(max_length=255, blank=True)
-    account_status = ChoiceEnumField(
-        enum_type=MerchantAccountStatus,
-        default=MerchantAccountStatus.PENDING,
-        help_text=_("Status for the merchant account with dwolla."),
-    )
-    is_certification_required = models.BooleanField(default=None, null=True)
-    certification_status = ChoiceEnumField(
-        enum_type=AccountCerficationStatus,
-        default=AccountCerficationStatus.PENDING,
-        help_text=_(
-            "Status for the merchant beneficial owner certified with dwolla."
-        ),
-    )
-    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "merchant_account"
 
     def update_status(self, status, save=True):
         self.account_status = status
-        if save:
-            self.save()
-
-    def deactivate(self, save=True):
-        self.is_active = False
-        if save:
-            self.save()
-
-    def activate(self, save=True):
-        self.is_active = True
         if save:
             self.save()
 

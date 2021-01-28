@@ -17,6 +17,9 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
     )
     merchant_id = serializers.CharField(source="u_id", read_only=True)
     account_id = serializers.IntegerField(source="account.id", read_only=True)
+    is_active = serializers.BooleanField(
+        source="account.is_active", read_only=True
+    )
 
     class Meta:
         model = MerchantAccount

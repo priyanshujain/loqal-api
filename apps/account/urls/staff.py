@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apps.account.views.staff import (CreateNonLoqalMerchantsAPI,
-                                      DisableMerchantsAPI, EnableMerchantsAPI,
+                                      DisableAccountAPI, EnableAccountAPI,
                                       GetActiveMerchantsAPI,
                                       GetNonLoqalMerchantsAPI)
 
@@ -17,14 +17,14 @@ urlpatterns = [
         name="view_non_loqal_active_merchants",
     ),
     path(
-        "staff/merchants/disable/",
-        DisableMerchantsAPI.as_view(),
-        name="disable_merchant",
+        "staff/account/disable/",
+        DisableAccountAPI.as_view(),
+        name="disable_account",
     ),
     path(
-        "staff/merchants/enable/",
-        EnableMerchantsAPI.as_view(),
-        name="enable_merchant",
+        "staff/account/enable/",
+        EnableAccountAPI.as_view(),
+        name="enable_account",
     ),
     path(
         "staff/merchants/",

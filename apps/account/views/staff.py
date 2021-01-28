@@ -2,10 +2,8 @@ from api.views import StaffAPIView
 from apps.account.dbapi.staff import (get_active_non_loqal_merchants,
                                       get_loqal_merchants)
 from apps.account.responses.staff import MerchantAccountProfileResponse
-from apps.account.services import (CreateNonLoqalMerchant, DisableMerchant,
-                                   EnableMerchant)
-
-__all__ = ("GetActiveMerchantsAPI",)
+from apps.account.services import (CreateNonLoqalMerchant, DisableAccount,
+                                   EnableAccount)
 
 
 class GetActiveMerchantsAPI(StaffAPIView):
@@ -26,15 +24,15 @@ class CreateNonLoqalMerchantsAPI(StaffAPIView):
         )
 
 
-class DisableMerchantsAPI(StaffAPIView):
+class DisableAccountAPI(StaffAPIView):
     def post(self, request):
-        DisableMerchant(data=self.request_data).handle()
+        DisableAccount(data=self.request_data).handle()
         return self.response(status=204)
 
 
-class EnableMerchantsAPI(StaffAPIView):
+class EnableAccountAPI(StaffAPIView):
     def post(self, request):
-        EnableMerchant(data=self.request_data).handle()
+        EnableAccount(data=self.request_data).handle()
         return self.response(status=204)
 
 

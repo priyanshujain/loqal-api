@@ -1,3 +1,5 @@
+import re
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
@@ -33,9 +35,15 @@ class ConsumerAPIView(APIAccessLogView):
 
         consumer_account = get_consumer_account(user_id=user.id)
         if not consumer_account:
-            exception_message = "User is not valid"
+            exception_message = "Account is not valid"
         else:
+            if not consumer_account.account:
+                exception_message = "Account is not valid"
             request.account = consumer_account.account
+
+            if not request.account.is_active:
+                exception_message = "Your account has been de-activated. Please contact our support team."
+                exception_class = PermissionDenied
             request.consumer_account = consumer_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
