@@ -367,11 +367,11 @@ class DisputeType(ChoiceCharEnum):
 
 class DisputeReasonType(ChoiceCharEnum):
     MONEY_NOT_REACHED = "money_not_reached", _(
-        "Money has not reached to merchant"
+        "Money has not reached the merchant"
     )
     PAID_TWICE = "paid_twice", _("Paid twice for the order")
     MORE_DETAILS_REQUIRED = "more_details_required", _(
-        "Require more details on transaction"
+        "I require more details"
     )
     DID_NOT_PERFORM = "did_not_perform", _(
         "I did not perform this transaction"

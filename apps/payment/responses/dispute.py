@@ -81,19 +81,13 @@ class DisputeListResponse(serializers.ModelSerializer):
 
 
 class ConsumerDisputeDetailsResponse(serializers.ModelSerializer):
-    dispute_type = serializers.CharField(
-        source="dispute_type.label", read_only=True
-    )
     status = serializers.CharField(source="status.label", read_only=True)
-    reason_type = serializers.CharField(
-        source="reason_type.label", read_only=True
-    )
+    reason_type = serializers.ChoiceCharEnumSerializer(read_only=True)
 
     class Meta:
         model = DisputeTransaction
         fields = (
             "created_at",
-            "dispute_type",
             "dispute_tracking_id",
             "reason_type",
             "status",
