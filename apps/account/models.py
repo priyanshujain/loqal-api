@@ -7,8 +7,7 @@ from rest_framework.fields import ModelField
 
 from apps.account.options import (AccountCerficationStatus,
                                   ConsumerAccountStatus, DwollaCustomerStatus,
-                                  DwollaCustomerVerificationStatus,
-                                  MerchantAccountStatus)
+                                  DwollaCustomerVerificationStatus)
 from apps.box.models import BoxFile
 from apps.user.models import User
 from db.models.abstract import AbstractBaseModel, BaseModel

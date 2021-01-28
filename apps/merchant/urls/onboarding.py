@@ -3,11 +3,11 @@ from django.urls import path
 from apps.merchant.views.onboarding import (
     AcceptableDocumentTypesAPI, CertifyOwnershipAPI, CreateBeneficialOwnerAPI,
     CreateControllerAPI, CreateIncorporationDetailsAPI,
-    DocumentRequirementsAPI, OnboardingDataAPI, RemoveBeneficialOwnerAPI,
-    SubmitDocumentAPI, SubmitKycDataAPI, UpdateBeneficialOwnerAPI,
-    UpdateBusinessVerificationDocumentAPI, UpdateControllerAPI,
-    UpdateControllerVerificationDocumentAPI, UpdateIncorporationDetailsAPI,
-    UpdateOwnerVerificationDocumentAPI)
+    DocumentRequirementsAPI, OnboardingDataAPI, OnboardingStatusAPI,
+    RemoveBeneficialOwnerAPI, SubmitDocumentAPI, SubmitKycDataAPI,
+    UpdateBeneficialOwnerAPI, UpdateBusinessVerificationDocumentAPI,
+    UpdateControllerAPI, UpdateControllerVerificationDocumentAPI,
+    UpdateIncorporationDetailsAPI, UpdateOwnerVerificationDocumentAPI)
 
 urlpatterns = [
     path(
@@ -49,6 +49,11 @@ urlpatterns = [
         "onboarding/data/",
         OnboardingDataAPI.as_view(),
         name="view_onboarding_data",
+    ),
+    path(
+        "onboarding/status/",
+        OnboardingStatusAPI.as_view(),
+        name="view_onboarding_status",
     ),
     path(
         "onboarding/submit-kyc/",

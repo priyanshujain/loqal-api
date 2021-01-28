@@ -1,16 +1,16 @@
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ProviderAPIException
+from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
-from apps.account.options import MerchantAccountStatus
+from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.provider.lib.actions import ProviderAPIActionBase
+
+from .certify_ownership import CertifyDwollaMerchantAccount
 
 __all__ = ("GetMerchantAccountStatus",)
 
 
 class GetMerchantAccountStatus(ServiceBase):
-    is_all_verified = True
-
     def __init__(self, merchant):
         self.merchant = merchant
 
@@ -41,8 +41,13 @@ class GetMerchantAccountStatus(ServiceBase):
         account.update_certification_required(
             required=is_certification_required
         )
-        if dwolla_status != MerchantAccountStatus.VERIFIED:
-            self.is_all_verified = False
+        if (
+            dwolla_status == DwollaCustomerStatus.VERIFIED
+            and self.merchant.account.is_certification_required
+            and self.merchant.account.certification_status
+            != AccountCerficationStatus.CERTIFIED
+        ):
+            CertifyDwollaMerchantAccount(merchant=self.merchant).handle()
 
         if controller_document_required:
             controller = merchant.controller_details
@@ -53,13 +58,14 @@ class GetMerchantAccountStatus(ServiceBase):
             incorporation_details.update_verification_document_required(
                 required=True
             )
+        return account
 
 
 class DwollaGetAccountAPIAction(ProviderAPIActionBase):
     def get(self):
         response = self.client.account.get_customer_account()
         if self.get_errors(response):
-            raise ProviderAPIException(
+            raise ValidationError(
                 {
                     "detail": ErrorDetail(
                         _(

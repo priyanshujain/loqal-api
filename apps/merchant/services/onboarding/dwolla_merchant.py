@@ -3,7 +3,9 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account
-from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
+from apps.account.options import (AccountCerficationStatus,
+                                  DwollaCustomerStatus,
+                                  DwollaCustomerVerificationStatus)
 from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  update_beneficial_owner_status)
 from apps.merchant.options import BeneficialOwnerStatus, BusinessTypes
@@ -126,6 +128,14 @@ class CreateDwollaMerchantAccount(ServiceBase):
             ]
 
             account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
+            if (
+                account.dwolla_customer_status == DwollaCustomerStatus.RETRY
+                and dwolla_status == DwollaCustomerStatus.RETRY
+            ):
+                dwolla_status = DwollaCustomerStatus.SUSPENDED
+                dwolla_verification_status = (
+                    DwollaCustomerVerificationStatus.SUSPENDED
+                )
             account.update_status(
                 status=dwolla_status,
                 verification_status=dwolla_verification_status,

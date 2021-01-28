@@ -7,6 +7,7 @@ from apps.merchant.options import BusinessDocumentType, IndividualDocumentType
 from apps.merchant.responses import (ControllerVerificationDocumentResponse,
                                      IncorporationVerificationDocumentResponse,
                                      OnboardingDataResponse,
+                                     OnboardingStatusResponse,
                                      OwnerVerificationDocumentResponse)
 from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     BusinessDocumentUpload,
@@ -17,6 +18,7 @@ from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     CreateDwollaMerchantAccount,
                                     CreateIncorporationDetails,
                                     DocumentRequirements,
+                                    GetMerchantAccountStatus,
                                     RemoveBeneficialOwner, SubmitDocuments,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
@@ -159,6 +161,13 @@ class OnboardingDataAPI(MerchantAPIView):
         merchant_account = request.merchant_account
         data = OnboardingDataResponse(merchant_account).data
         return self.response(data)
+
+
+class OnboardingStatusAPI(MerchantAPIView):
+    def get(self, request):
+        merchant_account = request.merchant_account
+        account = GetMerchantAccountStatus(merchant=merchant_account).handle()
+        return self.response(OnboardingStatusResponse(account).data)
 
 
 class SubmitKycDataAPI(MerchantAPIView):

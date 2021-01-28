@@ -1,7 +1,7 @@
 from types import ClassMethodDescriptorType
 
 from api import serializers
-from apps.account.models import MerchantAccount
+from apps.account.models import Account, MerchantAccount
 from apps.box.models import BoxFile
 from apps.merchant.models import (BeneficialOwner, ControllerDetails,
                                   ControllerVerificationDocument,
@@ -14,6 +14,7 @@ __all__ = (
     "IncorporationVerificationDocumentResponse",
     "OwnerVerificationDocumentResponse",
     "ControllerVerificationDocumentResponse",
+    "OnboardingStatusResponse",
 )
 
 
@@ -123,4 +124,20 @@ class OnboardingDataResponse(serializers.ModelSerializer):
             "incorporation_details",
             "controller_details",
             "beneficial_owners",
+        )
+
+
+class OnboardingStatusResponse(serializers.ModelSerializer):
+    account_status = serializers.ChoiceCharEnumSerializer(
+        source="dwolla_customer_status", read_only=True
+    )
+    account_verification_status = serializers.ChoiceCharEnumSerializer(
+        source="dwolla_customer_verification_status", read_only=True
+    )
+
+    class Meta:
+        model = Account
+        fields = (
+            "account_status",
+            "account_verification_status",
         )
