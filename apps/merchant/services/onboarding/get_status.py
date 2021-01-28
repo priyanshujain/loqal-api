@@ -34,6 +34,8 @@ class GetMerchantAccountStatus(ServiceBase):
         ]
 
         account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
+        if dwolla_status == DwollaCustomerStatus.DOCUMENT:
+            dwolla_verification_status = None
         account.update_status(
             status=dwolla_status,
             verification_status=dwolla_verification_status,

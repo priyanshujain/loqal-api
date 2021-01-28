@@ -1,7 +1,8 @@
 from api.views import StaffAPIView
 from apps.account.dbapi.staff import (get_active_non_loqal_merchants,
-                                      get_loqal_merchants)
-from apps.account.responses.staff import MerchantAccountProfileResponse
+                                      get_loqal_consumers, get_loqal_merchants)
+from apps.account.responses.staff import (ConsumerAccountProfileResponse,
+                                          MerchantAccountProfileResponse)
 from apps.account.services import (CreateNonLoqalMerchant, DisableAccount,
                                    EnableAccount)
 
@@ -11,6 +12,14 @@ class GetActiveMerchantsAPI(StaffAPIView):
         merchants = get_loqal_merchants()
         return self.response(
             MerchantAccountProfileResponse(merchants, many=True).data
+        )
+
+
+class GetConsumersAPI(StaffAPIView):
+    def get(self, request):
+        consumers = get_loqal_consumers()
+        return self.response(
+            ConsumerAccountProfileResponse(consumers, many=True).data
         )
 
 

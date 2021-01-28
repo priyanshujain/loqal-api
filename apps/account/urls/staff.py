@@ -2,7 +2,7 @@ from django.urls import path
 
 from apps.account.views.staff import (CreateNonLoqalMerchantsAPI,
                                       DisableAccountAPI, EnableAccountAPI,
-                                      GetActiveMerchantsAPI,
+                                      GetActiveMerchantsAPI, GetConsumersAPI,
                                       GetNonLoqalMerchantsAPI)
 
 urlpatterns = [
@@ -30,5 +30,10 @@ urlpatterns = [
         "staff/merchants/",
         GetActiveMerchantsAPI.as_view(),
         name="view_active_merchants",
+    ),
+    path(
+        "staff/consumers/",
+        GetConsumersAPI.as_view(),
+        name="view_consumers",
     ),
 ]
