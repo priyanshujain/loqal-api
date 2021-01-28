@@ -254,7 +254,7 @@ class Account(Http):
 
         endpoint = f"customers/{self.config.customer_id}/beneficial-owners"
         if is_update:
-            endpoint = f"{endpoint}/{data['dwolla_id']}"
+            endpoint = f"beneficial-owners/{data['dwolla_id']}"
         try:
             response = self.post(
                 endpoint,
