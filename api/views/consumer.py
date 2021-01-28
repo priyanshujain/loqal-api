@@ -60,9 +60,7 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(ConsumerPre2FaAPIView, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super(ConsumerPre2FaAPIView, self).dispatch(request, *args, **kwargs)
 
     def initialize_request(self, request, *args, **kwargs):
         """
@@ -80,6 +78,9 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
             exception_message = "User is not valid"
         else:
             request.account = consumer_account.account
+            if not request.account.is_active:
+                exception_message = "Your account has been de-activated. Please contact our support team."
+                exception_class = PermissionDenied
             request.consumer_account = consumer_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
