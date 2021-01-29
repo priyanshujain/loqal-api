@@ -38,7 +38,7 @@ class DownloadTermsDocument(object):
 
 
 class AcceptTermsFileTask(Task):
-    name = "submit_files"
+    name = "accept_term_file_email"
 
     def run(self, account_id, user_id, document_url):
         payment_consent = get_payment_account_consent(
