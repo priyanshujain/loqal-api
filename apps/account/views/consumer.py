@@ -29,9 +29,7 @@ class ConsumerSignupAPI(APIView):
 
     def _run_services(self, ip_address):
         data = self.request_data
-        service = CreateConsumerAccount(
-            data=self.request_data, ip_address=ip_address
-        )
+        service = CreateConsumerAccount(data=self.request_data)
         consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request, user=user)

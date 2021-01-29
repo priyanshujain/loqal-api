@@ -164,8 +164,13 @@ class PaymentAccountOpeningConsent(BaseModel):
     ip_address = models.GenericIPAddressField(editable=False)
     consent_timestamp = models.BigIntegerField(editable=False)
     payment_term_document = models.ForeignKey(
-        BoxFile, on_delete=models.DO_NOTHING, editable=False
+        BoxFile, on_delete=models.DO_NOTHING, null=True, blank=True
     )
 
     class Meta:
         db_table = "payment_account_opening_consent"
+
+    def add_terms_file(self, boxfile, save=True):
+        self.payment_term_document = boxfile
+        if save:
+            self.save()
