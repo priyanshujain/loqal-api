@@ -56,6 +56,10 @@ class ForgotPasswordValidator(serializers.ValidationSerializer):
     old_password = serializers.CharField()
     new_password = serializers.CharField()
 
+    def validate_new_password(self, new_password):
+        password_validation.validate_password(new_password)
+        return new_password
+
 
 class RequestResetPasswordValidator(serializers.ValidationSerializer):
     email = serializers.EmailField()
