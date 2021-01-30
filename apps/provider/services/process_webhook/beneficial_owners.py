@@ -2,7 +2,7 @@ from apps.merchant.dbapi.webhooks import (get_beneficial_owner_by_dwolla_id,
                                           get_owner_document)
 from apps.merchant.options import BeneficialOwnerStatus
 
-from .tasks import get_document_failure_details
+from .helpers import get_document_failure_details
 
 
 class ApplyBeneficialOwnerWebhook(object):

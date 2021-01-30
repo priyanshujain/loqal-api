@@ -5,16 +5,11 @@ from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
-from apps.account.dbapi.webhooks import get_account_by_dwolla_id
 from apps.provider.dbapi import (create_provider_webhook_event,
                                  get_provider_webhook)
 
-from .banking import ApplyBankingWebhook
-from .beneficial_owners import ApplyBeneficialOwnerWebhook
-from .onboarding import ApplyOnboardingWebhook
-from .payments import ApplyPaymentWebhook
+from .tasks import process_webhook_event
 
 __all__ = ("ProcesssProviderWebhook",)
 
@@ -60,42 +55,7 @@ class ProcesssProviderWebhook(ServiceBase):
             event_timestamp=event_timestamp,
         )
 
-        if not "customer" in topic:
-            # Add account related webhooks here
-            return
-
-        account_dwolla_id = (
-            self.request_data.get("_links", {})
-            .get("customer", {})
-            .get("href", "")
-            .split("/")
-            .pop()
-        )
-        customer_account = get_account_by_dwolla_id(
-            dwolla_id=account_dwolla_id
-        )
-        if not customer_account:
-            raise ValidationError(
-                {"detail": ErrorDetail("Invalid id for customer.")}
-            )
-
-        if "transfer" in topic:
-            ApplyPaymentWebhook(
-                event=event, customer_account=customer_account
-            ).handle()
-        elif "funding_source" in topic:
-            ApplyBankingWebhook(
-                event=event, customer_account=customer_account
-            ).handle()
-        elif "beneficial_owner" in topic:
-            ApplyBeneficialOwnerWebhook(
-                event=event,
-                customer_account=customer_account,
-            )
-        else:
-            ApplyOnboardingWebhook(
-                event=event, customer_account=customer_account
-            ).handle()
+        process_webhook_event.delay(event_id=event.id)
 
     def _verify_gateway_signature(
         self, proposed_signature, webhook_secret, payload_body

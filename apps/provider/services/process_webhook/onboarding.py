@@ -4,7 +4,7 @@ from apps.merchant.dbapi.webhooks import (get_controller_document,
                                           get_incorporation_document)
 from apps.merchant.options import VerificationDocumentStatus
 
-from .tasks import get_document_failure_details
+from .helpers import get_document_failure_details
 
 
 class ApplyOnboardingWebhook(object):

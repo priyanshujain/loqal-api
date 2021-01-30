@@ -70,6 +70,19 @@ def get_provider_webhook_events(webhook_id):
     return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id)
 
 
+def get_provider_webhook_event(event_id):
+    try:
+        return ProviderWebhookEvent.objects.get(id=event_id)
+    except ProviderWebhookEvent.DoesNotExist:
+        return None
+
+
+def get_pending_webhook_event(target_resource_dwolla_id):
+    return ProviderWebhookEvent.objects.filter(
+        target_resource_dwolla_id=target_resource_dwolla_id, is_processed=False
+    ).order_by("event_timestamp")
+
+
 def create_provider_webhook_event(
     webhook_id,
     event_payload,

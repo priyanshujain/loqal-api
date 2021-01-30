@@ -2,7 +2,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account_by_dwolla_id
 from apps.banking.options import DwollaFundingSourceStatus
 
-from .tasks import record_payment_failure
+from .helpers import record_payment_failure
 
 
 class ApplyBankingWebhook(object):

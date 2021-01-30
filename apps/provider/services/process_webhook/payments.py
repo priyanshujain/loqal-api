@@ -6,7 +6,7 @@ from apps.payment.options import (TransactionEventType,
                                   TransactionReceiverStatus,
                                   TransactionSenderStatus, TransactionStatus)
 
-from .tasks import record_payment_failure
+from .helpers import record_payment_failure
 
 
 class ApplyPaymentWebhook(object):
@@ -21,9 +21,7 @@ class ApplyPaymentWebhook(object):
             dwolla_id=transaction_dwolla_id
         )
         if not transaction:
-            raise ValidationError(
-                {"detail": ErrorDetail("Invalid resource id for transfer.")}
-            )
+            return
         self.transaction = transaction
         sender_account = transaction.sender_bank_account.account
 
