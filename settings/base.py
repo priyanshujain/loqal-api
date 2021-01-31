@@ -324,11 +324,11 @@ CELERY_BROKER_URL = REDIS_URL
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERYD_TASK_SOFT_TIME_LIMIT = 60
 
-# CELERY_ROUTES = {
-#     "apps.provider.services.process_webhook.tasks.process_webhook_event": {
-#         "queue": "psp_webhook"
-#     },
-# }
+CELERY_ROUTES = {
+    "apps.provider.services.process_webhook.tasks.process_webhook_event": {
+        "queue": "psp_webhook"
+    },
+}
 
 
 CORS_ORIGIN_REGEX_WHITELIST = []
