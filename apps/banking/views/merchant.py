@@ -36,7 +36,7 @@ class CreateBankAccountAPI(MerchantAPIView):
 class RemoveBankAccountAPI(MerchantAPIView):
     def post(self, request):
         account = request.account
-        RemoveBankAccount(account_id=account.id).handle()
+        RemoveBankAccount(account_id=account.id, is_merchant=True).handle()
         return self.response()
 
 

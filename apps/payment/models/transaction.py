@@ -98,6 +98,7 @@ class Transaction(AbstractBaseModel):
         default=TransactionReceiverStatus.NOT_STARTED,
     )
     is_sender_tranfer_pending = models.BooleanField(default=True)
+    is_receiver_tranfer_complete = models.BooleanField(default=False)
 
     # failure related
     failure_reason_type = ChoiceCharEnumField(
@@ -187,6 +188,11 @@ class Transaction(AbstractBaseModel):
         if self.payment.status == PaymentStatus.IN_PROGRESS:
             self.payment.status = PaymentStatus.FAILED
         self.payment.save()
+        if save:
+            self.save()
+
+    def complete_receiver_transfer(self, save=True):
+        self.is_receiver_tranfer_complete = True
         if save:
             self.save()
 

@@ -149,8 +149,6 @@ class ApplyPaymentWebhook(object):
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_BANK_TRANSFER_COMPLETED
                     )
-                    transaction.status = TransactionStatus.SENDER_COMPLETED
-                    transaction.complete_sender_transfer(save=False)
                     transaction.save()
                     self._create_event(
                         event_type=TransactionEventType.SENDER_VC_BANK_TRANSFER_COMPLETED
@@ -160,6 +158,7 @@ class ApplyPaymentWebhook(object):
                     transaction.receiver_status = (
                         TransactionReceiverStatus.VC_BANK_TRANSFER_COMPLETED
                     )
+                    transaction.complete_receiver_transfer(save=False)
                     transaction.save()
                     self._create_event(
                         event_type=TransactionEventType.RECEIVER_VC_BANK_TRANSFER_COMPLETED
@@ -291,7 +290,6 @@ class ApplyPaymentWebhook(object):
             if sender_account.id == self.customer_account.id:
                 if self.customer_account.is_verified_dwolla_customer:
                     # FIX: check with dwolla on this event
-                    transaction.status = TransactionStatus.SENDER_COMPLETED
                     transaction.sender_status = (
                         TransactionSenderStatus.VC_FROM_BALANCE_TRANSFER_COMPLETED
                     )
@@ -305,6 +303,8 @@ class ApplyPaymentWebhook(object):
                     self._create_event(
                         event_type=TransactionEventType.SENDER_UVC_BANK_TRANSFER_COMPLETED
                     )
+                transaction.status = TransactionStatus.SENDER_COMPLETED
+                transaction.complete_sender_transfer(save=False)
             elif self.customer_account.is_verified_dwolla_customer:
                 transaction.receiver_status = (
                     TransactionReceiverStatus.VC_TO_BALANCE_TRANSFER_COMPLETED
@@ -317,6 +317,7 @@ class ApplyPaymentWebhook(object):
                 transaction.receiver_status = (
                     TransactionReceiverStatus.UVC_BANK_TRANSFER_COMPLETED
                 )
+                transaction.complete_receiver_transfer(save=False)
                 self._create_event(
                     event_type=TransactionEventType.RECEIVER_UVC_BANK_TRANSFER_COMPLETED
                 )
