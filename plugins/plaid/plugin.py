@@ -48,6 +48,13 @@ class PlaidPlugin(object):
             "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
             "country_codes": ["US"],
             "language": "en",
+            "account_filters": {
+                "depository": {
+                    "account_subtypes": [
+                        "checking",
+                    ],
+                },
+            },
         }
 
         if access_token:
