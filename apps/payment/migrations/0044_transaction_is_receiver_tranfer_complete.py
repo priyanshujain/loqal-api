@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0043_auto_20210127_0653'),
+        ("payment", "0043_auto_20210127_0653"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transaction',
-            name='is_receiver_tranfer_complete',
+            model_name="transaction",
+            name="is_receiver_tranfer_complete",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -1,5 +1,6 @@
-from apps.payment.models import PaymentRegister, Transaction
 from django.db.models import Q
+
+from apps.payment.models import PaymentRegister, Transaction
 
 
 def get_payment_register(account_id):
@@ -29,7 +30,10 @@ def get_pending_transactions_merchant(bank_account_id):
     return Transaction.objects.filter(
         sender_bank_account_id=bank_account_id,
         is_success=True,
-    ).filter(Q(is_sender_tranfer_pending=True) | Q(is_receiver_tranfer_complete=False))
+    ).filter(
+        Q(is_sender_tranfer_pending=True)
+        | Q(is_receiver_tranfer_complete=False)
+    )
 
 
 def empty_transactions():

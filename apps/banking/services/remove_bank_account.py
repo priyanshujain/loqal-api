@@ -1,15 +1,13 @@
-from django.utils.translation import gettext as _
 from django.db.models import Sum
+from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.banking.dbapi import get_bank_account
+from apps.payment.dbapi import (empty_transactions,
+                                get_pending_transactions_merchant,
+                                get_pending_transactions_sender)
 from apps.provider.lib.actions import ProviderAPIActionBase
-from apps.payment.dbapi import (
-    get_pending_transactions_merchant,
-    get_pending_transactions_sender,
-    empty_transactions,
-)
 
 __all__ = ("RemoveBankAccount",)
 
@@ -54,7 +52,9 @@ class RemoveBankAccount(ServiceBase):
                 }
             )
 
-        response = BankAccountAPIAction().remove(dwolla_id=bank_account.dwolla_id)
+        response = BankAccountAPIAction().remove(
+            dwolla_id=bank_account.dwolla_id
+        )
         if response["is_success"] == True:
             bank_account.set_dwolla_removed()
         return True
@@ -62,7 +62,9 @@ class RemoveBankAccount(ServiceBase):
 
 class BankAccountAPIAction(ProviderAPIActionBase):
     def remove(self, dwolla_id):
-        response = self.client.banking.remove_bank_account(funding_source_id=dwolla_id)
+        response = self.client.banking.remove_bank_account(
+            funding_source_id=dwolla_id
+        )
         if self.get_errors(response):
             raise ProviderAPIException(
                 {

@@ -48,7 +48,10 @@ class UserLoginAPI(APIView):
 
 class RequestResetPasswordAPI(APIView):
     def post(self, request):
-        self._run_services(request=request)
+        reset_password_object = self._run_services(request=request)
+        SendMerchantResetPasswordEmail(
+            reset_password_object=reset_password_object
+        ).send()
         return self.response()
 
     def _run_services(self, request):
@@ -58,10 +61,7 @@ class RequestResetPasswordAPI(APIView):
 
 class ApplyResetPasswordAPI(APIView):
     def post(self, request):
-        reset_password_object = self._run_services(request=request)
-        SendMerchantResetPasswordEmail(
-            reset_password_object=reset_password_object
-        ).send()
+        self._run_services(request=request)
         return self.response()
 
     def _run_services(self, request):
