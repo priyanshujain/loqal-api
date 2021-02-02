@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db.models import Sum
 from django.utils.translation import gettext as _
 
@@ -38,7 +40,9 @@ class RemoveBankAccount(ServiceBase):
                 bank_account_id=bank_account.id
             )
 
-        pending_amount = transactions.aggregate(total=Sum("amount"))["total"]
+        pending_amount = transactions.aggregate(total=Sum("amount"))[
+            "total"
+        ] or Decimal(0.0)
         if pending_amount > 0:
             raise ValidationError(
                 {

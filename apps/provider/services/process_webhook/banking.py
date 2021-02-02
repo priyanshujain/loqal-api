@@ -15,13 +15,7 @@ class ApplyBankingWebhook(object):
         dwolla_id = self.event.target_resource_dwolla_id
         bank_account = get_bank_account_by_dwolla_id(dwolla_id=dwolla_id)
         if not bank_account:
-            raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        "Invalid resource id for funding source."
-                    )
-                }
-            )
+            return
 
         # event_payload, dwolla_id, is_processed, target_resource_dwolla_id
 

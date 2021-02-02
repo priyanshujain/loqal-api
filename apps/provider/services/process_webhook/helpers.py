@@ -121,9 +121,9 @@ def record_payment_failure(transaction, at_source):
     if customer_id:
         ach_return_account = get_account(customer_id=customer_id)
     transaction.log_ach_return(
-        ach_return_code=failure_details["code"],
-        ach_return_description=failure_details["description"],
-        ach_return_explaination=failure_details["explaination"],
+        ach_return_code=failure_details.get("code", ""),
+        ach_return_description=failure_details.get("description", ""),
+        ach_return_explaination=failure_details.get("explaination", ""),
         ach_return_bank_account=ach_return_bank_account,
         ach_return_account=ach_return_account,
     )
