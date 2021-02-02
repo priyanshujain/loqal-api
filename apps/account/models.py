@@ -154,6 +154,15 @@ class MerchantAccount(AbstractBaseModel):
         if save:
             self.save()
 
+    @property
+    def category(self):
+        categories = self.categories
+        categories = categories.filter(is_primary=True)
+        if categories.exists():
+            return categories.first()
+        else:
+            return None
+
 
 class PaymentAccountOpeningConsent(BaseModel):
     account = models.ForeignKey(

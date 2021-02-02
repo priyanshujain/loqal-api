@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.db.models import Q
+from django.utils.timezone import now
 
 from apps.payment.models import PaymentRegister, Transaction
 
@@ -38,3 +41,21 @@ def get_pending_transactions_merchant(bank_account_id):
 
 def empty_transactions():
     return Transaction.objects.none()
+
+
+def get_30days_transactions_consumer(consumer_account_id):
+    time_from = now() - timedelta(days=30)
+    time_to = now()
+    return Transaction.objects.filter(
+        payment__order__consumer_id=consumer_account_id,
+        is_success=True,
+    ).filter(Q(created_at__gte=time_from) & Q(created_at__lte=time_to))
+
+
+def get_30days_transactions_merchant(merchant_account_id):
+    time_from = now() - timedelta(days=30)
+    time_to = now()
+    return Transaction.objects.filter(
+        payment__order__merchant_id=merchant_account_id,
+        is_success=True,
+    ).filter(Q(created_at__gte=time_from) & Q(created_at__lte=time_to))
