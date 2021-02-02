@@ -64,7 +64,7 @@ class MerchantAccountStatusResponse(serializers.ModelSerializer):
         fields = (
             "account_status",
             "account_verification_status",
-            "beneficial_owner_verified",
+            "beneficial_owner_statuses",
         )
 
     def check_beneficial_owner_statuses(self, obj):
