@@ -56,3 +56,28 @@ def process_webhook_event(event_id):
     )
     for event in pending_events:
         process_event(event=event)
+
+
+def process_past_webhooks_for_transaction(transaction):
+    pending_events = get_pending_webhook_event(
+        target_resource_dwolla_id=transaction.dwolla_id
+    )
+    for event in pending_events:
+        account_dwolla_id = (
+            event.event_payload.get("_links", {})
+            .get("customer", {})
+            .get("href", "")
+            .split("/")
+            .pop()
+        )
+        customer_account = get_account_by_dwolla_id(
+            dwolla_id=account_dwolla_id
+        )
+        if not customer_account:
+            return
+
+        ApplyPaymentWebhook(
+            event=event,
+            customer_account=customer_account,
+            transaction=transaction,
+        ).handle()

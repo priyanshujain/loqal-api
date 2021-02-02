@@ -10,19 +10,22 @@ from .helpers import record_payment_failure
 
 
 class ApplyPaymentWebhook(object):
-    def __init__(self, event, customer_account):
+    def __init__(self, event, customer_account, transaction=None):
         self.event = event
         self.customer_account = customer_account
+        self.transaction = transaction
 
     def handle(self):
         topic = self.event.topic
-        transaction_dwolla_id = self.event.target_resource_dwolla_id
-        transaction = get_transaction_by_dwolla_id(
-            dwolla_id=transaction_dwolla_id
-        )
+        transaction = self.transaction
+        if not transaction:
+            transaction_dwolla_id = self.event.target_resource_dwolla_id
+            transaction = get_transaction_by_dwolla_id(
+                dwolla_id=transaction_dwolla_id
+            )
+            self.transaction = transaction
         if not transaction:
             return
-        self.transaction = transaction
         sender_account = transaction.sender_bank_account.account
 
         if topic == "customer_bank_transfer_created":
