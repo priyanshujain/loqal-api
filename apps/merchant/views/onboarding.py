@@ -2,7 +2,7 @@ from django.utils import datastructures
 
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
-from apps.account.responses.merchant import MerchantAccountProfileResponse
+from apps.account.responses.merchant import MerchantAccountStatusResponse
 from apps.merchant.options import BusinessDocumentType, IndividualDocumentType
 from apps.merchant.responses import (ControllerVerificationDocumentResponse,
                                      IncorporationVerificationDocumentResponse,
@@ -131,8 +131,6 @@ class UpdateBeneficialOwnerAPI(MerchantAPIView):
     changes to beneficial owner data API
     """
 
-    permission_classes = (IsMerchantAccountPendingPermission,)
-
     def put(self, request):
         merchant_id = request.merchant_account.id
         data = self.request_data
@@ -155,8 +153,6 @@ class RemoveBeneficialOwnerAPI(MerchantAPIView):
 
 
 class OnboardingDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
-
     def get(self, request):
         merchant_account = request.merchant_account
         data = OnboardingDataResponse(merchant_account).data
@@ -171,8 +167,6 @@ class OnboardingStatusAPI(MerchantAPIView):
 
 
 class SubmitKycDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
-
     def post(self, request):
         merchant_account = request.merchant_account
         user = request.user
@@ -183,7 +177,7 @@ class SubmitKycDataAPI(MerchantAPIView):
             ip_address=ip_address,
         ).handle()
         return self.response(
-            MerchantAccountProfileResponse(updated_merchant_account).data
+            MerchantAccountStatusResponse(updated_merchant_account).data
         )
 
 

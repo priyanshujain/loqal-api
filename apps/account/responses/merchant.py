@@ -5,7 +5,10 @@ from apps.account.models import MerchantAccount
 from apps.merchant.models import BeneficialOwner
 from apps.merchant.options import BeneficialOwnerStatus
 
-__all__ = ("MerchantAccountProfileResponse",)
+__all__ = (
+    "MerchantAccountProfileResponse",
+    "MerchantAccountStatusResponse",
+)
 
 
 class MerchantAccountProfileResponse(serializers.ModelSerializer):
@@ -43,3 +46,39 @@ class MerchantAccountProfileResponse(serializers.ModelSerializer):
             .filter(~Q(status=BeneficialOwnerStatus.VERIFIED))
             .exists()
         )
+
+
+class MerchantAccountStatusResponse(serializers.ModelSerializer):
+    account_status = serializers.ChoiceCharEnumSerializer(
+        source="account.dwolla_customer_status", read_only=True
+    )
+    account_verification_status = serializers.ChoiceCharEnumSerializer(
+        source="account.dwolla_customer_verification_status", read_only=True
+    )
+    beneficial_owner_statuses = serializers.SerializerMethodField(
+        "check_beneficial_owner_statuses"
+    )
+
+    class Meta:
+        model = MerchantAccount
+        fields = (
+            "account_status",
+            "account_verification_status",
+            "beneficial_owner_verified",
+        )
+
+    def check_beneficial_owner_statuses(self, obj):
+        statuses = []
+        for beneficial_owner in BeneficialOwner.objects.filter(
+            merchant_id=obj.id
+        ):
+            statuses.append(
+                {
+                    "id": beneficial_owner.id,
+                    "status": {
+                        "label": beneficial_owner.status.label,
+                        "value": beneficial_owner.status.value,
+                    },
+                }
+            )
+        return statuses
