@@ -336,7 +336,7 @@ class CreateBeneficialOwner(ServiceBase):
 
     def handle(self):
         assert self._validate_data()
-        return self._factory_controller_details()
+        return self._factory_beneficial_owner()
 
     def _validate_data(self):
         incorporation_details = get_incorporation_details(
@@ -368,7 +368,7 @@ class CreateBeneficialOwner(ServiceBase):
         self.data = run_validator(BeneficialOwnerValidator, self.data)
         return True
 
-    def _factory_controller_details(self):
+    def _factory_beneficial_owner(self):
         beneficial_owner = create_beneficial_owner(
             merchant_id=self.merchant_id, **self.data
         )
@@ -391,6 +391,7 @@ class UpdateBeneficialOwner(CreateBeneficialOwner):
     def handle(self):
         assert self._validate_data(validator=UpdateBeneficialOwnerValidator)
         self._update_benficial_owner()
+        return self.beneficial_owner
 
     def _validate_data(self, validator):
         data = run_validator(validator=validator, data=self.data)
@@ -403,12 +404,12 @@ class UpdateBeneficialOwner(CreateBeneficialOwner):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Beneficial owner did not found."))}
             )
-        self.benefical_owner = beneficial_owner
+        self.beneficial_owner = beneficial_owner
         return True
 
     def _update_benficial_owner(self):
         update_beneficial_owner(
-            beneficial_owner_id=self.benefical_owner.id,
+            beneficial_owner_id=self.beneficial_owner.id,
             merchant_id=self.merchant_id,
             **self.data
         )

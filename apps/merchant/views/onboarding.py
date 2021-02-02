@@ -123,7 +123,16 @@ class CreateBeneficialOwnerAPI(MerchantAPIView):
         beneficial_owner = CreateBeneficialOwner(
             merchant_id=merchant_id, data=data
         ).handle()
-        return self.response({"id": beneficial_owner.id}, status=201)
+        return self.response(
+            {
+                "id": beneficial_owner.id,
+                "status": {
+                    "label": beneficial_owner.status.label,
+                    "value": beneficial_owner.status.value,
+                },
+            },
+            status=201,
+        )
 
 
 class UpdateBeneficialOwnerAPI(MerchantAPIView):
@@ -134,8 +143,18 @@ class UpdateBeneficialOwnerAPI(MerchantAPIView):
     def put(self, request):
         merchant_id = request.merchant_account.id
         data = self.request_data
-        UpdateBeneficialOwner(merchant_id=merchant_id, data=data).handle()
-        return self.response(status=204)
+        beneficial_owner = UpdateBeneficialOwner(
+            merchant_id=merchant_id, data=data
+        ).handle()
+        return self.response(
+            {
+                "id": beneficial_owner.id,
+                "status": {
+                    "label": beneficial_owner.status.label,
+                    "value": beneficial_owner.status.value,
+                },
+            }
+        )
 
 
 class RemoveBeneficialOwnerAPI(MerchantAPIView):
