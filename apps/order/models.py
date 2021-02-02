@@ -74,6 +74,21 @@ class Order(AbstractBaseModel):
                 self.order_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
+    def set_fulfilled(self, save=True):
+        self.status = OrderStatus.FULFILLED
+        if save:
+            self.save()
+
+    def set_partially_fulfilled(self, save=True):
+        self.status = OrderStatus.PARTIALLY_FULFILLED
+        if save:
+            self.save()
+
+    def set_cancelled(self, save=True):
+        self.status = OrderStatus.CANCELLED
+        if save:
+            self.save()
+
 
 class OrderEvent(BaseModel):
     """

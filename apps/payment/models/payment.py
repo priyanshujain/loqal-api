@@ -98,8 +98,10 @@ class Payment(AbstractBaseModel):
         self.total_tip_amount += amount - amount_towards_order
         if amount_towards_order < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_CHARGED
+            self.order.set_partially_fulfilled()
         elif amount_towards_order == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_CHARGED
+            self.order.set_fulfilled()
         else:
             self.charge_status = ChargeStatus.OTHER
 
@@ -109,6 +111,13 @@ class Payment(AbstractBaseModel):
     def failed_payment(self, save=True):
         if self.status == PaymentStatus.IN_PROGRESS:
             self.status = PaymentStatus.FAILED
+            if save:
+                self.save()
+
+    def cancelled_payment(self, save=True):
+        if self.status == PaymentStatus.IN_PROGRESS:
+            self.status = PaymentStatus.CANCELLED
+            self.order.set_cancelled()
             if save:
                 self.save()
 

@@ -298,6 +298,7 @@ class PaymentStatus(ChoiceEnum):
     CAPTURED = 0, _("Captured")
     IN_PROGRESS = 1, _("In Progress")
     FAILED = 2, _("Failed")
+    CANCELLED = 3, _("Cancelled")
 
 
 class PaymentEventType(ChoiceEnum):

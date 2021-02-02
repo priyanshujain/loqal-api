@@ -140,7 +140,9 @@ class ApprovePaymentRequest(ServiceBase):
             payment_id=transaction.payment.id,
             transaction_tracking_id=transaction.transaction_tracking_id,
         )
-        payment_request.add_transaction(transaction=transaction)
+        payment_request.add_transaction(
+            transaction=transaction, tip_amount=data["tip_amount"]
+        )
         return payment_request
 
     def _validate_data(self):

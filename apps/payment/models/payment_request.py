@@ -63,11 +63,16 @@ class PaymentRequest(AbstractBaseModel):
 
     def reject(self, save=True):
         self.status = PaymentRequestStatus.REJECTED
+        self.payment.cancelled_payment()
         if save:
             self.save()
 
-    def add_transaction(self, transaction, save=True):
+    def add_transaction(self, transaction, tip_amount, save=True):
         self.transaction = transaction
+        self.tip_amount = tip_amount
         self.status = PaymentRequestStatus.ACCEPTED
+        self.payment.capture_payment(
+            amount=(self.amount + tip_amount), amount_towards_order=self.amount
+        )
         if save:
             self.save()

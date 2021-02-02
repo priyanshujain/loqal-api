@@ -388,6 +388,7 @@ class RecentStoresResponse(serializers.ModelSerializer):
             "address",
             "full_name",
             "created_at",
+            "updated_at",
             "merchant_id",
         )
 
