@@ -9,13 +9,11 @@ from weasyprint import HTML
 from api.helpers import run_validator
 from apps.account.dbapi import (create_payment_account_consent,
                                 get_payment_account_consent)
-from apps.account.notifications import SendConsumerTermsEmail
+from apps.account.notifications import SendMerchantTermsEmail
 from apps.account.validators import PaymentAccountOpeningConsentValidator
 from apps.box.dbapi import create_boxfile
 from apps.box.tasks import store_file_to_fss
 from config.celery import app
-
-from .create_dwolla_consumer import DwollaConsumerAccount
 
 __all__ = ("AcceptTerms",)
 
@@ -38,14 +36,14 @@ class DownloadTermsDocument(object):
 
 
 class AcceptTermsFileTask(Task):
-    name = "consumer_accept_term_file_email"
+    name = "merchant_accept_term_file_email"
 
     def run(self, account_id, user_id, document_url):
         payment_consent = get_payment_account_consent(
             account_id=account_id, user_id=user_id
         )
         tempfile_obj, boxfile = DownloadTermsDocument(document_url).generate()
-        SendConsumerTermsEmail(
+        SendMerchantTermsEmail(
             user=payment_consent.user, file_path=tempfile_obj.name
         ).send()
         payment_consent.add_terms_file(boxfile)
@@ -55,10 +53,10 @@ app.tasks.register(AcceptTermsFileTask)
 
 
 class AcceptTerms(object):
-    def __init__(self, request, data):
+    def __init__(self, request, account, user, data):
         self.data = data
-        self.account = request.account
-        self.user = request.user
+        self.account = account
+        self.user = user
         self.session = request.session
         self.ip_address = request.ip
 
@@ -66,17 +64,13 @@ class AcceptTerms(object):
         data = run_validator(
             PaymentAccountOpeningConsentValidator, data=self.data
         )
-        is_success = DwollaConsumerAccount(
-            user_id=self.user.id, ip_address=self.ip_address
-        ).handle()
-        if is_success:
-            payment_consent = self._factory_terms_consent(data=data)
-            task = AcceptTermsFileTask()
-            task.delay(
-                account_id=payment_consent.account.id,
-                user_id=payment_consent.user.id,
-                document_url=data["payment_terms_url"],
-            )
+        payment_consent = self._factory_terms_consent(data=data)
+        task = AcceptTermsFileTask()
+        task.delay(
+            account_id=payment_consent.account.id,
+            user_id=payment_consent.user.id,
+            document_url=data["payment_terms_url"],
+        )
 
     def _factory_terms_consent(self, data):
         return create_payment_account_consent(

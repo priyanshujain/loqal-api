@@ -165,6 +165,8 @@ class AfterLogin(object):
         self.send_alert = send_alert
 
     def handle(self):
-        Session(request=self.request).create_session(user=self.user)
+        user_session = Session(request=self.request).create_session(
+            user=self.user
+        )
         if self.send_alert:
             SendLoginAlert(user=self.user, session=self.request.session).send()

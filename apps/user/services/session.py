@@ -48,7 +48,7 @@ class Session(object):
         asn = ifconfig.get("asn_org", "")
         asn_code = ifconfig.get("asn", "")
 
-        _create_session(
+        return _create_session(
             user_id=user.id,
             session_key=session.session_key,
             user_agent=user_agent,

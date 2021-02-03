@@ -1,3 +1,4 @@
+from django.http import request
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -28,7 +29,7 @@ class MerchantSignupAPI(APIView):
         return self.response(status=201)
 
     def _run_services(self, data):
-        service = CreateMerchantAccount(data=data)
+        service = CreateMerchantAccount(data=data, request=self.request)
         account_member = service.handle()
         login(request=self.request, user=account_member.user)
         AfterLogin(

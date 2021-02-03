@@ -32,7 +32,7 @@ CONSUMER_APP_WEB_BASE_URL = "https://website-stag.payloqal.com"
 MERCHANT_APP_WEB_BASE_URL = "https://merchant-stag.payloqal.com"
 
 # Email configs.
-DEFAULT_FROM_EMAIL = "hello@payloqal.com"
+DEFAULT_FROM_EMAIL = "hello@loqal.us"
 EMAIL_SENDER_NAME = "Loqal App Team"
 
 # CSRF_TRUSTED_ORIGINS = [

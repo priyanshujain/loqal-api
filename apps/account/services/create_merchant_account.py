@@ -1,3 +1,4 @@
+from django.http import request
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -10,11 +11,14 @@ from apps.merchant.services import CreateDefaultRoles
 from apps.payment.dbapi import create_payment_register
 from apps.user.dbapi import create_user, get_user_by_email
 
+from .accept_merchant_terms import AcceptTerms
+
 __all__ = ("CreateMerchantAccount",)
 
 
 class CreateMerchantAccount(ServiceBase):
-    def __init__(self, data):
+    def __init__(self, data, request):
+        self.request = request
         self._first_name = data["first_name"]
         self._last_name = data["last_name"]
         self._email = data["email"]
@@ -24,6 +28,8 @@ class CreateMerchantAccount(ServiceBase):
         self._address = data["address"]
         self._category = data["category"]
         self._sub_category = data["sub_category"]
+        self._consent_timestamp = data["consent_timestamp"]
+        self._payment_terms_url = data["payment_terms_url"]
 
     def handle(self):
         self._validate_data()
@@ -37,7 +43,8 @@ class CreateMerchantAccount(ServiceBase):
             merchant_id=merchant_account.id,
             member_role_id=admin_role.id,
         )
-        self._send_verfication_email(user=user)
+        self._send_verification_email(user=user)
+        self._send_accepted_terms(account=merchant_account.account, user=user)
         return account_member
 
     def _validate_data(self):
@@ -80,5 +87,16 @@ class CreateMerchantAccount(ServiceBase):
         service = CreateDefaultRoles(merchant_id=merchant_id)
         service.handle()
 
-    def _send_verfication_email(self, user):
+    def _send_verification_email(self, user):
         SendMerchantAccountVerifyEmail(user=user).send()
+
+    def _send_accepted_terms(self, account, user):
+        AcceptTerms(
+            request=self.request,
+            account=account,
+            user=user,
+            data={
+                "consent_timestamp": self._consent_timestamp,
+                "payment_terms_url": self._payment_terms_url,
+            },
+        ).handle()

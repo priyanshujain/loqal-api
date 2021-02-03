@@ -30,7 +30,7 @@ CONSUMER_APP_WEB_BASE_URL = "https://payloqal.com"
 MERCHANT_APP_WEB_BASE_URL = "https://merchant.payloqal.com"
 
 # Email configs.
-DEFAULT_FROM_EMAIL = "hello@payloqal.com"
+DEFAULT_FROM_EMAIL = "hello@loqal.us"
 EMAIL_SENDER_NAME = "Loqal App Team"
 
 

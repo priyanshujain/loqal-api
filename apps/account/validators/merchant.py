@@ -57,6 +57,8 @@ class CreateMerchantAccountValidator(MerchantAccountSignupValidatorBase):
     category = serializers.CharField(max_length=64)
     sub_category = serializers.CharField(max_length=64)
     email = serializers.EmailField(max_length=254)
+    consent_timestamp = serializers.IntegerField()
+    payment_terms_url = serializers.URLField(max_length=128)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
