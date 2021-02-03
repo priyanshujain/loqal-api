@@ -4,8 +4,8 @@ from utils.email import send_email_async
 
 
 class SendPaymentInitiatedEmail(object):
-    def __init__(self, user, transaction):
-        self.user = user
+    def __init__(self, transaction):
+        self.user = transaction.payment.order.consumer.user
         self.transaction = transaction
 
     def send(self):
@@ -37,7 +37,7 @@ class SendPaymentInitiatedEmail(object):
 
 class RefundReceivedEmail(object):
     def __init__(self, user, transaction):
-        self.user = user
+        self.user = transaction.payment.order.consumer.user
         self.transaction = transaction
 
     def send(self):

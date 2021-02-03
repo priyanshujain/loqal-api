@@ -12,7 +12,8 @@ from apps.payment.notifications import (SendApproveRequestNotification,
                                         SendNewPaymentRequestNotification,
                                         SendRefundNotification,
                                         SendRejectRequestNotification)
-from apps.payment.notifications.email import SendPaymentInitiatedEmail
+from apps.payment.notifications.email import (RefundReceivedEmail,
+                                              SendPaymentInitiatedEmail)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
@@ -45,7 +46,7 @@ class CreatePaymentAPI(ConsumerAPIView):
             ).data,
         ).send()
         SendPaymentInitiatedEmail(
-            user=request.user, transaction=merchant_payment.transaction
+            transaction=merchant_payment.transaction
         ).send()
         return self.response(transaction_data, status=201)
 
@@ -116,7 +117,7 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             },
         ).send()
         SendPaymentInitiatedEmail(
-            user=request.user, transaction=payment_request.transaction
+            transaction=payment_request.transaction
         ).send()
         return self.response(transaction_data)
 
@@ -179,6 +180,7 @@ class CreateRefundPaymentAPI(MerchantAPIView):
         SendRefundNotification(
             user_id=refund_payment.payment.order.consumer.user.id, data=data
         ).send()
+        RefundReceivedEmail(transaction=refund_payment.transaction).send()
         return self.response(
             RefundHistoryResponse(refund_payment).data, status=201
         )
