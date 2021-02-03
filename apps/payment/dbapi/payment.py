@@ -269,10 +269,13 @@ def get_merchant_transactions(merchant_account):
 
 
 def get_merchant_transaction(merchant_account, transaction_tracking_id):
-    return Transaction.objects.filter(
-        recipient_bank_account__account=merchant_account.account,
-        transaction_tracking_id=transaction_tracking_id,
-    )
+    try:
+        return Transaction.objects.get(
+            recipient_bank_account__account=merchant_account.account,
+            transaction_tracking_id=transaction_tracking_id,
+        )
+    except Transaction.DoesNotExist:
+        return None
 
 
 def get_consumer_transaction(consumer_account, transaction_tracking_id):
