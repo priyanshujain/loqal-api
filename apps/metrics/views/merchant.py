@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Max, Sum
 from django.utils.translation import gettext as _
 
 from api.views import MerchantAPIView
@@ -39,6 +39,7 @@ class MerchantMetricsAPI(MerchantAPIView):
         )
         customers = transactions.distinct("payment__order__consumer").count()
         transaction_groups = transactions.values("created_at__day").annotate(
+            date=Max("created_at"),
             total=Sum("amount"),
             customers=Count("payment__order__consumer", distinct=True),
         )
