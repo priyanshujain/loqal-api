@@ -48,7 +48,7 @@ def update_campaign(
 def get_active_campaigns():
     current_datetime = now()
     return Campaign.objects.filter(is_active=True).filter(
-        Q(starts_at__gte=current_datetime) & Q(ends_at__lte=current_datetime)
+        Q(starts_at__lte=current_datetime) & Q(ends_at__gte=current_datetime)
     )
 
 

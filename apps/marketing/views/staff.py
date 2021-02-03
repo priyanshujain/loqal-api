@@ -6,17 +6,17 @@ from apps.marketing.services import CreateCampaign, UpdateCampaign
 
 class CreateCampaignAPI(StaffAPIView):
     def post(self, request):
-        campaign = CreateCampaign(data=self.request_data)
-        self.response(CampaignResponse(campaign).data, status=201)
+        campaign = CreateCampaign(data=self.request_data).handle()
+        return self.response(CampaignResponse(campaign).data, status=201)
 
 
 class UpdateCampaignAPI(StaffAPIView):
-    def post(self, request):
-        UpdateCampaign(data=self.request_data)
-        self.response()
+    def put(self, request):
+        UpdateCampaign(data=self.request_data).handle()
+        return self.response(status=204)
 
 
 class GetCampaignsAPI(StaffAPIView):
-    def post(self, request):
+    def get(self, request):
         campaigns = get_all_campaigns()
-        self.response(CampaignResponse(campaigns, many=True).data)
+        return self.response(CampaignResponse(campaigns, many=True).data)

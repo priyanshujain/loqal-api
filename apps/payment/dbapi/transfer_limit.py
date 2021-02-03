@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.utils.timezone import now
 
 from apps.payment.models import PaymentRegister, Transaction
+from apps.payment.options import TransactionType
 
 
 def get_payment_register(account_id):
@@ -59,3 +60,16 @@ def get_30days_transactions_merchant(merchant_account_id):
         payment__order__merchant_id=merchant_account_id,
         is_success=True,
     ).filter(Q(created_at__gte=time_from) & Q(created_at__lte=time_to))
+
+
+def get_transactions_in_period(time_from, time_to):
+    return (
+        Transaction.objects.filter(
+            is_success=True,
+        )
+        .filter(Q(created_at__gte=time_from) & Q(created_at__lte=time_to))
+        .filter(
+            Q(transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT)
+            | Q(transaction_type=TransactionType.PAYMENT_REQUEST)
+        )
+    )

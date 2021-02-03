@@ -33,6 +33,8 @@ class MerchantMetricsAPI(MerchantAPIView):
                 "customers": customers,
                 "total": transactions.aggregate(total=Sum("amount"))["total"]
                 or Decimal(0.0),
+                "count": transactions.aggregate(count=Count("id"))["count"]
+                or 0,
                 "daily_sales": transaction_groups,
             }
         )
