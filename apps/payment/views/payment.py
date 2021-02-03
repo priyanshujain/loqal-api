@@ -42,7 +42,9 @@ class CreatePaymentAPI(ConsumerAPIView):
         payment_notification_data = MerchantTransactionHistoryResponse(
             merchant_payment.transaction
         ).data
-        payment_notification_data["tip_amount"] = merchant_payment.tip_amount
+        payment_notification_data["tip_amount"] = str(
+            merchant_payment.tip_amount
+        )
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
             data=payment_notification_data,
@@ -108,7 +110,9 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         payment_notification_data = MerchantTransactionHistoryResponse(
             payment_request.transaction
         ).data
-        payment_notification_data["tip_amount"] = payment_request.tip_amount
+        payment_notification_data["tip_amount"] = str(
+            payment_request.tip_amount
+        )
         SendNewPaymentNotification(
             merchant_id=payment_request.payment.order.merchant.id,
             data=payment_notification_data,
