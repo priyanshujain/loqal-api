@@ -289,10 +289,6 @@ def get_consumer_transaction(consumer_account, transaction_tracking_id):
 
 
 def get_recent_store_orders(consumer_account):
-    return (
-        Order.objects.filter(
-            consumer=consumer_account, payment__status=PaymentStatus.CAPTURED
-        )
-        .order_by("-created_at")
-        .distinct("merchant")
-    )
+    return Order.objects.filter(
+        consumer=consumer_account, payment__status=PaymentStatus.CAPTURED
+    ).distinct("merchant")
