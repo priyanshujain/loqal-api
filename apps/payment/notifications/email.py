@@ -30,7 +30,7 @@ class SendPaymentInitiatedEmail(object):
         email_html = render_to_string("payment_initiated.html", render_data)
         send_email_async(
             (user.email),
-            f"New paytment initiated #{transaction.payment.payment_tracking_id}",
+            f"New paytment initiated #{transaction.transaction_tracking_id}",
             email_html,
         )
 
@@ -62,6 +62,6 @@ class RefundReceivedEmail(object):
         email_html = render_to_string("refund_initiated.html", render_data)
         send_email_async(
             (user.email),
-            f"Refund initiated for payment #{transaction.payment.payment_tracking_id}",
+            f"Refund initiated for payment #{transaction.transaction_tracking_id}",
             email_html,
         )
