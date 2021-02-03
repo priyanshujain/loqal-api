@@ -23,9 +23,7 @@ class CreateConsumerRating(ServiceBase):
         )
 
     def validate(self):
-        data = run_validator(
-            CreateMerchantToConsumerRatingValidator, data=self.data
-        )
+        data = run_validator(CreateMerchantToConsumerRatingValidator, data=self.data)
         transaction_id = data["transaction_id"]
         transaction = get_merchant_transaction(
             merchant_account=self.merchant,
@@ -36,3 +34,4 @@ class CreateConsumerRating(ServiceBase):
                 {"detail": ErrorDetail(_("Transaction is not valid"))}
             )
         data["transaction"] = transaction
+        return data
