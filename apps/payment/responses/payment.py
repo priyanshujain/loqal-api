@@ -308,6 +308,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     failure_reason_type_value = serializers.CharField(
         source="failure_reason_type.value", read_only=True
     )
+    merchant_rating = serializers.BooleanField(
+        source="merchant_rating.give_thanks", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -327,6 +330,7 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "failure_reason_type_label",
             "failure_reason_type_value",
             "failure_reason_message",
+            "merchant_rating",
         )
 
     def get_bank_details(self, obj):

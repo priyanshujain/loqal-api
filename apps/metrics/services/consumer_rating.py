@@ -4,6 +4,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.metrics.dbapi import create_merchant_to_consumer_rating
+from apps.metrics.models import MerchanttoConsumerRating
 from apps.metrics.validators import CreateMerchantToConsumerRatingValidator
 from apps.payment.dbapi import get_merchant_transaction
 
@@ -23,7 +24,9 @@ class CreateConsumerRating(ServiceBase):
         )
 
     def validate(self):
-        data = run_validator(CreateMerchantToConsumerRatingValidator, data=self.data)
+        data = run_validator(
+            CreateMerchantToConsumerRatingValidator, data=self.data
+        )
         transaction_id = data["transaction_id"]
         transaction = get_merchant_transaction(
             merchant_account=self.merchant,
@@ -33,5 +36,19 @@ class CreateConsumerRating(ServiceBase):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Transaction is not valid"))}
             )
+
+        try:
+            rating = transaction.merchant_rating
+            if rating:
+                raise ValidationError(
+                    {
+                        "detail": ErrorDetail(
+                            _("Transaction has already been rated.")
+                        )
+                    }
+                )
+        except MerchanttoConsumerRating.DoesNotExist:
+            pass
+
         data["transaction"] = transaction
         return data

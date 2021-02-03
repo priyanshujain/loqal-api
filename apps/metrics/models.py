@@ -8,7 +8,9 @@ from db.models import AbstractBaseModel
 class MerchanttoConsumerRating(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
     consumer = models.ForeignKey(ConsumerAccount, on_delete=models.CASCADE)
-    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    transaction = models.OneToOneField(
+        Transaction, on_delete=models.CASCADE, related_name="merchant_rating"
+    )
     give_thanks = models.BooleanField(default=True)
 
     class Meta:
