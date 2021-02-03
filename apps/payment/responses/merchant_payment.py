@@ -88,6 +88,9 @@ class TransactionPaymentResponse(serializers.ModelSerializer):
     payment_account = SenderAcconutResponse(
         source="sender_bank_account", read_only=True
     )
+    merchant_rating = serializers.BooleanField(
+        source="merchant_rating.give_thanks", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -99,6 +102,8 @@ class TransactionPaymentResponse(serializers.ModelSerializer):
             "fee_amount",
             "fee_currency",
             "payment_account",
+            "transaction_tracking_id",
+            "merchant_rating",
         )
 
 

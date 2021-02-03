@@ -1,0 +1,67 @@
+from django.template.loader import render_to_string
+
+from utils.email import send_email_async
+
+
+class SendPaymentInitiatedEmail(object):
+    def __init__(self, user, transaction):
+        self.user = user
+        self.transaction = transaction
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        user = self.user
+        transaction = self.transaction
+        source_bank_account = transaction.sender_bank_account
+        source = f"{source_bank_account.bank_name} XXXX{source_bank_account.account_number_suffix}({source_bank_account.name})"
+        recipient = transaction.payment.order.merchant.profile.full_name
+        amount = f"${transaction.amount}"
+        date_initiated = transaction.created_at.strftime(
+            "%X %p (%Z) %A, %b %d, %Y"
+        )
+        render_data = {
+            "source": source,
+            "recipient": recipient,
+            "amount": amount,
+            "date_initiated": date_initiated,
+        }
+        email_html = render_to_string("payment_initiated.html", render_data)
+        send_email_async(
+            (user.email),
+            f"New paytment initiated #{transaction.payment.payment_tracking_id}",
+            email_html,
+        )
+
+
+class RefundReceivedEmail(object):
+    def __init__(self, user, transaction):
+        self.user = user
+        self.transaction = transaction
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        user = self.user
+        transaction = self.transaction
+        bank_account = transaction.recipient_bank_account
+        source = f"{bank_account.bank_name} XXXX{bank_account.account_number_suffix}({bank_account.name})"
+        merchant = transaction.payment.order.merchant.profile.full_name
+        amount = f"${transaction.amount}"
+        date_initiated = transaction.created_at.strftime(
+            "%X %p (%Z) %A, %b %d, %Y"
+        )
+        render_data = {
+            "source": source,
+            "merchant": merchant,
+            "amount": amount,
+            "date_initiated": date_initiated,
+        }
+        email_html = render_to_string("refund_initiated.html", render_data)
+        send_email_async(
+            (user.email),
+            f"Refund initiated for payment #{transaction.payment.payment_tracking_id}",
+            email_html,
+        )

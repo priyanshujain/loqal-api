@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block message %}
+Hi,
+<p>
+    A payment was initiated to {{ recipient }}.
+</p>
+<br />
+Source: {{ source }} <br />
+Recipient: {{ recipient }} <br />
+Amount: {{ amount }} <br />
+Date Initiated: {{ date_initiated }}
+
+<br />
+<br />
+If you wish to know more about this transaction,
+please check out its details in the transaction history section of your Loqal app.
+To raise any flags regarding this transaction, please click the “Dispute” button at the
+bottom of the payment details screen, and follow the instructions on the app.
+
+{% endblock %}
