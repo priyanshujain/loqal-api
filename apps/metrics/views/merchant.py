@@ -4,6 +4,7 @@ from django.db.models import Count, Sum
 from django.utils.translation import gettext as _
 
 from api.views import MerchantAPIView
+from apps.metrics.notifications import SendConsumerRatingNotification
 from apps.metrics.services import CreateConsumerRating
 from apps.payment.dbapi import get_30days_transactions_merchant
 
@@ -11,9 +12,17 @@ from apps.payment.dbapi import get_30days_transactions_merchant
 class CreateConsumerRatingAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        CreateConsumerRating(
+        rating = CreateConsumerRating(
             merchant=merchant_account, data=self.request_data
         ).handle()
+        SendConsumerRatingNotification(
+            user_id=rating.consumer.user.id,
+            data={
+                "merchant_name": merchant_account.profile.full_name,
+                "created_at": rating.created_at,
+                "transaction": {"created_at": rating.transaction.created_at},
+            },
+        ).send()
         self.response()
 
 
