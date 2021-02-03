@@ -9,3 +9,7 @@ class PlaidReAuth(Exception):
 
 class PlaidBankUsernameExpired(Exception):
     pass
+
+
+class PlaidFailed(Exception):
+    pass

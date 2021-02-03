@@ -2,7 +2,8 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from plugins.plaid import PlaidPlugin
-from plugins.plaid.errors import PlaidBankUsernameExpired, PlaidReAuth
+from plugins.plaid.errors import (PlaidBankUsernameExpired, PlaidFailed,
+                                  PlaidReAuth)
 
 __all__ = ("CheckBankBalance",)
 
@@ -38,6 +39,18 @@ class CheckBankBalance(object):
                         )
                     ),
                     "code": "BANK_USERNAME_CHANGED",
+                }
+            )
+        except PlaidFailed:
+            return None, ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "We could not verify your account balance, please "
+                            "try again later or our support team for further assitance."
+                        )
+                    ),
+                    "code": "BALANCE_CHECK_FAILED",
                 }
             )
         except ValidationError as err:
