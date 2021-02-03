@@ -65,6 +65,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "created_at",
             "amount",
             "payment_tracking_id",
+            "transaction_tracking_id",
             "currency",
             "payment_status",
             "transaction_status",

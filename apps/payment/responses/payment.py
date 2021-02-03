@@ -317,6 +317,7 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "currency",
             "payment_status",
             "payment_tracking_id",
+            "transaction_tracking_id",
             "is_success",
             "merchant",
             "banks_details",
