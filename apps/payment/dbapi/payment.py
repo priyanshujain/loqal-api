@@ -293,6 +293,6 @@ def get_recent_store_orders(consumer_account):
         Order.objects.filter(
             consumer=consumer_account, payment__status=PaymentStatus.CAPTURED
         )
-        .order_by("merchant", "updated_at")
+        .order_by("merchant", "-updated_at")
         .distinct("merchant")
     )
