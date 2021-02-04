@@ -21,9 +21,12 @@ class NotificationBase(object):
                 return False
             for device in devices:
                 user_sessions = device.user_sessions
-                for user_session in user_sessions.all():
-                    if user_session.is_active:
-                        self.send_single_message(device)
+                if user_sessions.all().exists():
+                    self.send_single_message(device)
+                # user_sessions = device.user_sessions
+                # for user_session in user_sessions.all():
+                #     if user_session.is_active:
+                #         self.send_single_message(device)
             return True
 
         device = get_active_device_by_id(
