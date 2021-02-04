@@ -36,7 +36,7 @@ class SendPaymentInitiatedEmail(object):
 
 
 class RefundReceivedEmail(object):
-    def __init__(self, user, transaction):
+    def __init__(self, transaction):
         self.user = transaction.payment.order.consumer.user
         self.transaction = transaction
 
