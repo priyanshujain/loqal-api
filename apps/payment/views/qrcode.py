@@ -63,7 +63,7 @@ class GetQrCodeImageAPI(MerchantAPIView):
             )
         response_data = MerchantQrCodeResponse(qrcode).data
         image = qrcodelib.make(
-            f"loqal://pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}"
+            f"loqalapp://loqal/pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}/"
         )
         response_data["image_base64"] = img2base64(image)
         return self.response(response_data)
