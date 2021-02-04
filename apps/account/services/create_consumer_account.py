@@ -1,3 +1,4 @@
+import re
 from random import randint
 
 from django.utils.translation import gettext as _
@@ -12,6 +13,8 @@ from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_user_by_email
 
+from .accept_consumer_terms import AcceptTerms
+
 __all__ = (
     "CreateConsumerAccount",
     "GenerateUsername",
@@ -19,14 +22,25 @@ __all__ = (
 
 
 class CreateConsumerAccount(ServiceBase):
-    def __init__(self, data):
+    def __init__(self, request, data):
         self.data = data
+        self.request = request
 
     def handle(self):
         data = self._validate_data()
         user = self._factory_user()
         consumer_account = self._factory_account(user=user)
+        AcceptTerms(
+            request=self.request,
+            account=consumer_account.account,
+            user=user,
+            data={
+                "consent_timestamp": data["consent_timestamp"],
+                "payment_terms_url": data["payment_terms_url"],
+            },
+        ).handle()
         self._send_verfication_email(user=user)
+
         return consumer_account
 
     def _validate_data(self):

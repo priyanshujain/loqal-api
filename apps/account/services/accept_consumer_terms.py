@@ -55,10 +55,10 @@ app.tasks.register(AcceptTermsFileTask)
 
 
 class AcceptTerms(object):
-    def __init__(self, request, data):
+    def __init__(self, account, user, request, data):
         self.data = data
-        self.account = request.account
-        self.user = request.user
+        self.account = account
+        self.user = user
         self.session = request.session
         self.ip_address = request.ip
 

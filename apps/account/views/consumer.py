@@ -5,7 +5,7 @@ from api.views import APIView, ConsumerAPIView, ConsumerPre2FaAPIView
 from apps.account.responses import ConsumerAccountProfileResponse
 from apps.account.services import (AddZipCode, ChangeAccountUsername,
                                    CheckAccountUsername, CreateConsumerAccount)
-from apps.account.services.accept_terms import AcceptTerms
+from apps.account.services.accept_consumer_terms import AcceptTerms
 from apps.user.services import AfterLogin
 from utils.auth import login
 
@@ -29,7 +29,9 @@ class ConsumerSignupAPI(APIView):
 
     def _run_services(self, ip_address):
         data = self.request_data
-        service = CreateConsumerAccount(data=self.request_data)
+        service = CreateConsumerAccount(
+            request=self.request, data=self.request_data
+        )
         consumer_account = service.handle()
         user = consumer_account.user
         login(request=self.request, user=user)
@@ -78,5 +80,10 @@ class CheckAccountUsernameAPI(ConsumerAPIView):
 
 class AcceptTermsDocumentAPI(ConsumerPre2FaAPIView):
     def post(self, request):
-        AcceptTerms(request=request, data=self.request_data).handle()
+        AcceptTerms(
+            request=request,
+            account=request.account,
+            user=request.user,
+            data=self.request_data,
+        ).handle()
         return self.response()
