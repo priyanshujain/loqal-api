@@ -43,10 +43,12 @@ COPY . /app
 WORKDIR /app
 
 # RUN SECRET_KEY=dummy python3 manage.py collectstatic --no-input
+COPY ./deploy /scripts
+
+RUN chmod +x /scripts/*
 
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
 
-
-CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "wsgi:application"]
+CMD ["/scripts/entrypoint.sh"]
