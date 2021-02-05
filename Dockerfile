@@ -29,6 +29,8 @@ RUN apt-get update \
     libpangocairo-1.0-0 \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
     shared-mime-info \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
