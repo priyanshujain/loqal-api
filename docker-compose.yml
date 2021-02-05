@@ -37,7 +37,7 @@ services:
     build:
       context: .
     ports:
-      - "8000:8000"
+      - "8080:8080"
     links:
       - redis
     networks:
