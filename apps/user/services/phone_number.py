@@ -1,5 +1,3 @@
-from re import error
-
 from django.conf import settings
 from django.utils.translation import gettext as _
 
@@ -200,8 +198,8 @@ class EnrollSmsAuthenticator(object):
             if otp == "222222":
                 self._enroll_interface(interface=interface)
                 return True
-            # else:
-            #     return False
+            else:
+                return False
 
         if settings.APP_ENV == "staging":
             if otp == "111111":
