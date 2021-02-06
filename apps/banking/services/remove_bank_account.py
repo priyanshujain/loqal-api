@@ -25,7 +25,7 @@ class RemoveBankAccount(ServiceBase):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
-                        _("Bank account does does exist for your account.")
+                        _("No bank account exists for your Loqal account.")
                     )
                 }
             )
@@ -77,6 +77,11 @@ class BankAccountAPIAction(ProviderAPIActionBase):
                             "Banking service is facing a technical issue, Please try "
                             "again. If the problem persists please "
                             "contact our support team."
+                        )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Couldn't remove your bank account. Please try again."
                         )
                     )
                 }

@@ -17,6 +17,7 @@ from config.celery import app
 
 from .create_dwolla_consumer import DwollaConsumerAccount
 
+
 __all__ = ("AcceptTerms",)
 
 

@@ -20,9 +20,14 @@ class CheckBankBalance(object):
             bank_account.set_plaid_reverification()
             return None, ValidationError(
                 {
-                    "detail": ErrorDetail(
+                    "message": ErrorDetail(
                         _(
                             "Bank account access expired, please re-authenticate your bank account."
+                        )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your bank account credentials expired. Please re-authenticate your bank account."
                         )
                     ),
                     "code": "PLAID_REVERIFICATION_REQUIRED",
@@ -34,7 +39,7 @@ class CheckBankBalance(object):
                 {
                     "detail": ErrorDetail(
                         _(
-                            "Bank account user expired, please "
+                            "Your bank account credentials expired. Please "
                             "contact your bank or our support team for further assitance."
                         )
                     ),

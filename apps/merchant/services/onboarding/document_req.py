@@ -27,7 +27,7 @@ class DocumentRequirements(ServiceBase):
                 raise ValidationError(
                     {
                         "detail": ErrorDetail(
-                            "Please re-submit data before uploading documents. "
+                            "Please re-submit the data before uploading documents. "
                             "If you need further help please contact our "
                             "support team."
                         )

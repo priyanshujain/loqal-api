@@ -17,12 +17,18 @@ class CheckAccountUsername(object):
         self.consumer_account = consumer_account
 
     def handle(self):
-        username = run_validator(ConsumerUsernameValidator, data=self.data)[
-            "username"
-        ]
+        username = run_validator(ConsumerUsernameValidator, data=self.data)["username"]
         if username == self.consumer_account.username:
             raise ValidationError(
-                {"detail": ErrorDetail(_("You already have this username."))}
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "This is your current username. "
+                            "Please choose a different username."
+                        )
+                    ),
+                    "message": ErrorDetail(_("You already use this username.")),
+                }
             )
         if check_account_username(username=username):
             return {"available": False}
@@ -35,9 +41,7 @@ class ChangeAccountUsername(object):
         self.consumer_account = consumer_account
 
     def handle(self):
-        username = run_validator(ConsumerUsernameValidator, data=self.data)[
-            "username"
-        ]
+        username = run_validator(ConsumerUsernameValidator, data=self.data)["username"]
         if username == self.consumer_account.username:
             raise ValidationError(
                 {"detail": ErrorDetail(_("You already have this username."))}

@@ -76,7 +76,8 @@ class ReAuthBankAccountAPI(MerchantAPIView):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
-                        "Bank account has already been verified."
+                        "This bank account has already been verified "
+                        "and is ready to make payments."
                     )
                 }
             )

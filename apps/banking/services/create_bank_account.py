@@ -19,14 +19,12 @@ class CreateBankAccount(ServiceBase):
         plaid_item = self._process_plaid_token(data=data)
         plaid_access_token = plaid_item["plaid_access_token"]
         plaid_account_id = data["plaid_account_id"]
-        account_number_suffix = plaid_item["bank_account"].get(
-            "account_number", ""
-        )[-4:]
+        account_number_suffix = plaid_item["bank_account"].get("account_number", "")[
+            -4:
+        ]
         bank_name = plaid_item["bank_account"]["institution"].get("name")
         account_name = plaid_item["bank_account"].get("name")
-        bank_logo_base64 = plaid_item["bank_account"]["institution"].get(
-            "logo_base64"
-        )
+        bank_logo_base64 = plaid_item["bank_account"]["institution"].get("logo_base64")
 
         bank_account = self._factory_bank_account(
             plaid_access_token=plaid_access_token,
@@ -42,34 +40,29 @@ class CreateBankAccount(ServiceBase):
         dwolla_account_data = self._send_to_dwolla(
             processor_token=plaid_processor_token, account_name=account_name
         )
-        dwolla_funding_source_id = dwolla_account_data[
-            "dwolla_funding_source_id"
-        ]
+        dwolla_funding_source_id = dwolla_account_data["dwolla_funding_source_id"]
         status = dwolla_account_data["status"]
-        bank_account.add_dwolla_id(
-            dwolla_id=dwolla_funding_source_id, status=status
-        )
+        bank_account.add_dwolla_id(dwolla_id=dwolla_funding_source_id, status=status)
         return bank_account
 
     def _validate_data(self):
-        return run_validator(
-            validator=CreateBankAccountValidator, data=self.data
-        )
+        return run_validator(validator=CreateBankAccountValidator, data=self.data)
 
     def _process_plaid_token(self, data):
         plaid_public_token = data["plaid_public_token"]
         plaid_account_id = data["plaid_account_id"]
 
         plaid = PlaidPlugin()
-        access_token = plaid.exchange_public_token(
-            public_token=plaid_public_token
-        )
+        access_token = plaid.exchange_public_token(public_token=plaid_public_token)
         if not access_token:
             raise ValidationError(
                 {
+                    "message": ErrorDetail(_("plaid_public_token has been expired.")),
                     "detail": ErrorDetail(
-                        _("plaid_public_token has been expired.")
-                    )
+                        _(
+                            "Your bank account couldn't be verified. Please try again later."
+                        )
+                    ),
                 }
             )
         bank_account = plaid.get_bank_account(
@@ -77,7 +70,10 @@ class CreateBankAccount(ServiceBase):
         )
         if not bank_account:
             raise ValidationError(
-                {"detail": ErrorDetail(_("plaid_account_id is not valid."))}
+                {
+                    "message": ErrorDetail(_("plaid_account_id is not valid.")),
+                    "detail": ErrorDetail(_("Your bank account couldn't be verified. Please try again later.")),
+                }
             )
         processor_token = plaid.get_dwolla_processor_token(
             access_token=access_token, account_id=plaid_account_id
@@ -125,10 +121,17 @@ class CreateBankAccountAPIAction(ProviderAPIActionBase):
         if self.get_errors(response):
             raise ProviderAPIException(
                 {
-                    "detail": ErrorDetail(
+                    "message": ErrorDetail(
                         _(
                             "Banking service failed, Please try "
                             "again. If the problem persists please "
+                            "contact our support team."
+                        )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your bank account couldn't be verified, Please try "
+                            "again later. If the problem persists, please "
                             "contact our support team."
                         )
                     )
@@ -136,8 +139,6 @@ class CreateBankAccountAPIAction(ProviderAPIActionBase):
             )
         return {
             "status": response["data"].get("status"),
-            "dwolla_funding_source_id": response["data"][
-                "dwolla_funding_source_id"
-            ],
+            "dwolla_funding_source_id": response["data"]["dwolla_funding_source_id"],
             "status": response["data"]["status"],
         }

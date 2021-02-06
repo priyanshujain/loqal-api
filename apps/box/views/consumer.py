@@ -14,7 +14,9 @@ class FileAPI(LoggedInAPIView):
         if not form.is_valid():
             return (
                 None,
-                ValidationError({"detail": ErrorDetail(_("Invalid data."))}),
+                ValidationError(
+                    {"detail": ErrorDetail(_("Invalid data. Please try again."))}
+                ),
             )
         data = form.cleaned_data
         return data, None
@@ -31,7 +33,16 @@ class CreateFileAPI(FileAPI):
         source_file = fix_mimetype_file(source_file)
         if not validate_file_format(source_file):
             raise ValidationError(
-                {"source_file": [ErrorDetail(_("Unsupported file format."))]}
+                {
+                    "source_file": [
+                        ErrorDetail(
+                            _(
+                                "Unsupported file format. Please make sure "
+                                "you use .jpg, .jpeg, .pdf or .png file."
+                            )
+                        )
+                    ]
+                }
             )
 
         gcs_file = store_file_to_fss(
@@ -60,16 +71,12 @@ class FetchFileUrlAPI(LoggedInAPIView):
         try:
             box_id = int(box_id)
         except ValueError:
-            raise ValidationError(
-                {"box_id": [ErrorDetail(_("Invalid box id."))]}
-            )
+            raise ValidationError({"box_id": [ErrorDetail(_("Invalid box_id."))]})
 
         try:
             box_file = BoxFile.objects.get(pk=box_id)
         except BoxFile.DoesNotExist:
-            raise ValidationError(
-                {"box_id": [ErrorDetail(_("Invalid box_id."))]}
-            )
+            raise ValidationError({"box_id": [ErrorDetail(_("Invalid box_id."))]})
 
         box_file_data = BoxFileResponse(box_file).data
         box_file_data["signed_url"] = get_file_from_fss(

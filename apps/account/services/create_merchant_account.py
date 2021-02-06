@@ -1,4 +1,3 @@
-from django.http import request
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -53,7 +52,7 @@ class CreateMerchantAccount(ServiceBase):
             raise ValidationError(
                 {
                     "email": [
-                        ErrorDetail(_("User with this email already exists."))
+                        ErrorDetail(_("A user with this email already exists."))
                     ]
                 }
             )

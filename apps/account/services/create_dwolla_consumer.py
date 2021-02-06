@@ -35,9 +35,7 @@ class DwollaConsumerAccount(ServiceBase):
         status = response["status"]
         verification_status = response["verification_status"]
         account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
-        account.update_status(
-            status=status, verification_status=verification_status
-        )
+        account.update_status(status=status, verification_status=verification_status)
         return True
 
 
@@ -47,13 +45,19 @@ class CreateConsumerAccountAPIAction(ProviderAPIActionBase):
         if self.get_errors(response):
             raise ProviderAPIException(
                 {
-                    "detail": ErrorDetail(
+                    "message": ErrorDetail(
                         _(
                             "Banking service failed, Please try "
                             "again. If the problem persists please "
                             "contact our support team."
                         )
-                    )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your account couldn't be created. "
+                            "Please try again in a few hours, or contact our support team."
+                        )
+                    ),
                 }
             )
         return {

@@ -3,12 +3,14 @@
 
 ## Short term
 
+- Add a new field in account for all verified/ account ready to use
 - Replace all uid or u_id type reponse keys
 - Email verification mandatory on Merchant APIs and consumer payment APIs
 - Add conditions for disabled merchant/ user
 - Build feature for disabling a user account on admin
 - Show request ID on 500 error
 - Add twilio sms error conditions
+
 
 ## Medium term
 
