@@ -15,7 +15,11 @@ class FileAPI(LoggedInAPIView):
             return (
                 None,
                 ValidationError(
-                    {"detail": ErrorDetail(_("Invalid data. Please try again."))}
+                    {
+                        "detail": ErrorDetail(
+                            _("Invalid data. Please try again.")
+                        )
+                    }
                 ),
             )
         data = form.cleaned_data
@@ -71,12 +75,16 @@ class FetchFileUrlAPI(LoggedInAPIView):
         try:
             box_id = int(box_id)
         except ValueError:
-            raise ValidationError({"box_id": [ErrorDetail(_("Invalid box_id."))]})
+            raise ValidationError(
+                {"box_id": [ErrorDetail(_("Invalid box_id."))]}
+            )
 
         try:
             box_file = BoxFile.objects.get(pk=box_id)
         except BoxFile.DoesNotExist:
-            raise ValidationError({"box_id": [ErrorDetail(_("Invalid box_id."))]})
+            raise ValidationError(
+                {"box_id": [ErrorDetail(_("Invalid box_id."))]}
+            )
 
         box_file_data = BoxFileResponse(box_file).data
         box_file_data["signed_url"] = get_file_from_fss(

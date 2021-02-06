@@ -35,7 +35,9 @@ class DwollaConsumerAccount(ServiceBase):
         status = response["status"]
         verification_status = response["verification_status"]
         account.add_dwolla_id(dwolla_id=dwolla_customer_id, save=False)
-        account.update_status(status=status, verification_status=verification_status)
+        account.update_status(
+            status=status, verification_status=verification_status
+        )
         return True
 
 

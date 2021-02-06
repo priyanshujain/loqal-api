@@ -21,8 +21,12 @@ class PlaidLink(object):
         if not link_token:
             raise ValidationError(
                 {
-                    "message": ErrorDetail(_("Internal error please try again.")),
-                    "detail": ErrorDetail(_("Something went wrong. Please try again.")),
+                    "message": ErrorDetail(
+                        _("Internal error please try again.")
+                    ),
+                    "detail": ErrorDetail(
+                        _("Something went wrong. Please try again.")
+                    ),
                 }
             )
         return link_token

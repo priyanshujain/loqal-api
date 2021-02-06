@@ -57,7 +57,9 @@ class CreateConsumerAccount(ServiceBase):
             raise ValidationError(
                 {
                     "email": [
-                        ErrorDetail(_("A user with this email already exists."))
+                        ErrorDetail(
+                            _("A user with this email already exists.")
+                        )
                     ]
                 }
             )

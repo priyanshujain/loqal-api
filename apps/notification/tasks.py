@@ -20,7 +20,9 @@ class NotificationBase(object):
             if not devices.count() > 0:
                 return False
             for device in devices:
-                user_sessions = device.user_sessions.all().filter(is_expired=False)
+                user_sessions = device.user_sessions.all().filter(
+                    is_expired=False
+                )
                 if user_sessions.exists():
                     self.send_single_message(device)
                 # user_sessions = device.user_sessions

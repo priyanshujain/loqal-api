@@ -29,7 +29,9 @@ class ReAuthBankAccount(ServiceBase):
         plaid_public_token = data["plaid_public_token"]
 
         plaid = PlaidPlugin()
-        access_token = plaid.exchange_public_token(public_token=plaid_public_token)
+        access_token = plaid.exchange_public_token(
+            public_token=plaid_public_token
+        )
         if not access_token:
             raise ValidationError(
                 {
@@ -46,7 +48,9 @@ class ReAuthBankAccount(ServiceBase):
         }
 
     def _validate_data(self):
-        data = run_validator(validator=ReauthBankAccountValidator, data=self.data)
+        data = run_validator(
+            validator=ReauthBankAccountValidator, data=self.data
+        )
         return data
 
     def _update_bank_account(

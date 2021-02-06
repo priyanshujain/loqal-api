@@ -83,7 +83,7 @@ class BankAccountAPIAction(ProviderAPIActionBase):
                         _(
                             "Couldn't remove your bank account. Please try again."
                         )
-                    )
+                    ),
                 }
             )
         return response["data"]

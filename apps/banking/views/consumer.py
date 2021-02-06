@@ -5,12 +5,8 @@ from api.views import ConsumerAPIView
 from apps.banking.dbapi import get_bank_account
 from apps.banking.options import BankAccountStatus
 from apps.banking.response import BankAccountResponse
-from apps.banking.services import (
-    CreateBankAccount,
-    PlaidLink,
-    ReAuthBankAccount,
-    RemoveBankAccount,
-)
+from apps.banking.services import (CreateBankAccount, PlaidLink,
+                                   ReAuthBankAccount, RemoveBankAccount)
 from apps.banking.services.remove_bank_account import RemoveBankAccount
 
 
@@ -22,10 +18,14 @@ class CreateBankAccountAPI(ConsumerAPIView):
             return self.response(BankAccountResponse(bank_account).data)
 
         bank_account = self._run_services(account_id=account.id)
-        return self.response(BankAccountResponse(bank_account).data, status=201)
+        return self.response(
+            BankAccountResponse(bank_account).data, status=201
+        )
 
     def _run_services(self, account_id):
-        service = CreateBankAccount(account_id=account_id, data=self.request_data)
+        service = CreateBankAccount(
+            account_id=account_id, data=self.request_data
+        )
         return service.handle()
 
 
