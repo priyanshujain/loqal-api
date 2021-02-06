@@ -53,10 +53,11 @@ class ApplyOnboardingWebhook(object):
             """
             Additional documentation is needed to verify a Customer.
             """
-            self.customer_account.update_status(
-                status=DwollaCustomerStatus.DOCUMENT,
-                verification_status=DwollaCustomerVerificationStatus.DOCUMENT_NEEDED,
-            )
+            # self.customer_account.update_status(
+            #     status=DwollaCustomerStatus.DOCUMENT,
+            #     verification_status=DwollaCustomerVerificationStatus.DOCUMENT_NEEDED,
+            # )
+            pass
 
         if topic == "customer_verification_document_uploaded":
             """
