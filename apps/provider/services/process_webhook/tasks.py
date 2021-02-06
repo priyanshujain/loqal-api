@@ -10,7 +10,7 @@ from .onboarding import ApplyOnboardingWebhook
 from .payments import ApplyPaymentWebhook
 
 
-@shared_task
+@shared_task(queue="psp_webhook")
 def process_webhook_event(event_id):
     current_event = get_provider_webhook_event(event_id=event_id)
 
