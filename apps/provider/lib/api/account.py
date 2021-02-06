@@ -42,6 +42,12 @@ class Account(API):
             request_method=request_method, request_kwargs=kwargs
         )
 
+    def get_beneficial_owner(self, **kwargs):
+        request_method = self.psp_client.account.get_beneficial_owner
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )
+
     def certify_beneficial_owner(self, **kwargs):
         request_method = self.psp_client.account.certify_beneficial_owner
         return self.execute_request(

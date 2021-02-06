@@ -19,6 +19,7 @@ from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     CreateIncorporationDetails,
                                     DocumentRequirements,
                                     GetMerchantAccountStatus,
+                                    ProcessPendingOnboardingWebhooks,
                                     RemoveBeneficialOwner, SubmitDocuments,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
@@ -181,8 +182,8 @@ class OnboardingDataAPI(MerchantAPIView):
 class OnboardingStatusAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
-        account = GetMerchantAccountStatus(merchant=merchant_account).handle()
-        return self.response(OnboardingStatusResponse(account).data)
+        ProcessPendingOnboardingWebhooks(merchant=merchant_account).handle()
+        return self.response()
 
 
 class SubmitKycDataAPI(MerchantAPIView):
