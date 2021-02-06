@@ -48,7 +48,7 @@ class CheckTransferLimit(object):
                 from_datetime=payment_register.daily_usage_start_time,
                 bank_account_id=self.bank_account.id,
             ).aggregate(total=Sum("amount"))["total"]
-            + self.amount
+            or Decimal(0.0) + self.amount
         )
         if daily_total > payment_register.daily_send_limit:
             raise ValidationError(
@@ -70,7 +70,7 @@ class CheckTransferLimit(object):
                 from_datetime=payment_register.weekly_usage_start_time,
                 bank_account_id=self.bank_account.id,
             ).aggregate(total=Sum("amount"))["total"]
-            + self.amount
+            or Decimal(0.0) + self.amount
         )
         if weekly_total > payment_register.weekly_send_limit:
             raise ValidationError(

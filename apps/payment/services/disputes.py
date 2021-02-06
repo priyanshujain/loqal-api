@@ -7,9 +7,9 @@ from apps.payment.dbapi import (create_dispute_transaction,
                                 get_consumer_transaction,
                                 get_dispute_transaction)
 from apps.payment.dbapi.events import dispute_payment_event
+from apps.payment.notifications.email import CreateDisputeConsumerEmail
 from apps.payment.options import TransactionType
 from apps.payment.validators import CreateDisputeValidator
-from apps.payment.notifications.email import CreateDisputeConsumerEmail
 
 __all__ = ("CreateDispute",)
 
@@ -36,7 +36,7 @@ class CreateDispute(ServiceBase):
                 payment_id=transaction.payment.id,
                 dispute_tracking_id=dispute.dispute_tracking_id,
             )
-        CreateDisputeConsumerEmail(dispute=dict).send()
+        CreateDisputeConsumerEmail(dispute=dispute).send()
         return dispute
 
     def _validate_data(self):
