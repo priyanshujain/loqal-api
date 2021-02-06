@@ -130,7 +130,7 @@ class CreatePayment(ServiceBase):
                 register=register,
                 bank_account=self.sender_bank_account,
                 amount=self.total_amount,
-            )
+            ).handle()
         except ValidationError as err:
             code = to_str(err.detail.get("code"))
             if code == "WEEKLY_LIMIT_EXCEEDED":
