@@ -65,3 +65,30 @@ class RefundReceivedEmail(object):
             f"Refund initiated for payment #{transaction.transaction_tracking_id}",
             email_html,
         )
+
+
+class CreateDisputeConsumerEmail(object):
+    def __init__(self, dispute):
+        self.user = dispute.transaction.payment.order.consumer.user
+        self.dispute = dispute
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        user = self.user
+        dispute = self.dispute
+        reason = dispute.reason_type.label
+        description = dispute.reason_type
+        render_data = {
+            "reason": reason,
+            "description": description,
+        }
+        email_html = render_to_string(
+            "dispute_alert_consumer.html", render_data
+        )
+        send_email_async(
+            (user.email),
+            f"Payment dispute #{dispute.dispute_tracking_id}",
+            email_html,
+        )
