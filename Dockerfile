@@ -29,6 +29,8 @@ RUN apt-get update \
     libpangocairo-1.0-0 \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
     shared-mime-info \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -43,10 +45,12 @@ COPY . /app
 WORKDIR /app
 
 # RUN SECRET_KEY=dummy python3 manage.py collectstatic --no-input
+COPY ./deploy /scripts
+
+RUN chmod +x /scripts/*
 
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
 
-
-CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "wsgi:application"]
+CMD ["/scripts/entrypoint.sh"]

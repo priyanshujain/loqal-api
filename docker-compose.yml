@@ -1,12 +1,52 @@
 version: '3.7'
-  
+
 services:
-  app:
+  redis:
+    restart: unless-stopped
+    image: redis:latest
+    networks:
+      - loqal-backend-tier
+    volumes:
+      - loqal-redis:/data
+
+  worker1:
+    env_file: .env
+    restart: unless-stopped
+    build:
+      context: .
+    command: celery -A config worker -l INFO -E -Q celery -n apps --concurrency=2
+    links:
+      - redis
+    networks:
+      - loqal-backend-tier
+  
+  worker2:
+    env_file: .env
+    restart: unless-stopped
+    build:
+      context: .
+    command: celery -A config worker -l INFO -E -Q psp_webhook -n apps --concurrency=2
+    links:
+      - redis
+    networks:
+      - loqal-backend-tier
+
+  django:
+    env_file: .env
+    restart: unless-stopped
     build:
       context: .
     ports:
-      - "8000:8000"
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
-    environment:
-      - DEBUG=1
-  
+      - "8080:8080"
+    links:
+      - redis
+    networks:
+      - loqal-backend-tier
+
+volumes:
+  loqal-redis:
+    driver: local
+
+networks:
+  loqal-backend-tier:
+    driver: bridge
