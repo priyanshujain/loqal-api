@@ -33,5 +33,8 @@ def send_sms(
         print("###################### SMS END ##########################")
         return True
 
-    twilio = TwilioPlugin()
-    return twilio.send_text_message(phone_to, phone_from, body)
+    try:
+        twilio = TwilioPlugin()
+        return twilio.send_text_message(phone_to, phone_from, body)
+    except Exception:
+        return False

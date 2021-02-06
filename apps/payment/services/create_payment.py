@@ -6,7 +6,8 @@ from django.utils.translation import ungettext
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
-from apps.payment.dbapi import create_transaction, get_sender_pending_total
+from apps.payment.dbapi import (create_transaction, get_payment_register,
+                                get_sender_pending_total)
 from apps.payment.dbapi.events import (failed_payment_event,
                                        failed_refund_payment_event)
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
@@ -76,11 +77,16 @@ class CreatePayment(ServiceBase):
                 }
             )
             self._send_error(error, transaction)
+        sender_register = get_payment_register(
+            account_id=self.sender_bank_account.account.id
+        )
         if (
             self.order.consumer.account.id
             == self.sender_bank_account.account.id
         ):
-            error = self._check_transaction_limits(transaction)
+            error = self._check_transaction_limits(
+                register=sender_register, transaction=transaction
+            )
             if error:
                 error.detail["data"] = TransactionErrorDetailsResponse(
                     transaction
@@ -94,6 +100,8 @@ class CreatePayment(ServiceBase):
             status=dwolla_response["status"],
             amount_towards_order=self.amount_towards_order,
         )
+        if sender_register:
+            sender_register.update_usage(amount=self.total_amount)
         return transaction
 
     def _send_error(self, error, transaction):
@@ -116,10 +124,12 @@ class CreatePayment(ServiceBase):
             pass
         raise error
 
-    def _check_transaction_limits(self, transaction):
+    def _check_transaction_limits(self, register, transaction):
         try:
             CheckTransferLimit(
-                bank_account=self.sender_bank_account, amount=self.total_amount
+                register=register,
+                bank_account=self.sender_bank_account,
+                amount=self.total_amount,
             )
         except ValidationError as err:
             code = to_str(err.detail.get("code"))
