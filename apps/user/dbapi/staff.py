@@ -16,6 +16,7 @@ def create_staff_user(
     try:
         user = User.objects.create(
             email=email,
+            username=email,
             first_name=first_name,
             last_name=last_name,
         )
