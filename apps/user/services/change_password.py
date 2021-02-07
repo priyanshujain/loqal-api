@@ -1,4 +1,5 @@
 from django.contrib import auth
+from django.contrib.auth import update_session_auth_hash
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -48,3 +49,4 @@ class ChangePassword(ServiceBase):
         user = self.user
         set_new_user_password(user=user, new_password=data["new_password"])
         SendPasswordChangeAlert(user=user, session=session).send()
+        update_session_auth_hash(self.request, user)
