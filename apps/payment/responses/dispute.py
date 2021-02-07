@@ -36,10 +36,9 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
 
 
 class DisputeHistoryResponse(serializers.ModelSerializer):
-    dispute_type = serializers.CharField(
-        source="dispute_type.label", read_only=True
+    dispute_type = serializers.ChoiceCharEnumSerializer(read_only=True
     )
-    status = serializers.CharField(source="status.label", read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
@@ -60,16 +59,12 @@ class DisputeHistoryResponse(serializers.ModelSerializer):
 
 
 class DisputeListResponse(serializers.ModelSerializer):
-    dispute_type = serializers.CharField(
-        source="dispute_type.label", read_only=True
-    )
+    dispute_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
-    reason_type = serializers.CharField(
-        source="reason_type.label", read_only=True
-    )
+    reason_type = serializers.ChoiceCharEnumSerializer(read_only=True)
 
     class Meta:
         model = DisputeTransaction
@@ -85,7 +80,7 @@ class DisputeListResponse(serializers.ModelSerializer):
 
 
 class ConsumerDisputeDetailsResponse(serializers.ModelSerializer):
-    status = serializers.CharField(source="status.label", read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     reason_type = serializers.ChoiceCharEnumSerializer(read_only=True)
 
     class Meta:
