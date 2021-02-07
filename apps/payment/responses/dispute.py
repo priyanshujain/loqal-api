@@ -63,7 +63,7 @@ class DisputeListResponse(serializers.ModelSerializer):
     dispute_type = serializers.CharField(
         source="dispute_type.label", read_only=True
     )
-    status = serializers.CharField(source="status.label", read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
@@ -79,6 +79,7 @@ class DisputeListResponse(serializers.ModelSerializer):
             "dispute_tracking_id",
             "payment_tracking_id",
             "reason_type",
+            "is_closed",
             "status",
         )
 
@@ -131,6 +132,7 @@ class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
             "reason_type",
             "notes",
             "dispute_type",
+            "resolution",
             "is_closed",
             "amount",
         )
@@ -171,4 +173,5 @@ class StaffDisputeDetailsResponse(serializers.ModelSerializer):
             "dispute_type",
             "is_closed",
             "amount",
+            "resolution",
         )
