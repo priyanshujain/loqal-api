@@ -99,6 +99,7 @@ class CreatePayment(ServiceBase):
             individual_ach_id=dwolla_response["individual_ach_id"],
             status=dwolla_response["status"],
             amount_towards_order=self.amount_towards_order,
+            sender_balance_at_checkout=balance,
         )
         if sender_register:
             sender_register.update_usage(amount=self.total_amount)

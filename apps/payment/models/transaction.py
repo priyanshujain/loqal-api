@@ -158,6 +158,7 @@ class Transaction(AbstractBaseModel):
         individual_ach_id,
         status,
         amount_towards_order,
+        sender_balance_at_checkout=None,
         save=True,
     ):
         self.dwolla_id = dwolla_id
@@ -175,6 +176,8 @@ class Transaction(AbstractBaseModel):
                 )
             if self.transaction_type == TransactionType.REFUND_PAYMENT:
                 self.payment.update_charge_status_by_refund(self.amount)
+        if sender_balance_at_checkout != None:
+            self.sender_balance_at_checkout = sender_balance_at_checkout
         if save:
             self.save()
 
