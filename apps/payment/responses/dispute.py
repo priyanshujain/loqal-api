@@ -53,6 +53,7 @@ class DisputeHistoryResponse(serializers.ModelSerializer):
             "dispute_type",
             "dispute_tracking_id",
             "payment_tracking_id",
+            "is_closed",
             "customer",
             "status",
         )
