@@ -108,6 +108,9 @@ class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
     transaction_tracking_id = serializers.CharField(
         source="transaction.transaction_tracking_id", read_only=True
     )
+    amount = serializers.CharField(
+        source="transaction.amount", read_only=True
+    )
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
@@ -131,6 +134,7 @@ class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
             "notes",
             "dispute_type",
             "is_closed",
+            "amount",
         )
 
 
@@ -139,6 +143,9 @@ class StaffDisputeDetailsResponse(serializers.ModelSerializer):
     status = serializers.ChoiceCharEnumSerializer(read_only=True)
     transaction_tracking_id = serializers.CharField(
         source="transaction.transaction_tracking_id", read_only=True
+    )
+    amount = serializers.CharField(
+        source="transaction.amount", read_only=True
     )
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
@@ -167,4 +174,5 @@ class StaffDisputeDetailsResponse(serializers.ModelSerializer):
             "notes",
             "dispute_type",
             "is_closed",
+            "amount",
         )
