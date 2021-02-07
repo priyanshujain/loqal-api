@@ -7,8 +7,9 @@ from apps.payment.dbapi import (create_dispute_transaction,
                                 get_consumer_transaction,
                                 get_dispute_transaction)
 from apps.payment.dbapi.events import dispute_payment_event
-from apps.payment.notifications.email import CreateDisputeConsumerEmail
-from apps.payment.options import TransactionType
+from apps.payment.notifications.email import send_dispute_email
+from apps.payment.options import (DisputeReasonTypeMap, DisputeType,
+                                  TransactionType)
 from apps.payment.validators import CreateDisputeValidator
 
 __all__ = ("CreateDispute",)
@@ -36,7 +37,7 @@ class CreateDispute(ServiceBase):
                 payment_id=transaction.payment.id,
                 dispute_tracking_id=dispute.dispute_tracking_id,
             )
-        CreateDisputeConsumerEmail(dispute=dispute).send()
+        send_dispute_email.delay(dispute_id=dispute.id)
         return dispute
 
     def _validate_data(self):
@@ -73,8 +74,12 @@ class CreateDispute(ServiceBase):
         }
 
     def _factory_dispute(self, transaction_id, reason_message, reason_type):
+        dispute_type = getattr(
+            DisputeReasonTypeMap, reason_type.value, DisputeType.RETRIEVAL
+        )
         return create_dispute_transaction(
             transaction_id=transaction_id,
             reason_message=reason_message,
             reason_type=reason_type,
+            dispute_type=dispute_type,
         )

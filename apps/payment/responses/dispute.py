@@ -2,11 +2,14 @@ from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.payment.models import DisputeTransaction
 
+from .payment import MerchantDetailsResponse
+
 __all__ = (
     "DisputeHistoryResponse",
     "DisputeListResponse",
     "ConsumerDisputeDetailsResponse",
     "MerchantDisputeDetailsResponse",
+    "StaffDisputeDetailsResponse",
 )
 
 
@@ -93,25 +96,24 @@ class ConsumerDisputeDetailsResponse(serializers.ModelSerializer):
             "status",
             "reason_message",
             "reason_type",
+            "resolution",
+            "notes",
+            "is_closed",
         )
 
 
 class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
-    dispute_type = serializers.CharField(
-        source="dispute_type.label", read_only=True
-    )
-    status = serializers.CharField(source="status.label", read_only=True)
+    dispute_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     transaction_tracking_id = serializers.CharField(
         source="transaction.transaction_tracking_id", read_only=True
     )
     payment_tracking_id = serializers.CharField(
         source="transaction.payment.payment_tracking_id", read_only=True
     )
-    reason_type = serializers.CharField(
-        source="reason_type.label", read_only=True
-    )
+    reason_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     customer = CustomerDetailsResponse(
-        source="transaction.payment.order.consume", read_only=True
+        source="transaction.payment.order.consumer", read_only=True
     )
 
     class Meta:
@@ -126,4 +128,43 @@ class MerchantDisputeDetailsResponse(serializers.ModelSerializer):
             "customer",
             "reason_message",
             "reason_type",
+            "notes",
+            "dispute_type",
+            "is_closed",
+        )
+
+
+class StaffDisputeDetailsResponse(serializers.ModelSerializer):
+    dispute_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    transaction_tracking_id = serializers.CharField(
+        source="transaction.transaction_tracking_id", read_only=True
+    )
+    payment_tracking_id = serializers.CharField(
+        source="transaction.payment.payment_tracking_id", read_only=True
+    )
+    reason_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    customer = CustomerDetailsResponse(
+        source="transaction.payment.order.consumer", read_only=True
+    )
+    merchant = MerchantDetailsResponse(
+        source="transaction.payment.order.merchant", read_only=True
+    )
+
+    class Meta:
+        model = DisputeTransaction
+        fields = (
+            "created_at",
+            "dispute_type",
+            "dispute_tracking_id",
+            "payment_tracking_id",
+            "transaction_tracking_id",
+            "status",
+            "customer",
+            "merchant",
+            "reason_message",
+            "reason_type",
+            "notes",
+            "dispute_type",
+            "is_closed",
         )

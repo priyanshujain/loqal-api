@@ -1,5 +1,7 @@
+from celery import shared_task
 from django.template.loader import render_to_string
 
+from apps.payment.dbapi.transaction import get_dispute
 from utils.email import send_email_async
 
 
@@ -92,3 +94,9 @@ class CreateDisputeConsumerEmail(object):
             f"Payment dispute #{dispute.dispute_tracking_id}",
             email_html,
         )
+
+
+@shared_task
+def send_dispute_email(dispute_id):
+    dispute = get_dispute(dispute_id=dispute_id)
+    CreateDisputeConsumerEmail(dispute=dispute).send()

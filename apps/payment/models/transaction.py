@@ -345,10 +345,10 @@ class DisputeTransaction(AbstractBaseModel):
         unique=True,
         editable=False,
     )
-    status = ChoiceEnumField(
-        enum_type=DisputeStatus,
-        default=DisputeStatus.OPEN,
+    status = ChoiceCharEnumField(
+        enum_type=DisputeStatus, default=DisputeStatus.OPEN, max_length=64
     )
+    is_closed = models.BooleanField(default=False)
     dispute_type = ChoiceCharEnumField(
         max_length=32,
         enum_type=DisputeType,
@@ -360,6 +360,8 @@ class DisputeTransaction(AbstractBaseModel):
         default=DisputeReasonType.OTHER,
     )
     reason_message = models.TextField(default="")
+    notes = models.TextField(default="")
+    resolution = models.TextField(default="")
 
     class Meta:
         db_table = "dispute_transaction"
@@ -377,3 +379,17 @@ class DisputeTransaction(AbstractBaseModel):
             ).exists():
                 self.dispute_tracking_id = id_generator()
         return super().save(*args, **kwargs)
+
+    def update_status(self, status, notes, save=True):
+        self.status = status
+        self.notes = notes
+        if save:
+            self.save()
+
+    def close_dispute(self, resolution, status, notes, save=True):
+        self.resolution = resolution
+        self.status = status
+        self.notes = notes
+        self.is_closed = True
+        if save:
+            self.save()

@@ -6,7 +6,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.account.dbapi import (get_consumer_account_by_phone_number,
                                 get_consumer_account_by_username)
 from apps.payment.dbapi import get_payment_qrcode
-from apps.payment.options import DisputeReasonType
+from apps.payment.options import DisputeReasonType, DisputeStatus
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
@@ -167,3 +167,14 @@ class CreateDisputeValidator(serializers.ValidationSerializer):
     transaction_tracking_id = serializers.CharField()
     reason_message = serializers.CharField(max_length=2 * 1024)
     reason_type = serializers.ChoiceField(choices=DisputeReasonType.choices)
+
+
+class ChangeDisputeStatusValidator(serializers.ValidationSerializer):
+    status = serializers.ChoiceField(choices=DisputeStatus.choices)
+    notes = serializers.CharField(max_length=2 * 1024)
+
+
+class CloseDisputeValidator(serializers.ValidationSerializer):
+    resolution = serializers.CharField(max_length=2 * 1024)
+    status = serializers.ChoiceField(choices=DisputeStatus.choices)
+    notes = serializers.CharField(max_length=2 * 1024)

@@ -50,6 +50,11 @@ def get_merchant_disputes(merchant_account):
     )
 
 
+def get_all_disputes():
+    """"""
+    return DisputeTransaction.objects.all()
+
+
 def get_merchant_customers(merchant_account):
     aggregate_consumers = []
     consumers = [

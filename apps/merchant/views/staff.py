@@ -6,6 +6,7 @@ from apps.account.dbapi import get_merchant_account_by_uid
 from apps.merchant.dbapi import (get_merchant_code_protocols,
                                  get_merchant_operation_hours,
                                  get_merchant_service_availability)
+from apps.merchant.dbapi.non_loqal import delete_non_loqal
 from apps.merchant.responses import (CodesAndProtocolsResponse,
                                      MerchantOperationHoursResponse,
                                      MerchantProfileResponse,
@@ -24,6 +25,7 @@ __all__ = (
     "GetCodesAndProtocolsAPI",
     "GetServiceAvailabilityAPI",
     "UpdateServiceAvailabilityAPI",
+    "DeleteNonLoqalAPI",
 )
 
 
@@ -122,4 +124,15 @@ class UpdateServiceAvailabilityAPI(StaffBaseMerchantAPI):
         UpdateServiceAvailability(
             merchant_id=merchant_account.id, data=self.request_data
         ).handle()
+        return self.response(status=204)
+
+
+class DeleteNonLoqalAPI(StaffBaseMerchantAPI):
+    def delete(self, request, merchant_id):
+        merchant_account = self.validate_merchant(merchant_id)
+        if merchant_account.account:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("This is not non loqal merchant"))}
+            )
+        delete_non_loqal(merchant_id=merchant_account.id)
         return self.response(status=204)

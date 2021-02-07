@@ -64,7 +64,6 @@ class ApplyOnboardingWebhook(object):
             A verification document was uploaded for a Customer.
             """
             self.customer_account.update_status(
-                status=None,
                 verification_status=DwollaCustomerVerificationStatus.DOCUMENT_UPLOADED,
             )
 
@@ -73,7 +72,6 @@ class ApplyOnboardingWebhook(object):
             A verification document has been rejected for a Customer.
             """
             self.customer_account.update_status(
-                status=None,
                 verification_status=DwollaCustomerVerificationStatus.DOCUMENT_FAILED,
             )
             document_id = self.event.target_resource_dwolla_id

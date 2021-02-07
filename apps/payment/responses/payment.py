@@ -22,6 +22,7 @@ __all__ = (
     "TransactionDetailsResponse",
     "RecentStoresResponse",
     "TransactionErrorDetailsResponse",
+    "MerchantDetailsResponse",
 )
 
 

@@ -149,11 +149,6 @@ class MerchantAccount(AbstractBaseModel):
     class Meta:
         db_table = "merchant_account"
 
-    def update_status(self, status, save=True):
-        self.account_status = status
-        if save:
-            self.save()
-
     @property
     def category(self):
         categories = self.categories

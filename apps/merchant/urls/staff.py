@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.merchant.views.staff import (GetCodesAndProtocolsAPI,
+from apps.merchant.views.staff import (DeleteNonLoqalAPI,
+                                       GetCodesAndProtocolsAPI,
                                        GetMerchantOperationHoursAPI,
                                        GetMerchantProfileAPI,
                                        GetServiceAvailabilityAPI,
@@ -41,13 +42,18 @@ urlpatterns = [
         name="staff_view_codes_protocols",
     ),
     path(
-        "staff_<uuid:merchant_id>/service-availibility/update/",
+        "<uuid:merchant_id>/service-availibility/update/",
         UpdateServiceAvailabilityAPI.as_view(),
         name="update_service_availibilitys",
     ),
     path(
-        "staff_<uuid:merchant_id>/service-availibility/",
+        "<uuid:merchant_id>/service-availibility/",
         GetServiceAvailabilityAPI.as_view(),
         name="view_service_availibility",
+    ),
+    path(
+        "non-loqal/<uuid:merchant_id>/",
+        DeleteNonLoqalAPI.as_view(),
+        name="delete_non_loqal",
     ),
 ]

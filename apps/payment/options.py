@@ -351,13 +351,13 @@ class PaymentProcess(ChoiceEnum):
     NOT_PROVIDED = 3, _("Not Provided")
 
 
-class DisputeStatus(ChoiceEnum):
-    OPEN = 0, _("Open")
-    INTERNAL_REVIEW = 1, _("Internal Review")
-    BANK_REVIEW = 2, _("Bank Review")
-    MERCHANT_REVIEW = 5, _("Merchany Review")
-    CHARGEBACK_ACCEPTED = 3, _("Chargeback Accepted")
-    CHARGEBACK_REJECTED = 4, _("Chargeback Rejected")
+class DisputeStatus(ChoiceCharEnum):
+    OPEN = "open", _("Open")
+    INTERNAL_REVIEW = "internal_review", _("Internal Review")
+    BANK_REVIEW = "bank_review", _("Bank Review")
+    MERCHANT_REVIEW = "merchant_review", _("Merchany Review")
+    CHARGEBACK_ACCEPTED = "chargeback_accepted", _("Chargeback Accepted")
+    CHARGEBACK_REJECTED = "chargeback_rejected", _("Chargeback Rejected")
 
 
 class DisputeType(ChoiceCharEnum):
@@ -377,12 +377,20 @@ class DisputeReasonType(ChoiceCharEnum):
     DID_NOT_PERFORM = "did_not_perform", _(
         "I did not perform this transaction"
     )
+    FRAUDULENT_TRANSACTION = "fraudulent_transaction", _(
+        "This transaction is fraudulent"
+    )
+    TRANSACTION_EXECUTED_ACCIDENTLY = "transaction_executed_accidently", _(
+        "Transaction was executed by accident"
+    )
     OTHER = "other", _("Other issues")
 
 
 class DisputeReasonTypeMap:
-    MONEY_NOT_REACHED = DisputeType.CHARGEBACK
-    PAID_TWICE = DisputeType.CHARGEBACK
-    MORE_DETAILS_REQUIRED = DisputeType.RETRIEVAL
-    DID_NOT_PERFORM = DisputeType.FRAUD
-    OTHER = DisputeType.RETRIEVAL
+    money_not_reached = DisputeType.CHARGEBACK
+    paid_twice = DisputeType.CHARGEBACK
+    more_details_required = DisputeType.RETRIEVAL
+    did_not_perform = DisputeType.FRAUD
+    fraudulent_transaction = DisputeType.FRAUD
+    transaction_executed_accidently = DisputeType.CHARGEBACK
+    other = DisputeType.RETRIEVAL
