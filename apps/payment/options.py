@@ -352,7 +352,7 @@ class PaymentProcess(ChoiceEnum):
 
 
 class DisputeStatus(ChoiceCharEnum):
-    OPEN = "open", _("Open")
+    REVIEW_WAITING = "review_waiting", _("Waiting for review")
     INTERNAL_REVIEW = "internal_review", _("Internal Review")
     BANK_REVIEW = "bank_review", _("Bank Review")
     MERCHANT_REVIEW = "merchant_review", _("Merchany Review")

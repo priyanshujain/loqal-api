@@ -346,7 +346,7 @@ class DisputeTransaction(AbstractBaseModel):
         editable=False,
     )
     status = ChoiceCharEnumField(
-        enum_type=DisputeStatus, default=DisputeStatus.OPEN, max_length=64
+        enum_type=DisputeStatus, default=DisputeStatus.REVIEW_WAITING, max_length=64
     )
     is_closed = models.BooleanField(default=False)
     dispute_type = ChoiceCharEnumField(
