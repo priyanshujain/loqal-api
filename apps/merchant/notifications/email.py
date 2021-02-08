@@ -16,7 +16,7 @@ class MemberSignupInviteEmail:
         first_name = self.invite.first_name
 
         try:
-            company_name = self.invite.merchant.merchantprofile.full_name
+            company_name = self.invite.merchant.profile.full_name
         except AttributeError:
             company_name = "your company's loqal account"
         # Sending invited client email.
@@ -28,5 +28,5 @@ class MemberSignupInviteEmail:
 
         email_html = render_to_string("member_signup_invite.html", render_data)
         send_email_async(
-            (invite_email), "Signup invite for Spotlight Account", email_html
+            (invite_email), "Signup invite for Loqal Account", email_html
         )

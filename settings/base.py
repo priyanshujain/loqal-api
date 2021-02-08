@@ -59,6 +59,8 @@ LOCAL_APPS = [
     "apps.order",
     "apps.notification",
     "apps.support",
+    "apps.metrics",
+    "apps.marketing",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + VENDOR_APPS + LOCAL_APPS
@@ -256,6 +258,7 @@ REST_FRAMEWORK = {
         "anon_sustained": "100/day",
         "login": "10/min",
     },
+    "NON_FIELD_ERRORS_KEY": "detail",
 }
 
 
@@ -320,6 +323,14 @@ CELERY_BROKER_URL = REDIS_URL
 # TASK_SERIALIZER = "json"
 # RESULT_SERIALIZER = "json"
 # TIMEZONE = "UTC"
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+
+CELERY_ROUTES = {
+    "apps.provider.services.process_webhook.tasks.process_webhook_event": {
+        "queue": "psp_webhook"
+    },
+}
 
 
 CORS_ORIGIN_REGEX_WHITELIST = []
@@ -393,7 +404,7 @@ SPOTLIGHT_ADMIN_EMAIL = env("SPOTLIGHT_ADMIN_EMAIL")
 MANAGERS = (("Priyanshu Jain", "priyanshu@spotlightandcompany.com"),)
 ADMINS = MANAGERS
 
-APP_NAME = env("APP_NAME", default="Spotlight")
+APP_NAME = env("APP_NAME", default="Loqal")
 
 
 USE_CUSTOM_BIG_INTS = False
@@ -412,10 +423,20 @@ MAX_AVATAR_SIZE = 5000000
 
 # Transaction settings
 MIN_BANK_ACCOUNT_BALANCE_REQUIRED = 100.00
-DEFAULT_MAX_DIGITS = 5
+DEFAULT_MAX_DIGITS = 6
 DEFAULT_DECIMAL_PLACES = 2
 
 
 # Firebase settings
 FCM_SERVER_KEY = env("FCM_SERVER_KEY")
 FCM_SERVER = "https://fcm.googleapis.com/fcm/send"
+
+
+# Twilio settings
+TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
+DEFAULT_PHONE_REGION = "IN"
+
+
+# Setup
+INITIAL_ADMIN_PASSWORD = env("INITIAL_ADMIN_PASSWORD")

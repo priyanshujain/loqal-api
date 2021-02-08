@@ -25,15 +25,9 @@ class BeneficialOwnerSerializer(serializers.ModelSerializer):
 
 
 class OnboardingDataSerializer(serializers.ModelSerializer):
-    incorporation_details = IncorporationDetailsSerializer(
-        source="incorporationdetails", read_only=True
-    )
-    controller_details = ControllerDetailsSerializer(
-        source="controllerdetails", read_only=True
-    )
-    beneficial_owners = BeneficialOwnerSerializer(
-        source="beneficialowner_set", many=True, read_only=True
-    )
+    incorporation_details = IncorporationDetailsSerializer(read_only=True)
+    controller_details = ControllerDetailsSerializer(read_only=True)
+    beneficial_owners = BeneficialOwnerSerializer(many=True, read_only=True)
 
     class Meta:
         model = MerchantAccount

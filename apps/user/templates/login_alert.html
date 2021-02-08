@@ -2,12 +2,12 @@
 
 
 {% block title %}
-Log In alert for Spotlight
+Log In alert for Loqal
 {% endblock %}
 
 
 {% block preheader %}
-Log In alert for Spotlight
+Log In alert for Loqal
 {% endblock %}
 
 
@@ -15,17 +15,17 @@ Log In alert for Spotlight
 {% block message %}
 Hi,
 <p>
-  Your security is very important to us. This email address was used to sign in to the Loqal app.
+  Your security is very important to us. This email address was used to sign in to the Loqal.
   You are getting this email to make sure it was you.
 </p>
 <br />
 Email: {{ email }} <br />
-Browser: {{ browser }} on {{ os_name }} <br />
+<!-- Browser: {{ browser }} on {{ os_name }} <br /> -->
 IP Address: {{ ip }} <br />
 Time: {{ last_activity }}
 
 <p style="margin-top: 32px;">
   If this was you, you can ignore this alert. If you suspect any suspicious activity on your account, please change your
   password and enable two-factor authentication.
-
+</p>
 {% endblock %}

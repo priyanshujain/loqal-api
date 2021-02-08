@@ -7,13 +7,17 @@ from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
 from apps.merchant.services import CreateDefaultRoles
+from apps.payment.dbapi import create_payment_register
 from apps.user.dbapi import create_user, get_user_by_email
+
+from .accept_merchant_terms import AcceptTerms
 
 __all__ = ("CreateMerchantAccount",)
 
 
 class CreateMerchantAccount(ServiceBase):
-    def __init__(self, data):
+    def __init__(self, data, request):
+        self.request = request
         self._first_name = data["first_name"]
         self._last_name = data["last_name"]
         self._email = data["email"]
@@ -23,6 +27,8 @@ class CreateMerchantAccount(ServiceBase):
         self._address = data["address"]
         self._category = data["category"]
         self._sub_category = data["sub_category"]
+        self._consent_timestamp = data["consent_timestamp"]
+        self._payment_terms_url = data["payment_terms_url"]
 
     def handle(self):
         self._validate_data()
@@ -36,7 +42,8 @@ class CreateMerchantAccount(ServiceBase):
             merchant_id=merchant_account.id,
             member_role_id=admin_role.id,
         )
-        self._send_verfication_email(user=user)
+        self._send_verification_email(user=user)
+        self._send_accepted_terms(account=merchant_account.account, user=user)
         return account_member
 
     def _validate_data(self):
@@ -45,7 +52,9 @@ class CreateMerchantAccount(ServiceBase):
             raise ValidationError(
                 {
                     "email": [
-                        ErrorDetail(_("User with this email already exists."))
+                        ErrorDetail(
+                            _("A user with this email already exists.")
+                        )
                     ]
                 }
             )
@@ -60,7 +69,11 @@ class CreateMerchantAccount(ServiceBase):
             sub_category=self._sub_category,
             phone_number=self._contact_number,
         )
+        self._factory_payment_register(account_id=merchant_account.account.id)
         return merchant_account
+
+    def _factory_payment_register(self, account_id):
+        create_payment_register(account_id=account_id)
 
     def _factory_user(self):
         return create_user(
@@ -75,5 +88,16 @@ class CreateMerchantAccount(ServiceBase):
         service = CreateDefaultRoles(merchant_id=merchant_id)
         service.handle()
 
-    def _send_verfication_email(self, user):
+    def _send_verification_email(self, user):
         SendMerchantAccountVerifyEmail(user=user).send()
+
+    def _send_accepted_terms(self, account, user):
+        AcceptTerms(
+            request=self.request,
+            account=account,
+            user=user,
+            data={
+                "consent_timestamp": self._consent_timestamp,
+                "payment_terms_url": self._payment_terms_url,
+            },
+        ).handle()

@@ -2,15 +2,18 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.utils.dates import InvalidParams, get_date_range_from_params
-from api.views import ConsumerAPIView, MerchantAPIView
-from apps.payment.dbapi import (get_consumer_dispute_by_transaction,
+from api.views import ConsumerAPIView, MerchantAPIView, StaffAPIView
+from apps.payment.dbapi import (get_all_disputes,
+                                get_consumer_dispute_by_transaction,
                                 get_dispute_by_id, get_merchant_disputes)
 from apps.payment.dbapi.payment import get_consumer_transaction
 from apps.payment.options import DisputeReasonType
 from apps.payment.responses import (ConsumerDisputeDetailsResponse,
                                     DisputeHistoryResponse,
-                                    MerchantDisputeDetailsResponse)
-from apps.payment.services import CreateDispute
+                                    MerchantDisputeDetailsResponse,
+                                    StaffDisputeDetailsResponse)
+from apps.payment.services import (ChangeDisputeStatus, CloseDispute,
+                                   CreateDispute)
 
 
 class DisputeListAPI(MerchantAPIView):
@@ -90,3 +93,25 @@ class MerchantDisputeDetailsAPI(MerchantAPIView):
         if not dispute:
             raise ValidationError({"detail": ErrorDetail(_("No dispute."))})
         return self.response(MerchantDisputeDetailsResponse(dispute).data)
+
+
+class ChangeDisputeStatusAPI(StaffAPIView):
+    def post(self, request, dispute_id):
+        ChangeDisputeStatus(
+            dispute_id=dispute_id, data=self.request_data
+        ).handle()
+        return self.response(status=204)
+
+
+class CloseDisputeAPI(StaffAPIView):
+    def post(self, request, dispute_id):
+        CloseDispute(dispute_id=dispute_id, data=self.request_data).handle()
+        return self.response(status=204)
+
+
+class GetAllDisputeAPI(StaffAPIView):
+    def get(self, request):
+        disputes = get_all_disputes()
+        return self.response(
+            StaffDisputeDetailsResponse(disputes, many=True).data
+        )

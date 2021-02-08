@@ -1,3 +1,8 @@
+import re
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from api.exceptions import NotAuthenticated, PermissionDenied
 from apps.account.dbapi import get_consumer_account
 
@@ -8,6 +13,10 @@ class ConsumerAPIView(APIAccessLogView):
     """
     ConsumerAPIView
     """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConsumerAPIView, self).dispatch(request, *args, **kwargs)
 
     def initialize_request(self, request, *args, **kwargs):
         """
@@ -26,9 +35,15 @@ class ConsumerAPIView(APIAccessLogView):
 
         consumer_account = get_consumer_account(user_id=user.id)
         if not consumer_account:
-            exception_message = "User is not valid"
+            exception_message = "Account is not valid"
         else:
+            if not consumer_account.account:
+                exception_message = "Account is not valid"
             request.account = consumer_account.account
+
+            if not request.account.is_active:
+                exception_message = "Your account has been de-activated. Please contact our support team."
+                exception_class = PermissionDenied
             request.consumer_account = consumer_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)
@@ -42,6 +57,12 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
     """
     ConsumerAPIView
     """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConsumerPre2FaAPIView, self).dispatch(
+            request, *args, **kwargs
+        )
 
     def initialize_request(self, request, *args, **kwargs):
         """
@@ -59,6 +80,9 @@ class ConsumerPre2FaAPIView(APIAccessLogView):
             exception_message = "User is not valid"
         else:
             request.account = consumer_account.account
+            if not request.account.is_active:
+                exception_message = "Your account has been de-activated. Please contact our support team."
+                exception_class = PermissionDenied
             request.consumer_account = consumer_account
 
         drf_request = super().initialize_request(request, *args, **kwargs)

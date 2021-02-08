@@ -8,6 +8,7 @@ __all__ = (
     "SendConsumerAccountVerifyEmail",
     "SendMerchantAccountVerifyEmail",
     "SendConsumerTermsEmail",
+    "SendMerchantTermsEmail",
 )
 
 
@@ -46,7 +47,30 @@ class SendConsumerTermsEmail(object):
         )
         send_email_async(
             to_emails=(user.email),
-            subject="Accepted Terms of Service and Privacy Policy",
+            subject="Payment terms agreement with you",
+            content=email_html,
+            file_path=self.file_path,
+            file_name="payment_terms.pdf",
+        )
+
+
+class SendMerchantTermsEmail(object):
+    def __init__(self, user, file_path):
+        self.user = user
+        self.file_path = file_path
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        user = self.user
+        render_data = {}
+        email_html = render_to_string(
+            "merchant_terms_consent.html", render_data
+        )
+        send_email_async(
+            to_emails=(user.email),
+            subject="Payment terms agreement with you",
             content=email_html,
             file_path=self.file_path,
             file_name="payment_terms.pdf",

@@ -10,8 +10,9 @@ from apps.account.dbapi import (get_consumer_account_by_phone_number,
 from apps.banking.dbapi import get_bank_account
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_payment, create_payment_request,
-                                get_payment_reqeust_by_id)
-from apps.payment.dbapi.events import (capture_payment_event,
+                                get_payment_reqeust_by_uid)
+from apps.payment.dbapi.events import (cancelled_payment_event,
+                                       capture_payment_event,
                                        initiate_payment_event)
 from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
                                   TransactionType)
@@ -21,7 +22,7 @@ from apps.payment.validators import (ApprovePaymentRequestValidator,
 from apps.provider.options import DEFAULT_CURRENCY
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = (
     "CreatePaymentRequest",
@@ -67,7 +68,7 @@ class CreatePaymentRequest(ServiceBase):
                 }
             )
         try:
-            merchant_account = bank_account.account.merchantaccount
+            merchant_account = bank_account.account.merchant
         except AttributeError:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid account."))}
@@ -93,7 +94,6 @@ class CreatePaymentRequest(ServiceBase):
             payment_id=payment.id,
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
-            order_id=order.id,
         )
 
 
@@ -113,24 +113,22 @@ class ApprovePaymentRequest(ServiceBase):
         payment_request = data["payment_request"]
 
         try:
-            merchant_account = payment_request.account.merchantaccount
+            merchant_account = payment_request.account_from.merchant
         except AttributeError:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid payment request."))}
             )
 
         total_amount = payment_request.amount + data["tip_amount"]
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.account_id,
             receiver_account_id=merchant_account.account.id,
-            total_amount=total_amount,
         ).validate()
 
         transaction = CreatePayment(
             account_id=self.account_id,
             ip_address=self.ip_address,
             sender_bank_account=banking_data["sender_bank_account"],
-            sender_bank_balance=banking_data["sender_bank_balance"],
             receiver_bank_account=banking_data["receiver_bank_account"],
             order=payment_request.payment.order,
             total_amount=total_amount,
@@ -142,16 +140,18 @@ class ApprovePaymentRequest(ServiceBase):
             payment_id=transaction.payment.id,
             transaction_tracking_id=transaction.transaction_tracking_id,
         )
-        payment_request.add_transaction(transaction=transaction)
-        return transaction
+        payment_request.add_transaction(
+            transaction=transaction, tip_amount=data["tip_amount"]
+        )
+        return payment_request
 
     def _validate_data(self):
         data = run_validator(ApprovePaymentRequestValidator, data=self.data)
         payment_request_id = data["payment_request_id"]
 
-        payment_request = get_payment_reqeust_by_id(
+        payment_request = get_payment_reqeust_by_uid(
             payment_request_id=payment_request_id,
-            requested_to_id=self.account_id,
+            account_to_id=self.account_id,
         )
         if not payment_request:
             raise ValidationError(
@@ -163,7 +163,7 @@ class ApprovePaymentRequest(ServiceBase):
             )
         if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Payment request is expired."))}
+                {"detail": [ErrorDetail(_("Payment request is expired."))]}
             )
         data["payment_request"] = payment_request
         return data
@@ -181,12 +181,14 @@ class RejectPaymentRequest(ServiceBase):
     def handle(self):
         payment_request = self._validate_data()
         payment_request.reject()
+        cancelled_payment_event(payment_id=payment_request.payment.id)
+        return payment_request
 
     def _validate_data(self):
         data = run_validator(RejectPaymentRequestValidator, data=self.data)
         payment_request_id = data["payment_request_id"]
 
-        payment_request = get_payment_reqeust_by_id(
+        payment_request = get_payment_reqeust_by_uid(
             payment_request_id=payment_request_id,
             account_to_id=self.account_id,
         )

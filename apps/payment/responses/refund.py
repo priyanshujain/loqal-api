@@ -47,6 +47,7 @@ class RefundHistoryResponse(serializers.ModelSerializer):
     currency = serializers.CharField(
         source="transaction.currency", read_only=True
     )
+    amount = serializers.CharField(read_only=True)
 
     class Meta:
         model = Refund

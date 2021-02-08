@@ -1,16 +1,25 @@
+from django.utils import datastructures
+
 from api.views import MerchantAPIView
 from apps.account.permissions import IsMerchantAccountPendingPermission
-from apps.account.responses.merchant import MerchantAccountProfileResponse
+from apps.account.responses.merchant import MerchantAccountStatusResponse
 from apps.merchant.options import BusinessDocumentType, IndividualDocumentType
-from apps.merchant.responses import OnboardingDataResponse
+from apps.merchant.responses import (ControllerVerificationDocumentResponse,
+                                     IncorporationVerificationDocumentResponse,
+                                     OnboardingDataResponse,
+                                     OnboardingStatusResponse,
+                                     OwnerVerificationDocumentResponse)
 from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     BusinessDocumentUpload,
+                                    CertifyDwollaMerchantAccount,
                                     ControllerDocumentUpload,
                                     CreateBeneficialOwner,
                                     CreateControllerDetails,
                                     CreateDwollaMerchantAccount,
                                     CreateIncorporationDetails,
                                     DocumentRequirements,
+                                    GetMerchantAccountStatus,
+                                    ProcessPendingOnboardingWebhooks,
                                     RemoveBeneficialOwner, SubmitDocuments,
                                     UpdateBeneficialOwner,
                                     UpdateControllerDetails,
@@ -115,7 +124,16 @@ class CreateBeneficialOwnerAPI(MerchantAPIView):
         beneficial_owner = CreateBeneficialOwner(
             merchant_id=merchant_id, data=data
         ).handle()
-        return self.response({"id": beneficial_owner.id}, status=201)
+        return self.response(
+            {
+                "id": beneficial_owner.id,
+                "status": {
+                    "label": beneficial_owner.status.label,
+                    "value": beneficial_owner.status.value,
+                },
+            },
+            status=201,
+        )
 
 
 class UpdateBeneficialOwnerAPI(MerchantAPIView):
@@ -123,13 +141,21 @@ class UpdateBeneficialOwnerAPI(MerchantAPIView):
     changes to beneficial owner data API
     """
 
-    permission_classes = (IsMerchantAccountPendingPermission,)
-
     def put(self, request):
         merchant_id = request.merchant_account.id
         data = self.request_data
-        UpdateBeneficialOwner(merchant_id=merchant_id, data=data).handle()
-        return self.response(status=204)
+        beneficial_owner = UpdateBeneficialOwner(
+            merchant_id=merchant_id, data=data
+        ).handle()
+        return self.response(
+            {
+                "id": beneficial_owner.id,
+                "status": {
+                    "label": beneficial_owner.status.label,
+                    "value": beneficial_owner.status.value,
+                },
+            }
+        )
 
 
 class RemoveBeneficialOwnerAPI(MerchantAPIView):
@@ -147,17 +173,20 @@ class RemoveBeneficialOwnerAPI(MerchantAPIView):
 
 
 class OnboardingDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
-
     def get(self, request):
         merchant_account = request.merchant_account
         data = OnboardingDataResponse(merchant_account).data
         return self.response(data)
 
 
-class SubmitKycDataAPI(MerchantAPIView):
-    permission_classes = (IsMerchantAccountPendingPermission,)
+class OnboardingStatusAPI(MerchantAPIView):
+    def get(self, request):
+        merchant_account = request.merchant_account
+        ProcessPendingOnboardingWebhooks(merchant=merchant_account).handle()
+        return self.response()
 
+
+class SubmitKycDataAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
         user = request.user
@@ -168,7 +197,7 @@ class SubmitKycDataAPI(MerchantAPIView):
             ip_address=ip_address,
         ).handle()
         return self.response(
-            MerchantAccountProfileResponse(updated_merchant_account).data
+            MerchantAccountStatusResponse(updated_merchant_account).data
         )
 
 
@@ -184,34 +213,45 @@ class DocumentRequirementsAPI(MerchantAPIView):
 class UpdateBusinessVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BusinessDocumentUpload(
+        document = BusinessDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response(
+            IncorporationVerificationDocumentResponse(document).data
+        )
 
 
 class UpdateControllerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        ControllerDocumentUpload(
+        document = ControllerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response(
+            ControllerVerificationDocumentResponse(document).data
+        )
 
 
 class UpdateOwnerVerificationDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
-        BeneficialOwnerDocumentUpload(
+        document = BeneficialOwnerDocumentUpload(
             merchant=merchant_account, data=self.request_data
         ).handle()
-        return self.response()
+        return self.response(OwnerVerificationDocumentResponse(document).data)
 
 
 class SubmitDocumentAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
         SubmitDocuments(merchant=merchant_account).handle()
+        return self.response()
+
+
+class CertifyOwnershipAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        CertifyDwollaMerchantAccount(merchant=merchant_account).handle()
         return self.response()
 
 

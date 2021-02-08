@@ -1,6 +1,5 @@
 from django.utils.translation import gettext as _
 
-import api
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
@@ -37,6 +36,7 @@ class CreateBankAccount(ServiceBase):
             bank_logo_base64=bank_logo_base64,
             name=account_name,
         )
+        bank_account.set_plaid_verified()
 
         plaid_processor_token = plaid_item["plaid_processor_token"]
         dwolla_account_data = self._send_to_dwolla(
@@ -45,7 +45,10 @@ class CreateBankAccount(ServiceBase):
         dwolla_funding_source_id = dwolla_account_data[
             "dwolla_funding_source_id"
         ]
-        bank_account.add_dwolla_id(dwolla_id=dwolla_funding_source_id)
+        status = dwolla_account_data["status"]
+        bank_account.add_dwolla_id(
+            dwolla_id=dwolla_funding_source_id, status=status
+        )
         return bank_account
 
     def _validate_data(self):
@@ -64,9 +67,14 @@ class CreateBankAccount(ServiceBase):
         if not access_token:
             raise ValidationError(
                 {
-                    "detail": ErrorDetail(
+                    "message": ErrorDetail(
                         _("plaid_public_token has been expired.")
-                    )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your bank account couldn't be verified. Please try again later."
+                        )
+                    ),
                 }
             )
         bank_account = plaid.get_bank_account(
@@ -74,7 +82,16 @@ class CreateBankAccount(ServiceBase):
         )
         if not bank_account:
             raise ValidationError(
-                {"detail": ErrorDetail(_("plaid_account_id is not valid."))}
+                {
+                    "message": ErrorDetail(
+                        _("plaid_account_id is not valid.")
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your bank account couldn't be verified. Please try again later."
+                        )
+                    ),
+                }
             )
         processor_token = plaid.get_dwolla_processor_token(
             access_token=access_token, account_id=plaid_account_id
@@ -122,13 +139,20 @@ class CreateBankAccountAPIAction(ProviderAPIActionBase):
         if self.get_errors(response):
             raise ProviderAPIException(
                 {
-                    "detail": ErrorDetail(
+                    "message": ErrorDetail(
                         _(
                             "Banking service failed, Please try "
                             "again. If the problem persists please "
                             "contact our support team."
                         )
-                    )
+                    ),
+                    "detail": ErrorDetail(
+                        _(
+                            "Your bank account couldn't be verified, Please try "
+                            "again later. If the problem persists, please "
+                            "contact our support team."
+                        )
+                    ),
                 }
             )
         return {
@@ -136,4 +160,5 @@ class CreateBankAccountAPIAction(ProviderAPIActionBase):
             "dwolla_funding_source_id": response["data"][
                 "dwolla_funding_source_id"
             ],
+            "status": response["data"]["status"],
         }

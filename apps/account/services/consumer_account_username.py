@@ -22,7 +22,17 @@ class CheckAccountUsername(object):
         ]
         if username == self.consumer_account.username:
             raise ValidationError(
-                {"detail": ErrorDetail(_("You already have this username."))}
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "This is your current username. "
+                            "Please choose a different username."
+                        )
+                    ),
+                    "message": ErrorDetail(
+                        _("You already use this username.")
+                    ),
+                }
             )
         if check_account_username(username=username):
             return {"available": False}

@@ -32,6 +32,18 @@ class GetUserProfileAPI(APIView):
         if not account_member:
             return self.response()
 
+        if user.is_disabled:
+            return self.response(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            "You member account has been disabled please contact our support team."
+                        )
+                    )
+                },
+                status=403,
+            )
+
         return self.response(MemberProfileResponse(account_member).data)
 
 

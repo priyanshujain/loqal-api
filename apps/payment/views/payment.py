@@ -6,8 +6,16 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
-                                get_recent_store_orders)
+                                get_recent_store_orders, transaction)
+from apps.payment.notifications import (SendApproveRequestNotification,
+                                        SendNewPaymentNotification,
+                                        SendNewPaymentRequestNotification,
+                                        SendRefundNotification,
+                                        SendRejectRequestNotification)
+from apps.payment.notifications.email import (RefundReceivedEmail,
+                                              SendPaymentInitiatedEmail)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
                                     RefundHistoryResponse,
@@ -31,6 +39,19 @@ class CreatePaymentAPI(ConsumerAPIView):
             merchant_payment.transaction
         ).data
         transaction_data["tip_amount"] = merchant_payment.tip_amount
+        payment_notification_data = MerchantTransactionHistoryResponse(
+            merchant_payment.transaction
+        ).data
+        payment_notification_data["tip_amount"] = str(
+            merchant_payment.tip_amount
+        )
+        SendNewPaymentNotification(
+            merchant_id=merchant_payment.payment.order.merchant.id,
+            data=payment_notification_data,
+        ).send()
+        SendPaymentInitiatedEmail(
+            transaction=merchant_payment.transaction
+        ).send()
         return self.response(transaction_data, status=201)
 
 
@@ -65,6 +86,10 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         payment_request = CreatePaymentRequest(
             account_id=account_id, data=self.request_data
         ).handle()
+        SendNewPaymentRequestNotification(
+            user_id=payment_request.account_to.consumer.user.id,
+            data=ConsumerPaymentRequestResponse(payment_request).data,
+        ).send()
         return self.response(
             PaymentRequestResponse(payment_request).data, status=201
         )
@@ -73,27 +98,64 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class ApprovePaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        transaction = ApprovePaymentRequest(
+        payment_request = ApprovePaymentRequest(
             account_id=account_id,
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        return self.response(TransactionResponse(transaction).data)
+        transaction_data = TransactionHistoryResponse(
+            payment_request.transaction
+        ).data
+        transaction_data["tip_amount"] = payment_request.tip_amount
+        payment_notification_data = MerchantTransactionHistoryResponse(
+            payment_request.transaction
+        ).data
+        payment_notification_data["tip_amount"] = str(
+            payment_request.tip_amount
+        )
+        SendNewPaymentNotification(
+            merchant_id=payment_request.payment.order.merchant.id,
+            data=payment_notification_data,
+        ).send()
+        SendApproveRequestNotification(
+            merchant_id=payment_request.payment.order.merchant.id,
+            data={
+                "payment_request_id": str(payment_request.u_id),
+                "payment_id": payment_request.payment.payment_tracking_id,
+            },
+        ).send()
+        SendPaymentInitiatedEmail(
+            transaction=payment_request.transaction
+        ).send()
+        return self.response(transaction_data)
 
 
 class RejectPaymentRequestAPI(ConsumerAPIView):
     def post(self, request):
         account_id = request.account.id
-        RejectPaymentRequest(
+        payment_request = RejectPaymentRequest(
             account_id=account_id, data=self.request_data
         ).handle()
+        SendRejectRequestNotification(
+            merchant_id=payment_request.payment.order.merchant.id,
+            data={
+                "payment_request_id": str(payment_request.u_id),
+                "payment_id": payment_request.payment.payment_tracking_id,
+            },
+        ).send()
         return self.response()
 
 
 class ListMerchantPaymentRequestAPI(MerchantAPIView):
     def get(self, request):
         account_id = request.account.id
-        payment_requests = get_merchant_payment_reqeust(account_id=account_id)
+        pending = self.request_data.get("pending")
+        is_pending = False
+        if pending == "true":
+            is_pending = True
+        payment_requests = get_merchant_payment_reqeust(
+            account_id=account_id, is_pending=is_pending
+        )
         return self.response(
             PaymentRequestResponse(payment_requests, many=True).data
         )
@@ -102,7 +164,13 @@ class ListMerchantPaymentRequestAPI(MerchantAPIView):
 class ListConsumerPaymentRequestAPI(ConsumerAPIView):
     def get(self, request):
         account_id = request.account.id
-        payment_requests = get_consumer_payment_reqeust(account_id=account_id)
+        pending = self.request_data.get("pending")
+        is_pending = False
+        if pending == "true":
+            is_pending = True
+        payment_requests = get_consumer_payment_reqeust(
+            account_id=account_id, is_pending=is_pending
+        )
         return self.response(
             ConsumerPaymentRequestResponse(payment_requests, many=True).data
         )
@@ -116,6 +184,11 @@ class CreateRefundPaymentAPI(MerchantAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
+        data = TransactionHistoryResponse(refund_payment.transaction).data
+        SendRefundNotification(
+            user_id=refund_payment.payment.order.consumer.user.id, data=data
+        ).send()
+        RefundReceivedEmail(transaction=refund_payment.transaction).send()
         return self.response(
             RefundHistoryResponse(refund_payment).data, status=201
         )

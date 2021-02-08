@@ -58,3 +58,33 @@ class ListWebhookEventsResponse(serializers.ModelSerializer):
             "target_resource_dwolla_id",
             "id",
         )
+
+
+class ListMerchantWebhookEventsResponse(serializers.ModelSerializer):
+    class Meta:
+        model = ProviderWebhookEvent
+        fields = (
+            "event_timestamp",
+            "is_processed",
+            "topic",
+            "created_at",
+            "updated_at",
+            "id",
+        )
+
+
+class WebhookEventDetailsResponse(serializers.ModelSerializer):
+    class Meta:
+        model = ProviderWebhookEvent
+        fields = (
+            "event_timestamp",
+            "is_processed",
+            "topic",
+            "created_at",
+            "updated_at",
+            "event_payload",
+            "dwolla_id",
+            "is_processed",
+            "target_resource_dwolla_id",
+            "id",
+        )

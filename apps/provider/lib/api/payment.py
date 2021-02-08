@@ -11,3 +11,9 @@ class Payment(API):
         return self.execute_request(
             request_method=request_method, request_kwargs=kwargs
         )
+
+    def get_payment_failure(self, **kwargs):
+        request_method = self.psp_client.payment.get_payment_failure
+        return self.execute_request(
+            request_method=request_method, request_kwargs=kwargs
+        )

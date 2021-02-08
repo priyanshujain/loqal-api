@@ -67,11 +67,14 @@ class ContainsUppercaseValidator(object):
             )
 
     def get_help_text(self):
-        return ngettext(
-            "Your password must contain at least %(min_uppercase)d uppercase character.",
-            "Your password must contain at least %(min_uppercase)d uppercase characters.",
-            self.min_uppercase,
-        ) % {"min_uppercase": self.min_uppercase}
+        return (
+            ngettext(
+                "Your password must contain at least %(min_uppercase)d uppercase character.",
+                "Your password must contain at least %(min_uppercase)d uppercase characters.",
+                self.min_uppercase,
+            )
+            % {"min_uppercase": self.min_uppercase}
+        )
 
 
 class ContainsLowercaseValidator(object):
@@ -91,11 +94,14 @@ class ContainsLowercaseValidator(object):
             )
 
     def get_help_text(self):
-        return ngettext(
-            "Your password must contain at least %(min_lowercase)d lowercase character.",
-            "Your password must contain at least %(min_lowercase)d lowercase characters.",
-            self.min_lowercase,
-        ) % {"min_lowercase": self.min_lowercase}
+        return (
+            ngettext(
+                "Your password must contain at least %(min_lowercase)d lowercase character.",
+                "Your password must contain at least %(min_lowercase)d lowercase characters.",
+                self.min_lowercase,
+            )
+            % {"min_lowercase": self.min_lowercase}
+        )
 
 
 class ContainsSpecialCharactersValidator(object):
@@ -116,11 +122,14 @@ class ContainsSpecialCharactersValidator(object):
             )
 
     def get_help_text(self):
-        return ngettext(
-            "Your password must contain at least %(min_characters)d special character.",
-            "Your password must contain at least %(min_characters)d special characters.",
-            self.min_characters,
-        ) % {"min_characters": self.min_characters}
+        return (
+            ngettext(
+                "Your password must contain at least %(min_characters)d special character.",
+                "Your password must contain at least %(min_characters)d special characters.",
+                self.min_characters,
+            )
+            % {"min_characters": self.min_characters}
+        )
 
 
 class ContainsDigitsValidator(object):
@@ -140,8 +149,11 @@ class ContainsDigitsValidator(object):
             )
 
     def get_help_text(self):
-        return ngettext(
-            "Your password must contain at least %(min_digits)d number.",
-            "Your password must contain at least %(min_digits)d numbers.",
-            self.min_digits,
-        ) % {"min_digits": self.min_digits}
+        return (
+            ngettext(
+                "Your password must contain at least %(min_digits)d number.",
+                "Your password must contain at least %(min_digits)d numbers.",
+                self.min_digits,
+            )
+            % {"min_digits": self.min_digits}
+        )

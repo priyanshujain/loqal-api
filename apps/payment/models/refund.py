@@ -54,6 +54,13 @@ class Refund(AbstractBaseModel):
         if save:
             self.save()
 
+    def set_refund_failed(self, transaction=None, save=True):
+        if transaction:
+            self.transaction = transaction
+        self.status = RefundStatus.FAILED
+        if save:
+            self.save()
+
     def save(self, *args, **kwargs):
         def id_generator():
             return get_random_string(

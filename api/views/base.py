@@ -18,6 +18,7 @@ from api.exceptions import (APIException, AuthenticationFailed,
                             NotAuthenticated, ParseError, PermissionDenied,
                             UnsupportedMediaType, ValidationError)
 from apps.tracking.dbapi import create_api_access_log
+from apps.tracking.models import UserIP
 from apps.user.dbapi import get_session
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ class APIView(View):
     )
     renderer_classes = (JSONRenderer,)
     skip_request_logging = False
+    user_session = None
 
     def __init__(self, **args):
         self.started_at = timezone.now()
@@ -102,6 +104,7 @@ class APIView(View):
                 current_session.update_latest(
                     last_activity=session["last_activity"]
                 )
+                self.user_session = current_session
 
     def finalize_response(self, request, response, *args, **kwargs):
 
@@ -136,6 +139,10 @@ class APIView(View):
         if not self.response_count is None:
             response["X-Total"] = int(self.response_count)
 
+        if request.user.is_authenticated:
+            UserIP.log(
+                request.user, request.ip, request.session["cf_ip_country"]
+            )
         return response
 
     def response(self, data=None, total=0, status=200):
@@ -181,7 +188,7 @@ class APIView(View):
             limit = int(request.GET.get("limit", "10"))
         except ValueError:
             limit = 10
-        if limit < 0 or limit > 250:
+        if limit < 0 or limit > 25:
             limit = 10
         try:
             offset = int(request.GET.get("offset", "0"))
@@ -267,12 +274,17 @@ class APIAccessLogView(APIView):
             )
             if self._clean_credentials(query_params) == {}:
                 self.log.update({"query_params": self.log["data"]})
+
+            access_log = None
             try:
-                self.handle_log()
+                access_log = self.handle_log()
             except Exception:
                 # ensure that all exceptions raised by handle_log
                 # doesn't prevent API call to continue as expected
                 logger.exception("Logging API call raise exception!")
+
+            if access_log:
+                response["X-Request-Id"] = access_log.u_id
 
         return response
 
@@ -363,7 +375,7 @@ class APIAccessLogView(APIView):
         return data
 
     def handle_log(self):
-        create_api_access_log(**self.log)
+        return create_api_access_log(**self.log)
 
 
 class LoggedInAPIView(APIAccessLogView):

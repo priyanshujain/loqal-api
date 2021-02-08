@@ -19,7 +19,7 @@ class FcmPlugin(object):
         title=None,
         body=None,
         icon=None,
-        data=None,
+        data_message=None,
         sound=None,
         badge=None,
         low_priority=False,
@@ -41,7 +41,6 @@ class FcmPlugin(object):
         api_key=None,
         json_encoder=None,
         extra_notification_kwargs=None,
-        **kwargs
     ):
 
         """
@@ -96,7 +95,7 @@ class FcmPlugin(object):
             message_title=title,
             message_body=body,
             message_icon=icon,
-            data_message=data,
+            data_message=data_message,
             sound=sound,
             badge=badge,
             collapse_key=collapse_key,
@@ -116,7 +115,6 @@ class FcmPlugin(object):
             content_available=content_available,
             extra_kwargs=extra_kwargs,
             extra_notification_kwargs=extra_notification_kwargs,
-            **kwargs
         )
 
         # do not raise errors, pyfcm will raise exceptions if response status will

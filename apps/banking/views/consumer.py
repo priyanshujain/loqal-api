@@ -1,7 +1,13 @@
+from django.utils.translation import gettext as _
+
+from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView
 from apps.banking.dbapi import get_bank_account
+from apps.banking.options import BankAccountStatus
 from apps.banking.response import BankAccountResponse
-from apps.banking.services import CreateBankAccount, PlaidLink
+from apps.banking.services import (CreateBankAccount, PlaidLink,
+                                   ReAuthBankAccount, RemoveBankAccount)
+from apps.banking.services.remove_bank_account import RemoveBankAccount
 
 
 class CreateBankAccountAPI(ConsumerAPIView):
@@ -35,5 +41,44 @@ class GetBankAccountAPI(ConsumerAPIView):
 class PlaidLinkTokenAPI(ConsumerAPIView):
     def get(self, request):
         account = request.account
-        token = PlaidLink(account_uid=account.u_id.hex).token
+        bank_account = get_bank_account(account_id=account.id)
+        if bank_account and bank_account.plaid_access_token:
+            token = PlaidLink(
+                account_uid=account.u_id.hex,
+                access_token=bank_account.plaid_access_token,
+            ).token
+        else:
+            token = PlaidLink(account_uid=account.u_id.hex).token
         return self.response({"token": token})
+
+
+class ReAuthBankAccountAPI(ConsumerAPIView):
+    def post(self, request):
+        account = request.account
+        bank_account = get_bank_account(account_id=account.id)
+        if not bank_account:
+            raise ValidationError(
+                {"detail": ErrorDetail("Bank account does not exist.")}
+            )
+
+        if bank_account.plaid_status == BankAccountStatus.VERIFIED:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "This bank account has already been verified "
+                        "and is ready to make payments."
+                    )
+                }
+            )
+
+        bank_account = ReAuthBankAccount(
+            bank_account=bank_account, data=self.request_data
+        ).handle()
+        return self.response()
+
+
+class RemoveBankAccountAPI(ConsumerAPIView):
+    def post(self, request):
+        account = request.account
+        RemoveBankAccount(account_id=account.id).handle()
+        return self.response()

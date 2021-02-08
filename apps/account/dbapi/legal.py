@@ -14,7 +14,6 @@ def create_payment_account_consent(
     user_agent,
     ip_address,
     consent_timestamp,
-    payment_term_document_id,
 ):
     try:
         return PaymentAccountOpeningConsent.objects.create(
@@ -23,7 +22,6 @@ def create_payment_account_consent(
             user_agent=user_agent,
             ip_address=ip_address,
             consent_timestamp=consent_timestamp,
-            payment_term_document_id=payment_term_document_id,
         )
     except IntegrityError:
         return None

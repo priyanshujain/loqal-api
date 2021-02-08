@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from apps.account.options import MerchantAccountStatus
+from apps.account.options import DwollaCustomerStatus
 
 
 class IsMerchantAccountPendingPermission(BasePermission):
@@ -16,7 +16,10 @@ class IsMerchantAccountPendingPermission(BasePermission):
         except AttributeError:
             return False
 
-        if merchant_account.account_status == MerchantAccountStatus.VERIFIED:
+        if (
+            merchant_account.account.dwolla_customer_status
+            == DwollaCustomerStatus.VERIFIED
+        ):
             return False
 
         return True
@@ -35,7 +38,10 @@ class IsMerchantAccountVerifiedPermission(BasePermission):
         except AttributeError:
             return False
 
-        if merchant_account.account_status != MerchantAccountStatus.VERIFIED:
+        if (
+            merchant_account.account.dwolla_customer_status
+            != DwollaCustomerStatus.VERIFIED
+        ):
             return False
 
         return True

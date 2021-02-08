@@ -1,6 +1,10 @@
+from typing import Iterable
+
 from django.conf import settings
 from plaid import Client
-from plaid.errors import InvalidInputError
+from plaid.errors import APIError, InvalidInputError, ItemError
+
+from .errors import PlaidBankUsernameExpired, PlaidFailed, PlaidReAuth
 
 
 class PlaidPlugin(object):
@@ -26,7 +30,7 @@ class PlaidPlugin(object):
     def client(self):
         return self._client
 
-    def create_link_token(self, user_account_id):
+    def create_link_token(self, user_account_id, access_token=None):
         """
         Exchange access_token with short lived public_token
 
@@ -37,20 +41,32 @@ class PlaidPlugin(object):
             - access_token: access_token will be stored into DB and will
                             use for further auth purpose
         """
+        data = {
+            "user": {
+                "client_user_id": user_account_id,
+            },
+            "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
+            "country_codes": ["US"],
+            "language": "en",
+            "account_filters": {
+                "depository": {
+                    "account_subtypes": [
+                        "checking",
+                    ],
+                },
+            },
+        }
+
+        if access_token:
+            data["access_token"] = access_token
+
+        if not access_token:
+            data["products"] = ["auth"]
+
         try:
-            self._link_token = self._client.LinkToken.create(
-                {
-                    "user": {
-                        "client_user_id": user_account_id,
-                    },
-                    "products": ["auth"],
-                    "client_name": getattr(
-                        settings, "PLAID_APP_NAME", "Loqal"
-                    ),
-                    "country_codes": ["US"],
-                    "language": "en",
-                }
-            ).get("link_token")
+            self._link_token = self._client.LinkToken.create(data).get(
+                "link_token"
+            )
         except InvalidInputError:
             return None
         return self._link_token
@@ -139,12 +155,30 @@ class PlaidPlugin(object):
         """
         Get institution name and logo for given institution_id
         """
-        accounts = self._client.Accounts.balance.get(
-            access_token=access_token,
-            account_ids=[account_id],
-        ).get(
-            "accounts",
-        )
+        try:
+            accounts = self._client.Accounts.balance.get(
+                access_token=access_token,
+                account_ids=[account_id],
+            ).get(
+                "accounts",
+            )
+        except ItemError as err:
+            if err.code == "ITEM_LOGIN_REQUIRED":
+                raise PlaidReAuth
+            elif err.code == "ITEM_NO_ERROR":
+                return self.get_balance(access_token, account_id)
+            elif err.code == "INVALID_UPDATED_USERNAME":
+                raise PlaidBankUsernameExpired
+            return
+        except APIError:
+            raise PlaidFailed
+
         if accounts and len(accounts) > 0:
             return float(accounts[0]["balances"]["available"])
         return None
+
+    def sandbox_reset_login(self, access_token):
+        try:
+            self._client.Sandbox.item.reset_login(access_token)
+        except ItemError:
+            raise PlaidReAuth

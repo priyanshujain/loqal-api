@@ -7,6 +7,7 @@ import pytz
 import six
 from dateutil.parser import parse
 from django.db import connections
+from rest_framework import ISO_8601
 
 DATE_TRUNC_GROUPERS = {"date": "day", "hour": "hour", "minute": "minute"}
 
@@ -110,3 +111,10 @@ def parse_stats_period(period):
             }[unit]: value
         }
     )
+
+
+def datetime_format(dt):
+    value = dt.isoformat()
+    if value.endswith("+00:00"):
+        value = value[:-6] + "Z"
+    return value

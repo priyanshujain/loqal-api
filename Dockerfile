@@ -8,9 +8,10 @@ RUN apt-get -y update \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt /app/
+COPY requirements/production.txt /app/
+COPY requirements/base.txt /app/
 WORKDIR /app
-RUN pip install -r requirements.txt
+RUN pip install -r production.txt
 
 ### Final image
 FROM python:3.9-slim
@@ -29,6 +30,8 @@ RUN apt-get update \
     libpangocairo-1.0-0 \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
     shared-mime-info \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -43,10 +46,12 @@ COPY . /app
 WORKDIR /app
 
 # RUN SECRET_KEY=dummy python3 manage.py collectstatic --no-input
+COPY ./deploy /scripts
+
+RUN chmod +x /scripts/*
 
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
 
-
-CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "wsgi:application"]
+CMD ["/scripts/entrypoint.sh"]

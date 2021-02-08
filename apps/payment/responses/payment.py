@@ -3,9 +3,11 @@ from decimal import Decimal
 from api import serializers
 from apps.account.models import Account, ConsumerAccount, MerchantAccount
 from apps.banking.models import BankAccount
+from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction)
+                                 PaymentRequest, Refund, Transaction,
+                                 transaction)
 from apps.payment.options import PaymentProcess
 
 __all__ = (
@@ -19,53 +21,57 @@ __all__ = (
     "TransactionHistoryResponse",
     "TransactionDetailsResponse",
     "RecentStoresResponse",
+    "TransactionErrorDetailsResponse",
+    "MerchantDetailsResponse",
 )
 
 
+class MerchantCategoryResponse(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantCategory
+        fields = (
+            "category",
+            "sub_categories",
+            "is_primary",
+        )
+
+
 class PaymentRequestMerchantDetailsResponse(serializers.ModelSerializer):
-    uid = serializers.UUIDField(source="u_id", read_only=True)
+    merchant_id = serializers.CharField(source="u_id", read_only=True)
     full_name = serializers.CharField(
-        source="merchantprofile.full_name", read_only=True
+        source="profile.full_name", read_only=True
     )
-    about = serializers.CharField(
-        source="merchantprofile.about", read_only=True
+    about = serializers.CharField(source="profile.about", read_only=True)
+    categories = MerchantCategoryResponse(many=True, read_only=True)
+    avatar_file_id = serializers.CharField(
+        source="profile.avatar_file.id", read_only=True
     )
-    category = serializers.CharField(
-        source="merchantprofile.category", read_only=True
-    )
-    sub_category = serializers.CharField(
-        source="merchantprofile.sub_category", read_only=True
-    )
-    hero_image = serializers.CharField(
-        source="merchantprofile.hero_image", read_only=True
-    )
-    address = serializers.JSONField(
-        source="merchantprofile.address", read_only=True
-    )
+    address = serializers.JSONField(source="profile.address", read_only=True)
 
     class Meta:
         model = MerchantAccount
         fields = (
-            "uid",
+            "merchant_id",
             "full_name",
             "about",
-            "category",
-            "sub_category",
-            "hero_image",
+            "categories",
             "address",
+            "avatar_file_id",
         )
 
 
+# TODO: fix categories
 class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
     merchant = PaymentRequestMerchantDetailsResponse(
-        source="account.merchantaccount", read_only=True
+        source="account_from.merchant", read_only=True
     )
     status = serializers.CharField(source="status.label", read_only=True)
+    payment_request_id = serializers.CharField(source="u_id", read_only=True)
 
     class Meta:
         model = PaymentRequest
         fields = (
-            "id",
+            "payment_request_id",
             "created_at",
             "merchant",
             "amount",
@@ -76,10 +82,13 @@ class ConsumerPaymentRequestResponse(serializers.ModelSerializer):
 
 class ConsumerBasicInfoResponse(serializers.ModelSerializer):
     first_name = serializers.CharField(
-        source="consumeraccount.user.first_name", read_only=True
+        source="consumer.user.first_name", read_only=True
     )
     last_name = serializers.CharField(
-        source="consumeraccount.user.last_name", read_only=True
+        source="consumer.user.last_name", read_only=True
+    )
+    loqal_id = serializers.CharField(
+        source="consumer.username", read_only=True
     )
 
     class Meta:
@@ -87,22 +96,28 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
         fields = (
             "first_name",
             "last_name",
+            "loqal_id",
         )
 
 
 class PaymentRequestResponse(serializers.ModelSerializer):
     status = serializers.CharField(source="status.label", read_only=True)
     account_to = ConsumerBasicInfoResponse(read_only=True)
+    payment_request_id = serializers.CharField(source="u_id", read_only=True)
+    payment_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
 
     class Meta:
         model = PaymentRequest
         fields = (
-            "id",
             "account_to",
             "created_at",
             "amount",
             "currency",
             "status",
+            "payment_id",
+            "payment_request_id",
         )
 
 
@@ -123,10 +138,10 @@ class ConsumerResponse(serializers.ModelSerializer):
 
 
 class MerchantTransactionResponse(serializers.ModelSerializer):
-    user = ConsumerResponse(
-        source="sender.account.consumeraccount", read_only=True
+    user = ConsumerResponse(source="sender.account.consumer", read_only=True)
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
     )
-    uid = serializers.CharField(source="u_id", read_only=True)
     status = serializers.CharField(source="status.label", read_only=True)
     payment_qrcode_id = serializers.CharField(
         source="payment_qrcode.qrcode_id", read_only=True
@@ -139,7 +154,7 @@ class MerchantTransactionResponse(serializers.ModelSerializer):
         model = Transaction
         fields = (
             "id",
-            "uid",
+            "transaction_id",
             "created_at",
             "user",
             "amount",
@@ -210,21 +225,14 @@ class RefundPaymentResponse(serializers.ModelSerializer):
 
 class MerchantDetailsResponse(serializers.ModelSerializer):
     full_name = serializers.CharField(
-        source="merchantprofile.full_name", read_only=True
+        source="profile.full_name", read_only=True
     )
-    category = serializers.CharField(
-        source="merchantprofile.category", read_only=True
-    )
-    sub_category = serializers.CharField(
-        source="merchantprofile.sub_category", read_only=True
-    )
-    address = serializers.JSONField(
-        source="merchantprofile.address", read_only=True
-    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
+    address = serializers.JSONField(source="profile.address", read_only=True)
 
     class Meta:
         model = MerchantAccount
-        fields = ("full_name", "category", "sub_category", "address")
+        fields = ("full_name", "categories", "address")
 
 
 class TransactionHistoryResponse(serializers.ModelSerializer):
@@ -295,6 +303,15 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     banks_details = serializers.SerializerMethodField("get_bank_details")
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
     is_credit = serializers.SerializerMethodField("is_credit_transaction")
+    failure_reason_type_label = serializers.CharField(
+        source="failure_reason_type.label", read_only=True
+    )
+    failure_reason_type_value = serializers.CharField(
+        source="failure_reason_type.value", read_only=True
+    )
+    merchant_rating = serializers.BooleanField(
+        source="merchant_rating.give_thanks", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -304,12 +321,17 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "currency",
             "payment_status",
             "payment_tracking_id",
+            "transaction_tracking_id",
             "is_success",
             "merchant",
             "banks_details",
             "is_credit",
             "tip_amount",
             "is_disputed",
+            "failure_reason_type_label",
+            "failure_reason_type_value",
+            "failure_reason_message",
+            "merchant_rating",
         )
 
     def get_bank_details(self, obj):
@@ -353,17 +375,14 @@ class RecentStoresResponse(serializers.ModelSerializer):
     amount = serializers.CharField(
         source="payment.captured_amount", read_only=True
     )
-    category = serializers.CharField(
-        source="merchant.merchantprofile.category", read_only=True
-    )
-    sub_category = serializers.CharField(
-        source="merchant.merchantprofile.sub_category", read_only=True
-    )
     address = serializers.JSONField(
-        source="merchant.merchantprofile.address", read_only=True
+        source="merchant.profile.address", read_only=True
     )
     full_name = serializers.CharField(
-        source="merchant.merchantprofile.full_name", read_only=True
+        source="merchant.profile.full_name", read_only=True
+    )
+    categories = MerchantCategoryResponse(
+        source="merchant.categories", many=True, read_only=True
     )
     merchant_id = serializers.CharField(source="merchant.u_id", read_only=True)
 
@@ -371,10 +390,48 @@ class RecentStoresResponse(serializers.ModelSerializer):
         model = Order
         fields = (
             "amount",
-            "category",
-            "sub_category",
+            "categories",
             "address",
             "full_name",
             "created_at",
+            "updated_at",
             "merchant_id",
+        )
+
+
+class TransactionErrorDetailsResponse(serializers.ModelSerializer):
+    payment_status = serializers.CharField(
+        source="payment.status.label", read_only=True
+    )
+    payment_tracking_id = serializers.CharField(
+        source="payment.payment_tracking_id", read_only=True
+    )
+    merchant = MerchantDetailsResponse(
+        source="payment.order.merchant", read_only=True
+    )
+    failure_reason_type_label = serializers.CharField(
+        source="failure_reason_type.label", read_only=True
+    )
+    failure_reason_type_value = serializers.CharField(
+        source="failure_reason_type.value", read_only=True
+    )
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
+    )
+
+    class Meta:
+        model = Transaction
+        fields = (
+            "created_at",
+            "amount",
+            "currency",
+            "payment_status",
+            "payment_tracking_id",
+            "transaction_id",
+            "is_success",
+            "merchant",
+            "is_disputed",
+            "failure_reason_type_label",
+            "failure_reason_type_value",
+            "failure_reason_message",
         )

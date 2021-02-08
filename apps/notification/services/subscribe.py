@@ -9,9 +9,10 @@ __all__ = ("SubscribePushNotication",)
 
 
 class SubscribePushNotication(ServiceBase):
-    def __init__(self, request, data):
+    def __init__(self, request, user_session, data):
         self.user = request.user
         self.request = request
+        self.user_session = user_session
         self.data = data
 
     def handle(self):
@@ -26,6 +27,8 @@ class SubscribePushNotication(ServiceBase):
             user_device = self._factory_user_device(data)
         self.request.session["device_id"] = user_device.device_id
         self.request.session.modified = True
+        if self.user_session:
+            self.user_session.add_user_device(user_device)
         return user_device
 
     def _validate_data(self):

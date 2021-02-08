@@ -10,15 +10,20 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.box.dbapi import get_boxfile
-from apps.merchant.dbapi.onboarding import (get_beneficial_owner,
-                                            update_beneficial_owner_document,
-                                            update_business_document,
-                                            update_controller_document)
+from apps.merchant.dbapi.onboarding import (
+    create_beneficial_owner_document, create_business_document,
+    create_controller_document, get_beneficial_owner,
+    get_beneficial_owner_document, get_business_document,
+    get_controller_document, get_merchant_beneficial_owner_document,
+    get_merchant_business_document, get_merchant_controller_document,
+    update_beneficial_owner_document, update_business_document,
+    update_controller_document)
 from apps.merchant.options import (BeneficialOwnerStatus, BusinessDocumentType,
-                                   BusinessTypes)
+                                   BusinessTypes, VerificationDocumentStatus)
 from apps.merchant.validators import (BeneficialOwnerDocumentValidator,
                                       BusinessDocumentValidator,
                                       ControllerDocumentValidator)
+from apps.payment.options import RefundType
 
 __all__ = (
     "BusinessDocumentUpload",
@@ -38,21 +43,30 @@ class BusinessDocumentUpload(ServiceBase):
 
     def handle(self):
         data = self._validate_data()
-        verification_document_file_id = data["verification_document_file_id"]
-        verification_document_type = data["verification_document_type"]
-        update_business_document(
-            merchant_id=self.merchant.id,
-            verification_document_id=verification_document_file_id,
-            verification_document_type=verification_document_type,
-        )
-        boxfile = get_boxfile(boxfile_id=verification_document_file_id)
+        document_file_id = data["document_file_id"]
+        document_type = data["document_type"]
+        incorporation_details = data["incorporation_details"]
+        document = data.get("document")
+        if document:
+            document = update_business_document(
+                document=document,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        else:
+            document = create_business_document(
+                incorporation_details_id=incorporation_details.id,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
-        return True
+        return document
 
     def _validate_data(self):
         data = run_validator(BusinessDocumentValidator, data=self.data)
         try:
-            incorporation_details = self.merchant.incorporationdetails
+            incorporation_details = self.merchant.incorporation_details
         except AttributeError:
             raise ValidationError(
                 {
@@ -64,20 +78,21 @@ class BusinessDocumentUpload(ServiceBase):
                 }
             )
 
+        data["incorporation_details"] = incorporation_details
         if not incorporation_details.verification_document_required:
             raise ValidationError(
                 {"detail": [ErrorDetail(_("Document is not required."))]}
             )
-        verification_document_type = data["verification_document_type"]
+
+        document_type = data["document_type"]
         if (
             incorporation_details.business_type
             != BusinessTypes.SOLE_PROPRIETORSHIP
-            and verification_document_type
-            != BusinessDocumentType.EIN_LETTER.value
+            and document_type != BusinessDocumentType.EIN_LETTER
         ):
             raise ValidationError(
                 {
-                    "verification_document_type": [
+                    "document_type": [
                         ErrorDetail(
                             _(
                                 "If business if of type other than sole proprietor then,"
@@ -87,6 +102,48 @@ class BusinessDocumentUpload(ServiceBase):
                     ]
                 }
             )
+
+        document_id = data.get("document_id")
+        if not document_id:
+            documents = incorporation_details.documents
+            if not documents.exists():
+                return data
+            for document in documents.all():
+                if document.status != VerificationDocumentStatus.FAILED:
+                    if document.status == VerificationDocumentStatus.VERIFIED:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _(
+                                            "Incorporation document has already been verified."
+                                        )
+                                    )
+                                ]
+                            }
+                        )
+                    else:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _("Please update existing document.")
+                                    )
+                                ]
+                            }
+                        )
+            return data
+
+        document = get_business_document(
+            document_id=document_id,
+            incorporation_details_id=incorporation_details.id,
+        )
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data
 
 
@@ -97,21 +154,30 @@ class ControllerDocumentUpload(ServiceBase):
 
     def handle(self):
         data = self._validate_data()
-        verification_document_file_id = data["verification_document_file_id"]
-        verification_document_type = data["verification_document_type"]
-        update_controller_document(
-            merchant_id=self.merchant.id,
-            verification_document_id=verification_document_file_id,
-            verification_document_type=verification_document_type,
-        )
-        boxfile = get_boxfile(boxfile_id=verification_document_file_id)
+        document_file_id = data["document_file_id"]
+        document_type = data["document_type"]
+        controller_details = data["controller_details"]
+        document = data.get("document")
+        if document:
+            document = update_controller_document(
+                document=document,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        else:
+            document = create_controller_document(
+                controller_id=controller_details.id,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
-        return True
+        return document
 
     def _validate_data(self):
         data = run_validator(ControllerDocumentValidator, data=self.data)
         try:
-            controller_details = self.merchant.controllerdetails
+            controller_details = self.merchant.controller_details
         except AttributeError:
             raise ValidationError(
                 {
@@ -122,11 +188,52 @@ class ControllerDocumentUpload(ServiceBase):
                     )
                 }
             )
-
+        data["controller_details"] = controller_details
         if not controller_details.verification_document_required:
             raise ValidationError(
                 {"detail": [ErrorDetail(_("Document is not required."))]}
             )
+
+        document_id = data.get("document_id")
+        if not document_id:
+            documents = controller_details.documents
+            if not documents.exists():
+                return data
+            for document in documents.all():
+                if document.status != VerificationDocumentStatus.FAILED:
+                    if document.status == VerificationDocumentStatus.VERIFIED:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _(
+                                            "Incorporation document has already been verified."
+                                        )
+                                    )
+                                ]
+                            }
+                        )
+                    else:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _("Please update existing document.")
+                                    )
+                                ]
+                            }
+                        )
+            return data
+
+        document = get_controller_document(
+            document_id=document_id, controller_id=controller_details.id
+        )
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data
 
 
@@ -137,16 +244,25 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
 
     def handle(self):
         data = self._validate_data()
-        verification_document_file_id = data["verification_document_file_id"]
-        verification_document_type = data["verification_document_type"]
+        document_file_id = data["document_file_id"]
+        document_type = data["document_type"]
         beneficial_owner_id = data["beneficial_owner_id"]
-        update_beneficial_owner_document(
-            beneficial_owner_id=beneficial_owner_id,
-            verification_document_id=verification_document_file_id,
-            verification_document_type=verification_document_type,
-        )
-        boxfile = get_boxfile(boxfile_id=verification_document_file_id)
+        document = data.get("document")
+        if document:
+            document = update_beneficial_owner_document(
+                document=document,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        else:
+            document = create_beneficial_owner_document(
+                owner_id=beneficial_owner_id,
+                document_file_id=document_file_id,
+                document_type=document_type,
+            )
+        boxfile = get_boxfile(boxfile_id=document_file_id)
         boxfile.enable_use()
+        return document
 
     def _validate_data(self):
         data = run_validator(BeneficialOwnerDocumentValidator, data=self.data)
@@ -155,8 +271,8 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
             merchant_id=self.merchant.id,
             beneficial_owner_id=beneficial_owner_id,
         )
-        if not beneficial_owner_id:
-            ValidationError(
+        if not benenficial_owner:
+            raise ValidationError(
                 {
                     "beneficial_owner_id": [
                         ErrorDetail(_("Benefical owner is not valid"))
@@ -165,11 +281,52 @@ class BeneficialOwnerDocumentUpload(ServiceBase):
             )
 
         if benenficial_owner.status != BeneficialOwnerStatus.DOCUMENT_PENDING:
-            ValidationError(
+            raise ValidationError(
                 {
                     "detail": [
                         ErrorDetail(_("Document has not been requested."))
                     ]
                 }
             )
+
+        document_id = data.get("document_id")
+        if not document_id:
+            documents = benenficial_owner.documents
+            if not documents.exists():
+                return data
+            for document in documents.all():
+                if document.status != VerificationDocumentStatus.FAILED:
+                    if document.status == VerificationDocumentStatus.VERIFIED:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _(
+                                            "Incorporation document has already been verified."
+                                        )
+                                    )
+                                ]
+                            }
+                        )
+                    else:
+                        raise ValidationError(
+                            {
+                                "detail": [
+                                    ErrorDetail(
+                                        _("Please update existing document.")
+                                    )
+                                ]
+                            }
+                        )
+            return data
+
+        document = get_beneficial_owner_document(
+            document_id=document_id, owner_id=benenficial_owner.id
+        )
+        if document_id and not document:
+            raise ValidationError(
+                {"document_id": [ErrorDetail(_("Invalid document id."))]}
+            )
+        else:
+            data["document"] = document
         return data

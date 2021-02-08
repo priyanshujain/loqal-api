@@ -7,7 +7,7 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import get_account_member_by_id
 from apps.payment.dbapi import (assign_payment_qrcode, create_payment_qrcode,
-                                get_payment_qrcode)
+                                get_cashier_qrcode, get_payment_qrcode)
 from apps.payment.validators import AssignPaymentQrCodeValidator
 
 __all__ = (
@@ -57,9 +57,22 @@ class AssignQrCode(ServiceBase):
         if not merchant_member:
             raise ValidationError(
                 {
-                    "cashier_id": ErrorDetail(
-                        _("Cashier does not belong to the merchant.")
-                    )
+                    "cashier_id": [
+                        ErrorDetail(
+                            _("Cashier does not belong to the merchant.")
+                        )
+                    ]
+                }
+            )
+        qr_code = get_cashier_qrcode(
+            merchant_id=self.merchant_id, cashier_id=cashier_id
+        )
+        if qr_code:
+            raise ValidationError(
+                {
+                    "cashier_id": [
+                        ErrorDetail(_("This cashier already has a QR code."))
+                    ]
                 }
             )
         return data

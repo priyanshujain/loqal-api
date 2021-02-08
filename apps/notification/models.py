@@ -67,6 +67,7 @@ class UserDevice(BaseModel):
 
     def update_fcm_token(self, fcm_token, save=True):
         self.fcm_token = fcm_token
+        self.active = True
         if save:
             self.save()
 
@@ -80,7 +81,7 @@ class UserDevice(BaseModel):
         title=None,
         body=None,
         icon=None,
-        data=None,
+        data_message=None,
         sound=None,
         badge=None,
         api_key=None,
@@ -94,7 +95,7 @@ class UserDevice(BaseModel):
             title=title,
             body=body,
             icon=icon,
-            data=data,
+            data_message=data_message,
             sound=sound,
             badge=badge,
             api_key=api_key,

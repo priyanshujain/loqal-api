@@ -42,7 +42,8 @@ class RequestResetPassword(ServiceBase):
                 {
                     "email": [
                         ErrorDetail(_("User does not exist with this email."))
-                    ]
+                    ],
+                    "code": "INVALID_EMAIL",
                 }
             )
         self.user = user

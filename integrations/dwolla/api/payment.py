@@ -3,9 +3,8 @@ This module provides a class for payments
 creation related calls to the dwolla API.
 """
 
-
 from apps.payment.options import TransactionStatus
-from integrations.dwolla.errors import BadRequestError
+from integrations.dwolla.errors import BadRequestError, NotFoundError
 from integrations.dwolla.http import Http
 
 __all__ = "Payment"
@@ -67,6 +66,22 @@ class Payment(Http):
             authenticated=True,
             retry=False,
         )
+        response = response.json()
+        return response
+
+    def get_payment_failure(self, transfer_id):
+        """
+        Dwolla endpoint for get transfer fee details
+        """
+
+        try:
+            response = self.get(
+                f"/transfers/{transfer_id}/failure",
+                authenticated=True,
+                retry=False,
+            )
+        except NotFoundError:
+            return None
         response = response.json()
         return response
 

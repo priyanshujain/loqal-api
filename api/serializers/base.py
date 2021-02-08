@@ -62,3 +62,13 @@ class AddressSerializer(BaseSerializer):
     zip_code = CharField(max_length=10)
     latitude = FloatField(required=False)
     longitude = FloatField(required=False)
+
+
+class ChoiceCharEnumSerializer(BaseSerializer):
+    label = CharField()
+    value = CharField()
+
+
+class ChoiceEnumSerializer(BaseSerializer):
+    label = CharField()
+    value = IntegerField()

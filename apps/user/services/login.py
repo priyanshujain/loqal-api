@@ -16,6 +16,7 @@ __all__ = (
     "LoginRequest",
     "SmsOtpAuth",
     "ResendSmsOtpAuth",
+    "AfterLogin",
 )
 
 
@@ -53,6 +54,13 @@ class SmsOtpAuth(object):
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "development":
             if otp == "222222":
+                self.perform_login(interface=interface)
+                return True
+            else:
+                return False
+
+        if settings.APP_ENV == "staging":
+            if otp == "111111":
                 self.perform_login(interface=interface)
                 return True
             else:
@@ -151,10 +159,14 @@ class ResendSmsOtpAuth(object):
 
 
 class AfterLogin(object):
-    def __init__(self, request, user):
+    def __init__(self, request, user, send_alert=True):
         self.user = user
         self.request = request
+        self.send_alert = send_alert
 
     def handle(self):
-        Session(request=self.request).create_session(user=self.user)
-        SendLoginAlert(user=self.user, session=self.request.session).send()
+        user_session = Session(request=self.request).create_session(
+            user=self.user
+        )
+        if self.send_alert:
+            SendLoginAlert(user=self.user, session=self.request.session).send()

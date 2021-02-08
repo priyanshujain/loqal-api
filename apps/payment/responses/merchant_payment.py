@@ -57,6 +57,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
     )
+    amount = serializers.CharField(read_only=True)
 
     class Meta:
         model = Transaction
@@ -64,6 +65,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "created_at",
             "amount",
             "payment_tracking_id",
+            "transaction_tracking_id",
             "currency",
             "payment_status",
             "transaction_status",
@@ -86,6 +88,9 @@ class TransactionPaymentResponse(serializers.ModelSerializer):
     payment_account = SenderAcconutResponse(
         source="sender_bank_account", read_only=True
     )
+    merchant_rating = serializers.BooleanField(
+        source="merchant_rating.give_thanks", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -97,6 +102,8 @@ class TransactionPaymentResponse(serializers.ModelSerializer):
             "fee_amount",
             "fee_currency",
             "payment_account",
+            "transaction_tracking_id",
+            "merchant_rating",
         )
 
 
@@ -138,7 +145,7 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
         source="charge_status.label", read_only=True
     )
     payment_status = serializers.CharField(
-        source="payment_status.label", read_only=True
+        source="status.label", read_only=True
     )
     order_amount = serializers.CharField(
         source="order.total_net_amount", read_only=True

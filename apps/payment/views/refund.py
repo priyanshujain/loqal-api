@@ -6,7 +6,10 @@ from api.views import MerchantAPIView
 from apps.payment.dbapi import get_merchant_refund, get_merchant_refunds
 from apps.payment.responses import RefundDetailsResponse, RefundHistoryResponse
 
-__all__ = ("RefundListAPI",)
+__all__ = (
+    "RefundListAPI",
+    "RefundDetailsAPI",
+)
 
 
 class RefundListAPI(MerchantAPIView):

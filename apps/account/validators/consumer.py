@@ -21,10 +21,15 @@ class CreateConsumerAccountValidator(serializers.ValidationSerializer):
     last_name = serializers.CharField(max_length=512)
     email = serializers.EmailField(max_length=254)
     password = serializers.CharField(max_length=64)
+    consent_timestamp = serializers.IntegerField()
+    payment_terms_url = serializers.URLField(max_length=128)
 
-    def validate_password(self, password):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        password = attrs["password"]
         password_validation.validate_password(password)
-        return password
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
 
 
 class ConsumerZipCodeValidator(serializers.ValidationSerializer):

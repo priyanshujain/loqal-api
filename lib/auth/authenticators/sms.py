@@ -46,8 +46,19 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
     def _set_phone_number(self, value):
         self.config["phone_number"] = value
 
+    def _get_phone_number_country(self):
+        return self.config["phone_number_country"]
+
+    def _set_phone_number_country(self, value):
+        self.config["phone_number_country"] = value
+
     phone_number = property(_get_phone_number, _set_phone_number)
     del _get_phone_number, _set_phone_number
+
+    phone_number_country = property(
+        _get_phone_number_country, _set_phone_number_country
+    )
+    del _get_phone_number_country, _set_phone_number_country
 
     def activate(self, request):
         phone_number = self.config["phone_number"]
@@ -87,4 +98,8 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
             text = u"%s\n\n%s" % (text, _("Requested from %(ip)s"))
             ctx["ip"] = request.ip
 
-        return send_sms(text % ctx, to=self.phone_number)
+        return send_sms(
+            text % ctx,
+            phone_number=self.phone_number,
+            phone_number_country=self.phone_number_country,
+        )

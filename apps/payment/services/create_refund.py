@@ -10,7 +10,7 @@ from apps.payment.options import RefundType, TransactionType
 from apps.payment.validators import CreateRefundValidator
 
 from .create_payment import CreatePayment
-from .validate_bank_balance import ValidateBankBalance
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = ("CreateRefund",)
 
@@ -28,31 +28,38 @@ class CreateRefund(ServiceBase):
         )
         order = payment_data["order"]
 
-        transaction = CreatePayment(
-            account_id=self.merchant_account.id,
-            ip_address=self.ip_address,
-            sender_bank_account=payment_data["sender_bank_account"],
-            sender_bank_balance=payment_data["sender_bank_balance"],
-            receiver_bank_account=payment_data["receiver_bank_account"],
-            order=order,
-            total_amount=refund_payment.amount,
-            amount_towards_order=refund_payment.amount,
-            fee_bearer_account=self.merchant_account.account,
-            transaction_type=TransactionType.REFUND_PAYMENT,
-        ).handle()
-        if refund_payment.refund_type == RefundType.PARTIAL:
-            partial_refund_payment_event(
-                payment_id=transaction.payment.id,
-                refund_tracking_id=refund_payment.refund_tracking_id,
-                amount=transaction.amount,
-            )
-        if refund_payment.refund_type == RefundType.FULL:
-            full_refund_payment_event(
-                payment_id=transaction.payment.id,
-                refund_tracking_id=refund_payment.refund_tracking_id,
-            )
-        refund_payment.add_transaction(transaction=transaction)
-        return refund_payment
+        try:
+            transaction = CreatePayment(
+                account_id=self.merchant_account.id,
+                ip_address=self.ip_address,
+                sender_bank_account=payment_data["sender_bank_account"],
+                receiver_bank_account=payment_data["receiver_bank_account"],
+                order=order,
+                total_amount=refund_payment.amount,
+                amount_towards_order=refund_payment.amount,
+                fee_bearer_account=self.merchant_account.account,
+                transaction_type=TransactionType.REFUND_PAYMENT,
+            ).handle()
+            if refund_payment.refund_type == RefundType.PARTIAL:
+                partial_refund_payment_event(
+                    payment_id=transaction.payment.id,
+                    refund_tracking_id=refund_payment.refund_tracking_id,
+                    amount=transaction.amount,
+                )
+            if refund_payment.refund_type == RefundType.FULL:
+                full_refund_payment_event(
+                    payment_id=transaction.payment.id,
+                    refund_tracking_id=refund_payment.refund_tracking_id,
+                )
+            refund_payment.add_transaction(transaction=transaction)
+            return refund_payment
+        except ValidationError as error:
+            try:
+                transaction = error.transaction
+                refund_payment.set_refund_failed(transaction=transaction)
+            except AttributeError:
+                refund_payment.set_refund_failed()
+            raise error
 
     def _validate_data(self):
         data = run_validator(CreateRefundValidator, self.data)
@@ -78,10 +85,9 @@ class CreateRefund(ServiceBase):
 
         # FIXME: check for the amount to be less than total of all previous refunds
 
-        banking_data = ValidateBankBalance(
+        banking_data = ValidateBankAccount(
             sender_account_id=self.merchant_account.account.id,
             receiver_account_id=payment.order.consumer.account.id,
-            total_amount=data["amount"],
         ).validate()
 
         return {
@@ -89,7 +95,6 @@ class CreateRefund(ServiceBase):
             "amount": data["amount"],
             "sender_bank_account": banking_data["sender_bank_account"],
             "receiver_bank_account": banking_data["receiver_bank_account"],
-            "sender_bank_balance": banking_data["sender_bank_balance"],
         }
 
     def _factory_refund_payment(self, payment_data):

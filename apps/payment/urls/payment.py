@@ -10,6 +10,8 @@ from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         PaymentHistoryAPI, RecentStoresAPI,
                                         RejectPaymentRequestAPI,
                                         TransactionDetailsAPI)
+from apps.payment.views.settlements import (ListMerchantSettlementsAPI,
+                                            MerchantSettlementDetailsAPI)
 
 urlpatterns = [
     path("create/", CreatePaymentAPI.as_view(), name="create_payment"),
@@ -50,7 +52,7 @@ urlpatterns = [
         name="create_refund_payment",
     ),
     path(
-        "transactions/details/<str:transaction_id>",
+        "transactions/details/<str:transaction_id>/",
         TransactionDetailsAPI.as_view(),
         name="consumer_transaction_details",
     ),
@@ -58,5 +60,15 @@ urlpatterns = [
         "recent-stores/",
         RecentStoresAPI.as_view(),
         name="recent_stores",
+    ),
+    path(
+        "settlements/<str:settlement_id>/",
+        MerchantSettlementDetailsAPI.as_view(),
+        name="merchant_settlement_details",
+    ),
+    path(
+        "settlements/",
+        ListMerchantSettlementsAPI.as_view(),
+        name="merchant_settlements",
     ),
 ]

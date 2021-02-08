@@ -30,7 +30,7 @@ CONSUMER_APP_WEB_BASE_URL = "https://payloqal.com"
 MERCHANT_APP_WEB_BASE_URL = "https://merchant.payloqal.com"
 
 # Email configs.
-DEFAULT_FROM_EMAIL = "hello@payloqal.com"
+DEFAULT_FROM_EMAIL = "hello@loqal.us"
 EMAIL_SENDER_NAME = "Loqal App Team"
 
 
@@ -52,3 +52,7 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "same-origin"
+
+
+LOQAL_SMS_PHONE_NUMBER = "4122183340"
+LOQAL_SMS_PHONE_NUMBER_COUNTRY = "US"

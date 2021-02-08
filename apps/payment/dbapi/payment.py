@@ -4,6 +4,7 @@ Payments relted db operations.
 
 from decimal import Decimal
 
+from django.conf import settings
 from django.db.models import Count, Q, Sum
 from django.db.utils import IntegrityError
 
@@ -11,7 +12,8 @@ from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
-from apps.payment.options import PaymentStatus, TransactionType
+from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
+                                  TransactionType)
 from utils.types import to_float
 
 
@@ -45,7 +47,6 @@ def create_payment(
 def create_transaction(
     sender_bank_account_id,
     recipient_bank_account_id,
-    sender_balance_at_checkout,
     amount,
     currency,
     fee_bearer_account_id,
@@ -54,6 +55,9 @@ def create_transaction(
     payment_id,
     customer_ip_address,
     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+    min_access_balance_required=Decimal(
+        settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
+    ),
 ):
     """
     dbapi for creating new transaction.
@@ -62,7 +66,6 @@ def create_transaction(
         return Transaction.objects.create(
             sender_bank_account_id=sender_bank_account_id,
             recipient_bank_account_id=recipient_bank_account_id,
-            sender_balance_at_checkout=sender_balance_at_checkout,
             amount=Decimal(amount),
             currency=currency,
             fee_bearer_account_id=fee_bearer_account_id,
@@ -71,6 +74,7 @@ def create_transaction(
             payment_id=payment_id,
             customer_ip_address=customer_ip_address,
             transaction_type=transaction_type,
+            min_access_balance_required=min_access_balance_required,
         )
     except IntegrityError:
         return None
@@ -120,6 +124,16 @@ def get_payment_qrcode_by_id(qrcode_id, merchant_id):
         return None
 
 
+def get_single_qrcode_by_id(qrcode_id):
+    """
+    get QR code by qrcode_id
+    """
+    try:
+        return PaymentQrCode.objects.get(qrcode_id=qrcode_id)
+    except PaymentQrCode.DoesNotExist:
+        return None
+
+
 def assign_payment_qrcode(qrcode_id, merchant_id, cashier_id):
     """
     Assign QR code to a merchant
@@ -137,6 +151,13 @@ def get_merchant_qrcodes(merchant_id):
     if qrcode_qs.exists():
         return qrcode_qs
     return None
+
+
+def get_all_qrcodes():
+    """
+    Get all QR codes
+    """
+    return PaymentQrCode.objects.all()
 
 
 def get_cashier_qrcode(merchant_id, cashier_id):
@@ -164,7 +185,6 @@ def create_payment_request(
     payment_id,
     amount,
     currency,
-    order_id,
 ):
     """
     dbapi for creating new payment request.
@@ -176,7 +196,6 @@ def create_payment_request(
             payment_id=payment_id,
             amount=Decimal(amount),
             currency=currency,
-            order_id=order_id,
         )
     except IntegrityError:
         return None
@@ -218,18 +237,24 @@ def create_refund_payment(
         return None
 
 
-def get_merchant_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(account_id=account_id)
+def get_merchant_payment_reqeust(account_id, is_pending=False):
+    qs = PaymentRequest.objects.filter(account_from_id=account_id)
+    if is_pending:
+        qs = qs.filter(status=PaymentRequestStatus.REQUEST_SENT)
+    return qs
 
 
-def get_consumer_payment_reqeust(account_id):
-    return PaymentRequest.objects.filter(requested_to_id=account_id)
+def get_consumer_payment_reqeust(account_id, is_pending=False):
+    qs = PaymentRequest.objects.filter(account_to_id=account_id)
+    if is_pending:
+        qs = qs.filter(status=PaymentRequestStatus.REQUEST_SENT)
+    return qs
 
 
-def get_payment_reqeust_by_id(payment_request_id, account_to_id):
+def get_payment_reqeust_by_uid(payment_request_id, account_to_id):
     try:
         return PaymentRequest.objects.get(
-            id=payment_request_id, account_to_id=account_to_id
+            u_id=payment_request_id, account_to_id=account_to_id
         )
     except PaymentRequest.DoesNotExist:
         return None
@@ -260,6 +285,16 @@ def get_merchant_transactions(merchant_account):
     )
 
 
+def get_merchant_transaction(merchant_account, transaction_tracking_id):
+    try:
+        return Transaction.objects.get(
+            recipient_bank_account__account=merchant_account.account,
+            transaction_tracking_id=transaction_tracking_id,
+        )
+    except Transaction.DoesNotExist:
+        return None
+
+
 def get_consumer_transaction(consumer_account, transaction_tracking_id):
     transactions = get_consumer_transactions(consumer_account=consumer_account)
     transactions = transactions.filter(
@@ -271,4 +306,10 @@ def get_consumer_transaction(consumer_account, transaction_tracking_id):
 
 
 def get_recent_store_orders(consumer_account):
-    return Order.objects.filter(consumer=consumer_account).distinct("merchant")
+    return (
+        Order.objects.filter(
+            consumer=consumer_account, payment__status=PaymentStatus.CAPTURED
+        )
+        .order_by("merchant", "-updated_at")
+        .distinct("merchant")
+    )

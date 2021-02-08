@@ -31,3 +31,17 @@ MERCHANT_APP_WEB_BASE_URL = "http://localhost:3001"
 # Email configs.
 DEFAULT_FROM_EMAIL = "donotreply@spotlightandcompany.com"
 EMAIL_SENDER_NAME = "Loqal App Team"
+
+
+LOQAL_SMS_PHONE_NUMBER = "4122183340"
+LOQAL_SMS_PHONE_NUMBER_COUNTRY = "US"
+
+import urllib
+
+CELERY_TASK_DEFAULT_QUEUE = "loqal-api-local-0"
+
+
+CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
+    urllib.parse.quote(AWS_ACCESS_KEY_ID, safe=""),
+    urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=""),
+)

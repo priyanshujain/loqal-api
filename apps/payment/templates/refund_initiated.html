@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block message %}
+Hi,
+<p>
+    A refund was initiated to your account from {{ merchant }}. It will be credited to your bank account in 4-6 business days.
+</p>
+<b>Account to</b>: {{ source }} <br />
+<b>From</b>: {{ merchant }} <br />
+<b>Amount</b>: {{ amount }} <br />
+<b>Date Initiated</b>: {{ date_initiated }}
+
+<br />
+<br />
+If you wish to know more about this transaction,
+please check out its details in the transaction history section of your Loqal app.
+
+{% endblock %}

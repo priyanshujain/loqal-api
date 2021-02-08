@@ -1,11 +1,49 @@
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.cache import cache
 from django.db import models
+from django.utils import timezone
 
 from apps.account.models import Account
 from apps.provider.models import PaymentProvider
-from db.models.abstract import AbstractBaseModel
+from db.models.abstract import AbstractBaseModel, BaseModel
 from utils.shortcuts import upload_to
+
+
+class UserIP(BaseModel):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    ip_address = models.GenericIPAddressField()
+    country_code = models.CharField(max_length=16, null=True)
+    first_seen = models.DateTimeField(default=timezone.now)
+    last_seen = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "userip"
+        unique_together = (("user", "ip_address"),)
+
+    @classmethod
+    def log(cls, user, ip_address, country_code=None):
+        # Only log once every 5 minutes for the same user/ip_address pair
+        # since this is hit pretty frequently by all API calls in the UI, etc.
+        cache_key = "userip.log:%d:%s" % (user.id, ip_address)
+        if cache.get(cache_key):
+            return
+
+        values = {"last_seen": timezone.now()}
+        if country_code:
+            values.update(
+                {
+                    "country_code": country_code,
+                }
+            )
+
+        UserIP.objects.update_or_create(
+            defaults=values, user=user, ip_address=ip_address
+        )
+        cache.set(cache_key, 1, 300)
 
 
 class APIAccessLog(AbstractBaseModel):

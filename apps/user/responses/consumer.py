@@ -31,4 +31,5 @@ class UserProfileResponse(serializers.ModelSerializer):
             "phone_number",
             "phone_number_verified",
             "avatar_file",
+            "user_type",
         )

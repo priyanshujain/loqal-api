@@ -30,13 +30,7 @@ class IncorporationDetailsValidator(serializers.ModelSerializer):
 
     class Meta:
         model = IncorporationDetails
-        exclude = (
-            "merchant",
-            "verification_document_type",
-            "verification_document_file",
-            "verification_document_status",
-            "verification_document_required",
-        )
+        exclude = ("merchant",)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -140,13 +134,7 @@ class IndividualValidator(serializers.ValidationSerializer):
 class ControllerValidator(IndividualValidator, serializers.ModelSerializer):
     class Meta:
         model = ControllerDetails
-        exclude = (
-            "merchant",
-            "verification_document_type",
-            "verification_document_file",
-            "verification_document_status",
-            "verification_document_required",
-        )
+        exclude = ("merchant",)
 
 
 class BeneficialOwnerValidator(
@@ -154,12 +142,7 @@ class BeneficialOwnerValidator(
 ):
     class Meta:
         model = BeneficialOwner
-        exclude = (
-            "merchant",
-            "verification_document_type",
-            "verification_document_file",
-            "verification_document_status",
-        )
+        exclude = ("merchant",)
 
 
 class UpdateBeneficialOwnerValidator(BeneficialOwnerValidator):
@@ -171,20 +154,19 @@ class RemoveBeneficialOwnerValidator(serializers.ValidationSerializer):
 
 
 class DocumentFileValidator(serializers.ValidationSerializer):
-    verification_document_file_id = serializers.IntegerField()
-    verification_document_type = serializers.CharField()
+    document_file_id = serializers.IntegerField()
+    document_type = serializers.CharField()
+    document_id = serializers.UUIDField(required=False)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        verification_document_file_id = attrs.get(
-            "verification_document_file_id"
-        )
-        verification_document_type = attrs.get("verification_document_type")
-        boxfile = get_boxfile(boxfile_id=verification_document_file_id)
+        document_file_id = attrs.get("document_file_id")
+        document_type = attrs.get("document_type")
+        boxfile = get_boxfile(boxfile_id=document_file_id)
         if not boxfile:
             raise ValidationError(
                 {
-                    "verification_document_file_id": [
+                    "document_file_id": [
                         ErrorDetail(_("Given file is not valid."))
                     ]
                 }
@@ -192,15 +174,15 @@ class DocumentFileValidator(serializers.ValidationSerializer):
         if boxfile.in_use:
             raise ValidationError(
                 {
-                    "verification_document_file_id": [
+                    "document_file_id": [
                         ErrorDetail(_("Given file is already being used."))
                     ]
                 }
             )
-        if boxfile.document_type != verification_document_type:
+        if boxfile.document_type != document_type:
             raise ValidationError(
                 {
-                    "verification_document_type": [
+                    "document_type": [
                         ErrorDetail(_("Document type does not match."))
                     ]
                 }
@@ -210,18 +192,16 @@ class DocumentFileValidator(serializers.ValidationSerializer):
 
 class BeneficialOwnerDocumentValidator(DocumentFileValidator):
     beneficial_owner_id = serializers.IntegerField()
-    verification_document_type = serializers.ChoiceField(
-        choices=IndividualDocumentType.choices
+    document_type = serializers.EnumChoiceField(
+        enum_type=IndividualDocumentType
     )
 
 
 class ControllerDocumentValidator(DocumentFileValidator):
-    verification_document_type = serializers.ChoiceField(
-        choices=IndividualDocumentType.choices
+    document_type = serializers.EnumChoiceField(
+        enum_type=IndividualDocumentType
     )
 
 
 class BusinessDocumentValidator(DocumentFileValidator):
-    verification_document_type = serializers.ChoiceField(
-        choices=BusinessDocumentType.choices
-    )
+    document_type = serializers.EnumChoiceField(enum_type=BusinessDocumentType)

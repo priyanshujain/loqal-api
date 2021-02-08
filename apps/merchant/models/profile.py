@@ -1,3 +1,5 @@
+import math
+
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
 from django.utils.translation import gettext as _
@@ -5,7 +7,10 @@ from django.utils.translation import gettext as _
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
 from apps.merchant.constants import MERCHANT_CATEGORIES
+from apps.merchant.options import BusinessDayType, CleaningFrequencyType
+from apps.merchant.shortcuts import coordinate_distance
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceCharEnumField
 from db.postgres.fields import ArrayField
 
 __all__ = (
@@ -13,29 +18,47 @@ __all__ = (
     "MerchantOperationHours",
     "CodesAndProtocols",
     "ServiceAvailability",
+    "MerchantCategory",
 )
 
 
+class MerchantCategory(AbstractBaseModel):
+    merchant = models.ForeignKey(
+        MerchantAccount, on_delete=models.CASCADE, related_name="categories"
+    )
+    category = models.CharField(max_length=64)
+    is_primary = models.BooleanField(default=False)
+    sub_categories = ArrayField(models.CharField(max_length=255))
+
+    class Meta:
+        db_table = "merchant_category"
+        unique_together = (
+            "merchant",
+            "category",
+        )
+
+
 class MerchantProfile(AbstractBaseModel):
-    merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
+    merchant = models.OneToOneField(
+        MerchantAccount, on_delete=models.CASCADE, related_name="profile"
+    )
     full_name = models.CharField(max_length=256)
     about = models.TextField(blank=True)
-    category = models.CharField(
-        max_length=64, default=MERCHANT_CATEGORIES[0]["category_slug"]
+    background_file = models.ForeignKey(
+        BoxFile,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="merchant_background_file",
     )
-    sub_category = models.CharField(
-        max_length=64,
-        default=MERCHANT_CATEGORIES[0]["subcategories"][0]["slug"],
-    )
-    hero_image = models.ForeignKey(
-        BoxFile, on_delete=models.DO_NOTHING, blank=True, null=True
+    avatar_file = models.ForeignKey(
+        BoxFile,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="merchant_avatar_file",
     )
     address = models.JSONField()
-    neighborhood = models.CharField(
-        max_length=128,
-        blank=True,
-        help_text=_("Ex. Navy Yard"),
-    )
     website = models.URLField(blank=True)
     facebook_page = models.URLField(blank=True)
     instagram_page = models.URLField(blank=True)
@@ -70,28 +93,52 @@ class MerchantProfile(AbstractBaseModel):
     class Meta:
         db_table = "merchant_profile"
 
+    def distance(self, latitude, longitude):
+        if not self.address:
+            return 0
+        address_lat = self.address.get("latitude")
+        address_lon = self.address.get("longitude")
+
+        if not (address_lon and address_lat):
+            return None
+        return math.fabs(
+            coordinate_distance(latitude, longitude, address_lat, address_lon)
+        )
+
 
 class MerchantOperationHours(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
-    day = models.CharField(max_length=32)
-    open_time = models.TimeField()
-    close_time = models.TimeField()
+    day = ChoiceCharEnumField(max_length=3, enum_type=BusinessDayType)
+    open_time = models.TimeField(null=True)
+    close_time = models.TimeField(null=True)
     is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "merchant_operation_hours"
+        unique_together = (
+            "merchant",
+            "day",
+        )
 
 
 class CodesAndProtocols(AbstractBaseModel):
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
-    contactless_payments = models.BooleanField(default=False)
     mask_required = models.BooleanField(default=False)
     sanitizer_provided = models.BooleanField(default=False)
-    ourdoor_seating = models.BooleanField(default=False)
-    last_cleaned_at = models.DateTimeField(auto_now=True)
+    outdoor_seating = models.BooleanField(default=False)
+    cleaning_frequency = ChoiceCharEnumField(
+        max_length=32,
+        enum_type=CleaningFrequencyType,
+        default=CleaningFrequencyType.NOT_PROVIDED,
+    )
+    last_cleaned_at = models.DateTimeField(null=True)
 
     class Meta:
         db_table = "merchant_codes_and_protocols"
 
 
 class ServiceAvailability(AbstractBaseModel):
+    # Add parking/ valet to the list
     merchant = models.OneToOneField(MerchantAccount, on_delete=models.CASCADE)
     curbside_pickup = models.BooleanField(default=False)
     delivery = models.BooleanField(default=False)
