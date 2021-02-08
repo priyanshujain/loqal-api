@@ -62,6 +62,7 @@ class CreateMerchantAccountValidator(MerchantAccountSignupValidatorBase):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
         category = attrs.get("category")
         sub_category = attrs.get("sub_category")
 

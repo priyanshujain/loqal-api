@@ -26,11 +26,21 @@ class EditProfileValidator(serializers.ValidationSerializer):
 class UserEmailExistsValidator(serializers.ValidationSerializer):
     email = serializers.EmailField()
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
+
 
 class UserLoginValidator(serializers.ValidationSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     tfa_code = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
 
 
 class OtpAuthValidator(serializers.ValidationSerializer):
@@ -63,6 +73,11 @@ class ForgotPasswordValidator(serializers.ValidationSerializer):
 
 class RequestResetPasswordValidator(serializers.ValidationSerializer):
     email = serializers.EmailField()
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
 
 
 class ResetPasswordTokenValidator(serializers.ValidationSerializer):

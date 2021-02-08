@@ -24,6 +24,11 @@ class MemberInviteValidator(serializers.ValidationSerializer):
     position = serializers.CharField(max_length=256)
     role_id = serializers.IntegerField()
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
+
 
 class UpdateMemberInviteValidator(serializers.ValidationSerializer):
     invite_id = serializers.IntegerField()
@@ -34,6 +39,11 @@ class UpdateMemberInviteValidator(serializers.ValidationSerializer):
     email = serializers.EmailField(max_length=255)
     position = serializers.CharField(max_length=256)
     role_id = serializers.IntegerField()
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["email"] = str(attrs["email"]).lower()
+        return attrs
 
 
 class MemberSignupValidator(MerchantAccountSignupValidatorBase):

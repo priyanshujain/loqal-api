@@ -28,5 +28,5 @@ class MemberSignupInviteEmail:
 
         email_html = render_to_string("member_signup_invite.html", render_data)
         send_email_async(
-            (invite_email), "Signup invite for Spotlight Account", email_html
+            (invite_email), "Signup invite for Loqal Account", email_html
         )

@@ -404,7 +404,7 @@ SPOTLIGHT_ADMIN_EMAIL = env("SPOTLIGHT_ADMIN_EMAIL")
 MANAGERS = (("Priyanshu Jain", "priyanshu@spotlightandcompany.com"),)
 ADMINS = MANAGERS
 
-APP_NAME = env("APP_NAME", default="Spotlight")
+APP_NAME = env("APP_NAME", default="Loqal")
 
 
 USE_CUSTOM_BIG_INTS = False
@@ -436,3 +436,7 @@ FCM_SERVER = "https://fcm.googleapis.com/fcm/send"
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
 DEFAULT_PHONE_REGION = "IN"
+
+
+# Setup
+INITIAL_ADMIN_PASSWORD = env("INITIAL_ADMIN_PASSWORD")

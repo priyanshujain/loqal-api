@@ -8,7 +8,7 @@ class WelcomeAPI(APIView):
         self,
         request,
     ):
-        return self.response("Welcome to Spotlight API")
+        return self.response("Welcome to Loqal API")
 
 
 def error404(request, exception):

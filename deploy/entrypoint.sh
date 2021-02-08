@@ -3,5 +3,5 @@
 set -e
 
 python manage.py migrate
-
-gunicorn --bind :8080 --workers 4 wsgi
+python manage setup
+gunicorn --bind :8080 --workers 5 wsgi 
