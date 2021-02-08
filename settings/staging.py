@@ -13,11 +13,13 @@ CORS_ORIGIN_REGEX_WHITELIST += [
     "https://api-sandbox.dwolla.com",
 ]
 
+
 # app config
 APP_BASE_URL = "https://merchant-stag.payloqal.com"
 API_BASE_URL = "https://api-stag.payloqal.com"
 CONSUMER_APP_WEB_BASE_URL = "https://website-stag.payloqal.com"
 MERCHANT_APP_WEB_BASE_URL = "https://merchant-stag.payloqal.com"
+
 
 CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
     urllib.parse.quote(AWS_ACCESS_KEY_ID, safe=""),
@@ -25,8 +27,10 @@ CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
 )
 CELERY_TASK_DEFAULT_QUEUE = env("CELERY_TASK_DEFAULT_QUEUE")
 
+CSRF_COOKIE_NAME = '__Secure-csrftoken'
 CSRF_COOKIE_SAMESITE = True
 SESSION_COOKIE_SAMESITE = True
+
 
 REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
     "user_burst": "60/min",
