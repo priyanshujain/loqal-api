@@ -65,14 +65,14 @@ class UserLoginAPI(APIView):
             raise ValidationError(
                 {"detail": ErrorDetail(_("You are already logged in."))}
             )
-        session = request.session
-
-        # Assign the 7 days expiration period
-        if session:
-            session.set_expiry(60 * 60 * 24 * 7)
 
         service_response = self._run_services(request=request)
+
         if service_response:
+            session = request.session
+            # Assign the 7 days expiration period
+            if session:
+                session.set_expiry(60 * 60 * 24 * 7)
             return self.response(service_response)
         return self.response()
 
