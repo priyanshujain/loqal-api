@@ -59,13 +59,6 @@ class SmsOtpAuth(object):
             else:
                 return False
 
-        if settings.APP_ENV == "staging":
-            if otp == "111111":
-                self.perform_login(interface=interface)
-                return True
-            else:
-                return False
-
         if interface.validate_otp(otp):
             self.perform_login(interface=interface)
             return True
