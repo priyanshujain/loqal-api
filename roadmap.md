@@ -48,3 +48,7 @@ list    causes:             A list of reasons explaining why the
 ### DB
 
 - Make editable false on foreign keys
+
+
+### Django settings
+CSRF_TRUSTED_ORIGINS
