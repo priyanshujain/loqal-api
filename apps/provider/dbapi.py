@@ -150,6 +150,6 @@ def get_merchant_webhook_event(merchant_account):
 
 def get_webhook_event(id):
     try:
-        return ProviderWebhookEvent.objects.filter(id=id)
+        return ProviderWebhookEvent.objects.get(id=id)
     except ProviderWebhookEvent.DoesNotExist:
         return None
