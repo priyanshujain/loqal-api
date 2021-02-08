@@ -25,7 +25,7 @@ CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
     urllib.parse.quote(AWS_ACCESS_KEY_ID, safe=""),
     urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=""),
 )
-CELERY_TASK_DEFAULT_QUEUE = env("CELERY_TASK_DEFAULT_QUEUE")
+CELERY_TASK_DEFAULT_QUEUE = "loqal_queue"
 
 # CSRF_COOKIE_NAME = '__Secure-csrftoken'
 CSRF_COOKIE_SAMESITE = "strict"
