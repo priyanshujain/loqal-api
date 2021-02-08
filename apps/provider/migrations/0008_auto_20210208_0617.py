@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('provider', '0007_providerwebhookevent_event_timestamp'),
+        ("provider", "0007_providerwebhookevent_event_timestamp"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='providerwebhookevent',
-            name='target_resource_dwolla_id',
-            field=models.CharField(blank=True, db_index=True, default=None, max_length=255, null=True),
+            model_name="providerwebhookevent",
+            name="target_resource_dwolla_id",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                default=None,
+                max_length=255,
+                null=True,
+            ),
         ),
     ]

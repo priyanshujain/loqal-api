@@ -112,9 +112,6 @@ class CloseDisputeAPI(StaffAPIView):
 class GetAllDisputeAPI(StaffAPIView):
     def get(self, request):
         disputes = get_all_disputes()
-        return self.paginate(
-            request,
-            queryset=disputes,
-            order_by="-created_at",
-            response_serializer=StaffDisputeDetailsResponse,
+        return self.response(
+            StaffDisputeDetailsResponse(disputes, many=True).data
         )

@@ -30,10 +30,8 @@ class GetMerchantWebhookEventsAPI(StaffBaseAPI):
                 {"detail": ErrorDetail(_("Invalid merchant."))}
             )
         events = get_merchant_webhook_event(merchant_account=merchant_account)
-        return self.paginate(
-            request,
-            queryset=events,
-            response_serializer=ListMerchantWebhookEventsResponse,
+        return self.response(
+            ListMerchantWebhookEventsResponse(events, many=True).data
         )
 
 

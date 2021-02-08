@@ -21,12 +21,12 @@ urlpatterns = [
         name="all_disputes",
     ),
     path(
-        "staff/qrcodes/<str:qrcode_id>",
+        "staff/qrcodes/<str:qrcode_id>/",
         GetQrCodeImageAPI.as_view(),
         name="qrcode_img_staff",
     ),
     path(
-        "staff/qrcode/",
+        "staff/qrcodes/",
         GetAllQrCodesAPI.as_view(),
         name="all_qrcodes",
     ),
