@@ -227,7 +227,7 @@ LOGGING = {
         },
         "celery": {
             "handlers": LOGGING_HANDLERS,
-            "level": "DEBUG",
+            "level": "INFO",
             "propagate": True,
         },
         "": {
