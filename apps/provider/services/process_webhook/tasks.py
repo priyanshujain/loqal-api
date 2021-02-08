@@ -81,3 +81,38 @@ def process_past_webhooks_for_transaction(transaction):
             customer_account=customer_account,
             transaction=transaction,
         ).handle()
+
+
+def process_single_webhook_event(event):
+    if not "customer" in event.topic:
+        # Add account related webhooks here
+        return
+
+    account_dwolla_id = (
+        event.event_payload.get("_links", {})
+        .get("customer", {})
+        .get("href", "")
+        .split("/")
+        .pop()
+    )
+    customer_account = get_account_by_dwolla_id(dwolla_id=account_dwolla_id)
+    if not customer_account:
+        return
+
+    if "transfer" in event.topic:
+        ApplyPaymentWebhook(
+            event=event, customer_account=customer_account
+        ).handle()
+    elif "funding_source" in event.topic:
+        ApplyBankingWebhook(
+            event=event, customer_account=customer_account
+        ).handle()
+    elif "beneficial_owner" in event.topic:
+        ApplyBeneficialOwnerWebhook(
+            event=event,
+            customer_account=customer_account,
+        )
+    else:
+        ApplyOnboardingWebhook(
+            event=event, customer_account=customer_account
+        ).handle()

@@ -6,6 +6,7 @@ from apps.payment.models import PaymentQrCode
 
 __all__ = (
     "QrCodeResponse",
+    "StaffQrCodeResponse",
     "MerchantQrCodeResponse",
     "QrCodeMerchantDetailsResponse",
 )
@@ -64,6 +65,25 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
             "merchant_uid",
             "merchant_id",
             "cashier_id",
+            "cashier",
+            "updated_at",
+            "created_at",
+        )
+
+
+class StaffQrCodeResponse(serializers.ModelSerializer):
+    merchant_name = serializers.CharField(
+        source="merchant.profile.full_name", read_only=True
+    )
+    cashier = CashierDetailsResponse(read_only=True)
+
+    class Meta:
+        model = PaymentQrCode
+        fields = (
+            "qrcode_id",
+            "is_expired",
+            "currency",
+            "merchant_name",
             "cashier",
             "updated_at",
             "created_at",

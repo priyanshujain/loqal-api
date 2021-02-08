@@ -1,4 +1,5 @@
 import uuid
+from typing import Text
 
 from django.db import models
 from django.utils.timezone import now
@@ -99,7 +100,9 @@ class ProviderWebhookEvent(AbstractBaseModel):
     dwolla_id = models.CharField(max_length=255, blank=True)
     is_processed = models.BooleanField(default=False)
     topic = models.CharField(max_length=255, blank=True)
-    target_resource_dwolla_id = models.CharField(max_length=255, blank=True)
+    target_resource_dwolla_id = models.CharField(
+        max_length=255, blank=True, null=True, default=None, db_index=True
+    )
     event_timestamp = models.DateTimeField(null=True, blank=True)
 
     class Meta:

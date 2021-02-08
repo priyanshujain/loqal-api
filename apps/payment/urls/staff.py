@@ -2,6 +2,7 @@ from django.urls import path
 
 from apps.payment.views.dispute import (ChangeDisputeStatusAPI,
                                         CloseDisputeAPI, GetAllDisputeAPI)
+from apps.payment.views.staff import GetAllQrCodesAPI, GetQrCodeImageAPI
 
 urlpatterns = [
     path(
@@ -18,5 +19,15 @@ urlpatterns = [
         "staff/disputes/",
         GetAllDisputeAPI.as_view(),
         name="all_disputes",
+    ),
+    path(
+        "staff/qrcodes/<str:qrcode_id>",
+        GetQrCodeImageAPI.as_view(),
+        name="qrcode_img_staff",
+    ),
+    path(
+        "staff/qrcode/",
+        GetAllQrCodesAPI.as_view(),
+        name="all_qrcodes",
     ),
 ]
