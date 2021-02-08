@@ -27,7 +27,7 @@ CELERY_BROKER_URL = "sqs://{0}:{1}@".format(
 )
 CELERY_TASK_DEFAULT_QUEUE = env("CELERY_TASK_DEFAULT_QUEUE")
 
-CSRF_COOKIE_NAME = '__Secure-csrftoken'
+# CSRF_COOKIE_NAME = '__Secure-csrftoken'
 CSRF_COOKIE_SAMESITE = "strict"
 SESSION_COOKIE_SAMESITE = "strict"
 
