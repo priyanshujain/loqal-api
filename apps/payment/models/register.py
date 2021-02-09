@@ -48,13 +48,13 @@ class PaymentRegister(AbstractBaseModel):
 
     def update_usage(self, amount, last_used_at):
         amount = Decimal(amount)
-        if timezone.now() > self.daily_usage_start_time + timedelta(hours=24):
+        if last_used_at >= self.daily_usage_start_time + timedelta(hours=24):
             self.daily_usage_start_time = last_used_at
             self.daily_usage = amount
         else:
             self.daily_usage += amount
 
-        if timezone.now() > self.weekly_usage_start_time + timedelta(days=7):
+        if last_used_at >= self.weekly_usage_start_time + timedelta(days=7):
             self.weekly_usage_start_time = last_used_at
             self.weekly_usage = amount
         else:
