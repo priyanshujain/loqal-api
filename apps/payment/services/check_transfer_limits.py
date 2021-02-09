@@ -30,26 +30,15 @@ class CheckTransferLimit(object):
                 }
             )
         current_time = timezone.now()
-        if current_time < payment_register.daily_usage_start_time + timedelta(
-            hours=24
-        ):
+        if current_time < payment_register.daily_usage_start_time + timedelta(hours=24):
             self._check_daily_limit()
 
-        if (
-            current_time
-            < payment_register.weekly_usage_start_time + timedelta(days=7)
-        ):
+        if current_time < payment_register.weekly_usage_start_time + timedelta(days=7):
             self._check_weekly_limit()
 
     def _check_daily_limit(self):
         payment_register = self.register
-        daily_total = (
-            get_transactions_by_bank_account(
-                from_datetime=payment_register.daily_usage_start_time,
-                bank_account_id=self.bank_account.id,
-            ).aggregate(total=Sum("amount"))["total"]
-            or Decimal(0.0) + self.amount
-        )
+        daily_total = payment_register.daily_usage + self.amount
         if daily_total > payment_register.daily_send_limit:
             raise ValidationError(
                 {
@@ -65,13 +54,7 @@ class CheckTransferLimit(object):
 
     def _check_weekly_limit(self):
         payment_register = self.register
-        weekly_total = (
-            get_transactions_by_bank_account(
-                from_datetime=payment_register.weekly_usage_start_time,
-                bank_account_id=self.bank_account.id,
-            ).aggregate(total=Sum("amount"))["total"]
-            or Decimal(0.0) + self.amount
-        )
+        weekly_total = payment_register.weekly_usage + self.amount
         if weekly_total > payment_register.weekly_send_limit:
             raise ValidationError(
                 {

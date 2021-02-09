@@ -102,7 +102,9 @@ class CreatePayment(ServiceBase):
             sender_balance_at_checkout=balance,
         )
         if sender_register:
-            sender_register.update_usage(amount=self.total_amount)
+            sender_register.update_usage(
+                amount=self.total_amount, last_used_at=transaction.created_at
+            )
         return transaction
 
     def _send_error(self, error, transaction):

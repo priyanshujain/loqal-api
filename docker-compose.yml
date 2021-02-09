@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     build:
       context: .
-    command: celery -A config worker -l INFO -E -Q celery -n apps --concurrency=2
+    command: celery -A config worker -l INFO -E -Q loqal_queue -n apps --concurrency=2
     links:
       - redis
     networks:
