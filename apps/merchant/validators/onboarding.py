@@ -73,7 +73,7 @@ class IndividualValidator(serializers.ValidationSerializer):
     dob = serializers.DateField(format="%Y-%m-%d")
     address = serializers.AddressSerializer()
     is_us_citizen = serializers.BooleanField()
-    ssn_number = serializers.CharField(required=False)
+    ssn = serializers.CharField(required=False)
     passport_country = serializers.CharField(max_length=2, required=False)
     passport_number = serializers.CharField(required=False)
 
@@ -83,6 +83,12 @@ class IndividualValidator(serializers.ValidationSerializer):
         ssn = attrs.get("ssn")
         passport_country = attrs.get("passport_country")
         passport_number = attrs.get("passport_number")
+
+        try:
+            if ssn:
+                ssn = _ssn.format(ssn)
+        except Exception:
+            pass
 
         if is_us_citizen and not ssn:
             raise ValidationError(
@@ -127,7 +133,7 @@ class IndividualValidator(serializers.ValidationSerializer):
                     }
                 )
         if ssn:
-            attrs["ssn"] = _ssn.format(ssn)
+            attrs["ssn"] = ssn
         return attrs
 
 
