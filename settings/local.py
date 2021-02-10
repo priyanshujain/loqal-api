@@ -19,7 +19,7 @@ SESSION_INACTIVITY_EXPIRATION_DURATION = 86400
 
 SPOTLIGHT_ADMIN_EMAIL = "test@spotlightandcompany.com"
 
-APP_NAME = "Loqal local"
+APP_NAME = "Loqal"
 
 
 # app config
