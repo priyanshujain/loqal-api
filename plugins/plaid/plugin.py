@@ -48,13 +48,6 @@ class PlaidPlugin(object):
             "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
             "country_codes": ["US"],
             "language": "en",
-            "account_filters": {
-                "depository": {
-                    "account_subtypes": [
-                        "checking",
-                    ],
-                },
-            },
         }
 
         if access_token:
@@ -62,6 +55,13 @@ class PlaidPlugin(object):
 
         if not access_token:
             data["products"] = ["auth"]
+            data["account_filters"] = {
+                "depository": {
+                    "account_subtypes": [
+                        "checking",
+                    ],
+                },
+            }
 
         try:
             self._link_token = self._client.LinkToken.create(data).get(
