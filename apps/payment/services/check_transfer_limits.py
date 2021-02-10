@@ -30,10 +30,15 @@ class CheckTransferLimit(object):
                 }
             )
         current_time = timezone.now()
-        if current_time < payment_register.daily_usage_start_time + timedelta(hours=24):
+        if current_time < payment_register.daily_usage_start_time + timedelta(
+            hours=24
+        ):
             self._check_daily_limit()
 
-        if current_time < payment_register.weekly_usage_start_time + timedelta(days=7):
+        if (
+            current_time
+            < payment_register.weekly_usage_start_time + timedelta(days=7)
+        ):
             self._check_weekly_limit()
 
     def _check_daily_limit(self):
