@@ -47,7 +47,7 @@ class PlaidPlugin(object):
             },
             "client_name": getattr(settings, "PLAID_APP_NAME", "Loqal"),
             "country_codes": ["US"],
-            "language": "en"
+            "language": "en",
         }
 
         if access_token:
