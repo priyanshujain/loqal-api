@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from apps.user.models import User
-from apps.user.options import UserType
+from apps.user.options import CustomerTypes, UserType
 
 __all__ = (
     "create_staff_user",
@@ -16,9 +16,10 @@ def create_staff_user(
     try:
         user = User.objects.create(
             email=email,
-            username=email,
+            username=f"{email}::{CustomerTypes.INTERNAL.value}",
             first_name=first_name,
             last_name=last_name,
+            customer_type=CustomerTypes.INTERNAL,
         )
         user.set_password(password)
         user.gen_email_verification_token()

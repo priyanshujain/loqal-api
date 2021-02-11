@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 
 from apps.user.models import User, UserPasswordReset, UserSession
+from apps.user.options import CustomerTypes
 from utils.shortcuts import rand_str
 
 __all__ = (
@@ -20,6 +21,8 @@ __all__ = (
     "get_user_by_email_token",
     "get_user_by_phone",
     "get_session_by_id",
+    "get_consumer_user_by_email",
+    "get_merchant_user_by_email",
 )
 
 
@@ -28,16 +31,18 @@ def create_user(
     last_name,
     email,
     password,
+    customer_type,
     phone_number=None,
     email_verified=False,
 ):
     user = User.objects.create(
-        username=email,
+        username=f"{email}::{customer_type.value}",
         email=email,
         email_verified=email_verified,
         first_name=first_name,
         last_name=last_name,
         phone_number=phone_number,
+        customer_type=customer_type,
     )
     user.set_password(password)
     user.gen_email_verification_token()
@@ -56,6 +61,24 @@ def update_user_profile(user, first_name, last_name):
 def get_user_by_email(email):
     try:
         return User.objects.get(email=email)
+    except User.DoesNotExist:
+        return None
+
+
+def get_consumer_user_by_email(email):
+    try:
+        return User.objects.get(
+            email=email, customer_type=CustomerTypes.CONSUMER
+        )
+    except User.DoesNotExist:
+        return None
+
+
+def get_merchant_user_by_email(email):
+    try:
+        return User.objects.get(
+            email=email, customer_type=CustomerTypes.MERCHANT
+        )
     except User.DoesNotExist:
         return None
 

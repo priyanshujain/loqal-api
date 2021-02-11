@@ -48,7 +48,9 @@ class FeatureAccessRole(AbstractBaseModel):
 class AccountMember(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="merchant_account_member",
     )
     position = models.CharField(max_length=256, blank=True)
     account_active = models.BooleanField(default=False)

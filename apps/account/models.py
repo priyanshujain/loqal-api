@@ -113,7 +113,9 @@ class ConsumerAccount(AbstractBaseModel):
     account = models.OneToOneField(
         Account, related_name="consumer", on_delete=models.CASCADE
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="consumer_account"
+    )
     username = models.CharField(
         max_length=32, default=None, null=True, unique=True
     )

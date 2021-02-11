@@ -5,6 +5,7 @@ from django.db.utils import IntegrityError
 from apps.merchant.models import AccountMember, FeatureAccessRole, MemberInvite
 from apps.user.dbapi import create_user
 from apps.user.models import User
+from apps.user.options import CustomerTypes
 
 
 def get_account_member_by_id(member_id, merchant_id):
@@ -200,6 +201,7 @@ def create_account_member_from_team_invite(
         email=invite.email,
         phone_number=phone_number,
         password=password,
+        customer_type=CustomerTypes.MERCHANT,
         email_verified=True,
     )
     return AccountMember.objects.create(

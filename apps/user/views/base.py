@@ -8,7 +8,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
 from apps.user.dbapi import get_user_by_email
-from apps.user.services import (AddChangeUserAvatar, ChangePassword,
+from apps.user.services import (AddChangeUserAvatar,
                                 ResetPasswordTokenValidate, Session)
 from apps.user.validators import UserEmailExistsValidator
 from utils import auth
@@ -155,19 +155,6 @@ class UserLogoutAPI(LoggedInAPIView):
             if user_session.user_device:
                 user_session.user_device.inactivate_device()
         return self.response()
-
-
-class UserChangePasswordAPI(LoggedInAPIView):
-    def post(self, request):
-        """
-        Changes user's password and asks him to login again.
-        """
-        self._run_services(request=request)
-        return self.response()
-
-    def _run_services(self, request):
-        service = ChangePassword(request=request, data=self.request_data)
-        service.handle()
 
 
 class ResetPasswordTokenValidateAPI(APIView):

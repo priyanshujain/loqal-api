@@ -14,17 +14,15 @@ from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.notification.tasks import SendEmailVerifiedNotification
 from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.notifications import SendConsumerResetPasswordEmail
+from apps.user.options import CustomerTypes
 from apps.user.responses import UserProfileResponse
-from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
-                                ApplyResetPassword, ChangePassword,
-                                EmailVerification, LoginRequest,
-                                RequestResetPassword, ResendPhoneNumberOtp,
-                                ResendSmsOtpAuth, ResetPasswordTokenValidate,
-                                Session, SmsOtpAuth, StartSmsAuthEnrollment,
+from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
+                                ChangePassword, EmailVerification,
+                                LoginRequest, RequestResetPassword,
+                                ResendPhoneNumberOtp, ResendSmsOtpAuth,
+                                SmsOtpAuth, StartSmsAuthEnrollment,
                                 VerifyPhoneNumber)
-from apps.user.validators import EditProfileValidator, UserEmailExistsValidator
 from utils import auth
-from utils.shortcuts import img2base64, rand_str
 
 
 class GetUserProfileAPI(APIView):
@@ -77,7 +75,11 @@ class UserLoginAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = LoginRequest(request=request, data=self.request_data)
+        service = LoginRequest(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.CONSUMER,
+        )
         return service.handle()
 
 
@@ -202,7 +204,11 @@ class ApplyResetPasswordAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = ApplyResetPassword(request=request, data=self.request_data)
+        service = ApplyResetPassword(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.CONSUMER,
+        )
         service.handle()
 
 
@@ -219,3 +225,20 @@ class VerifyEmailAPI(APIView):
             SendEmailVerifiedNotification(
                 user_id=user.id, device_id=device_id
             ).send()
+
+
+class UserChangePasswordAPI(LoggedInAPIView):
+    def post(self, request):
+        """
+        Changes user's password and asks him to login again.
+        """
+        self._run_services(request=request)
+        return self.response()
+
+    def _run_services(self, request):
+        service = ChangePassword(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.CONSUMER,
+        )
+        service.handle()

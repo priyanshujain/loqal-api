@@ -11,7 +11,8 @@ from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.payment.dbapi import create_payment_register
 from apps.provider.lib.actions import ProviderAPIActionBase
-from apps.user.dbapi import create_user, get_user_by_email
+from apps.user.dbapi import create_user, get_consumer_user_by_email
+from apps.user.options import CustomerTypes
 
 from .accept_consumer_terms import AcceptTerms
 
@@ -52,7 +53,7 @@ class CreateConsumerAccount(ServiceBase):
         self._email = data["email"]
         self._password = data["password"]
 
-        user = get_user_by_email(email=self._email)
+        user = get_consumer_user_by_email(email=self._email)
         if user:
             raise ValidationError(
                 {
@@ -83,6 +84,7 @@ class CreateConsumerAccount(ServiceBase):
             last_name=self._last_name,
             email=self._email,
             password=self._password,
+            customer_type=CustomerTypes.CONSUMER,
         )
 
     def _send_verfication_email(self, user):

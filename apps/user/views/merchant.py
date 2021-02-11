@@ -7,8 +7,10 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.views import APIView, MerchantAPIView
 from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.user.notifications import SendMerchantResetPasswordEmail
-from apps.user.services import (ApplyResetPassword, EmailVerification,
-                                LoginRequest, RequestResetPassword)
+from apps.user.options import CustomerTypes
+from apps.user.services import (ApplyResetPassword, ChangePassword,
+                                EmailVerification, LoginRequest,
+                                RequestResetPassword)
 
 
 class ResendEmailverificationAPI(MerchantAPIView):
@@ -42,7 +44,11 @@ class UserLoginAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = LoginRequest(request=request, data=self.request_data)
+        service = LoginRequest(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.MERCHANT,
+        )
         return service.handle()
 
 
@@ -69,7 +75,11 @@ class ApplyResetPasswordAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = ApplyResetPassword(request=request, data=self.request_data)
+        service = ApplyResetPassword(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.MERCHANT,
+        )
         service.handle()
 
 
@@ -80,4 +90,21 @@ class VerifyEmailAPI(APIView):
 
     def _run_services(self):
         service = EmailVerification(data=self.request_data)
+        service.handle()
+
+
+class UserChangePasswordAPI(MerchantAPIView):
+    def post(self, request):
+        """
+        Changes user's password and asks him to login again.
+        """
+        self._run_services(request=request)
+        return self.response()
+
+    def _run_services(self, request):
+        service = ChangePassword(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.MERCHANT,
+        )
         service.handle()

@@ -4,17 +4,11 @@ from apps.user.views import (CheckTFAStausAPI, DeleteSessionAPI,
                              DisableTwoFactorAuthAPI, EnableTwoFactorAuthAPI,
                              GetTwoFactorAuthQRCodeAPI, ListSessionsAPI,
                              ResetPasswordTokenValidateAPI, UserAvatarAPI,
-                             UserChangePasswordAPI, UserLogoutAPI,
-                             UsernameOrEmailCheckAPI)
+                             UserLogoutAPI, UsernameOrEmailCheckAPI)
 
 urlpatterns = [
     path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
     path("logout/", UserLogoutAPI.as_view(), name="user_logout"),
-    path(
-        "change-password/",
-        UserChangePasswordAPI.as_view(),
-        name="user_change_password",
-    ),
     path(
         "reset-password/validate-token/",
         ResetPasswordTokenValidateAPI.as_view(),

@@ -4,7 +4,7 @@ from importlib import import_module
 import six
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
-from django.db import models
+from django.db import DefaultConnectionProxy, models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -16,11 +16,14 @@ from apps.user.options import UserType
 from db.models.base import BaseModel
 from db.models.fields import (BoundedPositiveIntegerField,
                               EncryptedPickledObjectField)
+from db.models.fields.choice import ChoiceCharEnumField
 from lib.auth.authenticators import (AUTHENTICATOR_CHOICES,
                                      AUTHENTICATOR_INTERFACES,
                                      AUTHENTICATOR_INTERFACES_BY_TYPE,
                                      available_authenticators)
 from utils.shortcuts import rand_str
+
+from .options import CustomerTypes
 
 
 class UserManager(models.Manager):
@@ -38,13 +41,12 @@ class UserManager(models.Manager):
         user = self.model(username=email, email=email)
         user.set_password(password)
         user.save()
-
         return user
 
 
 class User(BaseModel, AbstractBaseUser):
     username = models.CharField(max_length=254, unique=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(
         max_length=254, default=rand_str
@@ -54,15 +56,16 @@ class User(BaseModel, AbstractBaseUser):
     first_name = models.CharField(max_length=155, blank=True)
     last_name = models.CharField(max_length=155, blank=True)
     secondary_email = models.EmailField(max_length=255, blank=True)
-    phone_number = models.CharField(
-        max_length=10, default=None, null=True, unique=True
-    )
+    phone_number = models.CharField(max_length=10, default=None, null=True)
     phone_number_country = models.CharField(max_length=2, default="US")
     phone_number_verified = models.BooleanField(default=False)
 
     # Avatar
     avatar_file = models.ForeignKey(
         BoxFile, on_delete=models.CASCADE, blank=True, null=True
+    )
+    customer_type = ChoiceCharEnumField(
+        enum_type=CustomerTypes, default=CustomerTypes.INTERNAL, max_length=32
     )
 
     # One of UserType
@@ -83,7 +86,7 @@ class User(BaseModel, AbstractBaseUser):
         ),
     )
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
@@ -143,6 +146,11 @@ class User(BaseModel, AbstractBaseUser):
 
     class Meta:
         db_table = "user"
+        unique_together = (
+            "email",
+            "phone_number",
+            "customer_type",
+        )
 
 
 class AuthenticatorManager(models.Manager):

@@ -13,15 +13,19 @@ __all__ = ("ChangePassword",)
 
 
 class ChangePassword(ServiceBase):
-    def __init__(self, request, data):
+    def __init__(self, request, data, customer_type):
         self.request = request
         self.data = data
+        self.customer_type = customer_type
 
     def _validate_data(self):
         request = self.request
         data = run_validator(validator=ForgotPasswordValidator, data=self.data)
         email = request.user.email
-        user = auth.authenticate(email=email, password=data["old_password"])
+        username = f"{email}::{self.customer_type}"
+        user = auth.authenticate(
+            username=username, password=data["old_password"]
+        )
         if not user:
             raise ValidationError(
                 {
