@@ -21,3 +21,8 @@ class DwollaFundingSourceStatus(ChoiceCharEnum):
     UNVERIFIED = "unverified", _("Unverified")
     NEGATIVE_BALANCE = "negative_balance", _("Negative Balance")
     UPDATED = "updated", _("Updated")
+
+
+class VerificationProvider(ChoiceCharEnum):
+    DWOLLA = "dwolla", _("Dwolla")
+    PLAID = "plaid", _("Plaid")

@@ -32,11 +32,9 @@ class Banking(Http):
             )
         except NotFoundError:
             return None
-        response =  response.json()
-        return {
-            "token": response["token"]
-        }
-    
+        response = response.json()
+        return {"token": response["token"]}
+
     def get_bank_account(self, funding_source_id):
         """
         get bank account (Funding source)

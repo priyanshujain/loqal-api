@@ -7,13 +7,14 @@ from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 
-from .options import BankAccountStatus, DwollaFundingSourceStatus
+from .options import (BankAccountStatus, DwollaFundingSourceStatus,
+                      VerificationProvider)
 
 
 class BankAccount(AbstractBaseModel):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    plaid_access_token = models.CharField(max_length=255)
-    plaid_account_id = models.CharField(max_length=255)
+    plaid_access_token = models.CharField(max_length=255, blank=True)
+    plaid_account_id = models.CharField(max_length=255, blank=True)
     account_number_suffix = models.CharField(max_length=4)
     name = models.CharField(max_length=64)
     bank_name = models.CharField(max_length=1024)
@@ -26,6 +27,11 @@ class BankAccount(AbstractBaseModel):
     dwolla_funding_source_status = ChoiceCharEnumField(
         enum_type=DwollaFundingSourceStatus,
         default=DwollaFundingSourceStatus.NA,
+        max_length=32,
+    )
+    verification_provider = ChoiceCharEnumField(
+        enum_type=VerificationProvider,
+        default=VerificationProvider.PLAID,
         max_length=32,
     )
     plaid_status = ChoiceCharEnumField(
