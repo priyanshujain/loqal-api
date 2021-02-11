@@ -10,6 +10,9 @@ class BankAccountResponse(serializers.ModelSerializer):
     )
     plaid_status = serializers.ChoiceCharEnumSerializer(read_only=True)
     bank_account_id = serializers.CharField(source="u_id", read_only=True)
+    verification_provider = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
 
     class Meta:
         model = BankAccount
@@ -24,4 +27,5 @@ class BankAccountResponse(serializers.ModelSerializer):
             "name",
             "status",
             "plaid_status",
+            "verification_provider",
         )

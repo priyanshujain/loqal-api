@@ -20,6 +20,11 @@ class CreateIAVBankAccount(ServiceBase):
         data = GetBankAccountAPIAction(account_id=self.account.id).get(
             dwolla_id=dwolla_id
         )
+        customer_dwolla_id = data["customer_dwolla_id"]
+        if self.account.dwolla_id != customer_dwolla_id:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Funding source is not valid."))}
+            )
         bank_account = self._factory_bank_account(
             status=data["status"],
             bank_name=data["bank_name"],

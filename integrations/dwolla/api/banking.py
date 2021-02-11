@@ -48,6 +48,9 @@ class Banking(Http):
         except NotFoundError:
             return None
         data = response.json()
+        customer_dwolla_id = (
+            data["_links"]["customer"]["href"].split("/").pop()
+        )
         return {
             "status": getattr(DwollaFundingSourceStatusMap, data["status"]),
             "name": data["name"],
@@ -56,6 +59,7 @@ class Banking(Http):
             "bank_account_type": data["bank_account_type"],
             "type": data["type"],
             "removed": data["removed"],
+            "customer_dwolla_id": customer_dwolla_id,
         }
 
     def create_bank_account(self, data):
