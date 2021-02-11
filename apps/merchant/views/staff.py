@@ -143,10 +143,6 @@ class DeleteNonLoqalAPI(StaffBaseMerchantAPI):
 class CertifyOwnershipAPI(StaffBaseMerchantAPI):
     def post(self, request, merchant_id):
         merchant_account = self.validate_merchant(merchant_id)
-        if merchant_account.account:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("This is not non loqal merchant"))}
-            )
         CertifyDwollaMerchantAccount(merchant=merchant_account).handle()
         return self.response()
 
@@ -154,9 +150,5 @@ class CertifyOwnershipAPI(StaffBaseMerchantAPI):
 class ForceCertifyOwnershipAPI(StaffBaseMerchantAPI):
     def post(self, request, merchant_id):
         merchant_account = self.validate_merchant(merchant_id)
-        if merchant_account.account:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("This is not non loqal merchant"))}
-            )
         ForceCertifyDwollaMerchantAccount(merchant=merchant_account).handle()
         return self.response()
