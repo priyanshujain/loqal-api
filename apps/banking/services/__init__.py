@@ -1,4 +1,5 @@
 from .create_bank_account import CreateBankAccount
+from .create_iav_bank_account import CreateIAVBankAccount
 from .dwolla_iav_token import GetIAVToken
 from .plaid_link import PlaidLink
 from .reauth_bank_account import ReAuthBankAccount

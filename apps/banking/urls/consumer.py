@@ -1,6 +1,7 @@
 from django.urls import path
 
 from apps.banking.views.consumer import (CreateBankAccountAPI,
+                                         CreateIAVBankAccountAPI,
                                          GetBankAccountAPI, GetIAVTokenAPI,
                                          PlaidLinkTokenAPI,
                                          ReAuthBankAccountAPI,
@@ -11,6 +12,11 @@ urlpatterns = [
         "consumer/accounts/create/",
         CreateBankAccountAPI.as_view(),
         name="create_consumer_bank_account",
+    ),
+    path(
+        "consumer/accounts/iav/create/",
+        CreateIAVBankAccountAPI.as_view(),
+        name="create_iav_consumer_bank_account",
     ),
     path(
         "consumer/accounts/remove/",
