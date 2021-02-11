@@ -1,5 +1,5 @@
 from api import serializers
-from apps.core.models import AppMetaData
+from apps.core.models import AppMetaData, MerchantMetaData
 
 
 class AppMetaDataResponse(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class MerchantMetaDataResponse(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = AppMetaData
+        model = MerchantMetaData
         fields = (
             "platform",
             "primary_banking_verification_provider",
