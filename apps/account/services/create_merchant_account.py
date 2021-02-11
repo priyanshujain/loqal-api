@@ -2,7 +2,8 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
-from apps.account.dbapi import create_merchant_account
+from apps.account.dbapi import (create_merchant_account,
+                                get_consumer_account_by_email)
 from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
@@ -55,6 +56,21 @@ class CreateMerchantAccount(ServiceBase):
                     "email": [
                         ErrorDetail(
                             _("A user with this email already exists.")
+                        )
+                    ]
+                }
+            )
+
+        user = get_consumer_account_by_email(email=self._email)
+        if user:
+            raise ValidationError(
+                {
+                    "detail": [
+                        ErrorDetail(
+                            _(
+                                "You already signed for a Loqal app user account "
+                                "with this email. Please use a different email."
+                            )
                         )
                     ]
                 }

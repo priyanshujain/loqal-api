@@ -76,7 +76,6 @@ class User(BaseModel, AbstractBaseUser):
     two_factor_auth = models.BooleanField(default=False)
     tfa_token = models.CharField(max_length=254, blank=True)
     is_disabled = models.BooleanField(default=False)
-
     is_password_expired = models.BooleanField(
         _("password expired"),
         default=False,

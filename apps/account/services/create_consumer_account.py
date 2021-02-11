@@ -3,14 +3,15 @@ from random import randint
 
 from django.utils.translation import gettext as _
 
-from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
+from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import check_account_username, create_consumer_account
+from apps.account.dbapi import (check_account_username,
+                                create_consumer_account,
+                                get_merchant_account_by_email)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
 from apps.payment.dbapi import create_payment_register
-from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.user.dbapi import create_user, get_consumer_user_by_email
 from apps.user.options import CustomerTypes
 
@@ -60,6 +61,21 @@ class CreateConsumerAccount(ServiceBase):
                     "email": [
                         ErrorDetail(
                             _("A user with this email already exists.")
+                        )
+                    ]
+                }
+            )
+
+        user = get_merchant_account_by_email(email=self._email)
+        if user:
+            raise ValidationError(
+                {
+                    "detail": [
+                        ErrorDetail(
+                            _(
+                                "You already signed for a Loqal merchant account "
+                                "with this email. Please use a different email."
+                            )
                         )
                     ]
                 }
