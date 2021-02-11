@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.merchant.views.staff import (DeleteNonLoqalAPI,
+from apps.merchant.views.staff import (CertifyOwnershipAPI, DeleteNonLoqalAPI,
+                                       ForceCertifyOwnershipAPI,
                                        GetCodesAndProtocolsAPI,
                                        GetMerchantOperationHoursAPI,
                                        GetMerchantProfileAPI,
@@ -11,6 +12,16 @@ from apps.merchant.views.staff import (DeleteNonLoqalAPI,
                                        UpdateServiceAvailabilityAPI)
 
 urlpatterns = [
+    path(
+        "<uuid:merchant_id>/certify-ownership/",
+        CertifyOwnershipAPI.as_view(),
+        name="staff_certify_merchant",
+    ),
+    path(
+        "<uuid:merchant_id>/force-certify-ownership/",
+        ForceCertifyOwnershipAPI.as_view(),
+        name="staff_force_certify_merchant",
+    ),
     path(
         "<uuid:merchant_id>/profile/update/",
         UpdateMerchantProfileAPI.as_view(),
