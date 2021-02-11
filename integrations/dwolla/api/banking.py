@@ -84,9 +84,7 @@ class Banking(Http):
         )
         return {
             "dwolla_funding_source_id": dwolla_funding_source_id,
-            "status": getattr(
-                DwollaFundingSourceStatusMap, funding_source_details["status"]
-            ),
+            "status": funding_source_details["status"],
         }
 
     def get_bank_accounts(self):
