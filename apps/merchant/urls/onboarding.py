@@ -3,11 +3,12 @@ from django.urls import path
 from apps.merchant.views.onboarding import (
     AcceptableDocumentTypesAPI, CertifyOwnershipAPI, CreateBeneficialOwnerAPI,
     CreateControllerAPI, CreateIncorporationDetailsAPI,
-    DocumentRequirementsAPI, OnboardingDataAPI, OnboardingStatusAPI,
-    RemoveBeneficialOwnerAPI, SubmitDocumentAPI, SubmitKycDataAPI,
-    UpdateBeneficialOwnerAPI, UpdateBusinessVerificationDocumentAPI,
-    UpdateControllerAPI, UpdateControllerVerificationDocumentAPI,
-    UpdateIncorporationDetailsAPI, UpdateOwnerVerificationDocumentAPI)
+    DocumentRequirementsAPI, ForceCertifyOwnershipAPI, OnboardingDataAPI,
+    OnboardingStatusAPI, RemoveBeneficialOwnerAPI, SubmitDocumentAPI,
+    SubmitKycDataAPI, UpdateBeneficialOwnerAPI,
+    UpdateBusinessVerificationDocumentAPI, UpdateControllerAPI,
+    UpdateControllerVerificationDocumentAPI, UpdateIncorporationDetailsAPI,
+    UpdateOwnerVerificationDocumentAPI)
 
 urlpatterns = [
     path(
@@ -89,6 +90,11 @@ urlpatterns = [
         "onboarding/certify-ownership/",
         CertifyOwnershipAPI.as_view(),
         name="certify_ownership",
+    ),
+    path(
+        "onboarding/force-certify-ownership/",
+        ForceCertifyOwnershipAPI.as_view(),
+        name="force_certify_ownership",
     ),
     path(
         "onboarding/acceptable-document-types/",

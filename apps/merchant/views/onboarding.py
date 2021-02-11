@@ -18,6 +18,7 @@ from apps.merchant.services import (BeneficialOwnerDocumentUpload,
                                     CreateDwollaMerchantAccount,
                                     CreateIncorporationDetails,
                                     DocumentRequirements,
+                                    ForceCertifyDwollaMerchantAccount,
                                     GetMerchantAccountStatus,
                                     ProcessPendingOnboardingWebhooks,
                                     RemoveBeneficialOwner, SubmitDocuments,
@@ -39,6 +40,7 @@ __all__ = (
     "UpdateOwnerVerificationDocumentAPI",
     "UpdateControllerVerificationDocumentAPI",
     "AcceptableDocumentTypesAPI",
+    "ForceCertifyOwnershipAPI",
 )
 
 
@@ -252,6 +254,13 @@ class CertifyOwnershipAPI(MerchantAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
         CertifyDwollaMerchantAccount(merchant=merchant_account).handle()
+        return self.response()
+
+
+class ForceCertifyOwnershipAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        ForceCertifyDwollaMerchantAccount(merchant=merchant_account).handle()
         return self.response()
 
 
