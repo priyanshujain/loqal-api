@@ -6,7 +6,8 @@ from apps.banking.dbapi import get_bank_account
 from apps.banking.options import BankAccountStatus
 from apps.banking.response import BankAccountResponse
 from apps.banking.services import (CreateBankAccount, PlaidLink,
-                                   ReAuthBankAccount, RemoveBankAccount)
+                                   ReAuthBankAccount, RemoveBankAccount,
+                                   GetIAVToken)
 from apps.banking.services.remove_bank_account import RemoveBankAccount
 
 
@@ -50,6 +51,15 @@ class PlaidLinkTokenAPI(ConsumerAPIView):
         else:
             token = PlaidLink(account_uid=account.u_id.hex).token
         return self.response({"token": token})
+
+
+class GetIAVTokenAPI(ConsumerAPIView):
+    def get(self, request):
+        account = request.account
+        token = GetIAVToken(
+                account=account,
+            ).handle()
+        return self.response(token)
 
 
 class ReAuthBankAccountAPI(ConsumerAPIView):

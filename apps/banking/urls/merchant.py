@@ -3,7 +3,8 @@ from django.urls import path
 from apps.banking.views.merchant import (CreateBankAccountAPI,
                                          GetBankAccountAPI, PlaidLinkTokenAPI,
                                          ReAuthBankAccountAPI,
-                                         RemoveBankAccountAPI)
+                                         RemoveBankAccountAPI,
+                                         GetIAVTokenAPI)
 
 urlpatterns = [
     path(
@@ -25,6 +26,11 @@ urlpatterns = [
         "merchant/plaid-token/",
         PlaidLinkTokenAPI.as_view(),
         name="create_merchant_plaid_token",
+    ),
+    path(
+        "merchant/accounts/dwoll-iav-token/",
+        GetIAVTokenAPI.as_view(),
+        name="create_merchant_dwolla_iav_token",
     ),
     path(
         "merchant/accounts/",

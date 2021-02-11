@@ -20,6 +20,20 @@ class Banking(Http):
     This class provides an interface to the Customers endpoints of the dwolla API.
     """
 
+    def get_iav_token(self):
+        """
+        get bank account (Funding source)
+        """
+        try:
+            response = self.get(
+                f"/customers/{self.config.customer_id}/iav-token",
+                authenticated=True,
+                retry=False,
+            )
+        except NotFoundError:
+            return None
+        return response.json()
+    
     def get_bank_account(self, funding_source_id):
         """
         get bank account (Funding source)
