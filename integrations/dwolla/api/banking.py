@@ -56,7 +56,7 @@ class Banking(Http):
             "name": data["name"],
             "bank_name": data["bankName"],
             "dwolla_id": data["id"],
-            "bank_account_type": data["bank_account_type"],
+            "bank_account_type": data["bankAccountType"],
             "type": data["type"],
             "removed": data["removed"],
             "customer_dwolla_id": customer_dwolla_id,

@@ -5,6 +5,8 @@ from django.db import IntegrityError
 
 from apps.banking.models import BankAccount
 
+from .options import PlaidBankAccountStatus, VerificationProvider
+
 __all__ = (
     "create_bank_account",
     "get_bank_account",
@@ -52,9 +54,11 @@ def create_bank_account_via_iav(
             account_id=account_id,
             bank_name=bank_name,
             name=name,
-            status=status,
+            dwolla_funding_source_status=status,
             dwolla_id=dwolla_id,
             bank_account_type=bank_account_type,
+            plaid_status=PlaidBankAccountStatus.NOT_APPLICABLE,
+            verification_provider=VerificationProvider.DWOLLA,
         )
     except IntegrityError:
         return None
