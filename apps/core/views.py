@@ -41,7 +41,7 @@ class MerchantMetaDataAPI(StaffAPIView):
 
     def get(self, request):
         platforms = get_merchant_metadata()
-        return self.response(AppMetaDataResponse(platforms, many=True).data)
+        return self.response(MerchantMetaDataResponse(platforms, many=True).data)
 
 
 class GetAppMetaDataAPI(APIAccessLogView):
