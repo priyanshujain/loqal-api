@@ -77,7 +77,9 @@ class AdminUserAddAPI(StaffAPIView):
         last_name = data["last_name"]
         user_type = data["user_type"]
 
-        user = get_user_by_email(email=email)
+        user = get_user_by_email(
+            email=email, customer_type=CustomerTypes.INTERNAL
+        )
         if not user:
             user = create_staff_user(
                 email=email,
@@ -111,7 +113,9 @@ class ChangeAdminRoleAPI(StaffAPIView):
         email = data["user_email"]
         user_type = data["user_type"]
 
-        user = get_user_by_email(email=email)
+        user = get_user_by_email(
+            email=email, customer_type=CustomerTypes.INTERNAL
+        )
         if not user:
             raise ValidationError(
                 {"user_email": [ErrorDetail(_("Invalid user."))]}

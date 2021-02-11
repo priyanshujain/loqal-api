@@ -4,7 +4,7 @@ from apps.user.views import (CheckTFAStausAPI, DeleteSessionAPI,
                              DisableTwoFactorAuthAPI, EnableTwoFactorAuthAPI,
                              GetTwoFactorAuthQRCodeAPI, ListSessionsAPI,
                              ResetPasswordTokenValidateAPI, UserAvatarAPI,
-                             UserLogoutAPI, UsernameOrEmailCheckAPI)
+                             UserLogoutAPI)
 
 urlpatterns = [
     path("avatar/", UserAvatarAPI.as_view(), name="user_avatar"),
@@ -13,11 +13,6 @@ urlpatterns = [
         "reset-password/validate-token/",
         ResetPasswordTokenValidateAPI.as_view(),
         name="validate_reset_password_token",
-    ),
-    path(
-        "email/check/",
-        UsernameOrEmailCheckAPI.as_view(),
-        name="check_email_exists",
     ),
     path(
         "tfa/status/",

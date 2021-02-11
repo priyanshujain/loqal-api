@@ -1,18 +1,13 @@
-import qrcode
-from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from otpauth import OtpAuth
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.helpers import run_validator
 from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
                        LoggedInAPIView)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.notification.tasks import SendEmailVerifiedNotification
-from apps.user.dbapi import get_user_by_email, update_user_profile
 from apps.user.notifications import SendConsumerResetPasswordEmail
 from apps.user.options import CustomerTypes
 from apps.user.responses import UserProfileResponse
@@ -185,7 +180,9 @@ class RequestResetPasswordAPI(APIView):
     def post(self, request):
         try:
             reset_password_object = RequestResetPassword(
-                request=request, data=self.request_data
+                request=request,
+                data=self.request_data,
+                customer_type=CustomerTypes.CONSUMER,
             ).handle()
             SendConsumerResetPasswordEmail(
                 reset_password_object=reset_password_object

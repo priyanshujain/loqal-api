@@ -5,33 +5,11 @@ from django.utils.translation import gettext as _
 from otpauth import OtpAuth
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.helpers import run_validator
 from api.views import APIView, LoggedInAPIView
-from apps.user.dbapi import get_user_by_email
 from apps.user.services import (AddChangeUserAvatar,
                                 ResetPasswordTokenValidate, Session)
-from apps.user.validators import UserEmailExistsValidator
 from utils import auth
 from utils.shortcuts import img2base64, rand_str
-
-
-class UsernameOrEmailCheckAPI(APIView):
-    def post(self, request):
-        """
-        check email is duplicate during signup
-        """
-        data = run_validator(UserEmailExistsValidator, self.request_data)
-        email = data["email"].lower()
-        user = get_user_by_email(email=email)
-        if user:
-            raise ValidationError(
-                {
-                    "email": ErrorDetail(
-                        _("This email already exists with another user.")
-                    )
-                }
-            )
-        return self.response()
 
 
 class ListSessionsAPI(LoggedInAPIView):

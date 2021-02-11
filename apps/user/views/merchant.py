@@ -56,7 +56,9 @@ class RequestResetPasswordAPI(APIView):
     def post(self, request):
         try:
             reset_password_object = RequestResetPassword(
-                request=request, data=self.request_data
+                request=request,
+                data=self.request_data,
+                customer_type=CustomerTypes.MERCHANT,
             ).handle()
             SendMerchantResetPasswordEmail(
                 reset_password_object=reset_password_object

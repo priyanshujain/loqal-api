@@ -23,6 +23,7 @@ __all__ = (
     "get_session_by_id",
     "get_consumer_user_by_email",
     "get_merchant_user_by_email",
+    "get_staff_user_by_email",
 )
 
 
@@ -58,9 +59,18 @@ def update_user_profile(user, first_name, last_name):
     user.save()
 
 
-def get_user_by_email(email):
+def get_user_by_email(email, customer_type):
     try:
-        return User.objects.get(email=email)
+        return User.objects.get(email=email, customer_type=customer_type)
+    except User.DoesNotExist:
+        return None
+
+
+def get_staff_user_by_email(email):
+    try:
+        return User.objects.get(
+            email=email, customer_type=CustomerTypes.INTERNAL
+        )
     except User.DoesNotExist:
         return None
 
