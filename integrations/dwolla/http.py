@@ -63,7 +63,7 @@ class Http(HttpRequest):
     def post(
         self,
         endpoint,
-        data,
+        data={},
         custom_content_type="application/json",
         files=None,
         authenticated=True,

@@ -25,14 +25,17 @@ class Banking(Http):
         get bank account (Funding source)
         """
         try:
-            response = self.get(
+            response = self.post(
                 f"/customers/{self.config.customer_id}/iav-token",
                 authenticated=True,
                 retry=False,
             )
         except NotFoundError:
             return None
-        return response.json()
+        response =  response.json()
+        return {
+            "token": response["token"]
+        }
     
     def get_bank_account(self, funding_source_id):
         """
