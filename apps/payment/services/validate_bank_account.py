@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account
-from apps.banking.options import PlaidBankAccountStatus
+from apps.banking.options import PlaidBankAccountStatus, DwollaFundingSourceStatus
 
 __all__ = ("ValidateBankAccount",)
 
@@ -13,9 +13,7 @@ class ValidateBankAccount(object):
         self.receiver_account_id = receiver_account_id
 
     def validate(self):
-        sender_bank_account = get_bank_account(
-            account_id=self.sender_account_id
-        )
+        sender_bank_account = get_bank_account(account_id=self.sender_account_id)
 
         if not sender_bank_account:
             raise ValidationError(
@@ -26,7 +24,10 @@ class ValidateBankAccount(object):
                 }
             )
 
-        if sender_bank_account.plaid_status != PlaidBankAccountStatus.VERIFIED:
+        if (
+            sender_bank_account.dwolla_funding_source_status
+            != DwollaFundingSourceStatus.VERIFIED
+        ):
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -35,10 +36,32 @@ class ValidateBankAccount(object):
                 }
             )
 
-        receiver_bank_account = get_bank_account(
-            account_id=self.receiver_account_id
-        )
-        if not receiver_bank_account:
+        if sender_bank_account.plaid_access_token and (
+            sender_bank_account.plaid_status != PlaidBankAccountStatus.VERIFIED
+        ):
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        "Bank account is not verified, please verify your bank account."
+                    )
+                }
+            )
+
+        receiver_bank_account = get_bank_account(account_id=self.receiver_account_id)
+        if (
+            (not receiver_bank_account)
+            or (
+                receiver_bank_account.dwolla_funding_source_status
+                != DwollaFundingSourceStatus.VERIFIED
+            )
+            or (
+                receiver_bank_account.plaid_access_token
+                and (
+                    receiver_bank_account.plaid_status
+                    != PlaidBankAccountStatus.VERIFIED
+                )
+            )
+        ):
             raise ValidationError(
                 {"detail": ErrorDetail("Receiver account is not active yet.")}
             )
