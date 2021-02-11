@@ -28,7 +28,7 @@ urlpatterns = [
         name="create_merchant_plaid_token",
     ),
     path(
-        "merchant/accounts/dwoll-iav-token/",
+        "merchant/accounts/dwolla-iav-token/",
         GetIAVTokenAPI.as_view(),
         name="create_merchant_dwolla_iav_token",
     ),

@@ -28,7 +28,7 @@ urlpatterns = [
         name="create_consumer_plaid_token",
     ),
     path(
-        "consumer/accounts/dwoll-iav-token/",
+        "consumer/accounts/dwolla-iav-token/",
         GetIAVTokenAPI.as_view(),
         name="create_consumer_dwolla_iav_token",
     ),
