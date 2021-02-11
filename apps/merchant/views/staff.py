@@ -11,7 +11,9 @@ from apps.merchant.responses import (CodesAndProtocolsResponse,
                                      MerchantOperationHoursResponse,
                                      MerchantProfileResponse,
                                      ServiceAvailabilityResponse)
-from apps.merchant.services import (UpdateCodesAndProtocols,
+from apps.merchant.services import (CertifyDwollaMerchantAccount,
+                                    ForceCertifyDwollaMerchantAccount,
+                                    UpdateCodesAndProtocols,
                                     UpdateMerchantProfile,
                                     UpdateOperationHours,
                                     UpdateServiceAvailability)
@@ -136,3 +138,17 @@ class DeleteNonLoqalAPI(StaffBaseMerchantAPI):
             )
         delete_non_loqal(merchant_id=merchant_account.id)
         return self.response(status=204)
+
+
+class CertifyOwnershipAPI(StaffBaseMerchantAPI):
+    def post(self, request, merchant_id):
+        merchant_account = self.validate_merchant(merchant_id)
+        CertifyDwollaMerchantAccount(merchant=merchant_account).handle()
+        return self.response()
+
+
+class ForceCertifyOwnershipAPI(StaffBaseMerchantAPI):
+    def post(self, request, merchant_id):
+        merchant_account = self.validate_merchant(merchant_id)
+        ForceCertifyDwollaMerchantAccount(merchant=merchant_account).handle()
+        return self.response()

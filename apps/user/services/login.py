@@ -7,6 +7,7 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.user.models import Authenticator
 from apps.user.notifications import SendLoginAlert
+from apps.user.options import CustomerTypes
 from apps.user.validators import OtpAuthValidator, UserLoginValidator
 from utils import auth
 
@@ -72,9 +73,10 @@ class SmsOtpAuth(object):
 
 
 class LoginRequest(ServiceBase):
-    def __init__(self, request, data):
+    def __init__(self, request, data, customer_type):
         self.request = request
         self.data = data
+        self.customer_type = customer_type
 
     def _validate_data(self, data):
         data = run_validator(validator=UserLoginValidator, data=data)
@@ -82,9 +84,8 @@ class LoginRequest(ServiceBase):
     def handle(self):
         data = self.data
         self._validate_data(data=data)
-        user = auth.authenticate(
-            email=data["email"], password=data["password"]
-        )
+        username = f"{data['email']}::{self.customer_type.value}"
+        user = auth.authenticate(username=username, password=data["password"])
 
         if user:
             if user.is_disabled:

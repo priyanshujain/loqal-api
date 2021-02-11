@@ -20,6 +20,21 @@ class Banking(Http):
     This class provides an interface to the Customers endpoints of the dwolla API.
     """
 
+    def get_iav_token(self):
+        """
+        get bank account (Funding source)
+        """
+        try:
+            response = self.post(
+                f"/customers/{self.config.customer_id}/iav-token",
+                authenticated=True,
+                retry=False,
+            )
+        except NotFoundError:
+            return None
+        response = response.json()
+        return {"token": response["token"]}
+
     def get_bank_account(self, funding_source_id):
         """
         get bank account (Funding source)
@@ -32,7 +47,20 @@ class Banking(Http):
             )
         except NotFoundError:
             return None
-        return response.json()
+        data = response.json()
+        customer_dwolla_id = (
+            data["_links"]["customer"]["href"].split("/").pop()
+        )
+        return {
+            "status": getattr(DwollaFundingSourceStatusMap, data["status"]),
+            "name": data["name"],
+            "bank_name": data["bankName"],
+            "dwolla_id": data["id"],
+            "bank_account_type": data["bankAccountType"],
+            "type": data["type"],
+            "removed": data["removed"],
+            "customer_dwolla_id": customer_dwolla_id,
+        }
 
     def create_bank_account(self, data):
         """
@@ -56,9 +84,7 @@ class Banking(Http):
         )
         return {
             "dwolla_funding_source_id": dwolla_funding_source_id,
-            "status": getattr(
-                DwollaFundingSourceStatusMap, funding_source_details["status"]
-            ),
+            "status": funding_source_details["status"],
         }
 
     def get_bank_accounts(self):
@@ -96,7 +122,7 @@ class Banking(Http):
 
     def update_bank_account(self, funding_source_id):
         """
-        remove bank account (Funding source)
+        update bank account (Funding source)
         """
         try:
             response = self.post(

@@ -5,10 +5,11 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import MerchantAPIView
 from apps.banking.dbapi import get_bank_account
-from apps.banking.options import BankAccountStatus
+from apps.banking.options import PlaidBankAccountStatus
 from apps.banking.response import BankAccountResponse
-from apps.banking.services import (CreateBankAccount, PlaidLink,
-                                   ReAuthBankAccount, RemoveBankAccount)
+from apps.banking.services import (CreateBankAccount, CreateIAVBankAccount,
+                                   GetIAVToken, PlaidLink, ReAuthBankAccount,
+                                   RemoveBankAccount)
 
 
 class CreateBankAccountAPI(MerchantAPIView):
@@ -31,6 +32,21 @@ class CreateBankAccountAPI(MerchantAPIView):
             account_id=account_id, data=self.request_data
         )
         return service.handle()
+
+
+class CreateIAVBankAccountAPI(MerchantAPIView):
+    def post(self, request):
+        account = request.account
+        bank_account = get_bank_account(account_id=account.id)
+        if bank_account:
+            return self.response(BankAccountResponse(bank_account).data)
+
+        bank_account = CreateIAVBankAccount(
+            account=account, data=self.request_data
+        ).handle()
+        return self.response(
+            BankAccountResponse(bank_account).data, status=201
+        )
 
 
 class RemoveBankAccountAPI(MerchantAPIView):
@@ -72,7 +88,7 @@ class ReAuthBankAccountAPI(MerchantAPIView):
                 {"detail": ErrorDetail("Bank account does not exist.")}
             )
 
-        if bank_account.plaid_status == BankAccountStatus.VERIFIED:
+        if bank_account.plaid_status == PlaidBankAccountStatus.VERIFIED:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
@@ -86,3 +102,12 @@ class ReAuthBankAccountAPI(MerchantAPIView):
             bank_account=bank_account, data=self.request_data
         ).handle()
         return self.response()
+
+
+class GetIAVTokenAPI(MerchantAPIView):
+    def get(self, request):
+        account = request.account
+        token = GetIAVToken(
+            account=account,
+        ).handle()
+        return self.response(token)

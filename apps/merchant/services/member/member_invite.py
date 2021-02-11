@@ -10,7 +10,7 @@ from apps.merchant.dbapi import (create_member_invite,
 from apps.merchant.notifications import MemberSignupInviteEmail
 from apps.merchant.validators import (MemberInviteValidator,
                                       UpdateMemberInviteValidator)
-from apps.user.dbapi import get_user_by_email
+from apps.user.dbapi import get_merchant_user_by_email
 
 __all__ = (
     "CreateMemberInvite",
@@ -29,7 +29,7 @@ class CreateMemberInvite(ServiceBase):
         email = data["email"]
         role_id = data["role_id"]
 
-        user = get_user_by_email(email=email)
+        user = get_merchant_user_by_email(email=email)
         if user:
             raise ValidationError(
                 {

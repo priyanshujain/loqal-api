@@ -1,10 +1,13 @@
 from api import serializers
-from apps.core.models import AppMetaData
+from apps.core.models import AppMetaData, MerchantMetaData
 
 
 class AppMetaDataResponse(serializers.ModelSerializer):
     platform = serializers.ChoiceCharEnumSerializer(read_only=True)
     api_env = serializers.ChoiceCharEnumSerializer(read_only=True)
+    primary_banking_verification_provider = (
+        serializers.ChoiceCharEnumSerializer(read_only=True)
+    )
 
     class Meta:
         model = AppMetaData
@@ -14,4 +17,19 @@ class AppMetaDataResponse(serializers.ModelSerializer):
             "platform",
             "store_url",
             "api_env",
+            "primary_banking_verification_provider",
+        )
+
+
+class MerchantMetaDataResponse(serializers.ModelSerializer):
+    platform = serializers.ChoiceCharEnumSerializer(read_only=True)
+    primary_banking_verification_provider = (
+        serializers.ChoiceCharEnumSerializer(read_only=True)
+    )
+
+    class Meta:
+        model = MerchantMetaData
+        fields = (
+            "platform",
+            "primary_banking_verification_provider",
         )

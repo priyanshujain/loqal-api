@@ -1,16 +1,36 @@
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.views import APIView, StaffAPIView
 from apps.user.dbapi import (create_staff_user, get_admin_users,
                              get_user_by_email)
+from apps.user.options import CustomerTypes
 from apps.user.permissions import IsAdminStaffPermission, IsStaffPermission
-from apps.user.responses import AdminUserProfileResponse
-from apps.user.services import LoginRequest
+from apps.user.responses import AdminUserProfileResponse, UserProfileResponse
+from apps.user.services import ChangePassword, LoginRequest
 from apps.user.validators import (AdminRoleChangeSerializer,
                                   AdminUserAddSerializer)
+
+
+class GetUserProfileAPI(APIView):
+    """
+    Get user profile API
+    - View user profile.
+    - Also used for checking if user is logged In.
+    """
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request):
+        # TODO: Revisit status of this API, discuss with @adi
+        user = request.user
+        if not user.is_authenticated:
+            return self.response()
+
+        return self.response(UserProfileResponse(user).data)
 
 
 class UserLoginAPI(APIView):
@@ -31,7 +51,11 @@ class UserLoginAPI(APIView):
         return self.response()
 
     def _run_services(self, request):
-        service = LoginRequest(request=request, data=self.request_data)
+        service = LoginRequest(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.INTERNAL,
+        )
         return service.handle()
 
 
@@ -53,7 +77,9 @@ class AdminUserAddAPI(StaffAPIView):
         last_name = data["last_name"]
         user_type = data["user_type"]
 
-        user = get_user_by_email(email=email)
+        user = get_user_by_email(
+            email=email, customer_type=CustomerTypes.INTERNAL
+        )
         if not user:
             user = create_staff_user(
                 email=email,
@@ -87,7 +113,9 @@ class ChangeAdminRoleAPI(StaffAPIView):
         email = data["user_email"]
         user_type = data["user_type"]
 
-        user = get_user_by_email(email=email)
+        user = get_user_by_email(
+            email=email, customer_type=CustomerTypes.INTERNAL
+        )
         if not user:
             raise ValidationError(
                 {"user_email": [ErrorDetail(_("Invalid user."))]}
@@ -104,3 +132,20 @@ class GetAdminUserAPI(StaffAPIView):
         return self.response(
             AdminUserProfileResponse(admin_users, many=True).data
         )
+
+
+class UserChangePasswordAPI(StaffAPIView):
+    def post(self, request):
+        """
+        Changes user's password and asks him to login again.
+        """
+        self._run_services(request=request)
+        return self.response()
+
+    def _run_services(self, request):
+        service = ChangePassword(
+            request=request,
+            data=self.request_data,
+            customer_type=CustomerTypes.INTERNAL,
+        )
+        service.handle()

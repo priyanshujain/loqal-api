@@ -2,13 +2,15 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
-from apps.account.dbapi import create_merchant_account
+from apps.account.dbapi import (create_merchant_account,
+                                get_consumer_account_by_email)
 from apps.account.notifications import SendMerchantAccountVerifyEmail
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
 from apps.merchant.services import CreateDefaultRoles
 from apps.payment.dbapi import create_payment_register
-from apps.user.dbapi import create_user, get_user_by_email
+from apps.user.dbapi import create_user, get_merchant_user_by_email
+from apps.user.options import CustomerTypes
 
 from .accept_merchant_terms import AcceptTerms
 
@@ -47,13 +49,28 @@ class CreateMerchantAccount(ServiceBase):
         return account_member
 
     def _validate_data(self):
-        user = get_user_by_email(email=self._email)
+        user = get_merchant_user_by_email(email=self._email)
         if user:
             raise ValidationError(
                 {
                     "email": [
                         ErrorDetail(
                             _("A user with this email already exists.")
+                        )
+                    ]
+                }
+            )
+
+        user = get_consumer_account_by_email(email=self._email)
+        if user:
+            raise ValidationError(
+                {
+                    "detail": [
+                        ErrorDetail(
+                            _(
+                                "You already signed for a Loqal app user account "
+                                "with this email. Please use a different email."
+                            )
                         )
                     ]
                 }
@@ -82,6 +99,7 @@ class CreateMerchantAccount(ServiceBase):
             email=self._email,
             phone_number=self._contact_number,
             password=self._password,
+            customer_type=CustomerTypes.MERCHANT,
         )
 
     def _factory_default_roles(self, merchant_id):

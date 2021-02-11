@@ -6,6 +6,7 @@ from django.utils.translation import ungettext
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
+from apps.banking.options import VerificationProvider
 from apps.payment.dbapi import (create_transaction, get_payment_register,
                                 get_sender_pending_total)
 from apps.payment.dbapi.events import (failed_payment_event,
@@ -49,15 +50,20 @@ class CreatePayment(ServiceBase):
 
     def handle(self):
         transaction = self._factory_transaction()
-        balance, error = CheckBankBalance(
-            bank_account=self.sender_bank_account
-        ).validate()
-        if error:
-            transaction.set_balance_check_failed()
-            error.detail["data"] = TransactionErrorDetailsResponse(
-                transaction
-            ).data
-            self._send_error(error, transaction)
+        balance = None
+        if (
+            self.sender_bank_account.verification_provider
+            == VerificationProvider.PLAID
+        ):
+            balance, error = CheckBankBalance(
+                bank_account=self.sender_bank_account
+            ).validate()
+            if error:
+                transaction.set_balance_check_failed()
+                error.detail["data"] = TransactionErrorDetailsResponse(
+                    transaction
+                ).data
+                self._send_error(error, transaction)
         pending_sender_total = get_sender_pending_total(
             sender_bank_account_id=self.sender_bank_account.id
         )
@@ -66,7 +72,7 @@ class CreatePayment(ServiceBase):
             + self.total_amount
             + Decimal(settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED)
         )
-        if balance < min_required_balance:
+        if balance != None and (balance < min_required_balance):
             transaction.set_insufficient_balance()
             error = ValidationError(
                 {

@@ -6,7 +6,8 @@ from apps.user.views.consumer import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                                       ResendEmailverificationAPI,
                                       ResendPhoneNumberVerifyOtpAPI,
                                       ResendSmsOtpAuthAPI, SmsOtpAuthAPI,
-                                      StartSmsAuthEnrollmentAPI, UserLoginAPI,
+                                      StartSmsAuthEnrollmentAPI,
+                                      UserChangePasswordAPI, UserLoginAPI,
                                       VerifyEmailAPI, VerifyPhoneNumberAPI)
 
 urlpatterns = [
@@ -14,6 +15,11 @@ urlpatterns = [
         "consumer/login/", UserLoginAPI.as_view(), name="consumer_user_login"
     ),
     path("consumer/auth/otp/", SmsOtpAuthAPI.as_view(), name="otp_auth"),
+    path(
+        "consumer/change-password/",
+        UserChangePasswordAPI.as_view(),
+        name="consumer_change_password",
+    ),
     path(
         "consumer/auth/otp/resend/",
         ResendSmsOtpAuthAPI.as_view(),
@@ -52,7 +58,7 @@ urlpatterns = [
     path(
         "consumer/profile/",
         GetUserProfileAPI.as_view(),
-        name="view_user_profile",
+        name="view_consumer_profile",
     ),
     path(
         "consumer/email-verification/apply/",

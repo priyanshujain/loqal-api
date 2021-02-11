@@ -20,9 +20,10 @@ __all__ = (
 
 
 class RequestResetPassword(ServiceBase):
-    def __init__(self, request, data):
+    def __init__(self, request, data, customer_type):
         self.request = request
         self.data = data
+        self.customer_type = customer_type
         self.user = request.user
 
     def _validate_data(self):
@@ -36,7 +37,9 @@ class RequestResetPassword(ServiceBase):
                 {"detail": ErrorDetail(_("You are already logged in."))}
             )
 
-        user = get_user_by_email(email=data["email"])
+        user = get_user_by_email(
+            email=data["email"], customer_type=self.customer_type
+        )
         if not user:
             raise ValidationError(
                 {
@@ -94,13 +97,15 @@ class ResetPasswordTokenValidate(ServiceBase):
 
 
 class ApplyResetPassword(ResetPasswordTokenValidate):
-    def __init__(self, request, data):
+    def __init__(self, request, data, customer_type):
         self.request = request
         self.data = data
         self.user = request.user
+        self.customer_type = customer_type
 
     def _check_if_old_password_used(self, email, password):
-        user = auth.authenticate(email=email, password=password)
+        username = f"{email}::{self.customer_type.value}"
+        user = auth.authenticate(username=username, password=password)
         if user:
             raise ValidationError(
                 {

@@ -6,6 +6,7 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.account.dbapi import merchant
 from apps.merchant.shortcuts import validate_subcategory
 from apps.user.dbapi import get_user_by_phone
+from apps.user.options import CustomerTypes
 from lib.auth import password_validation
 
 __all__ = (
@@ -35,7 +36,9 @@ class MerchantAccountSignupValidatorBase(serializers.ValidationSerializer):
                 }
             )
 
-        user = get_user_by_phone(phone_number=phone_number)
+        user = get_user_by_phone(
+            phone_number=phone_number, customer_type=CustomerTypes.MERCHANT
+        )
         if user:
             raise ValidationError(
                 {
@@ -104,7 +107,9 @@ class CreateNonLoqalMerchantValidator(serializers.ValidationSerializer):
                 }
             )
 
-        user = get_user_by_phone(phone_number=phone_number)
+        user = get_user_by_phone(
+            phone_number=phone_number, customer_type=CustomerTypes.MERCHANT
+        )
         if user:
             raise ValidationError(
                 {

@@ -6,6 +6,7 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.user.dbapi import get_user_by_phone
 from apps.user.models import Authenticator
+from apps.user.options import CustomerTypes
 from apps.user.validators import (PhoneNumberValidator,
                                   ResendPhoneNumberOtpValidator,
                                   VerifyPhoneNumberOtpValidator)
@@ -62,7 +63,9 @@ class AddPhoneNumber(ServiceBase):
             )
         data = run_validator(validator=PhoneNumberValidator, data=data)
         phone_number = data["phone_number"]
-        phone_user = get_user_by_phone(phone_number=phone_number)
+        phone_user = get_user_by_phone(
+            phone_number=phone_number, customer_type=CustomerTypes.CONSUMER
+        )
         if phone_user and phone_user.id != self.user.id:
             raise ValidationError(
                 {

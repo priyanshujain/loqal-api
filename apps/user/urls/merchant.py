@@ -2,12 +2,18 @@ from django.urls import path
 
 from apps.user.views.merchant import (ApplyResetPasswordAPI,
                                       RequestResetPasswordAPI,
-                                      ResendEmailverificationAPI, UserLoginAPI,
+                                      ResendEmailverificationAPI,
+                                      UserChangePasswordAPI, UserLoginAPI,
                                       VerifyEmailAPI)
 
 urlpatterns = [
     path(
         "merchant/login/", UserLoginAPI.as_view(), name="merchant_user_login"
+    ),
+    path(
+        "merchant/change-password/",
+        UserChangePasswordAPI.as_view(),
+        name="merchant_change_password",
     ),
     path(
         "merchant/reset-password/request/",

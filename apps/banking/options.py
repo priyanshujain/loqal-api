@@ -3,7 +3,8 @@ from django.utils.translation import gettext as _
 from db.models.fields import ChoiceCharEnum
 
 
-class BankAccountStatus(ChoiceCharEnum):
+class PlaidBankAccountStatus(ChoiceCharEnum):
+    NOT_APPLICABLE = "not_applicable", _("Not Applicable")
     PENDING = "pending", _("Pending")
     VERIFIED = "verified", _("Verified")
     REVERIFICATION_REQUIRED = "re_verification_required", _(
@@ -21,3 +22,8 @@ class DwollaFundingSourceStatus(ChoiceCharEnum):
     UNVERIFIED = "unverified", _("Unverified")
     NEGATIVE_BALANCE = "negative_balance", _("Negative Balance")
     UPDATED = "updated", _("Updated")
+
+
+class VerificationProvider(ChoiceCharEnum):
+    DWOLLA = "dwolla", _("Dwolla")
+    PLAID = "plaid", _("Plaid")

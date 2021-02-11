@@ -1,5 +1,3 @@
-import re
-
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -12,6 +10,7 @@ from apps.merchant.dbapi import (get_account_member_by_user_id,
 from apps.merchant.responses import MemberProfileResponse
 from apps.merchant.validators import EditMemberProfileValidator
 from apps.user.dbapi import get_user_by_phone
+from apps.user.options import CustomerTypes
 
 
 class GetUserProfileAPI(APIView):
@@ -74,7 +73,9 @@ class UpdateUserProfileAPI(MerchantAPIView):
         if user.phone_number and user.phone_number == phone_number:
             return True
 
-        if get_user_by_phone(phone_number=phone_number):
+        if get_user_by_phone(
+            phone_number=phone_number, customer_type=CustomerTypes.MERCHANT
+        ):
             raise ValidationError(
                 {
                     "phone_number": [

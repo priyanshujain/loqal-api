@@ -3,10 +3,11 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView
 from apps.banking.dbapi import get_bank_account
-from apps.banking.options import BankAccountStatus
+from apps.banking.options import PlaidBankAccountStatus
 from apps.banking.response import BankAccountResponse
-from apps.banking.services import (CreateBankAccount, PlaidLink,
+from apps.banking.services import (CreateBankAccount, GetIAVToken, PlaidLink,
                                    ReAuthBankAccount, RemoveBankAccount)
+from apps.banking.services.create_iav_bank_account import CreateIAVBankAccount
 from apps.banking.services.remove_bank_account import RemoveBankAccount
 
 
@@ -27,6 +28,21 @@ class CreateBankAccountAPI(ConsumerAPIView):
             account_id=account_id, data=self.request_data
         )
         return service.handle()
+
+
+class CreateIAVBankAccountAPI(ConsumerAPIView):
+    def post(self, request):
+        account = request.account
+        bank_account = get_bank_account(account_id=account.id)
+        if bank_account:
+            return self.response(BankAccountResponse(bank_account).data)
+
+        bank_account = CreateIAVBankAccount(
+            account=account, data=self.request_data
+        ).handle()
+        return self.response(
+            BankAccountResponse(bank_account).data, status=201
+        )
 
 
 class GetBankAccountAPI(ConsumerAPIView):
@@ -52,6 +68,15 @@ class PlaidLinkTokenAPI(ConsumerAPIView):
         return self.response({"token": token})
 
 
+class GetIAVTokenAPI(ConsumerAPIView):
+    def get(self, request):
+        account = request.account
+        token = GetIAVToken(
+            account=account,
+        ).handle()
+        return self.response(token)
+
+
 class ReAuthBankAccountAPI(ConsumerAPIView):
     def post(self, request):
         account = request.account
@@ -61,7 +86,7 @@ class ReAuthBankAccountAPI(ConsumerAPIView):
                 {"detail": ErrorDetail("Bank account does not exist.")}
             )
 
-        if bank_account.plaid_status == BankAccountStatus.VERIFIED:
+        if bank_account.plaid_status == PlaidBankAccountStatus.VERIFIED:
             raise ValidationError(
                 {
                     "detail": ErrorDetail(
