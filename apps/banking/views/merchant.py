@@ -7,9 +7,8 @@ from api.views import MerchantAPIView
 from apps.banking.dbapi import get_bank_account
 from apps.banking.options import BankAccountStatus
 from apps.banking.response import BankAccountResponse
-from apps.banking.services import (CreateBankAccount, PlaidLink,
-                                   ReAuthBankAccount, RemoveBankAccount,
-                                   GetIAVToken)
+from apps.banking.services import (CreateBankAccount, GetIAVToken, PlaidLink,
+                                   ReAuthBankAccount, RemoveBankAccount)
 
 
 class CreateBankAccountAPI(MerchantAPIView):
@@ -93,6 +92,6 @@ class GetIAVTokenAPI(MerchantAPIView):
     def get(self, request):
         account = request.account
         token = GetIAVToken(
-                account=account,
-            ).handle()
+            account=account,
+        ).handle()
         return self.response(token)

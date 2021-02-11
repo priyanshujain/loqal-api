@@ -3,17 +3,16 @@ from enum import unique
 from django.db import models
 from django.utils.translation import gettext as _
 
+from apps.banking.options import VerificationProvider
 from db.models import BaseModel
 from db.models.fields import ChoiceCharEnumField
 
 from .options import APIEnvironmentTypes, PlatformTypes
-from db.models.fields import ChoiceCharEnumField
-from .options import VerificationProvider
 
 
 class AppMetaData(BaseModel):
     """
-    This represents consumer app metadata 
+    This represents consumer app metadata
     """
 
     min_allowed_version = models.CharField(max_length=128)
@@ -31,12 +30,12 @@ class AppMetaData(BaseModel):
         db_table = "app_metadata"
 
 
-
-class MerchantWebMetaData(BaseModel):
+class MerchantMetaData(BaseModel):
     """
-    This represents merchant web app metadata
+    This represents merchant app metadata
     """
 
+    platform = ChoiceCharEnumField(enum_type=PlatformTypes, max_length=8)
     primary_banking_verification_provider = ChoiceCharEnumField(
         enum_type=VerificationProvider,
         default=VerificationProvider.PLAID,
@@ -44,4 +43,4 @@ class MerchantWebMetaData(BaseModel):
     )
 
     class Meta:
-        db_table = "merchant_web_app_metadata"
+        db_table = "merchant_metadata"
