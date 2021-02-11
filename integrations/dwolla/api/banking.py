@@ -47,7 +47,16 @@ class Banking(Http):
             )
         except NotFoundError:
             return None
-        return response.json()
+        data = response.json()
+        return {
+            "status": getattr(DwollaFundingSourceStatusMap, data["status"]),
+            "name": data["name"],
+            "bank_name": data["bankName"],
+            "dwolla_id": data["id"],
+            "bank_account_type": data["bank_account_type"],
+            "type": data["type"],
+            "removed": data["removed"],
+        }
 
     def create_bank_account(self, data):
         """
@@ -111,7 +120,7 @@ class Banking(Http):
 
     def update_bank_account(self, funding_source_id):
         """
-        remove bank account (Funding source)
+        update bank account (Funding source)
         """
         try:
             response = self.post(

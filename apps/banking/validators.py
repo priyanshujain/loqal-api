@@ -10,3 +10,7 @@ class CreateBankAccountValidator(serializers.ValidationSerializer):
 
 class ReauthBankAccountValidator(serializers.ValidationSerializer):
     plaid_public_token = serializers.CharField(max_length=128)
+
+
+class CreateIAVBankAccountValidator(serializers.ValidationSerializer):
+    funding_source_url = serializers.URLField(max_length=256)
