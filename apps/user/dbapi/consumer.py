@@ -185,8 +185,10 @@ def get_user_by_email_token(token):
     return None
 
 
-def get_user_by_phone(phone_number):
-    user_qs = User.objects.filter(phone_number=phone_number)
+def get_user_by_phone(phone_number, customer_type):
+    user_qs = User.objects.filter(
+        phone_number=phone_number, customer_type=customer_type
+    )
     if user_qs.exists():
         return user_qs.first()
     return None
