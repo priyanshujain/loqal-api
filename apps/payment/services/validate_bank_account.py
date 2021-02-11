@@ -2,7 +2,8 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account
-from apps.banking.options import PlaidBankAccountStatus, DwollaFundingSourceStatus
+from apps.banking.options import (DwollaFundingSourceStatus,
+                                  PlaidBankAccountStatus)
 
 __all__ = ("ValidateBankAccount",)
 
@@ -13,7 +14,9 @@ class ValidateBankAccount(object):
         self.receiver_account_id = receiver_account_id
 
     def validate(self):
-        sender_bank_account = get_bank_account(account_id=self.sender_account_id)
+        sender_bank_account = get_bank_account(
+            account_id=self.sender_account_id
+        )
 
         if not sender_bank_account:
             raise ValidationError(
@@ -47,7 +50,9 @@ class ValidateBankAccount(object):
                 }
             )
 
-        receiver_bank_account = get_bank_account(account_id=self.receiver_account_id)
+        receiver_bank_account = get_bank_account(
+            account_id=self.receiver_account_id
+        )
         if (
             (not receiver_bank_account)
             or (
