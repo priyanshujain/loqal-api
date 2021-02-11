@@ -56,13 +56,16 @@ class RemoveBankAccount(ServiceBase):
                 }
             )
 
-        response = BankAccountAPIAction().remove(
-            dwolla_id=bank_account.dwolla_id
-        )
-        if response["is_success"] == True:
+        if bank_account.dwolla_id:
+            response = BankAccountAPIAction().remove(
+                dwolla_id=bank_account.dwolla_id
+            )
+            if response["is_success"] == True:
+                bank_account.set_dwolla_removed()
+            return True
+        else:
             bank_account.set_dwolla_removed()
-        return True
-
+            return True
 
 class BankAccountAPIAction(ProviderAPIActionBase):
     def remove(self, dwolla_id):
