@@ -11,7 +11,7 @@ class GetIAVToken(ServiceBase):
         self.account = account
 
     def handle(self):
-        if not account.dwolla_id:
+        if not self.account.dwolla_id:
             raise ValidationError({
                 "detail": ErrorDetail(
                         _(
