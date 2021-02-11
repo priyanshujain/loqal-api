@@ -7,7 +7,7 @@ from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 
-from .options import BankAccountStatus, DwollaFundingSourceStatus
+from .options import BankAccountStatus, DwollaFundingSourceStatus, VerificationProvider
 
 
 class BankAccount(AbstractBaseModel):
@@ -26,6 +26,11 @@ class BankAccount(AbstractBaseModel):
     dwolla_funding_source_status = ChoiceCharEnumField(
         enum_type=DwollaFundingSourceStatus,
         default=DwollaFundingSourceStatus.NA,
+        max_length=32,
+    )
+    verification_provider  = ChoiceCharEnumField(
+        enum_type=VerificationProvider,
+        default=VerificationProvider.PLAID,
         max_length=32,
     )
     plaid_status = ChoiceCharEnumField(
