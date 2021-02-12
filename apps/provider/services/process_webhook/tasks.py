@@ -2,7 +2,9 @@ import logging
 
 from celery import shared_task
 
+from apps.account.dbapi import consumer
 from apps.account.dbapi.webhooks import get_account_by_dwolla_id
+from apps.banking.notifications import SendVerifyMicroDepositEmail
 from apps.provider.dbapi import (get_pending_webhook_event,
                                  get_provider_webhook_event)
 
@@ -125,3 +127,20 @@ def process_single_webhook_event(event):
         ApplyOnboardingWebhook(
             event=event, customer_account=customer_account
         ).handle()
+
+
+def send_micro_deposit_verify_email(bank_account):
+    account = bank_account.account
+    email = ""
+    try:
+        consumer = account.consumer
+        email = consumer.user.email
+    except Exception:
+        pass
+
+    try:
+        merchant = account.merchant
+        email = merchant.company_email
+    except Exception:
+        pass
+    SendVerifyMicroDepositEmail(email=email).send()

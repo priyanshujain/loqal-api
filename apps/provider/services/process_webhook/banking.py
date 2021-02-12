@@ -1,8 +1,7 @@
-from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account_by_dwolla_id
 from apps.banking.options import DwollaFundingSourceStatus, MicroDepositStatus
 
-from .helpers import record_payment_failure
+from .tasks import send_micro_deposit_verify_email
 
 
 class ApplyBankingWebhook(object):
@@ -108,6 +107,7 @@ class ApplyBankingWebhook(object):
                 MicroDepositStatus.AWAITING_VERIFICATION
             )
             bank_account.save()
+            send_micro_deposit_verify_email(bank_account)
 
         if topic == "customer_microdeposits_maxattempts":
             """
