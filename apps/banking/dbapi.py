@@ -51,8 +51,8 @@ def create_bank_account_via_iav(
     name,
     status,
     dwolla_id,
-    verification_type=VerificationType.INSTANT,
-    micro_deposit_status=MicroDepositStatus.NA,
+    verification_type,
+    micro_deposit_status,
 ):
     """
     dbapi to create a bank account instance.

@@ -68,7 +68,7 @@ class BadRequestError(ApiError):
             return []
         return [
             {
-                "code": getattr(ErrorCodeMap, error["code"]),
+                "code": getattr(ErrorCodeMap, error["code"], ""),
                 "message": error["message"],
                 "source": error["path"][1:].replace("/", "."),
             }

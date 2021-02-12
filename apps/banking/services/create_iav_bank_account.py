@@ -24,10 +24,10 @@ class CreateIAVBankAccount(ServiceBase):
             dwolla_id=dwolla_id
         )
         customer_dwolla_id = data["customer_dwolla_id"]
-        # if self.account.dwolla_id != customer_dwolla_id:
-        #     raise ValidationError(
-        #         {"detail": ErrorDetail(_("Funding source is not valid."))}
-        #     )
+        if self.account.dwolla_id != customer_dwolla_id:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Funding source is not valid."))}
+            )
 
         micro_deposit_verification_available = data[
             "micro_deposit_verification_available"
