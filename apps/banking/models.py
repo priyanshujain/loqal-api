@@ -15,7 +15,7 @@ class BankAccount(AbstractBaseModel):
     plaid_account_id = models.CharField(max_length=255, blank=True)
     account_number_suffix = models.CharField(max_length=4, blank=True)
     name = models.CharField(max_length=64)
-    bank_name = models.CharField(max_length=1024)
+    bank_name = models.CharField(max_length=1024, blank=True)
     bank_logo_base64 = models.TextField(blank=True, null=True, default=None)
     currency = models.CharField(max_length=3, default="USD")
     is_disabled = models.BooleanField(default=False)
