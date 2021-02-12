@@ -1,6 +1,6 @@
 from api.exceptions import ErrorDetail, ValidationError
 from apps.banking.dbapi import get_bank_account_by_dwolla_id
-from apps.banking.options import DwollaFundingSourceStatus
+from apps.banking.options import DwollaFundingSourceStatus, MicroDepositStatus
 
 from .helpers import record_payment_failure
 
@@ -82,4 +82,39 @@ class ApplyBankingWebhook(object):
                 DwollaFundingSourceStatus.UPDATED
             )
             bank_account.save()
+
+        if topic == "customer_microdeposits_added":
+            """
+            A funding source was added to a Customer.
+            """
+
+            bank_account.micro_deposit_status = MicroDepositStatus.PENDING
+            bank_account.save()
+
+        if topic == "customer_microdeposits_failed":
+            """
+            A funding source was added to a Customer.
+            """
+
+            bank_account.micro_deposit_status = MicroDepositStatus.FAILED
+            bank_account.save()
+
+        if topic == "customer_microdeposits_completed":
+            """
+            A funding source was added to a Customer.
+            """
+
+            bank_account.micro_deposit_status = (
+                MicroDepositStatus.AWAITING_VERIFICATION
+            )
+            bank_account.save()
+
+        if topic == "customer_microdeposits_maxattempts":
+            """
+            A funding source was added to a Customer.
+            """
+
+            bank_account.max_attempts_exceeded = True
+            bank_account.save()
+
         self.event.mark_processed()

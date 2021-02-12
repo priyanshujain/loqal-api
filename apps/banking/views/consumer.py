@@ -38,7 +38,7 @@ class CreateIAVBankAccountAPI(ConsumerAPIView):
             return self.response(BankAccountResponse(bank_account).data)
 
         bank_account = CreateIAVBankAccount(
-            account=account, data=self.request_data
+            account=account, data=self.request_data, user=request.user
         ).handle()
         return self.response(
             BankAccountResponse(bank_account).data, status=201

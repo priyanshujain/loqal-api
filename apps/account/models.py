@@ -146,7 +146,8 @@ class MerchantAccount(AbstractBaseModel):
         null=True,
         blank=True,
     )
-    company_email = models.CharField(max_length=255, blank=True)
+    company_email = models.EmailField(max_length=255, blank=True)
+    notification_email = models.EmailField(max_length=255, blank=True)
 
     class Meta:
         db_table = "merchant_account"
@@ -159,6 +160,17 @@ class MerchantAccount(AbstractBaseModel):
             return categories.first()
         else:
             return None
+
+    def update_company_email(self, email, save=True):
+        if email != self.company_email:
+            self.company_email = email
+            if save:
+                self.save()
+
+    def update_notification_email(self, email, save=True):
+        self.notification_email = email
+        if save:
+            self.save()
 
 
 class PaymentAccountOpeningConsent(BaseModel):

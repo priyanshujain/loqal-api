@@ -46,6 +46,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
             "email": merchant_member.user.email,
         }
         data["incorporation_details"]["ip_address"] = self.ip_address
+        data["company_email"] = merchant_member.user.email
         return data, merchant
 
     def _validate_data(self, data, merchant):
@@ -114,6 +115,7 @@ class CreateDwollaMerchantAccount(ServiceBase):
             dwolla_response = DwollaCreateMerchantAccountAPIAction(
                 account_id=account.id
             ).create(data=merchant_account_data, is_update=is_account_update)
+            merchant.update_company_email(email=data["company_email"])
             dwolla_customer_id = dwolla_response["dwolla_customer_id"]
             dwolla_status = dwolla_response["status"]
             dwolla_verification_status = dwolla_response["verification_status"]

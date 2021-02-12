@@ -13,6 +13,8 @@ class BankAccountResponse(serializers.ModelSerializer):
     verification_provider = serializers.ChoiceCharEnumSerializer(
         read_only=True
     )
+    verification_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    micro_deposit_status = serializers.ChoiceCharEnumSerializer(read_only=True)
 
     class Meta:
         model = BankAccount
@@ -28,4 +30,7 @@ class BankAccountResponse(serializers.ModelSerializer):
             "status",
             "plaid_status",
             "verification_provider",
+            "micro_deposit_status",
+            "max_attempts_exceeded",
+            "verification_type",
         )
