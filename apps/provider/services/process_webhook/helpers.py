@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from apps.account.dbapi.webhooks import get_account_by_dwolla_id
+from apps.banking.notifications import SendVerifyMicroDepositEmail
 from apps.payment.options import (TransactionFailureReasonType,
                                   TransactionStatus)
 from apps.provider.lib.actions import ProviderAPIActionBase
@@ -128,3 +129,20 @@ def record_payment_failure(transaction, at_source):
         ach_return_account=ach_return_account,
     )
     return failure_details
+
+
+def send_micro_deposit_verify_email(bank_account):
+    account = bank_account.account
+    email = ""
+    try:
+        consumer = account.consumer
+        email = consumer.user.email
+    except Exception:
+        pass
+
+    try:
+        merchant = account.merchant
+        email = merchant.company_email
+    except Exception:
+        pass
+    SendVerifyMicroDepositEmail(email=email).send()

@@ -1,7 +1,7 @@
 from apps.banking.dbapi import get_bank_account_by_dwolla_id
 from apps.banking.options import DwollaFundingSourceStatus, MicroDepositStatus
 
-from .tasks import send_micro_deposit_verify_email
+from .helpers import send_micro_deposit_verify_email
 
 
 class ApplyBankingWebhook(object):
