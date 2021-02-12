@@ -5,13 +5,19 @@ from apps.banking.views.merchant import (CreateBankAccountAPI,
                                          GetBankAccountAPI, GetIAVTokenAPI,
                                          PlaidLinkTokenAPI,
                                          ReAuthBankAccountAPI,
-                                         RemoveBankAccountAPI)
+                                         RemoveBankAccountAPI,
+                                         VerifyMicroDepositAPI)
 
 urlpatterns = [
     path(
         "merchant/accounts/create/",
         CreateBankAccountAPI.as_view(),
         name="create_merchant_bank_account",
+    ),
+    path(
+        "merchant/accounts/verify-micro-deposit/",
+        VerifyMicroDepositAPI.as_view(),
+        name="verify_merchant_micro_deposit",
     ),
     path(
         "merchant/accounts/iav/create/",

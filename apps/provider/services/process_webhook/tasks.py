@@ -2,6 +2,7 @@ import logging
 
 from celery import shared_task
 
+from apps.account.dbapi import consumer
 from apps.account.dbapi.webhooks import get_account_by_dwolla_id
 from apps.provider.dbapi import (get_pending_webhook_event,
                                  get_provider_webhook_event)

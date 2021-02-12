@@ -67,6 +67,7 @@ class RemoveBankAccount(ServiceBase):
             bank_account.set_dwolla_removed()
             return True
 
+
 class BankAccountAPIAction(ProviderAPIActionBase):
     def remove(self, dwolla_id):
         response = self.client.banking.remove_bank_account(

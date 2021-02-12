@@ -4,8 +4,9 @@ from apps.account.models import Account
 from db.models.abstract import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 
-from .options import (DwollaFundingSourceStatus, PlaidBankAccountStatus,
-                      VerificationProvider)
+from .options import (DwollaFundingSourceStatus, MicroDepositStatus,
+                      PlaidBankAccountStatus, VerificationProvider,
+                      VerificationType)
 
 
 class BankAccount(AbstractBaseModel):
@@ -27,6 +28,17 @@ class BankAccount(AbstractBaseModel):
         default=DwollaFundingSourceStatus.NA,
         max_length=32,
     )
+    verification_type = ChoiceCharEnumField(
+        enum_type=VerificationType,
+        default=VerificationType.INSTANT,
+        max_length=32,
+    )
+    micro_deposit_status = ChoiceCharEnumField(
+        enum_type=MicroDepositStatus,
+        default=MicroDepositStatus.NA,
+        max_length=32,
+    )
+    max_attempts_exceeded = models.BooleanField(default=False)
     verification_provider = ChoiceCharEnumField(
         enum_type=VerificationProvider,
         default=VerificationProvider.PLAID,
@@ -83,5 +95,20 @@ class BankAccount(AbstractBaseModel):
 
     def set_username_changed(self, save=True):
         self.plaid_status = PlaidBankAccountStatus.USERNAME_CHANGED
+        if save:
+            self.save()
+
+    def set_micro_deposit_verified(self, save=True):
+        self.micro_deposit_status = MicroDepositStatus.VERIFIED
+        if save:
+            self.save()
+
+    def set_dwolla_verified(self, save=True):
+        self.dwolla_funding_source_status = DwollaFundingSourceStatus.VERIFIED
+        if save:
+            self.save()
+
+    def update_dwolla_status(self, status, save=True):
+        self.dwolla_funding_source_status = status
         if save:
             self.save()

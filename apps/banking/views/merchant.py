@@ -9,7 +9,7 @@ from apps.banking.options import PlaidBankAccountStatus
 from apps.banking.response import BankAccountResponse
 from apps.banking.services import (CreateBankAccount, CreateIAVBankAccount,
                                    GetIAVToken, PlaidLink, ReAuthBankAccount,
-                                   RemoveBankAccount)
+                                   RemoveBankAccount, VerifyMicroDeposit)
 
 
 class CreateBankAccountAPI(MerchantAPIView):
@@ -34,6 +34,18 @@ class CreateBankAccountAPI(MerchantAPIView):
         return service.handle()
 
 
+class VerifyMicroDepositAPI(MerchantAPIView):
+    # TODO: add permission classes
+    permission_classes = ()
+
+    def post(self, request):
+        account = request.account
+        bank_account = VerifyMicroDeposit(
+            account=account, data=self.request_data
+        ).handle()
+        return self.response(BankAccountResponse(bank_account).data)
+
+
 class CreateIAVBankAccountAPI(MerchantAPIView):
     def post(self, request):
         account = request.account
@@ -42,7 +54,7 @@ class CreateIAVBankAccountAPI(MerchantAPIView):
             return self.response(BankAccountResponse(bank_account).data)
 
         bank_account = CreateIAVBankAccount(
-            account=account, data=self.request_data
+            account=account, data=self.request_data, user=request.user
         ).handle()
         return self.response(
             BankAccountResponse(bank_account).data, status=201

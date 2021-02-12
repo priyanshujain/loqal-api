@@ -16,6 +16,7 @@ class API(object):
 
     def execute_request(self, request_method, request_kwargs=None):
         response = {}
+        errors = []
         try:
             response = request_method(**request_kwargs)
         except Exception as err:
@@ -26,7 +27,11 @@ class API(object):
                 self.request_tracker.add_errors(errors)
             except AttributeError:
                 pass
-            return {"status": RequestStatusTypes.ERROR, "data": {}}
+            return {
+                "status": RequestStatusTypes.ERROR,
+                "data": {},
+                "errors": errors,
+            }
 
         # TODO: Catch API error through an API error exception rather than this comparision
         if response.get("status") == RequestStatusTypes.ERROR:

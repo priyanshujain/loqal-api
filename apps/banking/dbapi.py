@@ -5,7 +5,8 @@ from django.db import IntegrityError
 
 from apps.banking.models import BankAccount
 
-from .options import PlaidBankAccountStatus, VerificationProvider
+from .options import (MicroDepositStatus, PlaidBankAccountStatus,
+                      VerificationProvider, VerificationType)
 
 __all__ = (
     "create_bank_account",
@@ -44,7 +45,14 @@ def create_bank_account(
 
 
 def create_bank_account_via_iav(
-    account_id, bank_name, bank_account_type, name, status, dwolla_id
+    account_id,
+    bank_name,
+    bank_account_type,
+    name,
+    status,
+    dwolla_id,
+    verification_type,
+    micro_deposit_status,
 ):
     """
     dbapi to create a bank account instance.
@@ -59,6 +67,8 @@ def create_bank_account_via_iav(
             bank_account_type=bank_account_type,
             plaid_status=PlaidBankAccountStatus.NOT_APPLICABLE,
             verification_provider=VerificationProvider.DWOLLA,
+            verification_type=verification_type,
+            micro_deposit_status=micro_deposit_status,
         )
     except IntegrityError:
         return None

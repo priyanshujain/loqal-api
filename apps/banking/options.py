@@ -27,3 +27,16 @@ class DwollaFundingSourceStatus(ChoiceCharEnum):
 class VerificationProvider(ChoiceCharEnum):
     DWOLLA = "dwolla", _("Dwolla")
     PLAID = "plaid", _("Plaid")
+
+
+class VerificationType(ChoiceCharEnum):
+    MICRO_DEPOSIT = "micro_deposit", _("Micro Deposit")
+    INSTANT = "instant", _("Instant Verification")
+
+
+class MicroDepositStatus(ChoiceCharEnum):
+    NA = "na", _("NA")
+    PENDING = "pending", _("Pending")
+    AWAITING_VERIFICATION = "awaiting_verification", _("Awaiting Verification")
+    VERIFIED = "verified", _("Verified")
+    FAILED = "failed", _("Failed")

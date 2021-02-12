@@ -4,8 +4,11 @@ creation related calls to the dwolla API.
 """
 
 from apps.banking.options import DwollaFundingSourceStatus
-from integrations.dwolla.errors import NotFoundError
+from integrations.dwolla.errors import (BadRequestError, ForbiddenError,
+                                        NotFoundError)
+from integrations.dwolla.errors.api import BadRequestError
 from integrations.dwolla.http import Http
+from integrations.utils.options import RequestStatusTypes
 
 __all__ = "Banking"
 
@@ -51,6 +54,11 @@ class Banking(Http):
         customer_dwolla_id = (
             data["_links"]["customer"]["href"].split("/").pop()
         )
+
+        links = data["_links"]
+        micro_deposit_verification_available = "verify-micro-deposits" in links
+        is_micro_deposit = "micro-deposits" in links
+
         return {
             "status": getattr(DwollaFundingSourceStatusMap, data["status"]),
             "name": data["name"],
@@ -60,6 +68,8 @@ class Banking(Http):
             "type": data["type"],
             "removed": data["removed"],
             "customer_dwolla_id": customer_dwolla_id,
+            "micro_deposit_verification_available": micro_deposit_verification_available,
+            "is_micro_deposit": is_micro_deposit,
         }
 
     def create_bank_account(self, data):
@@ -84,8 +94,57 @@ class Banking(Http):
         )
         return {
             "dwolla_funding_source_id": dwolla_funding_source_id,
-            "status": funding_source_details["status"],
+            "status": funding_source_details.get("status"),
         }
+
+    def verify_micro_deposit(self, data):
+        """
+        Create bank account (Funding source)
+        """
+        request_data = {
+            "id": data["dwolla_id"],
+            "amount1": {
+                "value": str(data["amount1"]),
+                "currency": data["currency"],
+            },
+            "amount2": {
+                "value": str(data["amount2"]),
+                "currency": data["currency"],
+            },
+        }
+        errors = []
+        try:
+            response = self.post(
+                f"/funding-sources/{data['dwolla_id']}/micro-deposits",
+                data=request_data,
+                authenticated=True,
+                retry=False,
+            )
+            if response.status_code == 200:
+                return self.get_bank_account(
+                    funding_source_id=data["dwolla_id"]
+                )
+            if response.status_code == 202:
+                errors = [
+                    {
+                        "message": (
+                            "Micro-deposits have not have not settled "
+                            "to destination bank. A Customer can verify these "
+                            "amounts after micro-deposits have processed to "
+                            "their bank."
+                        )
+                    }
+                ]
+        except BadRequestError as err1:
+            errors = err1.api_errors
+        except ForbiddenError as err2:
+            errors = err2.api_errors
+
+        if errors:
+            errors = [error["message"] for error in errors]
+
+        if errors:
+            return {"status": RequestStatusTypes.ERROR, "errors": errors}
 
     def get_bank_accounts(self):
         """
