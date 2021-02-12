@@ -62,7 +62,7 @@ class Banking(Http):
         return {
             "status": getattr(DwollaFundingSourceStatusMap, data["status"]),
             "name": data["name"],
-            "bank_name": data["bankName"],
+            "bank_name": data.get("bankName", ""),
             "dwolla_id": data["id"],
             "bank_account_type": data["bankAccountType"],
             "type": data["type"],
