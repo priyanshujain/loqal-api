@@ -3,6 +3,8 @@ This module provides a class for funding bank account
 creation related calls to the dwolla API.
 """
 
+from datetime import date
+
 from apps.banking.options import DwollaFundingSourceStatus
 from integrations.dwolla.errors import (BadRequestError, ForbiddenError,
                                         NotFoundError)
@@ -158,7 +160,20 @@ class Banking(Http):
             )
         except NotFoundError:
             return None
-        return response.json()
+        data = response.json()
+        bank_accounts = data["_embedded"]["funding-sources"]
+        bank_accounts = [
+            bank_account
+            for bank_account in bank_accounts
+            if (
+                (
+                    bank_account["removed"] != True
+                    or bank_account["removed"] != "true"
+                )
+                and (bank_account["type"] == "bank")
+            )
+        ]
+        return {"bank_accounts": bank_accounts}
 
     def remove_bank_account(self, funding_source_id):
         """
