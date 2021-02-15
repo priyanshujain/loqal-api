@@ -112,3 +112,11 @@ class BankAccount(AbstractBaseModel):
         self.dwolla_funding_source_status = status
         if save:
             self.save()
+
+    def update_bank_account_from_sync(
+        self, dwolla_funding_source_status, is_dwolla_removed, save=True
+    ):
+        self.dwolla_funding_source_status = dwolla_funding_source_status
+        self.is_dwolla_removed = is_dwolla_removed
+        if save:
+            self.save()
