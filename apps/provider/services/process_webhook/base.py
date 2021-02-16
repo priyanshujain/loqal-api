@@ -47,11 +47,22 @@ class ProcesssProviderWebhook(ServiceBase):
         if timestamp:
             event_timestamp = parser.parse(timestamp)
 
+        customer_dwolla_id = None
+        if "customer" in topic:
+            customer_dwolla_id = (
+                self.request_data.get("_links", {})
+                .get("customer", {})
+                .get("href", "")
+                .split("/")
+                .pop()
+            )
+
         event = self._factory_provider_webhook_event(
             webhook_id=provider_webhook.id,
             dwolla_id=event_id,
             target_resource_dwolla_id=target_resource_dwolla_id,
             topic=topic,
+            customer_dwolla_id=customer_dwolla_id,
             event_timestamp=event_timestamp,
         )
 
@@ -72,6 +83,7 @@ class ProcesssProviderWebhook(ServiceBase):
         webhook_id,
         dwolla_id,
         topic,
+        customer_dwolla_id,
         target_resource_dwolla_id,
         event_timestamp,
     ):
@@ -80,6 +92,7 @@ class ProcesssProviderWebhook(ServiceBase):
             event_payload=self.request_data,
             dwolla_id=dwolla_id,
             topic=topic,
+            customer_dwolla_id=customer_dwolla_id,
             target_resource_dwolla_id=target_resource_dwolla_id,
             event_timestamp=event_timestamp,
         )

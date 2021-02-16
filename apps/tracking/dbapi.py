@@ -54,7 +54,9 @@ def filter_psp_request_errors(account_id):
 
 
 def all_psp_requests(account_id):
-    return PspApiRequestStorage.objects.filter(account_id=account_id)
+    return PspApiRequestStorage.objects.filter(account_id=account_id).order_by(
+        "-created_at"
+    )
 
 
 def get_psp_request(request_id, account_id):

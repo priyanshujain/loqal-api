@@ -1,7 +1,8 @@
 from api.views import APIView
 from apps.tracking.dbapi import (all_psp_requests, filter_psp_request_errors,
                                  get_psp_request)
-from apps.tracking.responses import PspRequestAPIResponse
+from apps.tracking.responses import (BasePspRequestAPIResponse,
+                                     PspRequestAPIResponse)
 
 
 class PspRequestAPIView(APIView):
@@ -11,7 +12,7 @@ class PspRequestAPIView(APIView):
             request,
             queryset=psp_requests,
             order_by="-created_at",
-            response_serializer=PspRequestAPIResponse,
+            response_serializer=BasePspRequestAPIResponse,
         )
 
 
