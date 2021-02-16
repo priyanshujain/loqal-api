@@ -1,11 +1,5 @@
-from django.db.models import Q
 from django.db.utils import IntegrityError
 
-from apps.account.dbapi import merchant
-from apps.merchant.models import (BeneficialOwner, ControllerDetails,
-                                  ControllerVerificationDocument,
-                                  IncorporationVerificationDocument,
-                                  OwnerVerificationDocument)
 from integrations.options import IntegratedProviders
 from utils.shortcuts import generate_encryption_key, rand_str
 
@@ -73,7 +67,9 @@ def get_all_provider_webhook():
 
 
 def get_provider_webhook_events(webhook_id):
-    return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id)
+    return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id).order_by(
+        "-event_timestamp"
+    )
 
 
 def get_provider_webhook_event(event_id):
@@ -94,6 +90,7 @@ def create_provider_webhook_event(
     event_payload,
     dwolla_id,
     topic,
+    customer_dwolla_id,
     target_resource_dwolla_id,
     event_timestamp,
 ):
@@ -103,6 +100,7 @@ def create_provider_webhook_event(
             event_payload=event_payload,
             dwolla_id=dwolla_id,
             topic=topic,
+            customer_dwolla_id=customer_dwolla_id,
             event_timestamp=event_timestamp,
             target_resource_dwolla_id=target_resource_dwolla_id,
         )
@@ -110,46 +108,58 @@ def create_provider_webhook_event(
         return None
 
 
-def get_merchant_webhook_event(merchant_account):
-    customer_dwolla_id = merchant_account.account.dwolla_id
-    ba_dwolla_ids = []
-    document_dwolla_ids = []
-    for ba in BeneficialOwner.objects.filter(merchant_id=merchant_account.id):
-        if ba.dwolla_id:
-            ba_dwolla_ids.append(ba.dwolla_id)
-        for document in OwnerVerificationDocument.objects.filter(
-            owner_id=ba.id
-        ):
-            if document.dwolla_id:
-                document_dwolla_ids.append(document.dwolla_id)
-    try:
-        controller = merchant_account.controller_details
-        for document in OwnerVerificationDocument.objects.filter(
-            controller_id=controller.id
-        ):
-            if document.dwolla_id:
-                document_dwolla_ids.append(document.dwolla_id)
-    except Exception:
-        pass
-    try:
-        incorporation_details = merchant_account.incorporation_details
-        for document in IncorporationVerificationDocument.objects.filter(
-            incorporation_details_id=incorporation_details.id
-        ):
-            if document.dwolla_id:
-                document_dwolla_ids.append(document.dwolla_id)
-    except Exception:
-        pass
-
-    return ProviderWebhookEvent.objects.filter(
-        Q(target_resource_dwolla_id=customer_dwolla_id)
-        | Q(target_resource_dwolla_id__in=ba_dwolla_ids)
-        | Q(target_resource_dwolla_id__in=document_dwolla_ids)
-    ).order_by("event_timestamp")
-
-
 def get_webhook_event(id):
     try:
         return ProviderWebhookEvent.objects.get(id=id)
     except ProviderWebhookEvent.DoesNotExist:
         return None
+
+
+def get_merchant_webhook_event(merchant_account):
+    customer_dwolla_id = merchant_account.account.dwolla_id
+    return ProviderWebhookEvent.objects.filter(
+        customer_dwolla_id=customer_dwolla_id
+    ).order_by("event_timestamp")
+
+
+def get_account_webhook_events(account):
+    customer_dwolla_id = account.dwolla_id
+    return ProviderWebhookEvent.objects.filter(
+        customer_dwolla_id=customer_dwolla_id
+    ).order_by("event_timestamp")
+
+
+# def get_merchant_webhook_event_old(merchant_account):
+#     customer_dwolla_id = merchant_account.account.dwolla_id
+#     ba_dwolla_ids = []
+#     document_dwolla_ids = []
+#     for ba in BeneficialOwner.objects.filter(merchant_id=merchant_account.id):
+#         if ba.dwolla_id:
+#             ba_dwolla_ids.append(ba.dwolla_id)
+#         for document in OwnerVerificationDocument.objects.filter(owner_id=ba.id):
+#             if document.dwolla_id:
+#                 document_dwolla_ids.append(document.dwolla_id)
+#     try:
+#         controller = merchant_account.controller_details
+#         for document in OwnerVerificationDocument.objects.filter(
+#             controller_id=controller.id
+#         ):
+#             if document.dwolla_id:
+#                 document_dwolla_ids.append(document.dwolla_id)
+#     except Exception:
+#         pass
+#     try:
+#         incorporation_details = merchant_account.incorporation_details
+#         for document in IncorporationVerificationDocument.objects.filter(
+#             incorporation_details_id=incorporation_details.id
+#         ):
+#             if document.dwolla_id:
+#                 document_dwolla_ids.append(document.dwolla_id)
+#     except Exception:
+#         pass
+
+#     return ProviderWebhookEvent.objects.filter(
+#         Q(target_resource_dwolla_id=customer_dwolla_id)
+#         | Q(target_resource_dwolla_id__in=ba_dwolla_ids)
+#         | Q(target_resource_dwolla_id__in=document_dwolla_ids)
+#     ).order_by("event_timestamp")

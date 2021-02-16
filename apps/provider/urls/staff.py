@@ -12,7 +12,8 @@ from apps.provider.views.staff import (ActivateTermsDocumentAPI,
                                        RemoveTermDocumentAPI,
                                        UpdatePaymentProviderAPI,
                                        UpdatePaymentProviderCredsAPI)
-from apps.provider.views.webhooks import (GetMerchantWebhookEventsAPI,
+from apps.provider.views.webhooks import (GetConsumerWebhookEventsAPI,
+                                          GetMerchantWebhookEventsAPI,
                                           GetWebhookEventDetailsAPI,
                                           ProcessWebhookEventAPI)
 
@@ -72,6 +73,10 @@ urlpatterns = [
     path(
         "webhook/merchant/<uuid:merchant_id>/events/",
         GetMerchantWebhookEventsAPI.as_view(),
+    ),
+    path(
+        "webhook/consumer/<uuid:consumer_id>/events/",
+        GetConsumerWebhookEventsAPI.as_view(),
     ),
     path(
         "webhook/events/<int:event_id>/process/",

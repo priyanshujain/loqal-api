@@ -50,6 +50,7 @@ class ConsumerAccountProfileResponse(serializers.ModelSerializer):
     is_active = serializers.BooleanField(
         source="account.is_active", read_only=True
     )
+    consumer_id = serializers.CharField(source="u_id", read_only=True)
     loqal_id = serializers.CharField(source="username", read_only=True)
 
     class Meta:
@@ -61,6 +62,7 @@ class ConsumerAccountProfileResponse(serializers.ModelSerializer):
             "last_name",
             "email",
             "account_id",
+            "consumer_id",
             "loqal_id",
             "is_active",
         )
