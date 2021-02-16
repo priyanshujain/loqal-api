@@ -73,7 +73,7 @@ def get_all_provider_webhook():
 
 
 def get_provider_webhook_events(webhook_id):
-    return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id)
+    return ProviderWebhookEvent.objects.filter(webhook_id=webhook_id).order_by("-created_at")
 
 
 def get_provider_webhook_event(event_id):
