@@ -34,8 +34,6 @@ MERCHANT_APP_WEB_BASE_URL = "https://merchant-dev.payloqal.com"
 
 
 # Email configs.
-DEFAULT_FROM_EMAIL = "donotreply@spotlightandcompany.com"
-EMAIL_SENDER_NAME = "Loqal Team"
 SPOTLIGHT_ADMIN_EMAIL = "priyanshu@spotlightandcompany.com"
 
 

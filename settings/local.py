@@ -28,10 +28,6 @@ API_BASE_URL = "http://localhost:8000"
 CONSUMER_APP_WEB_BASE_URL = "http://localhost:3001"
 MERCHANT_APP_WEB_BASE_URL = "http://localhost:3001"
 
-# Email configs.
-DEFAULT_FROM_EMAIL = "donotreply@spotlightandcompany.com"
-EMAIL_SENDER_NAME = "Loqal App Team"
-
 
 LOQAL_SMS_PHONE_NUMBER = "4122183340"
 LOQAL_SMS_PHONE_NUMBER_COUNTRY = "US"
