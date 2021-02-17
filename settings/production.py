@@ -23,7 +23,3 @@ CONSUMER_APP_WEB_BASE_URL = "https://loqal.us"
 MERCHANT_APP_WEB_BASE_URL = "https://merchant.loqal.us"
 
 SESSION_COOKIE_DOMAIN = ".loqal.us"
-
-# Email configs.
-DEFAULT_FROM_EMAIL = "hello@loqal.us"
-EMAIL_SENDER_NAME = "Loqal Team"
