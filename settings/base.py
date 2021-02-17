@@ -442,3 +442,8 @@ TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
 
 # Setup
 INITIAL_ADMIN_PASSWORD = env("INITIAL_ADMIN_PASSWORD")
+
+
+# Email configs.
+DEFAULT_FROM_EMAIL = "hello@loqal.us"
+EMAIL_SENDER_NAME = "Loqal Team"
