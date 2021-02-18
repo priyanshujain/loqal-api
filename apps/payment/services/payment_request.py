@@ -13,6 +13,7 @@ from apps.payment.dbapi import (create_payment, create_payment_request,
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (cancelled_payment_event,
                                        capture_payment_event,
+                                       failed_payment_event,
                                        initiate_payment_event)
 from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
                                   TransactionType)
@@ -125,17 +126,38 @@ class ApprovePaymentRequest(ServiceBase):
             receiver_account_id=merchant_account.account.id,
         ).validate()
 
-        transaction = CreatePayment(
-            account_id=self.account_id,
-            ip_address=self.ip_address,
-            sender_bank_account=banking_data["sender_bank_account"],
-            receiver_bank_account=banking_data["receiver_bank_account"],
-            order=payment_request.payment.order,
-            total_amount=total_amount,
-            amount_towards_order=payment_request.amount,
-            fee_bearer_account=merchant_account.account,
-            transaction_type=TransactionType.PAYMENT_REQUEST,
-        ).handle()
+        try:
+            transaction = CreatePayment(
+                account_id=self.account_id,
+                ip_address=self.ip_address,
+                sender_bank_account=banking_data["sender_bank_account"],
+                receiver_bank_account=banking_data["receiver_bank_account"],
+                order=payment_request.payment.order,
+                total_amount=total_amount,
+                amount_towards_order=payment_request.amount,
+                fee_bearer_account=merchant_account.account,
+                transaction_type=TransactionType.PAYMENT_REQUEST,
+            ).handle()
+        except Exception as error:
+            is_save = False
+            transaction_tracking_id = None
+            payment_request.set_failed(save=False)
+            try:
+                transaction = error.transaction
+                payment_request.add_transaction(
+                    transaction=transaction, tip_amount=data["tip_amount"]
+                )
+                transaction_tracking_id = transaction.transaction_tracking_id
+                is_save = True
+            except AttributeError:
+                pass
+            if not is_save:
+                payment_request.save()
+            failed_payment_event(
+                payment_id=payment_request.payment.id,
+                transaction_tracking_id=transaction_tracking_id,
+            )
+            raise error
         capture_payment_event(
             payment_id=transaction.payment.id,
             transaction_tracking_id=transaction.transaction_tracking_id,
@@ -164,6 +186,15 @@ class ApprovePaymentRequest(ServiceBase):
         if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
             raise ValidationError(
                 {"detail": [ErrorDetail(_("Payment request is expired."))]}
+            )
+        receiver_account = payment_request.account_to
+        if not receiver_account.is_active:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Given payment request is no longer valid.")
+                    )
+                }
             )
         data["payment_request"] = payment_request
         return data
@@ -203,5 +234,14 @@ class RejectPaymentRequest(ServiceBase):
         if payment_request.status != PaymentRequestStatus.REQUEST_SENT:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Payment request is expired."))}
+            )
+        receiver_account = payment_request.account_to
+        if not receiver_account.is_active:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Given payment request is no longer valid.")
+                    )
+                }
             )
         return payment_request

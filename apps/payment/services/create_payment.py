@@ -1,4 +1,5 @@
 from decimal import Decimal
+from traceback import TracebackException
 
 from django.conf import settings
 from django.utils.translation import gettext as _
@@ -12,7 +13,10 @@ from apps.payment.dbapi import (create_transaction, get_payment_register,
 from apps.payment.dbapi.events import (failed_payment_event,
                                        failed_refund_payment_event)
 from apps.payment.options import (FACILITATION_FEES_CURRENCY,
-                                  FACILITATION_FEES_PERCENTAGE,
+                                  PAYMENT_FACILITATION_FEES_FIXED,
+                                  PAYMENT_FACILITATION_FEES_PERCENTAGE,
+                                  REFUND_FACILITATION_FEES_FIXED,
+                                  REFUND_FACILITATION_FEES_PERCENTAGE,
                                   TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
@@ -54,7 +58,7 @@ class CreatePayment(ServiceBase):
         if (
             self.sender_bank_account.verification_provider
             == VerificationProvider.PLAID
-        ):
+        ) and (self.transaction_type != TransactionType.REFUND_PAYMENT):
             balance, error = CheckBankBalance(
                 bank_account=self.sender_bank_account
             ).validate()
@@ -152,9 +156,7 @@ class CreatePayment(ServiceBase):
     def _factory_transaction(self):
         payment = self.order.payment
         amount = self.total_amount
-        fee_amount = amount * Decimal(FACILITATION_FEES_PERCENTAGE) / 100
-        fee_amount = round(fee_amount, 2)
-
+        fee_amount = self._calculate_fee_amount(amount)
         return create_transaction(
             sender_bank_account_id=self.sender_bank_account.id,
             recipient_bank_account_id=self.receiver_bank_account.id,
@@ -167,6 +169,19 @@ class CreatePayment(ServiceBase):
             customer_ip_address=self.ip_address,
             transaction_type=self.transaction_type,
         )
+
+    def _calculate_fee_amount(self, amount):
+        fee_amount = Decimal(0.0)
+        if self.transaction_type == TransactionType.REFUND_PAYMENT:
+            fee_amount = (
+                amount * Decimal(REFUND_FACILITATION_FEES_PERCENTAGE) / 100
+            ) + Decimal(REFUND_FACILITATION_FEES_FIXED)
+        else:
+            fee_amount = (
+                amount * Decimal(PAYMENT_FACILITATION_FEES_PERCENTAGE) / 100
+            ) + Decimal(PAYMENT_FACILITATION_FEES_FIXED)
+        fee_amount = round(fee_amount, 2)
+        return fee_amount
 
     def _send_to_dwolla(self, transaction):
         api_action = CreateTransferAPIAction(account_id=self.account_id)

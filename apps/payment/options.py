@@ -4,7 +4,11 @@ from apps.provider.options import DEFAULT_CURRENCY
 from db.models.fields import ChoiceCharEnum, ChoiceEnum
 from db.models.fields.choice import ChoiceCharEnum
 
-FACILITATION_FEES_PERCENTAGE = 1.5
+PAYMENT_FACILITATION_FEES_PERCENTAGE = 1.5
+REFUND_FACILITATION_FEES_PERCENTAGE = 0.5
+PAYMENT_FACILITATION_FEES_FIXED = 0.15
+REFUND_FACILITATION_FEES_FIXED = 0.05
+
 FACILITATION_FEES_CURRENCY = DEFAULT_CURRENCY
 
 
@@ -316,6 +320,7 @@ class PaymentRequestStatus(ChoiceEnum):
     REQUEST_SENT = 0, _("Request Sent")
     ACCEPTED = 1, _("Request Accepted")
     REJECTED = 2, _("Request Rejected")
+    FAILED = 3, _("Refund Failed")
 
 
 class RefundType(ChoiceCharEnum):

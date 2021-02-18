@@ -68,6 +68,15 @@ class DirectMerchantPayment(ServiceBase):
                 }
             )
 
+        if not merchant_account.account.is_active:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Given merchant is no longer available.")
+                    )
+                }
+            )
+
         if (
             merchant_account.account.dwolla_customer_status
             != DwollaCustomerStatus.VERIFIED

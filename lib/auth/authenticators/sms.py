@@ -21,7 +21,7 @@ class SmsInterface(OtpMixin, AuthenticatorInterface):
         "or when you do not have a phone that supports "
         "an authenticator application."
     )
-    code_ttl = 60
+    code_ttl = 120
 
     @classproperty
     def is_available(cls):
