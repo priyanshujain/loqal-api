@@ -166,15 +166,15 @@ class CreateRefundValidator(serializers.ValidationSerializer):
 class CreateDisputeValidator(serializers.ValidationSerializer):
     transaction_tracking_id = serializers.CharField()
     reason_message = serializers.CharField(max_length=2 * 1024)
-    reason_type = serializers.EnumChoiceField(choices=DisputeReasonType.choices)
+    reason_type = serializers.EnumChoiceField(enum_type=DisputeReasonType)
 
 
 class ChangeDisputeStatusValidator(serializers.ValidationSerializer):
-    status = serializers.EnumChoiceField(choices=DisputeStatus.choices)
+    status = serializers.EnumChoiceField(enum_type=DisputeStatus)
     notes = serializers.CharField(max_length=2 * 1024)
 
 
 class CloseDisputeValidator(serializers.ValidationSerializer):
     resolution = serializers.CharField(max_length=2 * 1024)
-    status = serializers.EnumChoiceField(choices=DisputeStatus.choices)
+    status = serializers.EnumChoiceField(enum_type=DisputeStatus)
     notes = serializers.CharField(max_length=2 * 1024)
