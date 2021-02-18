@@ -43,7 +43,7 @@ class CreateDisputeAPI(ConsumerAPIView):
             data=self.request_data,
         ).handle()
         return self.response(
-            {"dispute_tracking_id": dispute.dispute_tracking_id}, status=201
+            ConsumerDisputeDetailsResponse(dispute).data, status=201
         )
 
 
