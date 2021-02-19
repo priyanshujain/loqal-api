@@ -9,7 +9,9 @@ def get_all_merchants():
     )
 
 
-def get_merchant_qs_by_category(merchant_qs, category):
+def get_merchant_qs_by_category(category, merchant_qs=None):
+    if not merchant_qs:
+        merchant_qs = get_all_merchants()
     return merchant_qs.filter(categories__category=category)
 
 
