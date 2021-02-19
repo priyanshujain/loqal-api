@@ -75,7 +75,7 @@ class CreateDispute(ServiceBase):
 
     def _factory_dispute(self, transaction_id, reason_message, reason_type):
         dispute_type = getattr(
-            DisputeReasonTypeMap, reason_type, DisputeType.RETRIEVAL
+            DisputeReasonTypeMap, reason_type.value, DisputeType.RETRIEVAL
         )
         return create_dispute_transaction(
             transaction_id=transaction_id,

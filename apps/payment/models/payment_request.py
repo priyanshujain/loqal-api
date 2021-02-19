@@ -76,3 +76,8 @@ class PaymentRequest(AbstractBaseModel):
         )
         if save:
             self.save()
+
+    def set_failed(self, save=True):
+        self.status = PaymentRequestStatus.FAILED
+        if save:
+            self.save()

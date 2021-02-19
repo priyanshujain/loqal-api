@@ -30,13 +30,24 @@ def get_pending_transactions_sender(bank_account_id):
     )
 
 
-def get_pending_transactions_merchant(bank_account_id):
+def get_pending_transactions_receiver(bank_account_id):
     return Transaction.objects.filter(
-        sender_bank_account_id=bank_account_id,
         is_success=True,
-    ).filter(
-        Q(is_sender_tranfer_pending=True)
-        | Q(is_receiver_tranfer_complete=False)
+        recipient_bank_account_id=bank_account_id,
+        is_receiver_tranfer_complete=False,
+    )
+
+
+def get_pending_transactions_all(bank_account_id):
+    return Transaction.objects.filter(is_success=True).filter(
+        Q(
+            sender_bank_account_id=bank_account_id,
+            is_sender_tranfer_pending=True,
+        )
+        | Q(
+            recipient_bank_account_id=bank_account_id,
+            is_receiver_tranfer_complete=False,
+        )
     )
 
 

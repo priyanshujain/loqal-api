@@ -7,7 +7,7 @@ from api.exceptions import ErrorDetail, ProviderAPIException, ValidationError
 from api.services import ServiceBase
 from apps.banking.dbapi import get_bank_account
 from apps.payment.dbapi import (empty_transactions,
-                                get_pending_transactions_merchant,
+                                get_pending_transactions_all,
                                 get_pending_transactions_sender)
 from apps.provider.lib.actions import ProviderAPIActionBase
 
@@ -30,15 +30,9 @@ class RemoveBankAccount(ServiceBase):
                 }
             )
 
-        transactions = empty_transactions()
-        if self.is_merchant:
-            transactions = get_pending_transactions_merchant(
-                bank_account_id=bank_account.id
-            )
-        else:
-            transactions = get_pending_transactions_sender(
-                bank_account_id=bank_account.id
-            )
+        transactions = get_pending_transactions_all(
+            bank_account_id=bank_account.id
+        )
 
         pending_amount = transactions.aggregate(total=Sum("amount"))[
             "total"

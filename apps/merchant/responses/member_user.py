@@ -16,7 +16,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
     phone_number = serializers.CharField(
         source="user.phone_number", read_only=True
     )
-    two_factor_auth = serializers.CharField(
+    two_factor_auth = serializers.BooleanField(
         source="user.two_factor_auth", read_only=True
     )
     role_id = serializers.CharField(source="role.id", read_only=True)

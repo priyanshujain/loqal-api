@@ -79,12 +79,15 @@ def get_merchant_customers(merchant_account):
             total_refund_amount=Sum("amount"),
             total_refunds=Count("id"),
         )
+        last_name = consumer.user.last_name
+        if last_name and len(str(last_name)) > 0:
+            last_name = str(last_name)[0]
         aggregate_consumers.append(
             {
                 "created_at": consumer.created_at,
                 "consumer_loqal_id": consumer.username,
                 "first_name": consumer.user.first_name,
-                "last_name": consumer.user.last_name,
+                "last_name": last_name,
                 "total_payments": payment_stats["total_payments"],
                 "total_payment_amount": to_float(
                     payment_stats["total_payment_amount"]

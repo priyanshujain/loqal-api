@@ -9,7 +9,7 @@ __all__ = (
 
 
 class RegisterUserDeviceValidator(serializers.ModelSerializer):
-    device_platform = serializers.ChoiceField(choices=UserDeviceTypes.choices)
+    device_platform = serializers.EnumChoiceField(enum_type=UserDeviceTypes)
     device_id = serializers.CharField()
 
     class Meta:
