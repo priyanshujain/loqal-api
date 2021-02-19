@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import ConsumerAPIView
 from apps.account.dbapi import get_merchant_account_by_uid
-from apps.merchant.dbapi import get_merchants_by_category
+from apps.merchant.dbapi import get_merchant_qs_by_category
 from apps.merchant.responses import (CategoryMerchantListResponse,
                                      MerchantBasicDetailsResponse,
                                      MerchantFullDetailsResponse)
@@ -54,7 +54,7 @@ class ListCategoryMerchantsAPI(ConsumerAPIView):
                 {"detail": ErrorDetail(_("category is not valid."))}
             )
 
-        merchants = get_merchants_by_category(category=category)
+        merchants = get_merchant_qs_by_category(category=category)
         return self.response(
             CategoryMerchantListResponse(merchants, many=True).data
         )

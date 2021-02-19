@@ -1,9 +1,12 @@
+from django.utils.translation import activate
 from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.banking.dbapi import get_bank_account
 
 
 def check_if_merchant_account_ready(merchant):
     account = merchant.account
+    if not account:
+        return False
     if account.dwolla_customer_status != DwollaCustomerStatus.VERIFIED:
         return False
     if (
