@@ -1,6 +1,6 @@
 from api import serializers
 from apps.account.validators import MerchantAccountSignupValidatorBase
-from apps.merchant.options import FeatureAcessTypes
+from apps.merchant.options import AllowedFeatureAcessTypes
 
 __all__ = (
     "MemberInviteValidator",
@@ -8,11 +8,92 @@ __all__ = (
     "MemberSignupValidator",
     "UpdateMemberRoleValidator",
     "DisableMemberValidator",
-    "CreateFeatureAccessRoleValidator",
-    "UpdateFeatureAccessRoleValidator",
-    "DeleteFeatureAccessRoleValidator",
     "EditMemberProfileValidator",
 )
+
+
+class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
+    is_full_access = serializers.BooleanField()
+    payment_requests = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.PAYMENT_REQUESTS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    payment_history = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.PAYMENT_HISTORY
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    settlements = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.SETTLEMENTS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    refunds = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.REFUNDS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    disputes = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.DISPUTES
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    customers = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.CUSTOMERS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    bank_accounts = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.BANK_ACCOUNTS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    qr_codes = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.QR_CODES
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    store_profile = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.STORE_PROFILE
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    team_management = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.TEAM_MANAGEMENT
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
 
 
 class MemberInviteValidator(serializers.ValidationSerializer):
@@ -22,7 +103,7 @@ class MemberInviteValidator(serializers.ValidationSerializer):
     )
     email = serializers.EmailField(max_length=255)
     position = serializers.CharField(max_length=256)
-    role_id = serializers.IntegerField()
+    role = FeatureAccessRoleValidatorBase()
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -38,7 +119,7 @@ class UpdateMemberInviteValidator(serializers.ValidationSerializer):
     )
     email = serializers.EmailField(max_length=255)
     position = serializers.CharField(max_length=256)
-    role_id = serializers.IntegerField()
+    role = FeatureAccessRoleValidatorBase()
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -53,59 +134,11 @@ class MemberSignupValidator(MerchantAccountSignupValidatorBase):
 
 class UpdateMemberRoleValidator(serializers.ValidationSerializer):
     member_id = serializers.IntegerField()
-    role_id = serializers.IntegerField()
+    role = FeatureAccessRoleValidatorBase()
 
 
 class DisableMemberValidator(serializers.ValidationSerializer):
     member_id = serializers.IntegerField()
-
-
-class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
-    description = serializers.CharField(
-        max_length=1024, default="", required=False
-    )
-    team_and_roles = serializers.ListField(
-        child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
-        allow_empty=True,
-        required=False,
-        default={},
-    )
-    beneficiaries = serializers.ListField(
-        child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
-        allow_empty=True,
-        required=False,
-        default={},
-    )
-    transactions = serializers.ListField(
-        child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
-        allow_empty=True,
-        required=False,
-        default={},
-    )
-    banking = serializers.ListField(
-        child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
-        allow_empty=True,
-        required=False,
-        default={},
-    )
-    settings = serializers.ListField(
-        child=serializers.ChoiceField(choices=FeatureAcessTypes.choices),
-        allow_empty=True,
-        required=False,
-        default={},
-    )
-
-
-class CreateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
-    role_name = serializers.CharField(max_length=256)
-
-
-class UpdateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
-    role_id = serializers.IntegerField()
-
-
-class DeleteFeatureAccessRoleValidator(serializers.ValidationSerializer):
-    role_id = serializers.IntegerField()
 
 
 class EditMemberProfileValidator(serializers.ValidationSerializer):

@@ -169,6 +169,14 @@ def get_feature_access_role_by_id(role_id, merchant_id):
         return None
 
 
+def create_member_role(data):
+    return FeatureAccessRole.objects.create(**data)
+
+
+def update_member_role(role_id, data):
+    return FeatureAccessRole.objects.filter(id=role_id).update(**data)
+
+
 def get_feature_access_roles_by_account(merchant_id):
     return FeatureAccessRole.objects.filter(merchant_id=merchant_id)
 

@@ -3,10 +3,12 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (create_member_invite,
+from apps.merchant.constants import DEFAULT_ROLE
+from apps.merchant.dbapi import (create_member_invite, create_member_role,
                                  get_feature_access_role_by_id,
                                  get_member_invite_by_email,
-                                 get_member_invite_by_id, update_member_invite)
+                                 get_member_invite_by_id, update_member_invite,
+                                 update_member_role)
 from apps.merchant.notifications import MemberSignupInviteEmail
 from apps.merchant.validators import (MemberInviteValidator,
                                       UpdateMemberInviteValidator)
@@ -27,8 +29,6 @@ class CreateMemberInvite(ServiceBase):
     def _validate_data(self):
         data = run_validator(validator=MemberInviteValidator, data=self.data)
         email = data["email"]
-        role_id = data["role_id"]
-
         user = get_merchant_user_by_email(email=email)
         if user:
             raise ValidationError(
@@ -45,18 +45,6 @@ class CreateMemberInvite(ServiceBase):
                 {"detail": ErrorDetail(_("User has already been invited."))}
             )
 
-        role = get_feature_access_role_by_id(
-            role_id=role_id, merchant_id=self.merchant_id
-        )
-        if not role:
-            raise ValidationError(
-                {"role_id": [ErrorDetail(_("Invalid role_id."))]}
-            )
-        if role.merchant.id != self.merchant_id:
-            raise ValidationError(
-                {"role_id": [ErrorDetail(_("Invalid role_id."))]}
-            )
-
     def handle(self):
         self._validate_data()
         data = self.data
@@ -64,14 +52,23 @@ class CreateMemberInvite(ServiceBase):
         last_name = data["last_name"]
         email = data["email"]
         position = data["position"]
-        role_id = data["role_id"]
+        role = data["role"]
+        is_full_access = role["is_full_access"]
+        member_role = None
+        if is_full_access:
+            member_role = create_member_role(
+                is_full_access=True, **DEFAULT_ROLE
+            )
+        else:
+            member_role = create_member_role(data=role)
+
         invite = create_member_invite(
             merchant_id=self.merchant_id,
             first_name=first_name,
             last_name=last_name,
             email=email,
             position=position,
-            role_id=role_id,
+            role_id=member_role.id,
         )
         MemberSignupInviteEmail(invite=invite).send()
         return invite
@@ -119,7 +116,6 @@ class UpdateMemberInvite(ServiceBase):
             validator=UpdateMemberInviteValidator, data=self.data
         )
         invite_id = data["invite_id"]
-        role_id = data["role_id"]
 
         invite = get_member_invite_by_id(
             invite_id=invite_id, merchant_id=self.merchant_id
@@ -132,16 +128,7 @@ class UpdateMemberInvite(ServiceBase):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invite already expired."))}
             )
-
-        role = get_feature_access_role_by_id(
-            role_id=role_id, merchant_id=self.merchant_id
-        )
-        if not role:
-            raise ValidationError(
-                {"role_id": [ErrorDetail(_("Invalid role_id."))]}
-            )
         self.invite = invite
-        self.role = role
 
     def handle(self):
         self._validate_data()
@@ -151,14 +138,14 @@ class UpdateMemberInvite(ServiceBase):
         first_name = data["first_name"]
         last_name = data["last_name"]
         email = data["email"]
-        role_id = data["role_id"]
+        role = data["role"]
         position = data["position"]
+        update_member_role(id=invite.role.id, data=role)
         invite = update_member_invite(
             invite=invite,
             first_name=first_name,
             last_name=last_name,
             email=email,
-            role_id=role_id,
             position=position,
         )
         return invite

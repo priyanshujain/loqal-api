@@ -28,38 +28,24 @@ class MemberType(ChoiceEnum):
 
 
 class FeatureAcessTypes(ChoiceEnum):
-    CREATE = "create", _("Create")
-    UPDATE = "update", _("Update")
-    VIEW = "view", _("View")
-    APPROVE = "approve", _("Approve")
-    DELETE = "delete", _("Delete")
+    CREATE = "CREATE", _("Create")
+    UPDATE = "UPDATE", _("Update")
+    VIEW = "VIEW", _("View")
+    PARTIAL_VIEW = "PARTIAL_VIEW", _("Partial View")
+    DELETE = "DELETE", _("Delete")
 
 
 class AllowedFeatureAcessTypes:
-    TEAM_AND_ROLES = ["CREATE", "UPDATE", "VIEW", "DELETE"]
-    BENEFICIARIES = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-        "APPROVE",
-        "DELETE",
-    ]
-    TRANSACTIONS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-        "APPROVE",
-    ]
-    DIRECT_DEBIT_ACCOUNTS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-    ]
-    SETTINGS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-    ]
+    PAYMENT_REQUESTS = ["CREATE", "VIEW"]
+    PAYMENT_HISTORY = ["PARTIAL_VIEW", "VIEW"]
+    SETTLEMENTS = ["VIEW", "PARTIAL_VIEW"]
+    REFUNDS = ["CREATE", "VIEW", "PARTIAL_VIEW"]
+    DISPUTES = ["PARTIAL_VIEW", "VIEW"]
+    CUSTOMERS = ["PARTIAL_VIEW", "VIEW"]
+    BANK_ACCOUNTS = ["CREATE", "VIEW", "DELETE"]
+    QR_CODES = ["CREATE", "UPDATE", "VIEW"]
+    STORE_PROFILE = ["UPDATE", "VIEW"]
+    TEAM_MANAGEMENT = ["CREATE", "UPDATE", "VIEW", "DELETE"]
 
 
 class BeneficialOwnerStatus(ChoiceCharEnum):
