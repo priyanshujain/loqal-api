@@ -30,7 +30,7 @@ class UpdateMemberRole(ServiceBase):
         )
         if not account_member:
             raise ValidationError(
-                {"account_member_id": [ErrorDetail(_("Invalid member_id."))]}
+                {"member_id": [ErrorDetail(_("Invalid member_id."))]}
             )
         self.account_member = account_member
         return data
