@@ -20,6 +20,9 @@ class FeatureAccessRole(AbstractBaseModel):
     settlements = ArrayField(
         models.CharField(max_length=255, blank=True), default=list, blank=True
     )
+    disputes = ArrayField(
+        models.CharField(max_length=255, blank=True), default=list, blank=True
+    )
     refunds = ArrayField(
         models.CharField(max_length=255, blank=True), default=list, blank=True
     )
