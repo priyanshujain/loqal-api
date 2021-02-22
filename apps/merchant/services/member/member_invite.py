@@ -57,7 +57,7 @@ class CreateMemberInvite(ServiceBase):
         member_role = None
         if is_full_access:
             member_role = create_member_role(
-                is_full_access=True, **DEFAULT_ROLE
+                is_full_access=True, data=DEFAULT_ROLE
             )
         else:
             member_role = create_member_role(data=role)
