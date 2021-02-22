@@ -102,10 +102,9 @@ class CreateMerchantAccount(ServiceBase):
         )
 
     def _factory_admin_role(self):
-        service = FeatureAccessRole.objects.create(
+        return FeatureAccessRole.objects.create(
             is_full_access=True, is_super_admin=True, **DEFAULT_ROLE
         )
-        service.handle()
 
     def _send_verification_email(self, user):
         SendMerchantAccountVerifyEmail(user=user).send()
