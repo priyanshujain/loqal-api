@@ -8,14 +8,16 @@ class FeatureAccessRoleResponse(serializers.ModelSerializer):
     class Meta:
         model = FeatureAccessRole
         fields = (
-            "team_and_roles",
-            "beneficiaries",
-            "transactions",
-            "banking",
-            "settings",
-            "is_super_admin",
-            "is_standard_user",
-            "is_editable",
+            "is_full_access",
+            "payment_requests",
+            "payment_history",
+            "settlements",
+            "disputes",
+            "refunds",
+            "customers",
+            "qr_codes",
+            "store_profile",
+            "team_management",
         )
 
 
