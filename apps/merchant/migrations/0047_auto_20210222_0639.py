@@ -5,6 +5,28 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def migrate_data(apps, schema_editor):
+    FeatureAccessRole = apps.get_model("merchant", "FeatureAccessRole")
+    for role in FeatureAccessRole.objects.all():
+        members = role.accountmember_set.all()
+        if members.count() > 1:
+            members = members[1:]
+            for member in members:
+                new_role = FeatureAccessRole(
+                    merchant=member.merchant,
+                    role_name=f"admin_{member.id}",
+                    is_super_admin=True,
+                    team_and_roles=["CREATE", "VIEW"],
+                    beneficiaries=["PARTIAL_VIEW", "VIEW"],
+                    transactions=["VIEW", "PARTIAL_VIEW"],
+                    banking=["CREATE", "VIEW", "PARTIAL_VIEW"],
+                    settings=["PARTIAL_VIEW", "VIEW"],
+                )
+                new_role.save()
+                member.role = new_role
+                member.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -163,4 +185,5 @@ class Migration(migrations.Migration):
             model_name="featureaccessrole",
             name="transactions",
         ),
+        migrations.RunPython(migrate_data),
     ]
