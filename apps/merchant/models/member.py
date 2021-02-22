@@ -49,9 +49,6 @@ class FeatureAccessRole(AbstractBaseModel):
     class Meta:
         db_table = "merchant_account_role"
 
-    def __str__(self):
-        return self.role_name
-
 
 class AccountMember(AbstractBaseModel):
     merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)

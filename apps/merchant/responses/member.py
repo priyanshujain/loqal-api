@@ -9,20 +9,25 @@ __all__ = (
 )
 
 
-class RoleInfoResponse(serializers.ModelSerializer):
-    role_id = serializers.IntegerField(source="id", read_only=True)
 
+class FeatureAccessRoleResponse(serializers.ModelSerializer):
     class Meta:
         model = FeatureAccessRole
         fields = (
-            "role_id",
-            "role_name",
+            "team_and_roles",
+            "beneficiaries",
+            "transactions",
+            "banking",
+            "settings",
+            "is_super_admin",
+            "is_standard_user",
+            "is_editable",
         )
 
 
 class MemberInviteResponse(serializers.ModelSerializer):
     invite_id = serializers.IntegerField(source="id", read_only=True)
-    role = RoleInfoResponse(read_only=True)
+    role = FeatureAccessRoleResponse(read_only=True)
     merchant_id = serializers.IntegerField(
         source="merchant.id", read_only=True
     )
@@ -42,7 +47,7 @@ class MemberInviteResponse(serializers.ModelSerializer):
 
 class MemberInviteDetailsResponse(serializers.ModelSerializer):
     invite_id = serializers.IntegerField(source="id", read_only=True)
-    role = RoleInfoResponse(read_only=True)
+    role = FeatureAccessRoleResponse(read_only=True)
     company_name = serializers.CharField(
         source="account.company_name", read_only=True
     )
@@ -70,7 +75,7 @@ class AccountMemberResponse(serializers.ModelSerializer):
     is_disbled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )
-    role = RoleInfoResponse(read_only=True)
+    role = FeatureAccessRoleResponse(read_only=True)
 
     class Meta:
         model = AccountMember
@@ -84,26 +89,3 @@ class AccountMemberResponse(serializers.ModelSerializer):
             "role",
         )
 
-
-class FeatureAccessRoleResponse(serializers.ModelSerializer):
-    role_id = serializers.IntegerField(source="id", read_only=True)
-    merchant_id = serializers.IntegerField(
-        source="merchant.id", read_only=True
-    )
-
-    class Meta:
-        model = FeatureAccessRole
-        fields = (
-            "merchant_id",
-            "role_name",
-            "description",
-            "team_and_roles",
-            "beneficiaries",
-            "transactions",
-            "banking",
-            "settings",
-            "is_super_admin",
-            "is_standard_user",
-            "is_editable",
-            "role_id",
-        )
