@@ -25,6 +25,25 @@ def migrate_data(apps, schema_editor):
                 new_role.save()
                 member.role = new_role
                 member.save()
+        
+
+        invites = role.memberinvite_set.all()
+        if invites.count() > 1:
+            invites = invites[1:]
+            for invite in invites:
+                new_role = FeatureAccessRole(
+                    merchant=invite.merchant,
+                    role_name=f"admin_{member.id}",
+                    is_super_admin=True,
+                    team_and_roles=["CREATE", "VIEW"],
+                    beneficiaries=["PARTIAL_VIEW", "VIEW"],
+                    transactions=["VIEW", "PARTIAL_VIEW"],
+                    banking=["CREATE", "VIEW", "PARTIAL_VIEW"],
+                    settings=["PARTIAL_VIEW", "VIEW"],
+                )
+                new_role.save()
+                invite.role = new_role
+                invite.save()
 
 
 class Migration(migrations.Migration):
@@ -34,6 +53,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(migrate_data),
         migrations.AddField(
             model_name="featureaccessrole",
             name="bank_accounts",
@@ -185,5 +205,4 @@ class Migration(migrations.Migration):
             model_name="featureaccessrole",
             name="transactions",
         ),
-        migrations.RunPython(migrate_data),
     ]

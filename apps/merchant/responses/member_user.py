@@ -1,7 +1,21 @@
 from api import serializers
-from apps.merchant.models import AccountMember
+from apps.merchant.models import AccountMember, FeatureAccessRole
 
 __all__ = ("MemberProfileResponse",)
+
+class FeatureAccessRoleResponse(serializers.ModelSerializer):
+    class Meta:
+        model = FeatureAccessRole
+        fields = (
+            "team_and_roles",
+            "beneficiaries",
+            "transactions",
+            "banking",
+            "settings",
+            "is_super_admin",
+            "is_standard_user",
+            "is_editable",
+        )
 
 
 class MemberProfileResponse(serializers.ModelSerializer):
@@ -19,7 +33,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
     two_factor_auth = serializers.BooleanField(
         source="user.two_factor_auth", read_only=True
     )
-    role_id = serializers.CharField(source="role.id", read_only=True)
+    role = FeatureAccessRoleResponse(read_only=True)
 
     class Meta:
         model = AccountMember
@@ -31,7 +45,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
             "two_factor_auth",
             "position",
             "account_active",
-            "role_id",
+            "role",
             "is_primary_member",
             "phone_number",
         )
