@@ -13,6 +13,7 @@ class FeatureAccessRoleResponse(serializers.ModelSerializer):
     class Meta:
         model = FeatureAccessRole
         fields = (
+            "is_full_access",
             "payment_requests",
             "payment_history",
             "settlements",
