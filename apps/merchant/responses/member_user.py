@@ -3,6 +3,7 @@ from apps.merchant.models import AccountMember, FeatureAccessRole
 
 __all__ = ("MemberProfileResponse",)
 
+
 class FeatureAccessRoleResponse(serializers.ModelSerializer):
     class Meta:
         model = FeatureAccessRole

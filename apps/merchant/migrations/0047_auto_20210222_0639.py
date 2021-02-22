@@ -25,7 +25,6 @@ def migrate_data(apps, schema_editor):
                 new_role.save()
                 member.role = new_role
                 member.save()
-        
 
         invites = role.memberinvite_set.all()
         if invites.count() > 1:

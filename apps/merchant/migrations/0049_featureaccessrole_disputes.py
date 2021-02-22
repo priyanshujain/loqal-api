@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0048_auto_20210222_0640'),
+        ("merchant", "0048_auto_20210222_0640"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='featureaccessrole',
-            name='disputes',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, default=list, size=None),
+            model_name="featureaccessrole",
+            name="disputes",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                default=list,
+                size=None,
+            ),
         ),
     ]

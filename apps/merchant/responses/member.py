@@ -89,4 +89,3 @@ class AccountMemberResponse(serializers.ModelSerializer):
             "is_disbled",
             "role",
         )
-
