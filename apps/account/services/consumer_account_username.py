@@ -25,8 +25,9 @@ class CheckAccountUsername(object):
                 {
                     "detail": ErrorDetail(
                         _(
-                            "This is your current username. "
-                            "Please choose a different username."
+                            "This is your current loqal ID. "
+                            "Please choose a different one to"
+                            " change your current Loqal ID."
                         )
                     ),
                     "message": ErrorDetail(
@@ -50,14 +51,21 @@ class ChangeAccountUsername(object):
         ]
         if username == self.consumer_account.username:
             raise ValidationError(
-                {"detail": ErrorDetail(_("You already have this username."))}
+                {"detail": ErrorDetail(
+                        _(
+                            "This is your current loqal ID. "
+                            "Please choose a different one to change"
+                            " your current Loqal ID."
+                        )
+                    )}
             )
         if check_account_username(username=username):
             raise ValidationError(
                 {
                     "username": ErrorDetail(
                         _(
-                            "This username already exists, please choose a different one."
+                            "This Loqal ID already exists with another user,"
+                            " please choose a different one."
                         )
                     )
                 }

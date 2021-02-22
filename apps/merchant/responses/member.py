@@ -23,6 +23,7 @@ class FeatureAccessRoleResponse(serializers.ModelSerializer):
             "qr_codes",
             "store_profile",
             "team_management",
+            "bank_accounts",
         )
 
 
