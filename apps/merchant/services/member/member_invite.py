@@ -140,7 +140,7 @@ class UpdateMemberInvite(ServiceBase):
         email = data["email"]
         role = data["role"]
         position = data["position"]
-        update_member_role(id=invite.role.id, data=role)
+        update_member_role(role_id=invite.role.id, data=role)
         invite = update_member_invite(
             invite=invite,
             first_name=first_name,
