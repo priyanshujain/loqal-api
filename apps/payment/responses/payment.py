@@ -98,7 +98,7 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
         )
     
     def get_last_name(self, obj):
-        last_name = obj.user.last_name
+        last_name = obj.consumer.user.last_name
         if last_name:
             return last_name[0]
         return ""
