@@ -84,9 +84,7 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
     first_name = serializers.CharField(
         source="consumer.user.first_name", read_only=True
     )
-    last_name = serializers.CharField(
-        source="consumer.user.last_name", read_only=True
-    )
+    last_name = serializers.SerializerMethodField("get_last_name")
     loqal_id = serializers.CharField(
         source="consumer.username", read_only=True
     )
@@ -98,6 +96,12 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
             "last_name",
             "loqal_id",
         )
+    
+    def get_last_name(self, obj):
+        last_name = obj.user.last_name
+        if last_name:
+            return last_name[0]
+        return ""
 
 
 class PaymentRequestResponse(serializers.ModelSerializer):
@@ -119,6 +123,8 @@ class PaymentRequestResponse(serializers.ModelSerializer):
             "payment_id",
             "payment_request_id",
         )
+
+    
 
 
 class ConsumerResponse(serializers.ModelSerializer):
