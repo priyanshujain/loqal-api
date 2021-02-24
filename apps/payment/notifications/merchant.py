@@ -11,9 +11,12 @@ __all__ = (
 
 class SendSinglePaymentNotification(NotificationBase):
     def send_single_message(self, device):
+        amount = self.data["amount"]
+        first_name = self.data["customer"]["first_name"]
+        last_name = self.data["customer"]["last_name"]
         device.send_notification_message(
             title="New payment recieved",
-            body="Click to view payment details",
+            body=f"You received a payment of ${amount} from {first_name} {last_name}",
             data_message={
                 "action": "NEW_PAYMENT",
                 "payload": self.data,
@@ -84,9 +87,11 @@ class SendApproveRequestNotification(object):
 
 class SendRefundNotification(NotificationBase):
     def send_single_message(self, device):
+        merchant_name = self.data["merchant"].get("full_name", "Loqal merchant")
+        amount = self.data["amount"]
         device.send_notification_message(
-            title="New refund recieved",
-            body="Click to view refund details",
+            title="Refund recieved",
+            body=f"You received a refund of ${amount} from {merchant_name}",
             data_message={
                 "action": "REFUND_RECEIVED",
                 "payload": self.data,

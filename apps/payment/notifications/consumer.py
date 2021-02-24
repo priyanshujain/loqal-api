@@ -6,9 +6,12 @@ __all__ = ("SendNewPaymentRequestNotification",)
 
 class SendNewPaymentRequestNotification(NotificationBase):
     def send_single_message(self, device):
+        merchant_name = self.data["merchant"].get("full_name", "Loqal merchant")
+        amount = self.data["amount"]
+
         device.send_notification_message(
-            title="New payment request",
-            body="Click to view details",
+            title="You received a new payment request",
+            body=f"{merchant_name} has requested a payment of ${amount} for your purchase",
             data_message={
                 "action": "NEW_PAYMENT_REQUEST",
                 "payload": self.data,
