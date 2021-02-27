@@ -1,7 +1,9 @@
-from django.utils.translation import activate
+from celery import shared_task
 
 from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.banking.dbapi import get_bank_account
+from apps.merchant.models import StoreImage
+from utils.thumbnails import create_thumbnails
 
 
 def check_if_merchant_account_ready(merchant):
@@ -21,3 +23,11 @@ def check_if_merchant_account_ready(merchant):
     if not bank_account.is_payment_allowed():
         return False
     return True
+
+
+@shared_task
+def create_store_image_thumbnails(image_id):
+    """Create thumbnails for store images."""
+    create_thumbnails(
+        pk=image_id, model=StoreImage, size_set="stores", image_attr="image"
+    )

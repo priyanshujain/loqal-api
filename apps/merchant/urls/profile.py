@@ -4,10 +4,12 @@ from apps.merchant.views.profile import (GetCodesAndProtocolsAPI,
                                          GetMerchantOperationHoursAPI,
                                          GetMerchantProfileAPI,
                                          GetServiceAvailabilityAPI,
+                                         ListStoreImageAPI,
                                          UpdateCodesAndProtocolsAPI,
                                          UpdateMerchantOperationHoursAPI,
                                          UpdateMerchantProfileAPI,
-                                         UpdateServiceAvailabilityAPI)
+                                         UpdateServiceAvailabilityAPI,
+                                         UploadStoreImageAPI)
 
 urlpatterns = [
     path(
@@ -49,5 +51,15 @@ urlpatterns = [
         "service-availibility/",
         GetServiceAvailabilityAPI.as_view(),
         name="view_service_availibility",
+    ),
+    path(
+        "store-images/upload/",
+        UploadStoreImageAPI.as_view(),
+        name="upload_store_image",
+    ),
+    path(
+        "store-images/",
+        ListStoreImageAPI.as_view(),
+        name="list_store_image",
     ),
 ]

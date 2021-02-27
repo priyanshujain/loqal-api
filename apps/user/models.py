@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from versatileimagefield.fields import VersatileImageField
 
 from apps.box.models import BoxFile
 from apps.notification.models import UserDevice
@@ -63,6 +64,9 @@ class User(BaseModel, AbstractBaseUser):
     # Avatar
     avatar_file = models.ForeignKey(
         BoxFile, on_delete=models.CASCADE, blank=True, null=True
+    )
+    avatar = VersatileImageField(
+        upload_to="user-avatars", blank=True, null=True
     )
     customer_type = ChoiceCharEnumField(
         enum_type=CustomerTypes, default=CustomerTypes.INTERNAL, max_length=32

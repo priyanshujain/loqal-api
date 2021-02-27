@@ -3,6 +3,7 @@ import math
 from django.db import models
 from django.db.models.deletion import DO_NOTHING
 from django.utils.translation import gettext as _
+from versatileimagefield.fields import PPOIField, VersatileImageField
 
 from apps.account.models import MerchantAccount
 from apps.box.models import BoxFile
@@ -19,6 +20,7 @@ __all__ = (
     "CodesAndProtocols",
     "ServiceAvailability",
     "MerchantCategory",
+    "StoreImage",
 )
 
 
@@ -36,6 +38,20 @@ class MerchantCategory(AbstractBaseModel):
             "merchant",
             "category",
         )
+
+
+class StoreImage(AbstractBaseModel):
+    merchant = models.ForeignKey(
+        MerchantAccount, on_delete=models.CASCADE, related_name="images"
+    )
+    image = VersatileImageField(
+        upload_to="store-images/", ppoi_field="ppoi", blank=False
+    )
+    ppoi = PPOIField()
+    alt = models.CharField(max_length=128, blank=True)
+
+    class Meta:
+        db_table = "store_photo"
 
 
 class MerchantProfile(AbstractBaseModel):

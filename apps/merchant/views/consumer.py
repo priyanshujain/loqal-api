@@ -5,6 +5,7 @@ from api.views import ConsumerAPIView
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.merchant.dbapi import get_merchant_qs_by_category
 from apps.merchant.responses import (CategoryMerchantListResponse,
+                                     ListStoreImageResponse,
                                      MerchantBasicDetailsResponse,
                                      MerchantFullDetailsResponse)
 from apps.merchant.services import StoreSearch
@@ -73,4 +74,6 @@ class StoreDetailsAPI(ConsumerAPIView):
         data["is_merchant_account_ready"] = check_if_merchant_account_ready(
             merchant=merchant_account
         )
+        images = merchant_account.images
+        data["images"] = ListStoreImageResponse(images, many=True).data
         return self.response(data)

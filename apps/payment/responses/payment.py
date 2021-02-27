@@ -96,7 +96,7 @@ class ConsumerBasicInfoResponse(serializers.ModelSerializer):
             "last_name",
             "loqal_id",
         )
-    
+
     def get_last_name(self, obj):
         last_name = obj.consumer.user.last_name
         if last_name:
@@ -123,8 +123,6 @@ class PaymentRequestResponse(serializers.ModelSerializer):
             "payment_id",
             "payment_request_id",
         )
-
-    
 
 
 class ConsumerResponse(serializers.ModelSerializer):

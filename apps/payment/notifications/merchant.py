@@ -87,7 +87,9 @@ class SendApproveRequestNotification(object):
 
 class SendRefundNotification(NotificationBase):
     def send_single_message(self, device):
-        merchant_name = self.data["merchant"].get("full_name", "Loqal merchant")
+        merchant_name = self.data["merchant"].get(
+            "full_name", "Loqal merchant"
+        )
         amount = self.data["amount"]
         device.send_notification_message(
             title="Refund recieved",

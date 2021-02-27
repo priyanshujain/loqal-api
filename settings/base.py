@@ -10,6 +10,8 @@ from google.oauth2 import service_account
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
+DEBUG = True
+
 ROOT_DIR = environ.Path(__file__) - 2
 APPS_DIR = ROOT_DIR.path("apps")
 DATA_DIR = f"{ROOT_DIR}/data"
@@ -43,6 +45,7 @@ VENDOR_APPS = [
     "django_extensions",
     "django_dbconn_retry",
     "corsheaders",
+    "versatileimagefield",
 ]
 
 
@@ -446,3 +449,24 @@ INITIAL_ADMIN_PASSWORD = env("INITIAL_ADMIN_PASSWORD")
 # Email configs.
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 EMAIL_SENDER_NAME = env("EMAIL_SENDER_NAME")
+
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "stores": [
+        ("store_gallery", "thumbnail__540x540"),
+        ("store_gallery_2x", "thumbnail__1080x1080"),
+        ("store_small", "thumbnail__60x60"),
+        ("store_small_2x", "thumbnail__120x120"),
+        ("store_list", "thumbnail__255x255"),
+        ("store_list_2x", "thumbnail__510x510"),
+    ],
+    "user_avatars": [
+        ("default", "thumbnail__445x445"),
+        ("small", "thumbnail__255x255"),
+    ],
+}
+
+VERSATILEIMAGEFIELD_SETTINGS = {
+    # Images should be pre-generated on Production environment
+    # "create_images_on_demand": env("CREATE_IMAGES_ON_DEMAND")
+    "create_images_on_demand": False
+}

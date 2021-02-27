@@ -253,7 +253,9 @@ class TransactionEventType(ChoiceCharEnum):
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CREATED = (
         "receiver_vc_from_balance_transfer_created",
-        _("A transfer has been created from receiver's Loqal balance to bank account."),
+        _(
+            "A transfer has been created from receiver's Loqal balance to bank account."
+        ),
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "receiver_vc_from_balance_transfer_cancelled",
@@ -268,18 +270,24 @@ class TransactionEventType(ChoiceCharEnum):
     )
     RECEIVER_VC_BANK_TRANSFER_CREATION_FAILED = (
         "vc_bank_transfer_creation_failed",
-        _("The transfer from from receiver's Loqal balance to bank account has failed"),
+        _(
+            "The transfer from from receiver's Loqal balance to bank account has failed"
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_CANCELLED = (
         "receiver_vc_bank_transfer_cancelled",
-        _("The transfer from receiver's Loqal balance to bank account has cancelled."),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has cancelled."
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_FAILED = "receiver_vc_bank_transfer_failed", _(
         "The transfer from receiver's Loqal balance to bank account has failed."
     )
     RECEIVER_VC_BANK_TRANSFER_COMPLETED = (
         "receiver_vc_bank_transfer_completed",
-        _("The transfer from receiver's Loqal balance to bank account has completed."),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has completed."
+        ),
     )
     RECEIVER_UVC_BANK_TRANSFER_CREATED = (
         "receiver_uvc_bank_transfer_created",

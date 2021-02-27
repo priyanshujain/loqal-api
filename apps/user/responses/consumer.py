@@ -1,4 +1,5 @@
 from django.contrib.auth import models
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from api import serializers
 from apps.box.models import BoxFile
@@ -18,6 +19,9 @@ class AvatarFileResponse(serializers.ModelSerializer):
 
 class UserProfileResponse(serializers.ModelSerializer):
     avatar_file = AvatarFileResponse()
+    avatar = VersatileImageFieldSerializer(
+        sizes="user_avatars", read_only=True
+    )
 
     class Meta:
         model = User
@@ -32,4 +36,5 @@ class UserProfileResponse(serializers.ModelSerializer):
             "phone_number_verified",
             "avatar_file",
             "user_type",
+            "avatar",
         )
