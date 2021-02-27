@@ -105,12 +105,13 @@ class ListStoreImageResponse(serializers.ModelSerializer):
         ],
         read_only=True,
     )
+    image_id = serializers.CharField(source="u_id")
 
     class Meta:
         model = StoreImage
         fields = (
             "image",
-            "id",
+            "image_id",
             "created_at",
             "alt",
         )

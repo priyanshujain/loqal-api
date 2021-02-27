@@ -1,6 +1,7 @@
 from django.urls import path
 
-from apps.merchant.views.profile import (GetCodesAndProtocolsAPI,
+from apps.merchant.views.profile import (DeleteStoreImageAPI,
+                                         GetCodesAndProtocolsAPI,
                                          GetMerchantOperationHoursAPI,
                                          GetMerchantProfileAPI,
                                          GetServiceAvailabilityAPI,
@@ -56,6 +57,11 @@ urlpatterns = [
         "store-images/upload/",
         UploadStoreImageAPI.as_view(),
         name="upload_store_image",
+    ),
+    path(
+        "store-images/<uuid:image_id>/delete/",
+        DeleteStoreImageAPI.as_view(),
+        name="delete_store_image",
     ),
     path(
         "store-images/",

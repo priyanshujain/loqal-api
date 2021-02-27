@@ -24,6 +24,7 @@ __all__ = (
     "update_merchant_category",
     "get_merchant_category_by_merchant",
     "create_store_image",
+    "get_store_image",
 )
 
 
@@ -269,4 +270,11 @@ def create_store_image(merchant_id, image, alt=""):
             merchant_id=merchant_id, image=image, alt=alt
         )
     except IntegrityError:
+        return None
+
+
+def get_store_image(merchant_id, image_id):
+    try:
+        return StoreImage.objects.get(merchant_id=merchant_id, u_id=image_id)
+    except StoreImage.DoesNotExist:
         return None

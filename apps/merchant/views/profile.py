@@ -5,7 +5,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.views import MerchantAPIView
 from apps.merchant.dbapi import (get_merchant_code_protocols,
                                  get_merchant_operation_hours,
-                                 get_merchant_service_availability)
+                                 get_merchant_service_availability,
+                                 get_store_image)
 from apps.merchant.responses import (CodesAndProtocolsResponse,
                                      ListStoreImageResponse,
                                      MerchantOperationHoursResponse,
@@ -131,3 +132,21 @@ class ListStoreImageAPI(MerchantAPIView):
     def get(self, request):
         images = request.merchant_account.images
         return self.response(ListStoreImageResponse(images, many=True).data)
+
+
+class DeleteStoreImageAPI(MerchantAPIView):
+    def delete(self, request, image_id):
+        store_image = get_store_image(
+            merchant_id=request.merchant_account.id, image_id=image_id
+        )
+        if not store_image:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Image couldn't be deleted please try again.")
+                    ),
+                    "message": ErrorDetail(_("Invalid image_id.")),
+                }
+            )
+        store_image.delete()
+        return self.response()
