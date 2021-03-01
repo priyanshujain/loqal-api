@@ -46,6 +46,11 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+    rewards_credit_applied = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
     discount_name = models.CharField(max_length=255, blank=True, null=True)
     customer_note = models.TextField(blank=True, default="")
     order_tracking_id = models.CharField(
