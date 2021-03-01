@@ -23,4 +23,5 @@ class LoyaltyProgramResponse(serializers.ModelSerializer):
             "reward_type",
             "reward_start_date",
             "reward_end_date",
+            "reward_value_maximum",
         )

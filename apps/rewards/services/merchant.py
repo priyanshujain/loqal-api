@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ungettext
+from picklefield.fields import dbsafe_decode
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
@@ -8,7 +11,7 @@ from api.services import ServiceBase
 from apps.rewards.dbapi import (create_loyalty_program,
                                 get_current_loyalty_program,
                                 update_loyalty_program)
-from apps.rewards.options import LoyaltyParameters
+from apps.rewards.options import LoyaltyParameters, RewardValueType
 from apps.rewards.validators import (CreateLoyaltyProgramValidator,
                                      EditLoyaltyProgramValidator)
 from utils.dates import dt_add_months
@@ -59,13 +62,21 @@ class CreateLoyaltyProgram(ServiceBase):
                     )
                 }
             )
+        loyalty_parameter = data["loyalty_parameter"]
+        reward_value_maximum = Decimal(0.0)
+        if not data.get("reward_value_maximum"):
+            reward_value_maximum = data["reward_value"]
+        elif data["reward_value_type"] == RewardValueType.FIXED_AMOUNT:
+            reward_value_maximum = data["reward_value"]
+
         return create_loyalty_program(
             merchant_id=self.merchant.id,
-            loyalty_parameter=data["loyalty_parameter"],
+            loyalty_parameter=loyalty_parameter,
             program_start_date=program_start_date,
             program_end_date=program_end_date,
             reward_value_type=data["reward_value_type"],
             reward_value=data["reward_value"],
+            reward_value_maximum=reward_value_maximum,
             min_total_purchase=min_total_purchase,
             min_visits=min_visits,
         )
@@ -143,6 +154,13 @@ class EditLoyaltyProgram(ServiceBase):
                     )
                 }
             )
+
+        reward_value_maximum = Decimal(0.0)
+        if not data.get("reward_value_maximum"):
+            reward_value_maximum = data["reward_value"]
+        elif data["reward_value_type"] == RewardValueType.FIXED_AMOUNT:
+            reward_value_maximum = data["reward_value"]
+
         update_loyalty_program(
             merchant_id=self.merchant.id,
             loyalty_parameter=loyalty_parameter,
@@ -150,6 +168,27 @@ class EditLoyaltyProgram(ServiceBase):
             program_end_date=program_end_date,
             reward_value_type=data["reward_value_type"],
             reward_value=data["reward_value"],
+            reward_value_maximum=reward_value_maximum,
             min_total_purchase=min_total_purchase,
             min_visits=min_visits,
         )
+
+
+class DeactivateLoyaltyProgram(ServiceBase):
+    def __init__(self, merchant):
+        self.merchant = merchant
+
+    def handle(self):
+        loyalty_program = get_current_loyalty_program(
+            merchant_id=self.merchant.id
+        )
+        if not loyalty_program:
+            raise ValidationError(
+                {
+                    "detail": _(
+                        "Loyalty program does not exist. "
+                        "Please create a new loyalty program."
+                    )
+                }
+            )
+        loyalty_program.de_activate()

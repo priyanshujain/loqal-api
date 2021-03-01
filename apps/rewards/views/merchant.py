@@ -1,9 +1,12 @@
 from rest_framework.settings import import_from_string
 
 from api.views import MerchantAPIView
-from apps.rewards.dbapi import get_current_loyalty_program
+from apps.rewards.dbapi import (get_all_loyalty_program,
+                                get_current_loyalty_program)
 from apps.rewards.responses import LoyaltyProgramResponse
-from apps.rewards.services import CreateLoyaltyProgram, EditLoyaltyProgram
+from apps.rewards.services import (CreateLoyaltyProgram,
+                                   DeactivateLoyaltyProgram,
+                                   EditLoyaltyProgram)
 
 
 class CreateLoyaltyProgramAPI(MerchantAPIView):
@@ -12,6 +15,20 @@ class CreateLoyaltyProgramAPI(MerchantAPIView):
             merchant=request.merchant_account, data=self.request_data
         ).handle()
         return self.response(LoyaltyProgramResponse(program).data)
+
+
+class DeactivateLoyaltyProgramAPI(MerchantAPIView):
+    def post(self, request):
+        DeactivateLoyaltyProgram(merchant=request.merchant_account).handle()
+        return self.response(status=204)
+
+
+class GetAllLoyaltyProgramAPI(MerchantAPIView):
+    def get(self, request):
+        programs = get_all_loyalty_program(
+            merchant_id=request.merchant_account.id
+        )
+        return self.response(LoyaltyProgramResponse(programs, many=True).data)
 
 
 class UpdateLoyaltyProgramAPI(MerchantAPIView):

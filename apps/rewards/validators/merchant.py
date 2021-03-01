@@ -30,6 +30,13 @@ class CreateLoyaltyProgramValidator(serializers.ValidationSerializer):
         coerce_to_string=False,
         default=0,
     )
+    reward_value_maximum = serializers.DecimalField(
+        min_value=0,
+        max_digits=4,
+        decimal_places=2,
+        coerce_to_string=False,
+        default=0,
+    )
 
 
 class EditLoyaltyProgramValidator(serializers.ValidationSerializer):

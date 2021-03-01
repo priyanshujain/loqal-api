@@ -1,6 +1,8 @@
 from django.urls import path
 
 from apps.rewards.views.merchant import (CreateLoyaltyProgramAPI,
+                                         DeactivateLoyaltyProgramAPI,
+                                         GetAllLoyaltyProgramAPI,
                                          GetLoyaltyProgramAPI,
                                          UpdateLoyaltyProgramAPI)
 
@@ -14,6 +16,16 @@ urlpatterns = [
         "merchant/loyalty-program/update/",
         UpdateLoyaltyProgramAPI.as_view(),
         name="update_loyalty_program",
+    ),
+    path(
+        "merchant/loyalty-program/de-activate/",
+        DeactivateLoyaltyProgramAPI.as_view(),
+        name="deactivate_loyalty_program",
+    ),
+    path(
+        "merchant/loyalty-program/all/",
+        GetAllLoyaltyProgramAPI.as_view(),
+        name="all_loyalty_programs",
     ),
     path(
         "merchant/loyalty-program/",
