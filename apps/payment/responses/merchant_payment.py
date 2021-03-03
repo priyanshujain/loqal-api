@@ -13,6 +13,7 @@ __all__ = (
     "PaymentDetailsResponse",
     "PaymentListResponse",
     "CustomerBasicDetailsResponse",
+    "DirectMerchantPaymentResponse",
 )
 
 
@@ -70,6 +71,25 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "payment_status",
             "transaction_status",
             "is_success",
+            "customer",
+        )
+
+class DirectMerchantPaymentResponse(serializers.ModelSerializer):
+    payment_status = serializers.ChoiceCharEnumSerializer(
+        source="status", read_only=True
+    )
+    customer = CustomerDetailsResponse(
+        source="order.consumer", read_only=True
+    )
+    amount = serializers.CharField(source="captured_amount",read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = (
+            "created_at",
+            "amount",
+            "payment_tracking_id",
+            "payment_status",
             "customer",
         )
 

@@ -1,3 +1,5 @@
+from decimal import Decimal
+from re import I
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -5,15 +7,15 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.options import DwollaCustomerStatus
-from apps.order.dbapi import create_payment_request_order
+from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
-                                get_payment_qrcode)
+                                get_payment_qrcode, merchant_payment)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        initiate_payment_event)
 from apps.payment.options import PaymentProcess, TransactionType
 from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
-
+from apps.order.options import OrderType
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
 
@@ -33,6 +35,10 @@ class DirectMerchantPayment(ServiceBase):
         )
         total_amount = payment_data["amount"] + payment_data["tip_amount"]
         merhcant_account = payment_data["merchant_account"]
+
+        if total_amount == Decimal(0.0):
+            merchant_payment.payment.process_zero_payment()
+            return merchant_payment
 
         transaction = CreatePayment(
             account_id=self.consumer_account.id,
@@ -129,11 +135,15 @@ class DirectMerchantPayment(ServiceBase):
         amount = payment_data["amount"]
         tip_amount = payment_data["tip_amount"]
         payment_qrcode_id = payment_data["payment_qrcode_id"]
-        order = create_payment_request_order(
+        order_type = OrderType.IN_PERSON
+        if not payment_qrcode_id:
+            order_type = OrderType.ONLINE
+        order = CreateOrder(
             merchant_id=merchant_id,
             consumer_id=consumer_id,
             amount=amount,
-        )
+            order_type=order_type,
+        ).handle()
         payment_process = PaymentProcess.DIRECT_APP
         if payment_qrcode_id:
             payment_process = PaymentProcess.QRCODE

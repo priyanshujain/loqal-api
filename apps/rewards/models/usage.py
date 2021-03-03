@@ -22,9 +22,6 @@ class RewardUsage(AbstractBaseModel):
         max_length=32,
         enum_type=RewardValueType,
     )
-    loyalty_program = models.ForeignKey(
-        LoyaltyProgram, on_delete=models.CASCADE, related_name="reward_usage"
-    )
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="reward_usage"
     )

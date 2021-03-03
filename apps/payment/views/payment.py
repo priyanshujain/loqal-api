@@ -6,7 +6,7 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
-                                get_recent_store_orders, transaction)
+                                get_recent_store_orders)
 from apps.payment.notifications import (SendApproveRequestNotification,
                                         SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
@@ -21,7 +21,8 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     RefundHistoryResponse,
                                     TransactionDetailsResponse,
                                     TransactionHistoryResponse,
-                                    TransactionResponse)
+                                    DirectMerchantPaymentConsumerResponse,
+                                    DirectMerchantPaymentResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
@@ -36,13 +37,25 @@ class CreatePaymentAPI(ConsumerAPIView):
             data=self.request_data,
             ip_address=request.ip,
         ).handle()
-        transaction_data = TransactionHistoryResponse(
-            merchant_payment.transaction
-        ).data
+        transaction_data = {}
+        if merchant_payment.transaction:
+            transaction_data = TransactionHistoryResponse(
+                merchant_payment.transaction
+            ).data
+        else:
+            transaction_data = DirectMerchantPaymentConsumerResponse(merchant_payment.payment).data
+        transaction_data["discount"] = {
+            "amount": merchant_payment.payment.order.discount_amount,
+            "name": merchant_payment.payment.order.discount_name,
+        }
         transaction_data["tip_amount"] = merchant_payment.tip_amount
-        payment_notification_data = MerchantTransactionHistoryResponse(
-            merchant_payment.transaction
-        ).data
+        payment_notification_data = {}
+        if merchant_payment.transaction:
+            payment_notification_data = MerchantTransactionHistoryResponse(
+                merchant_payment.transaction
+            ).data
+        else:
+            payment_notification_data = DirectMerchantPaymentResponse(merchant_payment.payment).data
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
         )
@@ -56,9 +69,10 @@ class CreatePaymentAPI(ConsumerAPIView):
             merchant_id=merchant_payment.payment.order.merchant.id,
             data=payment_notification_data,
         ).send()
-        SendPaymentInitiatedEmail(
-            transaction=merchant_payment.transaction
-        ).send()
+        if merchant_payment.transaction:
+            SendPaymentInitiatedEmail(
+                transaction=merchant_payment.transaction
+            ).send()
         return self.response(transaction_data, status=201)
 
 

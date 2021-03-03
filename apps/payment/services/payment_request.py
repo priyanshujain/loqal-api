@@ -1,27 +1,34 @@
-from decimal import Decimal
-
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import (get_consumer_account_by_phone_number,
-                                get_consumer_account_by_username)
+from apps.account.dbapi import (
+    get_consumer_account_by_phone_number,
+    get_consumer_account_by_username,
+)
 from apps.banking.dbapi import get_bank_account
 from apps.order.dbapi import create_payment_request_order
-from apps.payment.dbapi import (create_payment, create_payment_request,
-                                get_payment_reqeust_by_uid)
-from apps.payment.dbapi.events import (cancelled_payment_event,
-                                       capture_payment_event,
-                                       failed_payment_event,
-                                       initiate_payment_event)
-from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
-                                  TransactionType)
-from apps.payment.validators import (ApprovePaymentRequestValidator,
-                                     CreatePaymentRequestValidator,
-                                     RejectPaymentRequestValidator)
+from apps.payment.dbapi import (
+    create_payment,
+    create_payment_request,
+    get_payment_reqeust_by_uid,
+)
+from apps.payment.dbapi.events import (
+    cancelled_payment_event,
+    capture_payment_event,
+    failed_payment_event,
+    initiate_payment_event,
+)
+from apps.payment.options import PaymentProcess, PaymentRequestStatus, TransactionType
+from apps.payment.validators import (
+    ApprovePaymentRequestValidator,
+    CreatePaymentRequestValidator,
+    RejectPaymentRequestValidator,
+)
 from apps.provider.options import DEFAULT_CURRENCY
-
+from apps.order.services import CreateOrder
+from apps.order.options import OrderType
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
 
@@ -53,9 +60,7 @@ class CreatePaymentRequest(ServiceBase):
                 phone_number=phone_number
             )
         else:
-            consumer_account = get_consumer_account_by_username(
-                username=loqal_id
-            )
+            consumer_account = get_consumer_account_by_username(username=loqal_id)
 
         bank_account = get_bank_account(account_id=self.account_id)
         if not bank_account:
@@ -71,28 +76,16 @@ class CreatePaymentRequest(ServiceBase):
         try:
             merchant_account = bank_account.account.merchant
         except AttributeError:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid account."))}
-            )
+            raise ValidationError({"detail": ErrorDetail(_("Invalid account."))})
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id
         return data
 
     def _factory_payment_request(self, data):
-        order = create_payment_request_order(
-            merchant_id=data["merchant_id"],
-            consumer_id=data["consumer_id"],
-            amount=data["amount"],
-        )
-        payment = create_payment(
-            order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
-        )
-        initiate_payment_event(payment_id=payment.id)
         return create_payment_request(
             account_from_id=self.account_id,
             account_to_id=data["account_to_id"],
-            payment_id=payment.id,
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
         )
@@ -120,12 +113,26 @@ class ApprovePaymentRequest(ServiceBase):
                 {"detail": ErrorDetail(_("Invalid payment request."))}
             )
 
+        try:
+            consumer_account = payment_request.account_from.consumer
+        except AttributeError:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid payment request."))}
+            )
+
         total_amount = payment_request.amount + data["tip_amount"]
         banking_data = ValidateBankAccount(
             sender_account_id=self.account_id,
             receiver_account_id=merchant_account.account.id,
         ).validate()
 
+        order = CreateOrder(
+            consumer_id=consumer_account.id,
+            merchant_id=merchant_account.id,
+            order_type=OrderType.ONLINE,
+        ).handle()
+        payment = create_payment(order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST)
+        payment_request.add_payment(payment)
         try:
             transaction = CreatePayment(
                 account_id=self.account_id,
@@ -190,11 +197,7 @@ class ApprovePaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Given payment request is no longer valid.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
             )
         data["payment_request"] = payment_request
         return data
@@ -238,10 +241,6 @@ class RejectPaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Given payment request is no longer valid.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
             )
         return payment_request

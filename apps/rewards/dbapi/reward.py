@@ -35,6 +35,7 @@ def get_cash_rewards(merchant_id, consumer_id):
         available_value__gt=0,
     ).order_by("created_at")
 
+
 def get_voucher_rewards(merchant_id, consumer_id):
     return VoucherReward.objects.filter(
         loyalty_program__merchant_id=merchant_id,

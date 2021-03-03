@@ -182,7 +182,6 @@ def get_empty_qrcodes():
 def create_payment_request(
     account_from_id,
     account_to_id,
-    payment_id,
     amount,
     currency,
 ):
@@ -193,7 +192,6 @@ def create_payment_request(
         return PaymentRequest.objects.create(
             account_from_id=account_from_id,
             account_to_id=account_to_id,
-            payment_id=payment_id,
             amount=Decimal(amount),
             currency=currency,
         )

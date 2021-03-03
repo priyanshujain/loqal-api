@@ -22,6 +22,23 @@ def create_payment_request_order(merchant_id, consumer_id, amount):
         return None
 
 
+def create_base_order(merchant_id, consumer_id, amount, order_type):
+    """
+    Create an order
+    """
+    try:
+        return Order.objects.create(
+            merchant_id=merchant_id,
+            consumer_id=consumer_id,
+            total_net_amount=amount,
+            total_amount=amount,
+            order_type=order_type,
+        )
+    except IntegrityError:
+        return None
+
+
+
 def get_order_by_id(order_id, merchant_id):
     """
     get an order

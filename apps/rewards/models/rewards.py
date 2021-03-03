@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
@@ -24,6 +25,7 @@ class CashReward(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+    is_full_used = models.BooleanField(default=False)
     expires_at = models.DateTimeField(null=True)
     is_cancelled = models.BooleanField(default=False)
     cancellation_reason = models.CharField(max_length=256, blank=True)
@@ -33,6 +35,16 @@ class CashReward(AbstractBaseModel):
 
     class Meta:
         db_table = "cash_reward"
+
+    
+    def update_usage(self, used_amount, save=True):
+        self.available_value -= used_amount
+        self.used_value += used_amount
+        if self.available_value == Decimal(0.0):
+            self.is_full_used = True
+        if save:
+            self.save()
+        
 
 
 class VoucherReward(AbstractBaseModel):
@@ -63,3 +75,8 @@ class VoucherReward(AbstractBaseModel):
 
     class Meta:
         db_table = "voucher_reward"
+    
+    def update_usage(self, save=True):
+        self.is_used = True
+        if save:
+            self.save()

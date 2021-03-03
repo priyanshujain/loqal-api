@@ -23,7 +23,9 @@ __all__ = (
     "RecentStoresResponse",
     "TransactionErrorDetailsResponse",
     "MerchantDetailsResponse",
+    "DirectMerchantPaymentConsumerResponse",
 )
+
 
 
 class MerchantCategoryResponse(serializers.ModelSerializer):
@@ -237,6 +239,19 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantAccount
         fields = ("full_name", "categories", "address")
+
+
+class DirectMerchantPaymentConsumerResponse(serializers.ModelSerializer):
+    amount = serializers.CharField(source="captured_amount",read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = (
+            "created_at",
+            "amount",
+            "total_tip_amount",
+            "payment_tracking_id",
+        )
 
 
 class TransactionHistoryResponse(serializers.ModelSerializer):

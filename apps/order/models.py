@@ -53,6 +53,8 @@ class Order(AbstractBaseModel):
     )
     is_paid = models.BooleanField(default=False)
     is_rewarded = models.BooleanField(default=False)
+   
+    # Reward given for the order
     cash_reward = models.ForeignKey(
         to="rewards.CashReward",
         on_delete=models.CASCADE,
@@ -126,7 +128,13 @@ class Order(AbstractBaseModel):
         self.status = OrderStatus.CANCELLED
         if save:
             self.save()
-
+    
+    def update_discount(self, amount, name="", save=True):
+        self.discount_amount += amount
+        self.total_net_amount -= amount
+        self.discount_name = name
+        if save:
+            self.save()
 
 class OrderEvent(BaseModel):
     """
