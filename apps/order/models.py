@@ -36,6 +36,11 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+    total_return_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
     total_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
@@ -46,10 +51,21 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
-    rewards_credit_applied = models.DecimalField(
-        max_digits=settings.DEFAULT_MAX_DIGITS,
-        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
-        default=0,
+    is_paid = models.BooleanField(default=False)
+    is_rewarded = models.BooleanField(default=False)
+    cash_reward = models.ForeignKey(
+        to="rewards.CashReward",
+        on_delete=models.CASCADE,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
+    voucher_reward = models.ForeignKey(
+        to="rewards.VoucherReward",
+        on_delete=models.CASCADE,
+        related_name="orders",
+        null=True,
+        blank=True,
     )
     discount_name = models.CharField(max_length=255, blank=True, null=True)
     customer_note = models.TextField(blank=True, default="")
@@ -79,6 +95,11 @@ class Order(AbstractBaseModel):
                 self.order_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
+    def mark_paid(self, save=False):
+        self.is_paid = True
+        if save:
+            self.save()
+
     def set_fulfilled(self, save=True):
         self.status = OrderStatus.FULFILLED
         if save:
@@ -86,6 +107,18 @@ class Order(AbstractBaseModel):
 
     def set_partially_fulfilled(self, save=True):
         self.status = OrderStatus.PARTIALLY_FULFILLED
+        if save:
+            self.save()
+
+    def set_partially_returned(self, amount, save=True):
+        self.status = OrderStatus.PARTIALLY_RETURNED
+        self.total_return_amount += amount
+        if save:
+            self.save()
+
+    def set_returned(self, amount, save=True):
+        self.status = OrderStatus.RETURNED
+        self.total_return_amount += amount
         if save:
             self.save()
 

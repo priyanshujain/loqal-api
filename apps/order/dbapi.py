@@ -1,7 +1,9 @@
+from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from apps.order.models import Order
 from apps.order.options import OrderType
+from apps.payment.options import ChargeStatus
 
 
 def create_payment_request_order(merchant_id, consumer_id, amount):
@@ -31,3 +33,12 @@ def get_order_by_id(order_id, merchant_id):
         )
     except Order.DoesNotExist:
         return None
+
+
+def get_orders_in_period(consumer_id, merchant_id, start_date, end_date):
+    return Order.objects.filter(
+        consumer_id=consumer_id,
+        merchant_id=merchant_id,
+        is_paid=True,
+        is_rewarded=False,
+    ).filter(Q(created_at__gte=start_date) & Q(created_at__lte=end_date))

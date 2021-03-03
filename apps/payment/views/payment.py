@@ -25,6 +25,7 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
+from apps.rewards.services import AllocateRewards
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -45,6 +46,12 @@ class CreatePaymentAPI(ConsumerAPIView):
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
         )
+        try:
+            messsage = AllocateRewards(payment=merchant_payment.payment).handle()
+            if messsage:
+                transaction_data["reward"] = messsage
+        except Exception:
+            pass
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
             data=payment_notification_data,
@@ -117,6 +124,14 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             merchant_id=payment_request.payment.order.merchant.id,
             data=payment_notification_data,
         ).send()
+        try:
+            messsage = AllocateRewards(
+                payment=payment_request.payment
+            ).handle()
+            if messsage:
+                transaction_data["reward"] = messsage
+        except Exception:
+            pass
         SendApproveRequestNotification(
             merchant_id=payment_request.payment.order.merchant.id,
             data={

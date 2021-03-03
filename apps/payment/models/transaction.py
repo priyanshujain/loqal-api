@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.db.models.base import ModelStateFieldsCacheDescriptor
@@ -42,7 +44,7 @@ class Transaction(AbstractBaseModel):
         db_index=True,
     )
     sender_balance_at_checkout = models.DecimalField(
-        max_digits=settings.DEFAULT_MAX_DIGITS,
+        max_digits=12,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         null=True,
         default=None,
@@ -177,6 +179,10 @@ class Transaction(AbstractBaseModel):
             if self.transaction_type == TransactionType.REFUND_PAYMENT:
                 self.payment.update_charge_status_by_refund(self.amount)
         if sender_balance_at_checkout != None:
+            sender_balance_at_checkout = Decimal(sender_balance_at_checkout)
+            sender_balance_at_checkout = round(
+                sender_balance_at_checkout, settings.DEFAULT_DECIMAL_PLACES
+            )
             self.sender_balance_at_checkout = sender_balance_at_checkout
         if save:
             self.save()

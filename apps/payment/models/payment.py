@@ -87,8 +87,10 @@ class Payment(AbstractBaseModel):
         self.refunded_amount += amount
         if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
+            self.order.set_partially_returned(amount)
         elif self.refunded_amount == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_REFUNDED
+            self.order.set_returned(amount)
         if save:
             self.save()
 
@@ -101,6 +103,7 @@ class Payment(AbstractBaseModel):
             self.order.set_partially_fulfilled()
         elif amount_towards_order == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_CHARGED
+            self.order.mark_paid()
             self.order.set_fulfilled()
         else:
             self.charge_status = ChargeStatus.OTHER

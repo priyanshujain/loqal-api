@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rewards', '0002_auto_20210301_0623'),
+        ("rewards", "0002_auto_20210301_0623"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='loyaltyprogram',
-            name='reward_value_maximum',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=6),
+            model_name="loyaltyprogram",
+            name="reward_value_maximum",
+            field=models.DecimalField(
+                decimal_places=2, default=0, max_digits=6
+            ),
         ),
     ]
