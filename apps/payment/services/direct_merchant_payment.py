@@ -1,5 +1,6 @@
 from decimal import Decimal
 from re import I
+
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
@@ -7,6 +8,7 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.options import DwollaCustomerStatus
+from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
                                 get_payment_qrcode, merchant_payment)
@@ -15,7 +17,7 @@ from apps.payment.dbapi.events import (capture_payment_event,
 from apps.payment.options import PaymentProcess, TransactionType
 from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
-from apps.order.options import OrderType
+
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
 
@@ -33,11 +35,17 @@ class DirectMerchantPayment(ServiceBase):
         merhcant_payment = self._factory_merchant_payment(
             payment_data=payment_data
         )
-        total_amount = payment_data["amount"] + payment_data["tip_amount"]
+
+        order = merhcant_payment.payment.order
+        total_amount = order.total_net_amount + payment_data["tip_amount"]
         merhcant_account = payment_data["merchant_account"]
 
         if total_amount == Decimal(0.0):
             merchant_payment.payment.process_zero_payment()
+            capture_payment_event(
+                payment_id=merchant_payment.payment.id,
+                transaction_tracking_id=None,
+            )
             return merchant_payment
 
         transaction = CreatePayment(
@@ -45,9 +53,9 @@ class DirectMerchantPayment(ServiceBase):
             ip_address=self.ip_address,
             sender_bank_account=payment_data["sender_bank_account"],
             receiver_bank_account=payment_data["receiver_bank_account"],
-            order=merhcant_payment.payment.order,
+            order=order,
             total_amount=total_amount,
-            amount_towards_order=payment_data["amount"],
+            amount_towards_order=order.total_net_amount,
             fee_bearer_account=merhcant_account.account,
             transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
         ).handle()

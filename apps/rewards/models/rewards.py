@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
@@ -36,7 +37,6 @@ class CashReward(AbstractBaseModel):
     class Meta:
         db_table = "cash_reward"
 
-    
     def update_usage(self, used_amount, save=True):
         self.available_value -= used_amount
         self.used_value += used_amount
@@ -44,7 +44,6 @@ class CashReward(AbstractBaseModel):
             self.is_full_used = True
         if save:
             self.save()
-        
 
 
 class VoucherReward(AbstractBaseModel):
@@ -75,7 +74,7 @@ class VoucherReward(AbstractBaseModel):
 
     class Meta:
         db_table = "voucher_reward"
-    
+
     def update_usage(self, save=True):
         self.is_used = True
         if save:

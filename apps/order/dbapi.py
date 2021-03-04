@@ -38,7 +38,6 @@ def create_base_order(merchant_id, consumer_id, amount, order_type):
         return None
 
 
-
 def get_order_by_id(order_id, merchant_id):
     """
     get an order
@@ -59,3 +58,10 @@ def get_orders_in_period(consumer_id, merchant_id, start_date, end_date):
         is_paid=True,
         is_rewarded=False,
     ).filter(Q(created_at__gte=start_date) & Q(created_at__lte=end_date))
+
+
+def get_rewarded_merchant_orders(consumer_id):
+    return Order.objects.filter(
+        consumer_id=consumer_id,
+        is_rewarded=True,
+    ).distinct("merchant")

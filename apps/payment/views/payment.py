@@ -15,14 +15,14 @@ from apps.payment.notifications import (SendApproveRequestNotification,
 from apps.payment.notifications.email import (RefundReceivedEmail,
                                               SendPaymentInitiatedEmail)
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    DirectMerchantPaymentConsumerResponse,
+                                    DirectMerchantPaymentResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
                                     RefundHistoryResponse,
                                     TransactionDetailsResponse,
-                                    TransactionHistoryResponse,
-                                    DirectMerchantPaymentConsumerResponse,
-                                    DirectMerchantPaymentResponse)
+                                    TransactionHistoryResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
@@ -43,7 +43,9 @@ class CreatePaymentAPI(ConsumerAPIView):
                 merchant_payment.transaction
             ).data
         else:
-            transaction_data = DirectMerchantPaymentConsumerResponse(merchant_payment.payment).data
+            transaction_data = DirectMerchantPaymentConsumerResponse(
+                merchant_payment.payment
+            ).data
         transaction_data["discount"] = {
             "amount": merchant_payment.payment.order.discount_amount,
             "name": merchant_payment.payment.order.discount_name,
@@ -55,12 +57,16 @@ class CreatePaymentAPI(ConsumerAPIView):
                 merchant_payment.transaction
             ).data
         else:
-            payment_notification_data = DirectMerchantPaymentResponse(merchant_payment.payment).data
+            payment_notification_data = DirectMerchantPaymentResponse(
+                merchant_payment.payment
+            ).data
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
         )
         try:
-            messsage = AllocateRewards(payment=merchant_payment.payment).handle()
+            messsage = AllocateRewards(
+                payment=merchant_payment.payment
+            ).handle()
             if messsage:
                 transaction_data["reward"] = messsage
         except Exception:

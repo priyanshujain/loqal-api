@@ -10,6 +10,7 @@ __all__ = (
     "CategoryMerchantListResponse",
     "StoreSearchResponse",
     "MerchantFullDetailsResponse",
+    "MerchantBasicDetailsResponse",
 )
 
 
@@ -66,6 +67,18 @@ class MerchantBasicProfileResponse(serializers.ModelSerializer):
             "full_name",
             "address",
         )
+
+
+class MerchantBasicDetailsResponse(serializers.ModelSerializer):
+    full_name = serializers.CharField(
+        source="profile.full_name", read_only=True
+    )
+    categories = MerchantCategoryResponse(many=True, read_only=True)
+    address = serializers.JSONField(source="profile.address", read_only=True)
+
+    class Meta:
+        model = MerchantAccount
+        fields = ("full_name", "categories", "address")
 
 
 class MerchantOperatingHoursResponse(serializers.ModelSerializer):

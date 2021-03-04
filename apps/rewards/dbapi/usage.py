@@ -1,5 +1,6 @@
-from apps.rewards.models import RewardUsage, RewardUsageItem
 from django.db.utils import IntegrityError
+
+from apps.rewards.models import RewardUsage, RewardUsageItem
 
 
 def create_debit_reward_usage(total_amount, reward_value_type, order_id):
@@ -14,7 +15,9 @@ def create_debit_reward_usage(total_amount, reward_value_type, order_id):
         return None
 
 
-def create_debit_reward_usage_item(amount, usage_id, voucher_reward=None, cash_reward=None):
+def create_debit_reward_usage_item(
+    amount, usage_id, voucher_reward=None, cash_reward=None
+):
     try:
         return RewardUsageItem.objects.create(
             amount=amount,
@@ -24,5 +27,3 @@ def create_debit_reward_usage_item(amount, usage_id, voucher_reward=None, cash_r
         )
     except IntegrityError:
         return None
-
-

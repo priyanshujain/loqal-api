@@ -74,14 +74,13 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "customer",
         )
 
+
 class DirectMerchantPaymentResponse(serializers.ModelSerializer):
     payment_status = serializers.ChoiceCharEnumSerializer(
         source="status", read_only=True
     )
-    customer = CustomerDetailsResponse(
-        source="order.consumer", read_only=True
-    )
-    amount = serializers.CharField(source="captured_amount",read_only=True)
+    customer = CustomerDetailsResponse(source="order.consumer", read_only=True)
+    amount = serializers.CharField(source="captured_amount", read_only=True)
 
     class Meta:
         model = Payment

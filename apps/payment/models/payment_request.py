@@ -76,7 +76,7 @@ class PaymentRequest(AbstractBaseModel):
         )
         if save:
             self.save()
-    
+
     def add_payment(self, payment, save=True):
         self.payment = payment
         if save:

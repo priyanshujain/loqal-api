@@ -1,4 +1,5 @@
 from enum import Flag
+
 from django.db.utils import IntegrityError
 
 from apps.rewards.models import (CashReward, LoyaltyProgram, RewardUsage,

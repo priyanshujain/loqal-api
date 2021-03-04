@@ -123,7 +123,7 @@ class Payment(AbstractBaseModel):
             self.order.set_cancelled()
             if save:
                 self.save()
-    
+
     def process_zero_payment(self, save=True):
         self.status = PaymentStatus.CAPTURED
         self.charge_status = ChargeStatus.FULLY_CHARGED
@@ -131,8 +131,6 @@ class Payment(AbstractBaseModel):
         self.order.set_fulfilled()
         if save:
             self.save()
-
-        
 
 
 class PaymentEvent(AbstractBaseModel):

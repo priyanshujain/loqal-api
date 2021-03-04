@@ -4,7 +4,8 @@ from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
 from apps.order.dbapi import get_orders_in_period
-from apps.rewards.dbapi import (create_cash_reward, create_voucher_reward,
+from apps.rewards.dbapi import (create_cash_reward, create_reward_credit_event,
+                                create_voucher_reward,
                                 get_current_loyalty_program)
 from apps.rewards.options import LoyaltyParameters, RewardValueType
 
@@ -92,6 +93,13 @@ class AllocateRewards(ServiceBase):
                 loyalty_program_id=loyalty_program.id,
                 consumer_id=consumer.id,
             )
+            create_reward_credit_event(
+                merchant_id=loyalty_program.merchant.id,
+                consumer_id=consumer.id,
+                reward_value_type=RewardValueType.FIXED_AMOUNT,
+                value=cash_reward.available_value,
+                cash_reward=cash_reward,
+            )
             if cash_reward:
                 orders.update(cash_reward=cash_reward, is_rewarded=True)
             return (
@@ -105,6 +113,13 @@ class AllocateRewards(ServiceBase):
                 max_value=loyalty_program.value_maximum,
                 loyalty_program_id=loyalty_program.id,
                 consumer_id=consumer.id,
+            )
+            create_reward_credit_event(
+                merchant_id=loyalty_program.merchant.id,
+                consumer_id=consumer.id,
+                reward_value_type=RewardValueType.FIXED_AMOUNT,
+                value=voucher_reward.value,
+                voucher_reward=voucher_reward,
             )
             if voucher_reward:
                 orders.update(voucher_reward=voucher_reward, is_rewarded=True)

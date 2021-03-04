@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/user/", include("apps.user.urls")),
     path("api/notification/", include("apps.notification.urls")),
     path("api/account/", include("apps.account.urls")),
+    path("api/order/", include("apps.order.urls")),
     path("api/banking/", include("apps.banking.urls")),
     path("api/box/", include("apps.box.urls.consumer")),
     path("api/payment/", include("apps.payment.urls")),

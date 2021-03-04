@@ -27,7 +27,6 @@ __all__ = (
 )
 
 
-
 class MerchantCategoryResponse(serializers.ModelSerializer):
     class Meta:
         model = MerchantCategory
@@ -242,7 +241,7 @@ class MerchantDetailsResponse(serializers.ModelSerializer):
 
 
 class DirectMerchantPaymentConsumerResponse(serializers.ModelSerializer):
-    amount = serializers.CharField(source="captured_amount",read_only=True)
+    amount = serializers.CharField(source="captured_amount", read_only=True)
 
     class Meta:
         model = Payment

@@ -7,7 +7,6 @@ from apps.rewards.options import RewardValueType
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 
-from .loyalty import LoyaltyProgram
 from .rewards import CashReward, VoucherReward
 
 
@@ -16,6 +15,7 @@ class RewardUsage(AbstractBaseModel):
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
+        null=True,
     )
     is_credit = models.BooleanField(default=False)
     reward_value_type = ChoiceCharEnumField(
@@ -49,6 +49,7 @@ class RewardUsageItem(AbstractBaseModel):
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
+        null=True,
     )
     usage = models.ForeignKey(
         RewardUsage, on_delete=models.CASCADE, related_name="items"

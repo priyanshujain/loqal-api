@@ -21,3 +21,12 @@ class RewardValueType(ChoiceCharEnum):
 
 class RewardType(ChoiceCharEnum):
     ENTIRE_SALE = "entire_sale", _("Entire Sale")
+
+
+class RewardEventType(ChoiceCharEnum):
+    CREDITED = "credited", _("Reward credited")
+    DEBITED = "debited", _("Reward Debited")
+    RECLAIMED = "reclaimed", _("Reward Reclaimed")
+    CANCELLED = "cancelled", _("Cancelled")
+    REFUNDED = "refunded", _("Refunded")
+    EXPIRED = "expired", _("Expired")
