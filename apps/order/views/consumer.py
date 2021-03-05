@@ -10,10 +10,10 @@ from apps.merchant.responses import MerchantBasicDetailsResponse
 from apps.order.dbapi import get_orders_in_period, get_rewarded_merchant_orders
 from apps.order.services import CheckRewardAvailable
 from apps.order.validators import CheckRewardSerializer
-from apps.rewards.dbapi import (get_cash_rewards, get_current_loyalty_program,
+from apps.reward.dbapi import (get_cash_rewards, get_current_loyalty_program,
                                 get_voucher_rewards)
-from apps.rewards.options import RewardValueType
-from apps.rewards.responses import (CashRewardResponse, LoyaltyProgramResponse,
+from apps.reward.options import RewardValueType
+from apps.reward.responses import (CashRewardResponse, LoyaltyProgramResponse,
                                     VoucherRewardResponse)
 
 

@@ -56,14 +56,14 @@ class Order(AbstractBaseModel):
 
     # Reward given for the order
     cash_reward = models.ForeignKey(
-        to="rewards.CashReward",
+        to="reward.CashReward",
         on_delete=models.CASCADE,
         related_name="orders",
         null=True,
         blank=True,
     )
     voucher_reward = models.ForeignKey(
-        to="rewards.VoucherReward",
+        to="reward.VoucherReward",
         on_delete=models.CASCADE,
         related_name="orders",
         null=True,

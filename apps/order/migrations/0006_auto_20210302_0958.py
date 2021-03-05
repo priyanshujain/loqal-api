@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("rewards", "0004_auto_20210302_0958"),
+        ("reward", "0004_auto_20210302_0958"),
         ("order", "0005_order_rewards_credit_applied"),
     ]
 
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="orders",
-                to="rewards.cashreward",
+                to="reward.cashreward",
             ),
         ),
         migrations.AddField(
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="orders",
-                to="rewards.voucherreward",
+                to="reward.voucherreward",
             ),
         ),
     ]

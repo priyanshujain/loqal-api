@@ -5,10 +5,10 @@ from django.utils.translation import gettext as _
 from api.services import ServiceBase
 from apps.order.dbapi import create_base_order
 from apps.order.options import OrderType
-from apps.rewards.dbapi import (create_debit_reward_usage,
+from apps.reward.dbapi import (create_debit_reward_usage,
                                 create_debit_reward_usage_item,
                                 create_reward_debit_event)
-from apps.rewards.options import RewardValueType
+from apps.reward.options import RewardValueType
 
 from .check_reward_available import CheckRewardAvailable
 

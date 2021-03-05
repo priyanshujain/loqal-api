@@ -2,8 +2,8 @@ from django.db.models import Sum
 from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
-from apps.rewards.dbapi import get_cash_rewards, get_voucher_rewards
-from apps.rewards.options import RewardValueType
+from apps.reward.dbapi import get_cash_rewards, get_voucher_rewards
+from apps.reward.options import RewardValueType
 
 __all__ = ("CheckRewardAvailable",)
 

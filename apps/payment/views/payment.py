@@ -26,7 +26,7 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
-from apps.rewards.services import AllocateRewards
+from apps.reward.services import AllocateRewards
 
 
 class CreatePaymentAPI(ConsumerAPIView):
