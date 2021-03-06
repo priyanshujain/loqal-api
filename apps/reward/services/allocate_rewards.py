@@ -5,8 +5,8 @@ from django.utils.translation import gettext as _
 from api.services import ServiceBase
 from apps.order.dbapi import get_orders_in_period
 from apps.reward.dbapi import (create_cash_reward, create_reward_credit_event,
-                                create_voucher_reward,
-                                get_current_loyalty_program)
+                               create_voucher_reward,
+                               get_current_loyalty_program)
 from apps.reward.options import LoyaltyParameters, RewardValueType
 
 __all__ = ("AllocateRewards",)

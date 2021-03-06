@@ -44,6 +44,7 @@ class RewardEvent(AbstractBaseModel):
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
+        null=True,
     )
     reward_usage_item = models.ForeignKey(
         RewardUsageItem, on_delete=models.CASCADE, null=True, blank=True

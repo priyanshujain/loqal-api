@@ -6,8 +6,8 @@ from api.services import ServiceBase
 from apps.order.dbapi import create_base_order
 from apps.order.options import OrderType
 from apps.reward.dbapi import (create_debit_reward_usage,
-                                create_debit_reward_usage_item,
-                                create_reward_debit_event)
+                               create_debit_reward_usage_item,
+                               create_reward_debit_event)
 from apps.reward.options import RewardValueType
 
 from .check_reward_available import CheckRewardAvailable

@@ -223,7 +223,8 @@ class CreateRefundPaymentAPI(MerchantAPIView):
         SendRefundNotification(
             user_id=refund_payment.payment.order.consumer.user.id, data=data
         ).send()
-        RefundReceivedEmail(transaction=refund_payment.transaction).send()
+        if refund_payment.transaction:
+            RefundReceivedEmail(transaction=refund_payment.transaction).send()
         return self.response(
             RefundHistoryResponse(refund_payment).data, status=201
         )

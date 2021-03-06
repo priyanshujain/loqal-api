@@ -45,6 +45,16 @@ class CashReward(AbstractBaseModel):
         if save:
             self.save()
 
+    def refund(self, refund_amount, save=True):
+        self.available_value += refund_amount
+        self.used_value -= refund_amount
+        if self.available_value == Decimal(0.0):
+            self.is_full_used = True
+        else:
+            self.is_full_used = False
+        if save:
+            self.save()
+
 
 class VoucherReward(AbstractBaseModel):
     consumer = models.ForeignKey(
@@ -77,5 +87,10 @@ class VoucherReward(AbstractBaseModel):
 
     def update_usage(self, save=True):
         self.is_used = True
+        if save:
+            self.save()
+
+    def refund(self, save=True):
+        self.is_used = False
         if save:
             self.save()

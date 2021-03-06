@@ -1,13 +1,17 @@
+from decimal import Decimal
+
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
+from apps.order.services import CheckReturnRewardCreditAmount
 from apps.payment.dbapi import create_refund_payment, get_merchant_payment
 from apps.payment.dbapi.events import (full_refund_payment_event,
                                        partial_refund_payment_event)
 from apps.payment.options import RefundType, TransactionType
 from apps.payment.validators import CreateRefundValidator
+from apps.reward.services import ReturnRewards
 
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
@@ -23,43 +27,76 @@ class CreateRefund(ServiceBase):
 
     def handle(self):
         payment_data = self._validate_data()
-        refund_payment = self._factory_refund_payment(
-            payment_data=payment_data
-        )
         order = payment_data["order"]
+        amount = payment_data["amount"]
+        return_reward_credit = CheckReturnRewardCreditAmount(
+            order=order, amount=amount
+        ).handle()
+        return_reward_value = Decimal(0.0)
+        reclaim_reward_value = Decimal(0.0)
+        if return_reward_credit:
+            return_reward_value = return_reward_credit["return_reward_value"]
+            reclaim_reward_value = return_reward_credit["reclaim_reward_value"]
+        refund_payment = self._factory_refund_payment(
+            order=order,
+            amount=amount,
+            return_reward_value=return_reward_value,
+            reclaim_reward_value=reclaim_reward_value,
+        )
 
-        try:
-            transaction = CreatePayment(
-                account_id=self.merchant_account.id,
-                ip_address=self.ip_address,
-                sender_bank_account=payment_data["sender_bank_account"],
-                receiver_bank_account=payment_data["receiver_bank_account"],
-                order=order,
-                total_amount=refund_payment.amount,
-                amount_towards_order=refund_payment.amount,
-                fee_bearer_account=self.merchant_account.account,
-                transaction_type=TransactionType.REFUND_PAYMENT,
-            ).handle()
-            if refund_payment.refund_type == RefundType.PARTIAL:
-                partial_refund_payment_event(
-                    payment_id=transaction.payment.id,
-                    refund_tracking_id=refund_payment.refund_tracking_id,
-                    amount=transaction.amount,
-                )
-            if refund_payment.refund_type == RefundType.FULL:
-                full_refund_payment_event(
-                    payment_id=transaction.payment.id,
-                    refund_tracking_id=refund_payment.refund_tracking_id,
-                )
-            refund_payment.add_transaction(transaction=transaction)
-            return refund_payment
-        except ValidationError as error:
+        transaction = None
+        if refund_payment.amount > Decimal(0.0):
             try:
-                transaction = error.transaction
-                refund_payment.set_refund_failed(transaction=transaction)
-            except AttributeError:
-                refund_payment.set_refund_failed()
-            raise error
+                transaction = CreatePayment(
+                    account_id=self.merchant_account.id,
+                    ip_address=self.ip_address,
+                    sender_bank_account=payment_data["sender_bank_account"],
+                    receiver_bank_account=payment_data[
+                        "receiver_bank_account"
+                    ],
+                    order=order,
+                    total_amount=refund_payment.amount,
+                    amount_towards_order=refund_payment.amount,
+                    fee_bearer_account=self.merchant_account.account,
+                    transaction_type=TransactionType.REFUND_PAYMENT,
+                ).handle()
+                refund_payment.add_transaction(transaction=transaction)
+            except ValidationError as error:
+                try:
+                    transaction = error.transaction
+                    refund_payment.set_refund_failed(transaction=transaction)
+                except AttributeError:
+                    refund_payment.set_refund_failed()
+                raise error
+
+        if refund_payment.refund_type == RefundType.PARTIAL:
+            partial_refund_payment_event(
+                payment_id=refund_payment.payment.id,
+                refund_tracking_id=refund_payment.refund_tracking_id,
+                amount=refund_payment.amount,
+            )
+        if refund_payment.refund_type == RefundType.FULL:
+            full_refund_payment_event(
+                payment_id=refund_payment.payment.id,
+                refund_tracking_id=refund_payment.refund_tracking_id,
+            )
+
+        if return_reward_credit:
+            reward_credit = ReturnRewards(
+                return_reward_value=return_reward_credit[
+                    "return_reward_value"
+                ],
+                updated_reward_value=return_reward_credit[
+                    "updated_reward_value"
+                ],
+                reclaim_reward_value=return_reward_credit[
+                    "reclaim_reward_value"
+                ],
+                reward_usage=return_reward_credit["reward_usage"],
+            ).handle()
+            if reward_credit:
+                refund_payment.add_reward_credit(reward_credit=reward_credit)
+        return refund_payment
 
     def _validate_data(self):
         data = run_validator(CreateRefundValidator, self.data)
@@ -74,16 +111,22 @@ class CreateRefund(ServiceBase):
             raise ValidationError(
                 {"payment_id": ErrorDetail(_("Given payment does not exist."))}
             )
-        if (payment.refunded_amount + amount) > payment.order.total_net_amount:
+
+        order = payment.order
+        current_total_order_amount = (
+            order.total_amount - order.total_return_amount
+        )
+        if amount > current_total_order_amount:
             raise ValidationError(
                 {
                     "amount": ErrorDetail(
-                        _("amount should be less than total payment amount.")
+                        _(
+                            "The amount should be less than or equal to"
+                            " available payment amount."
+                        )
                     )
                 }
             )
-
-        # FIXME: check for the amount to be less than total of all previous refunds
 
         banking_data = ValidateBankAccount(
             sender_account_id=self.merchant_account.account.id,
@@ -91,18 +134,28 @@ class CreateRefund(ServiceBase):
         ).validate()
 
         return {
-            "order": payment.order,
+            "order": order,
             "amount": data["amount"],
             "sender_bank_account": banking_data["sender_bank_account"],
             "receiver_bank_account": banking_data["receiver_bank_account"],
         }
 
-    def _factory_refund_payment(self, payment_data):
-        order = payment_data["order"]
-        amount = payment_data["amount"]
+    def _factory_refund_payment(
+        self, order, amount, return_reward_value, reclaim_reward_value
+    ):
         refund_type = RefundType.FULL
+        requested_items_value = amount
         if order.total_net_amount > amount:
             refund_type = RefundType.PARTIAL
+        if return_reward_value > Decimal(0.0):
+            amount -= return_reward_value
+        if reclaim_reward_value > Decimal(0.0):
+            amount -= reclaim_reward_value
         return create_refund_payment(
-            payment_id=order.payment.id, amount=amount, refund_type=refund_type
+            requested_items_value=requested_items_value,
+            payment_id=order.payment.id,
+            amount=amount,
+            refund_type=refund_type,
+            return_reward_value=return_reward_value,
+            reclaim_reward_value=reclaim_reward_value,
         )

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
@@ -22,8 +24,8 @@ class RewardUsage(AbstractBaseModel):
         max_length=32,
         enum_type=RewardValueType,
     )
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name="reward_usage"
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="reward_usages"
     )
 
     class Meta:
@@ -54,6 +56,7 @@ class RewardUsageItem(AbstractBaseModel):
     usage = models.ForeignKey(
         RewardUsage, on_delete=models.CASCADE, related_name="items"
     )
+    is_reclaimed = models.BooleanField(default=False)
 
     class Meta:
         db_table = "reward_usage_item"

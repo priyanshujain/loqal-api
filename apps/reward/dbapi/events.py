@@ -6,7 +6,7 @@ def create_reward_credit_event(
     merchant_id,
     consumer_id,
     reward_value_type,
-    value,
+    value=None,
     cash_reward=None,
     voucher_reward=None,
     reward_usage_item=None,

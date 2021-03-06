@@ -3,7 +3,7 @@ from enum import Flag
 from django.db.utils import IntegrityError
 
 from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
-                                 RewardUsageItem, VoucherReward)
+                                RewardUsageItem, VoucherReward)
 
 
 def create_cash_reward(value, loyalty_program_id, consumer_id):

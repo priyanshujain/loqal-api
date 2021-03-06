@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.crypto import get_random_string
 
 from apps.payment.options import RefundStatus, RefundType
+from apps.reward.models import RewardUsage
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.models.fields.enum import ChoiceEnumField
@@ -32,10 +33,32 @@ class Refund(AbstractBaseModel):
         related_name="refunds",
         on_delete=models.CASCADE,
     )
+    requested_items_value = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
     amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
+    )
+    return_reward_value = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
+    reclaim_reward_value = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
+    reward_credit = models.ForeignKey(
+        RewardUsage,
+        null=True,
+        blank=True,
+        related_name="refunds",
+        on_delete=models.CASCADE,
     )
     refund_tracking_id = models.CharField(
         max_length=10,
@@ -58,6 +81,11 @@ class Refund(AbstractBaseModel):
         if transaction:
             self.transaction = transaction
         self.status = RefundStatus.FAILED
+        if save:
+            self.save()
+
+    def add_reward_credit(self, reward_credit, save=True):
+        self.reward_credit = reward_credit
         if save:
             self.save()
 

@@ -219,8 +219,11 @@ def create_direct_merchant_payment(
 
 def create_refund_payment(
     payment_id,
+    requested_items_value,
     amount,
     refund_type,
+    return_reward_value,
+    reclaim_reward_value,
 ):
     """
     dbapi for creating new refund payment.
@@ -228,8 +231,11 @@ def create_refund_payment(
     try:
         return Refund.objects.create(
             payment_id=payment_id,
+            requested_items_value=requested_items_value,
             amount=amount,
             refund_type=refund_type,
+            return_reward_value=return_reward_value,
+            reclaim_reward_value=reclaim_reward_value,
         )
     except IntegrityError:
         return None

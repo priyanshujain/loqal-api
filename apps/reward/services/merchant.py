@@ -9,11 +9,11 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.reward.dbapi import (create_loyalty_program,
-                                get_current_loyalty_program,
-                                update_loyalty_program)
+                               get_current_loyalty_program,
+                               update_loyalty_program)
 from apps.reward.options import LoyaltyParameters, RewardValueType
 from apps.reward.validators import (CreateLoyaltyProgramValidator,
-                                     EditLoyaltyProgramValidator)
+                                    EditLoyaltyProgramValidator)
 from utils.dates import dt_add_months
 
 

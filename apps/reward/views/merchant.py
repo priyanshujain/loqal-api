@@ -2,11 +2,10 @@ from rest_framework.settings import import_from_string
 
 from api.views import MerchantAPIView
 from apps.reward.dbapi import (get_all_loyalty_program,
-                                get_current_loyalty_program)
+                               get_current_loyalty_program)
 from apps.reward.responses import LoyaltyProgramResponse
 from apps.reward.services import (CreateLoyaltyProgram,
-                                   DeactivateLoyaltyProgram,
-                                   EditLoyaltyProgram)
+                                  DeactivateLoyaltyProgram, EditLoyaltyProgram)
 
 
 class CreateLoyaltyProgramAPI(MerchantAPIView):

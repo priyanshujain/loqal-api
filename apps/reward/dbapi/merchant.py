@@ -1,7 +1,7 @@
 from django.db.utils import IntegrityError
 
 from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
-                                 RewardUsageItem, VoucherReward)
+                                RewardUsageItem, VoucherReward)
 
 
 def get_current_loyalty_program(merchant_id):

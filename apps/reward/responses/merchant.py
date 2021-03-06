@@ -1,6 +1,6 @@
 from api import serializers
 from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
-                                 RewardUsageItem, VoucherReward)
+                                RewardUsageItem, VoucherReward)
 
 
 class LoyaltyProgramResponse(serializers.ModelSerializer):
