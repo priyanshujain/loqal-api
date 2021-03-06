@@ -11,7 +11,7 @@ from apps.account.options import DwollaCustomerStatus
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
-                                get_payment_qrcode, merchant_payment)
+                                get_payment_qrcode,)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        initiate_payment_event)
 from apps.payment.options import PaymentProcess, TransactionType
@@ -32,11 +32,11 @@ class DirectMerchantPayment(ServiceBase):
 
     def handle(self):
         payment_data = self._validate_data()
-        merhcant_payment = self._factory_merchant_payment(
+        merchant_payment = self._factory_merchant_payment(
             payment_data=payment_data
         )
 
-        order = merhcant_payment.payment.order
+        order = merchant_payment.payment.order
         total_amount = order.total_net_amount + payment_data["tip_amount"]
         merhcant_account = payment_data["merchant_account"]
 
@@ -63,8 +63,8 @@ class DirectMerchantPayment(ServiceBase):
             payment_id=transaction.payment.id,
             transaction_tracking_id=transaction.transaction_tracking_id,
         )
-        merhcant_payment.add_transaction(transaction=transaction)
-        return merhcant_payment
+        merchant_payment.add_transaction(transaction=transaction)
+        return merchant_payment
 
     def _validate_data(self):
         data = run_validator(CreateMerchantPaymentValidator, self.data)
