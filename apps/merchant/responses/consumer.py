@@ -75,10 +75,11 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
     )
     categories = MerchantCategoryResponse(many=True, read_only=True)
     address = serializers.JSONField(source="profile.address", read_only=True)
+    merchant_id = serializers.CharField(source="u_id", read_only=True)
 
     class Meta:
         model = MerchantAccount
-        fields = ("full_name", "categories", "address")
+        fields = ("full_name", "categories", "address", "merchant_id",)
 
 
 class MerchantOperatingHoursResponse(serializers.ModelSerializer):
