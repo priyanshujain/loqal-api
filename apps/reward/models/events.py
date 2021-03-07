@@ -26,7 +26,7 @@ class RewardEvent(AbstractBaseModel):
     reward_value_type = ChoiceCharEnumField(
         max_length=32, enum_type=RewardValueType
     )
-    voucher_reward = models.OneToOneField(
+    voucher_reward = models.ForeignKey(
         VoucherReward,
         on_delete=models.CASCADE,
         related_name="events",
