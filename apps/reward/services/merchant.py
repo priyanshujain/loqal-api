@@ -64,8 +64,8 @@ class CreateLoyaltyProgram(ServiceBase):
             )
         loyalty_parameter = data["loyalty_parameter"]
         reward_value_maximum = Decimal(0.0)
-        if not data.get("reward_value_maximum"):
-            reward_value_maximum = data["reward_value"]
+        if data.get("reward_value_maximum"):
+            reward_value_maximum = data["reward_value_maximum"]
         elif data["reward_value_type"] == RewardValueType.FIXED_AMOUNT:
             reward_value_maximum = data["reward_value"]
 
