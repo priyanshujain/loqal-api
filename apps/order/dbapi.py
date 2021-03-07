@@ -61,7 +61,11 @@ def get_orders_in_period(consumer_id, merchant_id, start_date, end_date):
 
 
 def get_rewarded_merchant_orders(consumer_id):
-    return Order.objects.filter(
-        consumer_id=consumer_id,
-        is_rewarded=True,
-    ).distinct("merchant")
+    return (
+        Order.objects.filter(
+            consumer_id=consumer_id,
+            is_rewarded=True,
+        )
+        .order_by("merchant", "-created_at")
+        .distinct("merchant")
+    )

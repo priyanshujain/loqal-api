@@ -80,6 +80,7 @@ class RewardedMerchantsAPI(ConsumerAPIView):
             merchant["vouchers"] = get_voucher_rewards(
                 merchant_id=order.merchant.id, consumer_id=order.consumer.id
             ).count()
+            merchant["last_used_at"] = order.created_at.isoformat()
             merchants.append(merchant)
         return self.response(merchants)
 
