@@ -110,7 +110,7 @@ class AllocateRewards(ServiceBase):
         else:
             voucher_reward = create_voucher_reward(
                 value=loyalty_program.reward_value,
-                max_value=loyalty_program.value_maximum,
+                max_value=loyalty_program.reward_value_maximum,
                 loyalty_program_id=loyalty_program.id,
                 consumer_id=consumer.id,
             )

@@ -15,7 +15,7 @@ class CreateLoyaltyProgramValidator(serializers.ValidationSerializer):
     min_total_purchase = serializers.DecimalField(
         min_value=0,
         max_digits=4,
-        decimal_places=2,
+        decimal_places=5,
         coerce_to_string=False,
         default=0,
     )
@@ -26,14 +26,14 @@ class CreateLoyaltyProgramValidator(serializers.ValidationSerializer):
     reward_value = serializers.DecimalField(
         min_value=0,
         max_digits=4,
-        decimal_places=2,
+        decimal_places=5,
         coerce_to_string=False,
         default=0,
     )
     reward_value_maximum = serializers.DecimalField(
         min_value=0,
         max_digits=4,
-        decimal_places=2,
+        decimal_places=5,
         coerce_to_string=False,
         default=0,
     )
@@ -44,7 +44,7 @@ class EditLoyaltyProgramValidator(serializers.ValidationSerializer):
     min_total_purchase = serializers.DecimalField(
         min_value=0,
         max_digits=4,
-        decimal_places=2,
+        decimal_places=6,
         coerce_to_string=False,
         default=0,
     )
@@ -55,7 +55,7 @@ class EditLoyaltyProgramValidator(serializers.ValidationSerializer):
     reward_value = serializers.DecimalField(
         min_value=0,
         max_digits=4,
-        decimal_places=2,
+        decimal_places=6,
         coerce_to_string=False,
         default=0,
     )
