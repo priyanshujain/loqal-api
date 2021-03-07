@@ -24,6 +24,7 @@ def create_voucher_reward(value, max_value, loyalty_program_id, consumer_id):
             value_maximum=max_value,
             loyalty_program_id=loyalty_program_id,
             consumer_id=consumer_id,
+            expires_at=None,
         )
     except IntegrityError:
         return None
