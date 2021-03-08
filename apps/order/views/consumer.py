@@ -99,7 +99,7 @@ class MerchantRewardDetailsAPI(ConsumerAPIView):
                 }
             )
         consumer = request.consumer_account
-        reward_details = {}
+        reward_details = MerchantBasicDetailsResponse(merchant).data
         loyalty_program = get_current_loyalty_program(merchant_id=merchant.id)
         if not loyalty_program:
             reward_details["loyalty_program"] = {}
