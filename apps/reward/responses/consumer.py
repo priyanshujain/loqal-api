@@ -50,6 +50,7 @@ class RewardUsageItemResponse(serializers.ModelSerializer):
             "voucher_reward",
             "is_credit",
             "is_reclaimed",
-            "payment_id",
+            "payment_tracking_id",
+            "transaction_tracking_id",
             "order_id",
         )
