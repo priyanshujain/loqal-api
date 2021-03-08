@@ -7,7 +7,7 @@ from db.models import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.models.fields.enum import ChoiceEnumField
 
-from .options import OrderEventType, OrderStatus, OrderType
+from .options import DiscountType, OrderEventType, OrderStatus, OrderType
 
 
 class Order(AbstractBaseModel):
@@ -51,6 +51,13 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+
+    discount_name = models.CharField(max_length=255, blank=True, null=True)
+    discount_type = ChoiceCharEnumField(
+        max_length=32,
+        default=DiscountType.FIXED_AMOUNT,
+        enum_type=DiscountType,
+    )
     is_paid = models.BooleanField(default=False)
     is_rewarded = models.BooleanField(default=False)
 
@@ -69,7 +76,6 @@ class Order(AbstractBaseModel):
         null=True,
         blank=True,
     )
-    discount_name = models.CharField(max_length=255, blank=True, null=True)
     customer_note = models.TextField(blank=True, default="")
     order_tracking_id = models.CharField(
         max_length=10,

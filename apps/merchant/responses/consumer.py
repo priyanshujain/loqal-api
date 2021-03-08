@@ -79,7 +79,12 @@ class MerchantBasicDetailsResponse(serializers.ModelSerializer):
 
     class Meta:
         model = MerchantAccount
-        fields = ("full_name", "categories", "address", "merchant_id",)
+        fields = (
+            "full_name",
+            "categories",
+            "address",
+            "merchant_id",
+        )
 
 
 class MerchantOperatingHoursResponse(serializers.ModelSerializer):

@@ -11,7 +11,7 @@ from apps.account.options import DwollaCustomerStatus
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
-                                get_payment_qrcode,)
+                                create_zero_transaction, get_payment_qrcode)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        initiate_payment_event)
 from apps.payment.options import PaymentProcess, TransactionType
@@ -46,6 +46,14 @@ class DirectMerchantPayment(ServiceBase):
                 payment_id=merchant_payment.payment.id,
                 transaction_tracking_id=None,
             )
+            transaction = create_zero_transaction(
+                customer_ip_address=self.ip_address,
+                sender_bank_account=payment_data["sender_bank_account"],
+                receiver_bank_account=payment_data["receiver_bank_account"],
+                transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+                payment_id=merchant_payment.payment.id,
+            )
+            merchant_payment.add_transaction(transaction)
             return merchant_payment
 
         transaction = CreatePayment(

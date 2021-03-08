@@ -12,6 +12,7 @@ from apps.order.dbapi import create_payment_request_order
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_payment, create_payment_request,
+                                create_zero_transaction,
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (cancelled_payment_event,
                                        capture_payment_event,
@@ -139,6 +140,16 @@ class ApprovePaymentRequest(ServiceBase):
             capture_payment_event(
                 payment_id=payment_request.payment.id,
                 transaction_tracking_id=None,
+            )
+            transaction = create_zero_transaction(
+                customer_ip_address=self.ip_address,
+                sender_bank_account=banking_data["sender_bank_account"],
+                receiver_bank_account=banking_data["receiver_bank_account"],
+                transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+                payment_id=payment_request.payment.id,
+            )
+            payment_request.add_transaction(
+                transaction=transaction, tip_amount=data["tip_amount"]
             )
             return payment_request
 

@@ -6,7 +6,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.order.services import CheckReturnRewardCreditAmount
-from apps.payment.dbapi import create_refund_payment, get_merchant_payment
+from apps.payment.dbapi import (create_refund_payment, create_zero_transaction,
+                                get_merchant_payment)
 from apps.payment.dbapi.events import (full_refund_payment_event,
                                        partial_refund_payment_event)
 from apps.payment.options import RefundType, TransactionType
@@ -68,12 +69,23 @@ class CreateRefund(ServiceBase):
                 except AttributeError:
                     refund_payment.set_refund_failed()
                 raise error
+            else:
+                transaction = create_zero_transaction(
+                    customer_ip_address=self.ip_address,
+                    sender_bank_account=payment_data["sender_bank_account"],
+                    receiver_bank_account=payment_data[
+                        "receiver_bank_account"
+                    ],
+                    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+                    payment_id=refund_payment.payment.id,
+                )
+                refund_payment.add_transaction(transaction=transaction)
 
         if refund_payment.refund_type == RefundType.PARTIAL:
             partial_refund_payment_event(
                 payment_id=refund_payment.payment.id,
                 refund_tracking_id=refund_payment.refund_tracking_id,
-                amount=refund_payment.amount,
+                amount=amount,
             )
         if refund_payment.refund_type == RefundType.FULL:
             full_refund_payment_event(

@@ -1,4 +1,5 @@
 from api import serializers
+from apps.payment.dbapi import transaction
 from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
                                 RewardUsageItem, VoucherReward)
 
@@ -28,8 +29,12 @@ class VoucherRewardResponse(serializers.ModelSerializer):
 class RewardUsageItemResponse(serializers.ModelSerializer):
     cash_reward = CashRewardResponse(read_only=True)
     voucher_reward = VoucherRewardResponse(read_only=True)
-    payment_id = serializers.CharField(
-        source="usage.order.payment.u_id", read_only=True
+    payment_tracking_id = serializers.CharField(
+        source="usage.order.payment.payment_tracking_id", read_only=True
+    )
+    transaction_tracking_id = serializers.CharField(
+        source="usage.order.payment.transaction.transaction_tracking_id",
+        read_only=True,
     )
     order_id = serializers.CharField(source="usage.order.u_id", read_only=True)
     is_credit = serializers.BooleanField(

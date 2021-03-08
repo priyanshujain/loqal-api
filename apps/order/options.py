@@ -19,6 +19,11 @@ class OrderType(ChoiceCharEnum):
     ONLINE = "online", _("Online")
 
 
+class DiscountType(ChoiceCharEnum):
+    FIXED_AMOUNT = "fixed_amount", _("Fixed Amount")
+    PERCENTAGE = "percentage", _("Percentage")
+
+
 class OrderEventType(ChoiceEnum):
     CONFIRMED = 0, _("confirmed")
     CANCELED = 1, _("canceled")

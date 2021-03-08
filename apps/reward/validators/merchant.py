@@ -66,4 +66,3 @@ class EditLoyaltyProgramValidator(serializers.ValidationSerializer):
         coerce_to_string=False,
         default=0,
     )
-

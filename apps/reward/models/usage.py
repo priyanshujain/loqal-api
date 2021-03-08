@@ -25,7 +25,11 @@ class RewardUsage(AbstractBaseModel):
         enum_type=RewardValueType,
     )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="reward_usages"
+        Order,
+        on_delete=models.CASCADE,
+        related_name="reward_usages",
+        blank=True,
+        null=True,
     )
 
     class Meta:

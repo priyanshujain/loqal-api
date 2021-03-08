@@ -9,15 +9,9 @@ from django.db.utils import IntegrityError
 from django.utils import translation
 
 from apps.order.models import Order
-from apps.payment.models import (
-    DirectMerchantPayment,
-    Payment,
-    PaymentQrCode,
-    PaymentRegister,
-    PaymentRequest,
-    Refund,
-    Transaction,
-)
+from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
+                                 PaymentRegister, PaymentRequest, Refund,
+                                 Transaction)
 from apps.payment.models.transaction import DisputeTransaction
 from apps.payment.options import PaymentStatus, RefundStatus
 from utils.types import to_float
@@ -95,8 +89,12 @@ def get_merchant_customers(merchant_account):
                 "first_name": consumer.user.first_name,
                 "last_name": last_name,
                 "total_payments": payment_stats["total_payments"],
-                "total_payment_amount": to_float(payment_stats["total_payment_amount"]),
-                "total_refund_amount": to_float(refund_stats["total_refund_amount"]),
+                "total_payment_amount": to_float(
+                    payment_stats["total_payment_amount"]
+                ),
+                "total_refund_amount": to_float(
+                    refund_stats["total_refund_amount"]
+                ),
                 "total_refunds": refund_stats["total_refunds"],
             }
         )

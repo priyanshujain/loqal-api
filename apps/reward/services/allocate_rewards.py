@@ -4,7 +4,9 @@ from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
 from apps.order.dbapi import get_orders_in_period
-from apps.reward.dbapi import (create_cash_reward, create_reward_credit_event,
+from apps.reward.dbapi import (create_cash_reward, create_new_cash_usage,
+                               create_new_voucher_usage,
+                               create_reward_credit_event,
                                create_voucher_reward,
                                get_current_loyalty_program)
 from apps.reward.options import LoyaltyParameters, RewardValueType
@@ -102,6 +104,7 @@ class AllocateRewards(ServiceBase):
             )
             if cash_reward:
                 orders.update(cash_reward=cash_reward, is_rewarded=True)
+                create_new_cash_usage(cash_reward_id=cash_reward.id)
             return (
                 f"You have received a cash reward of ${cash_reward.available_value}."
                 " You can use it for your future purchases at "
@@ -123,6 +126,7 @@ class AllocateRewards(ServiceBase):
             )
             if voucher_reward:
                 orders.update(voucher_reward=voucher_reward, is_rewarded=True)
+                create_new_voucher_usage(voucher_reward_id=voucher_reward.id)
             return (
                 "You have received a reward consists of voucher "
                 f"${voucher_reward.value}% off on the next "

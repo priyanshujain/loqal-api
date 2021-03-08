@@ -87,3 +87,35 @@ def get_all_reward_usage(merchant_id, consumer_id):
         usage__order__merchant_id=merchant_id,
         usage__order__consumer_id=consumer_id,
     ).order_by("-created_at")
+
+
+def create_new_cash_usage(cash_reward_id):
+    try:
+        usage = RewardUsage.objects.create(
+            is_credit=True,
+            total_amount=None,
+            reward_value_type=RewardValueType.FIXED_AMOUNT,
+        )
+        RewardUsageItem.objects.create(
+            cash_reward_id=cash_reward_id,
+            usage=usage,
+        )
+        return usage
+    except IntegrityError:
+        return None
+
+
+def create_new_voucher_usage(voucher_reward_id):
+    try:
+        usage = RewardUsage.objects.create(
+            is_credit=True,
+            total_amount=None,
+            reward_value_type=RewardValueType.PERCENTAGE,
+        )
+        RewardUsageItem.objects.create(
+            voucher_reward_id=voucher_reward_id,
+            usage=usage,
+        )
+        return usage
+    except IntegrityError:
+        return None
