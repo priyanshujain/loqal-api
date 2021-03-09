@@ -60,6 +60,8 @@ class RefundHistoryResponse(serializers.ModelSerializer):
             "status",
             "amount",
             "currency",
+            "return_reward_value",
+            "reclaim_reward_value",
         )
 
 
@@ -81,6 +83,8 @@ class RefundListResponse(serializers.ModelSerializer):
             "refund_tracking_id",
             "payment_tracking_id",
             "status",
+            "return_reward_value",
+            "reclaim_reward_value",
         )
 
 
@@ -143,4 +147,6 @@ class RefundDetailsResponse(serializers.ModelSerializer):
             "status",
             "amount",
             "customer",
+            "return_reward_value",
+            "reclaim_reward_value",
         )
