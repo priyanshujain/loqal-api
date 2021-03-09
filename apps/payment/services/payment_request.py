@@ -114,7 +114,7 @@ class ApprovePaymentRequest(ServiceBase):
             )
 
         try:
-            consumer_account = payment_request.account_from.consumer
+            consumer_account = payment_request.account_to.consumer
         except AttributeError:
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid payment request."))}
@@ -128,6 +128,7 @@ class ApprovePaymentRequest(ServiceBase):
         order = CreateOrder(
             consumer_id=consumer_account.id,
             merchant_id=merchant_account.id,
+            amount=payment_request.amount,
             order_type=OrderType.ONLINE,
         ).handle()
         total_amount = order.total_net_amount + data["tip_amount"]
