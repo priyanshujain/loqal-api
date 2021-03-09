@@ -51,7 +51,6 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
-
     discount_name = models.CharField(max_length=255, blank=True, null=True)
     discount_type = ChoiceCharEnumField(
         max_length=32,
@@ -135,9 +134,16 @@ class Order(AbstractBaseModel):
         if save:
             self.save()
 
-    def update_discount(self, amount, name="", save=True):
+    def update_discount(
+        self,
+        amount,
+        name="",
+        discount_type=DiscountType.FIXED_AMOUNT,
+        save=True,
+    ):
         self.discount_amount += amount
         self.total_net_amount -= amount
+        self.discount_type = discount_type
         self.discount_name = name
         if save:
             self.save()

@@ -58,6 +58,15 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
     )
+    order_total_amount = serializers.CharField(
+        source="payment.order.total_amount", read_only=True
+    )
+    order_net_amount = serializers.CharField(
+        source="payment.order.total_net_amount", read_only=True
+    )
+    order_return_amount = serializers.CharField(
+        source="payment.order.total_return_amount", read_only=True
+    )
     amount = serializers.CharField(read_only=True)
 
     class Meta:
@@ -72,6 +81,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "transaction_status",
             "is_success",
             "customer",
+            "order_total_amount",
+            "order_net_amount",
+            "order_return_amount",
         )
 
 

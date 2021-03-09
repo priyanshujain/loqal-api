@@ -105,11 +105,14 @@ class AllocateRewards(ServiceBase):
             if cash_reward:
                 orders.update(cash_reward=cash_reward, is_rewarded=True)
                 create_new_cash_usage(cash_reward_id=cash_reward.id)
-            return (
-                f"You have received a cash reward of ${cash_reward.available_value}."
-                " You can use it for your future purchases at "
-                f"{loyalty_program.merchant.profile.full_name}"
-            )
+            return {
+                "reward_value_type": {
+                    "label": RewardValueType.FIXED_AMOUNT.label,
+                    "value": RewardValueType.FIXED_AMOUNT.value,
+                },
+                "value": cash_reward.available_value,
+            }
+
         else:
             voucher_reward = create_voucher_reward(
                 value=loyalty_program.reward_value,
@@ -127,10 +130,11 @@ class AllocateRewards(ServiceBase):
             if voucher_reward:
                 orders.update(voucher_reward=voucher_reward, is_rewarded=True)
                 create_new_voucher_usage(voucher_reward_id=voucher_reward.id)
-            return (
-                "You have received a reward consists of voucher "
-                f"${voucher_reward.value}% off on the next "
-                f"transaction(upto ${voucher_reward.reward_value_maximum})."
-                " You can use it for your future purchases at "
-                f"{loyalty_program.merchant.profile.full_name}"
-            )
+            return {
+                "reward_value_type": {
+                    "label": RewardValueType.PERCENTAGE.label,
+                    "value": RewardValueType.PERCENTAGE.value,
+                },
+                "value": voucher_reward.value,
+                "value_maximum": voucher_reward.value_maximum,
+            }

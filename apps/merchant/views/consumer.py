@@ -11,6 +11,8 @@ from apps.merchant.responses import (CategoryMerchantListResponse,
 from apps.merchant.services import StoreSearch
 from apps.merchant.shortcuts import validate_category
 from apps.merchant.tasks import check_if_merchant_account_ready
+from apps.reward.dbapi.merchant import get_current_loyalty_program
+from apps.reward.responses import LoyaltyProgramResponse
 
 __all__ = (
     "MerchantBasicDetailsAPI",
@@ -76,4 +78,11 @@ class StoreDetailsAPI(ConsumerAPIView):
         )
         images = merchant_account.images
         data["images"] = ListStoreImageResponse(images, many=True).data
+        loyalty_program = get_current_loyalty_program(
+            merchant_id=merchant_account.id
+        )
+        if loyalty_program:
+            data["loyalty_program"] = LoyaltyProgramResponse(
+                loyalty_program
+            ).data
         return self.response(data)

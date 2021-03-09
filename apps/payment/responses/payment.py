@@ -24,6 +24,7 @@ __all__ = (
     "TransactionErrorDetailsResponse",
     "MerchantDetailsResponse",
     "DirectMerchantPaymentConsumerResponse",
+    "CreateTransactionResponse",
 )
 
 
@@ -34,6 +35,18 @@ class MerchantCategoryResponse(serializers.ModelSerializer):
             "category",
             "sub_categories",
             "is_primary",
+        )
+
+
+class TransactionDiscountResponse(serializers.ModelSerializer):
+    discount_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = (
+            "discount_amount",
+            "discount_name",
+            "discount_type",
         )
 
 
@@ -268,6 +281,15 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
     )
     bank_logo = serializers.SerializerMethodField("get_bank_logo")
     is_credit = serializers.SerializerMethodField("is_credit_transaction")
+    order_total_amount = serializers.CharField(
+        source="payment.order.total_amount", read_only=True
+    )
+    order_net_amount = serializers.CharField(
+        source="payment.order.total_net_amount", read_only=True
+    )
+    order_return_amount = serializers.CharField(
+        source="payment.order.total_return_amount", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -282,6 +304,58 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
             "bank_logo",
             "is_credit",
             "merchant_id",
+            "order_total_amount",
+            "order_net_amount",
+            "order_return_amount",
+        )
+
+    def get_bank_logo(self, obj):
+        self.refund = None
+        try:
+            self.refund = obj.refund
+            return obj.recipient_bank_account.bank_logo_base64
+        except Refund.DoesNotExist:
+            return obj.sender_bank_account.bank_logo_base64
+
+    def is_credit_transaction(self, obj):
+        if self.refund:
+            return True
+        return False
+
+
+class CreateTransactionResponse(serializers.ModelSerializer):
+    payment_status = serializers.CharField(
+        source="payment.status.label", read_only=True
+    )
+    transaction_id = serializers.CharField(
+        source="transaction_tracking_id", read_only=True
+    )
+    merchant = MerchantDetailsResponse(
+        source="payment.order.merchant", read_only=True
+    )
+    merchant_id = serializers.CharField(
+        source="payment.order.merchant.u_id", read_only=True
+    )
+    bank_logo = serializers.SerializerMethodField("get_bank_logo")
+    is_credit = serializers.SerializerMethodField("is_credit_transaction")
+    discount = TransactionDiscountResponse(
+        source="payment.order", read_only=True
+    )
+
+    class Meta:
+        model = Transaction
+        fields = (
+            "created_at",
+            "amount",
+            "currency",
+            "payment_status",
+            "transaction_id",
+            "is_success",
+            "merchant",
+            "bank_logo",
+            "is_credit",
+            "merchant_id",
+            "discount",
         )
 
     def get_bank_logo(self, obj):
@@ -330,6 +404,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     merchant_rating = serializers.BooleanField(
         source="merchant_rating.give_thanks", read_only=True
     )
+    discount = TransactionDiscountResponse(
+        source="payment.order", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -350,6 +427,7 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "failure_reason_type_value",
             "failure_reason_message",
             "merchant_rating",
+            "discount",
         )
 
     def get_bank_details(self, obj):

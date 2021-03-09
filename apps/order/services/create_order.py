@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
 from apps.order.dbapi import create_base_order
-from apps.order.options import OrderType
+from apps.order.options import DiscountType, OrderType
 from apps.reward.dbapi import (create_debit_reward_usage,
                                create_debit_reward_usage_item,
                                create_reward_debit_event)
@@ -67,7 +67,8 @@ class CreateOrder(ServiceBase):
         )
         order.update_discount(
             amount=redeemable_reward_amount,
-            name=f"Loyalty reward cash credits applied.",
+            name=f"Rewards cashback",
+            discount_type=DiscountType.FIXED_AMOUNT,
         )
         redeemed_amount = 0
         for cash_reward in cash_rewards:
@@ -109,7 +110,8 @@ class CreateOrder(ServiceBase):
         )
         order.update_discount(
             amount=redeemable_reward_amount,
-            name=f"Loyalty reward voucher applied.",
+            name=f"{voucher.value}% off upto {voucher.value_maximum}",
+            discount_type=DiscountType.PERCENTAGE,
         )
         usage_item = create_debit_reward_usage_item(
             amount=redeemable_reward_amount,
