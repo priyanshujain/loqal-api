@@ -104,6 +104,7 @@ def create_zero_transaction(
             payment_id=payment_id,
             customer_ip_address=customer_ip_address,
             transaction_type=transaction_type,
+            is_success=True,
         )
     except IntegrityError:
         return None
