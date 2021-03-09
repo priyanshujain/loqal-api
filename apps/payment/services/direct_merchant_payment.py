@@ -49,7 +49,7 @@ class DirectMerchantPayment(ServiceBase):
             transaction = create_zero_transaction(
                 customer_ip_address=self.ip_address,
                 sender_bank_account=payment_data["sender_bank_account"],
-                receiver_bank_account=payment_data["receiver_bank_account"],
+                recipient_bank_account=payment_data["receiver_bank_account"],
                 transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
                 payment_id=merchant_payment.payment.id,
             )
