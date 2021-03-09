@@ -63,7 +63,6 @@ class MerchantCustomersAPI(MerchantAPIView):
         customers_response = get_merchant_customers(
             merchant_account=merchant_account
         )
-
         return self.response(customers_response)
 
 
