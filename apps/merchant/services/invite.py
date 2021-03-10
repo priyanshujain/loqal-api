@@ -52,7 +52,7 @@ class InviteConsumerBySMS(ServiceBase):
                         )
                     }
                 )
-
+            return True
         except Exception:
             raise ValidationError(
                 {

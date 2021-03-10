@@ -11,6 +11,7 @@ from apps.banking.dbapi import get_bank_account
 from apps.merchant.services import InviteConsumerBySMS
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_payment, create_payment_request,
+                                get_merchant_receive_limit,
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (cancelled_payment_event,
                                        capture_payment_event,
@@ -78,24 +79,55 @@ class CreatePaymentRequest(ServiceBase):
 
         if not consumer_account:
             if is_phone_number_based:
+                is_success = False
                 try:
-                    InviteConsumerBySMS(
+                    is_success = InviteConsumerBySMS(
                         merchant=merchant_account,
                         phone_number=phone_number,
                         request_payment=True,
                     ).handle()
                 except Exception:
                     pass
-            raise ValidationError(
-                {
-                    "detail": [
-                        ErrorDetail(
-                            "Given phone number/ Loqal ID is not vaild. Please check and try again."
-                        )
-                    ]
-                }
-            )
+                if is_success:
+                    raise ValidationError(
+                        {
+                            "detail": [
+                                ErrorDetail(
+                                    "Given phone number is not registered "
+                                    "with Loqal. We have sent an SMS invite "
+                                    "to this number to download the Loqal App."
+                                )
+                            ]
+                        }
+                    )
+                raise ValidationError(
+                    {
+                        "detail": [
+                            ErrorDetail(
+                                "Given phone number/ Loqal ID is not vaild. Please check and try again."
+                            )
+                        ]
+                    }
+                )
 
+        amount = data["amount"]
+        merchant_receive_limit = get_merchant_receive_limit(
+            merchant_id=merchant_account.id
+        )
+        if merchant_receive_limit:
+            if amount > merchant_receive_limit.transaction_limit:
+                raise ValidationError(
+                    {
+                        "detail": [
+                            ErrorDetail(
+                                "Payment request amount limit exceeded. "
+                                "Your store is set to receive upto "
+                                f"${merchant_receive_limit.transaction_limit} per transaction."
+                                " If you want to increase your limit please email us at hello@loqal.us."
+                            )
+                        ]
+                    }
+                )
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id
