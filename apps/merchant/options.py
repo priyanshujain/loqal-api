@@ -46,6 +46,8 @@ class AllowedFeatureAcessTypes:
     QR_CODES = ["CREATE", "UPDATE", "VIEW"]
     STORE_PROFILE = ["UPDATE", "VIEW"]
     TEAM_MANAGEMENT = ["CREATE", "UPDATE", "VIEW", "DELETE"]
+    TOP_CUSTOMERS = ["VIEW"]
+    LOYALTY_PRGRAM = ["CREATE", "UPDATE", "VIEW", "DELETE"]
 
 
 class BeneficialOwnerStatus(ChoiceCharEnum):
