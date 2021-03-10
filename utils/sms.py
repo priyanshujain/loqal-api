@@ -16,7 +16,9 @@ def format_phone(phone_number, phone_number_country):
     )
 
 
-def send_sms(body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REGION):
+def send_sms(
+    body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REGION
+):
     phone_from = format_phone(
         settings.LOQAL_SMS_PHONE_NUMBER,
         settings.LOQAL_SMS_PHONE_NUMBER_COUNTRY,
@@ -24,8 +26,8 @@ def send_sms(body, phone_number, phone_number_country=settings.DEFAULT_PHONE_REG
     phone_to = format_phone(phone_number, phone_number_country)
 
     if (
-        settings.APP_ENV == "local"
-        or settings.APP_ENV == "development"
+        # settings.APP_ENV == "local"
+        settings.APP_ENV == "development"
         or settings.APP_ENV == "staging"
     ):
         print("###################### SMS START ########################")

@@ -8,6 +8,7 @@ from api.services import ServiceBase
 from apps.account.dbapi import (get_consumer_account_by_phone_number,
                                 get_consumer_account_by_username)
 from apps.banking.dbapi import get_bank_account
+from apps.merchant.services import InviteConsumerBySMS
 from apps.order.dbapi import create_payment_request_order
 from apps.payment.dbapi import (create_payment, create_payment_request,
                                 get_payment_reqeust_by_uid)
@@ -74,6 +75,27 @@ class CreatePaymentRequest(ServiceBase):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid account."))}
             )
+
+        if not consumer_account:
+            if is_phone_number_based:
+                try:
+                    InviteConsumerBySMS(
+                        merchant=merchant_account,
+                        phone_number=phone_number,
+                        request_payment=True,
+                    ).handle()
+                except Exception:
+                    pass
+            raise ValidationError(
+                {
+                    "detail": [
+                        ErrorDetail(
+                            "Given phone number/ Loqal ID is not vaild. Please check and try again."
+                        )
+                    ]
+                }
+            )
+
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id

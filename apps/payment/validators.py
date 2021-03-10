@@ -69,17 +69,17 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
                         ]
                     }
                 )
-            consumer_account = get_consumer_account_by_phone_number(
-                phone_number=phone_number
-            )
-            if not consumer_account:
-                raise ValidationError(
-                    {
-                        "detail": ErrorDetail(
-                            _("No user exists with given phone number.")
-                        )
-                    }
-                )
+            # consumer_account = get_consumer_account_by_phone_number(
+            #     phone_number=phone_number
+            # )
+            # if not consumer_account:
+            #     raise ValidationError(
+            #         {
+            #             "detail": ErrorDetail(
+            #                 _("No user exists with given phone number.")
+            #             )
+            #         }
+            #     )
         else:
             if not loqal_id:
                 raise ValidationError(
