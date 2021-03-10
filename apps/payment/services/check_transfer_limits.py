@@ -87,7 +87,7 @@ class CheckTransferLimit(object):
                     "detail": ErrorDetail(
                         _(
                             f"The maximum transaction size to {self.merchant.profile.full_name}"
-                            f" is {merchant_receive_limit.transaction_size}. Please contact the store for further details."
+                            f" is {merchant_receive_limit.transaction_limit}. Please contact the store for further details."
                         )
                     ),
                     "code": "MERCHANT_RECEIVE_LIMIT_EXCEEDED",
