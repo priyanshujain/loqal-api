@@ -6,13 +6,15 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from apps.payment.dbapi import get_transactions_by_bank_account
+from apps.merchant.services.profile import merchant_profile
+from apps.payment.dbapi import get_merchant_receive_limit
 
 __all__ = ("CheckTransferLimit",)
 
 
 class CheckTransferLimit(object):
-    def __init__(self, register, bank_account, amount):
+    def __init__(self, merchant, register, bank_account, amount):
+        self.merchant = merchant
         self.register = register
         self.bank_account = bank_account
         self.amount = Decimal(amount)
@@ -29,6 +31,11 @@ class CheckTransferLimit(object):
                     )
                 }
             )
+        merchant_receive_limit = get_merchant_receive_limit(
+            merchant_id=self.merchant.id
+        )
+        if merchant_receive_limit:
+            self._check_merchant_receive_limit(merchant_receive_limit)
         current_time = timezone.now()
         if current_time < payment_register.daily_usage_start_time + timedelta(
             hours=24
@@ -49,7 +56,7 @@ class CheckTransferLimit(object):
                 {
                     "detail": ErrorDetail(
                         _(
-                            "You have reached the Loqal payment limit($500/day). "
+                            f"You have reached the Loqal payment limit(${payment_register.daily_send_limit}/day). "
                             "Please try again after 24 hours."
                         )
                     ),
@@ -70,5 +77,19 @@ class CheckTransferLimit(object):
                         )
                     ),
                     "code": "WEEKLY_LIMIT_EXCEEDED",
+                }
+            )
+
+    def _check_merchant_receive_limit(self, merchant_receive_limit):
+        if self.amount > merchant_receive_limit.transaction_limit:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _(
+                            f"The maximum transaction size to {self.merchant.profile.full_name}"
+                            f" is {merchant_receive_limit.transaction_size}. Please contact the store for further details."
+                        )
+                    ),
+                    "code": "MERCHANT_RECEIVE_LIMIT_EXCEEDED",
                 }
             )
