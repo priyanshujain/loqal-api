@@ -22,7 +22,7 @@ class PaymentRegister(AbstractBaseModel):
     daily_send_limit = models.DecimalField(
         max_digits=10,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
-        default=500,
+        default=5000,
     )
     weekly_send_limit = models.DecimalField(
         max_digits=10,
