@@ -1,5 +1,7 @@
 from .consumer import urlpatterns as consumer_urls
+from .invite import urlpatterns as invite_urls
 from .member import urlpatterns as member_urls
+from .member_staff import urlpatterns as member_staff_urls
 from .member_user import urlpatterns as member_user_urls
 from .onboarding import urlpatterns as onboarding_urls
 from .profile import urlpatterns as profile_urls
@@ -12,4 +14,6 @@ urlpatterns = (
     + profile_urls
     + consumer_urls
     + member_user_urls
+    + member_staff_urls
+    + invite_urls
 )

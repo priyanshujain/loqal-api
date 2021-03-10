@@ -1,0 +1,59 @@
+from django.urls import path
+
+from apps.merchant.views.member_staff import (CreateMemberInviteAPI,
+                                              DisableMemberAPI,
+                                              EnableMemberAPI,
+                                              GetMemberInvitesAPI,
+                                              ListMembersAPI,
+                                              ResendMemberInviteEmailAPI,
+                                              UpdateFeatureAccessRoleAPI,
+                                              UpdateMemberInviteAPI,
+                                              UpdateMemberRoleAPI)
+
+urlpatterns = [
+    path(
+        "<uuid:merchant_id>/member/update-invite/",
+        UpdateMemberInviteAPI.as_view(),
+        name="staff_update_invite_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/resend-invite/",
+        ResendMemberInviteEmailAPI.as_view(),
+        name="staff_resend_invite_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/disable/",
+        DisableMemberAPI.as_view(),
+        name="staff_disable_member_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/enable/",
+        EnableMemberAPI.as_view(),
+        name="staff_enable_member_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/invite/create/",
+        CreateMemberInviteAPI.as_view(),
+        name="staff_create_member_invite_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/invite/",
+        GetMemberInvitesAPI.as_view(),
+        name="staff_get_member_invites_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/roles/update/",
+        UpdateFeatureAccessRoleAPI.as_view(),
+        name="staff_member_role_update_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/feature-access/update/",
+        UpdateMemberRoleAPI.as_view(),
+        name="staff_member_feature_access_api",
+    ),
+    path(
+        "<uuid:merchant_id>/member/",
+        ListMembersAPI.as_view(),
+        name="staff_list_member_api",
+    ),
+]

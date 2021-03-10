@@ -1,4 +1,5 @@
 from django.utils.translation import activate
+
 from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.banking.dbapi import get_bank_account
 

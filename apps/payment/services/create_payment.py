@@ -140,17 +140,22 @@ class CreatePayment(ServiceBase):
     def _check_transaction_limits(self, register, transaction):
         try:
             CheckTransferLimit(
+                merchant=transaction.payment.order.merchant,
                 register=register,
                 bank_account=self.sender_bank_account,
                 amount=self.total_amount,
             ).handle()
         except ValidationError as err:
             code = to_str(err.detail.get("code"))
+            message = to_str(err.detail.get("detail"))
             if code == "WEEKLY_LIMIT_EXCEEDED":
-                transaction.set_weekly_limit_exceeded()
+                transaction.set_weekly_limit_exceeded(message)
                 return err
             if code == "DAILY_LIMIT_EXCEEDED":
-                transaction.set_daily_limit_exceeded()
+                transaction.set_daily_limit_exceeded(message)
+                return err
+            if code == "MERCHANT_RECEIVE_LIMIT_EXCEEDED":
+                transaction.set_merchant_receive_limit_exceeded(message)
                 return err
 
     def _factory_transaction(self):
