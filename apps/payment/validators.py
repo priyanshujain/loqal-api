@@ -178,3 +178,21 @@ class CloseDisputeValidator(serializers.ValidationSerializer):
     resolution = serializers.CharField(max_length=2 * 1024)
     status = serializers.EnumChoiceField(enum_type=DisputeStatus)
     notes = serializers.CharField(max_length=2 * 1024)
+
+
+class PaymentRegisterValidator(serializers.ValidationSerializer):
+    daily_send_limit = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
+
+
+class MerchantReceiveLimitValidator(serializers.ValidationSerializer):
+    transaction_limit = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
