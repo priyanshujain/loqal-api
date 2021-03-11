@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.serializers import *
+from django.utils.translation import gettext as _
 
 
 class BaseSerializer(Serializer):
@@ -62,6 +63,22 @@ class AddressSerializer(BaseSerializer):
     zip_code = CharField(max_length=10)
     latitude = FloatField(required=False)
     longitude = FloatField(required=False)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        country = attrs.get("country", "")
+        zip_code = attrs.get("zip_code", "")
+
+        if country == "US":
+            if len(zip_code) != 5:
+                raise ValidationError(
+                    {
+                        "zip_code": ErrorDetail(
+                            _("US zipcode should be a 5 digit number.")
+                        )
+                    }
+                )
+        return attrs
 
 
 class ChoiceCharEnumSerializer(BaseSerializer):
