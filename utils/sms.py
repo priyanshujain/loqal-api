@@ -28,7 +28,7 @@ def send_sms(
     if (
         settings.APP_ENV == "local"
         or settings.APP_ENV == "development"
-        or settings.APP_ENV == "staging"
+        # or settings.APP_ENV == "staging"
     ):
         print("###################### SMS START ########################")
         print("TO: ", phone_to)

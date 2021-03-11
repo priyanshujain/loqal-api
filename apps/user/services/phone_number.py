@@ -7,9 +7,11 @@ from api.services import ServiceBase
 from apps.user.dbapi import get_user_by_phone
 from apps.user.models import Authenticator
 from apps.user.options import CustomerTypes
-from apps.user.validators import (PhoneNumberValidator,
-                                  ResendPhoneNumberOtpValidator,
-                                  VerifyPhoneNumberOtpValidator)
+from apps.user.validators import (
+    PhoneNumberValidator,
+    ResendPhoneNumberOtpValidator,
+    VerifyPhoneNumberOtpValidator,
+)
 
 __all__ = (
     "StartSmsAuthEnrollment",
@@ -45,7 +47,10 @@ class AddPhoneNumber(ServiceBase):
         data = self._validate_data(data=data)
 
         phone_number = data["phone_number"]
-        self.user.add_phone_number(phone_number=phone_number)
+        phone_number_country = data.get("phone_number_country", "US")
+        self.user.add_phone_number(
+            phone_number=phone_number, phone_number_country=phone_number_country
+        )
         EnrollSmsAuthenticator(
             request=self.request, user=self.user, data=data
         ).send_otp()
@@ -101,15 +106,9 @@ class VerifyPhoneNumber(ServiceBase):
     def _validate_data(self, data):
         if self.user.phone_number_verified:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Phone number has already been verified.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Phone number has already been verified."))}
             )
-        return run_validator(
-            validator=VerifyPhoneNumberOtpValidator, data=data
-        )
+        return run_validator(validator=VerifyPhoneNumberOtpValidator, data=data)
 
 
 class ResendPhoneNumberOtp(object):
@@ -140,11 +139,7 @@ class EnrollSmsAuthenticator(object):
         )
         if interface.is_enrolled():
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Phone number has already been verified.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Phone number has already been verified."))}
             )
         return interface
 
@@ -171,11 +166,7 @@ class EnrollSmsAuthenticator(object):
             )
         if phone_number_verified:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Phone number has already been verified.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Phone number has already been verified."))}
             )
         interface.phone_number = phone_number
         interface.phone_number_country = self.user.phone_number_country
