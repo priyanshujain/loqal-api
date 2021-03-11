@@ -131,6 +131,6 @@ class SendPaymentCapturedEmail(object):
         email_html = render_to_string("payment_captured.html", render_data)
         send_email_async(
             (self.email),
-            f"New paytment captured #{payment.payment_tracking_id}",
+            f"New payment captured #{payment.payment_tracking_id}",
             email_html,
         )
