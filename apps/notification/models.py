@@ -180,3 +180,8 @@ class StaffPaymentNotificationSetting(AbstractBaseModel):
         self.is_active = False
         if save:
             self.save()
+
+    def enable(self, save=True):
+        self.is_active = True
+        if save:
+            self.save()

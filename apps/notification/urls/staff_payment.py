@@ -2,7 +2,8 @@ from django.urls import path
 
 from apps.notification.views.staff_payment import (
     AddStaffNoticationSettingAPI, DeleteStaffNoticationSettingAPI,
-    DisableStaffNoticationSettingAPI, GetStaffNoticationSettingAPI)
+    DisableStaffNoticationSettingAPI, EnableStaffNoticationSettingAPI,
+    GetStaffNoticationSettingAPI)
 
 urlpatterns = [
     path(
@@ -14,6 +15,11 @@ urlpatterns = [
         "merchant/payment/<uuid:setting_id>/disable/",
         DisableStaffNoticationSettingAPI.as_view(),
         name="disable_staff_payment_notification_setting",
+    ),
+    path(
+        "merchant/payment/<uuid:setting_id>/enable/",
+        EnableStaffNoticationSettingAPI.as_view(),
+        name="enable_staff_payment_notification_setting",
     ),
     path(
         "merchant/payment/<uuid:setting_id>/delete/",

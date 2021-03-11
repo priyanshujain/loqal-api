@@ -47,6 +47,21 @@ class DisableStaffNoticationSettingAPI(MerchantAPIView):
         return self.response()
 
 
+class EnableStaffNoticationSettingAPI(MerchantAPIView):
+    def post(self, request, setting_id):
+        notification_setting = get_staff_payment_notification_setting(
+            setting_id=setting_id, merchant_id=request.merchant_account.id
+        )
+
+        if not notification_setting:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid notification setting id."))}
+            )
+
+        notification_setting.enable()
+        return self.response()
+
+
 class DeleteStaffNoticationSettingAPI(MerchantAPIView):
     def post(self, request, setting_id):
         notification_setting = get_staff_payment_notification_setting(
