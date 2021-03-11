@@ -136,3 +136,9 @@ def get_staff_payment_notification_setting_by_staff(
     if notification_settings.exists():
         return notification_settings.first()
     return None
+
+
+def get_staff_payment_notifications(merchant_id):
+    return StaffPaymentNotificationSetting.objects.filter(
+        merchant_id=merchant_id, is_active=True
+    )

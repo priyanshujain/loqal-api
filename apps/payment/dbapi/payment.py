@@ -313,3 +313,10 @@ def get_recent_store_orders(consumer_account):
         .order_by("merchant", "-updated_at")
         .distinct("merchant")
     )
+
+
+def get_payment_by_id(payment_id):
+    try:
+        return Payment.objects.get(id=payment_id)
+    except Payment.DoesNotExist:
+        return None

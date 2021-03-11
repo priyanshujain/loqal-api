@@ -6,7 +6,7 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
-                                get_recent_store_orders, transaction)
+                                get_recent_store_orders, payment, transaction)
 from apps.payment.notifications import (SendApproveRequestNotification,
                                         SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
@@ -25,6 +25,7 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
+from apps.payment.tasks import create_staff_payment_notification
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -44,6 +45,9 @@ class CreatePaymentAPI(ConsumerAPIView):
         ).data
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
+        )
+        create_staff_payment_notification.delay(
+            payment_id=merchant_payment.payment.id
         )
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
@@ -112,6 +116,9 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         ).data
         payment_notification_data["tip_amount"] = str(
             payment_request.tip_amount
+        )
+        create_staff_payment_notification.delay(
+            payment_id=payment_request.payment.id
         )
         SendNewPaymentNotification(
             merchant_id=payment_request.payment.order.merchant.id,
