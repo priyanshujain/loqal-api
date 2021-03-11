@@ -17,7 +17,7 @@ class SendPaymentCapturedSMS(object):
         first_name = consumer.user.first_name
         last_name = consumer.user.last_name
         if len(last_name) > 0:
-            last_name - last_name[0]
+            last_name = last_name[0]
         amount = f"${payment.captured_amount}"
         date_initiated = payment.created_at.strftime(
             "%X %p (%Z) %A, %b %d, %Y"
