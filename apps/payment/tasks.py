@@ -12,7 +12,7 @@ def create_staff_payment_notification(payment_id):
     payment = get_payment_by_id(payment_id=payment_id)
     if not payment:
         return
-    merchant - payment.order.merchant
+    merchant = payment.order.merchant
     staff_notifications = get_staff_payment_notifications(
         merchant_id=merchant.id
     )

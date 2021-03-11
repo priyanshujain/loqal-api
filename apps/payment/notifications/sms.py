@@ -9,7 +9,7 @@ class SendPaymentCapturedSMS(object):
         self.phone_number_country = phone_number_country
 
     def send(self):
-        self._send_email()
+        self._send_sms()
 
     def _send_sms(self):
         consumer = self.consumer
@@ -24,9 +24,9 @@ class SendPaymentCapturedSMS(object):
         )
         sms_body = (
             f"A new Loqal payment captured from {first_name} "
-            f"{last_name}({consumer.username}).\n\n",
-            f"Amount: {amount}\n",
-            f"Time: {date_initiated}",
+            f"{last_name}({consumer.username}).\n\n"
+            f"Amount: {amount}\n"
+            f"Time: {date_initiated}"
         )
         send_sms(
             body=sms_body,
