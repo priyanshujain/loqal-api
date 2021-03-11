@@ -1,15 +1,19 @@
 from enum import unique
 
 from django.conf import settings
+from django.contrib.auth import default_app_config
 from django.db import models
+from django.utils import tree
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext as _
 
-from db.models import BaseModel
+from apps.account.models import MerchantAccount
+from apps.merchant.models import AccountMember
+from db.models import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceCharEnumField
 from plugins.fcm import FcmPlugin
 
-from .options import UserDeviceTypes
+from .options import PaymentNotificationTypes, UserDeviceTypes
 
 
 class UserDevice(BaseModel):
@@ -137,3 +141,42 @@ class UserDevice(BaseModel):
             json_encoder=json_encoder,
         )
         return result
+
+
+class StaffPaymentNotificationSetting(AbstractBaseModel):
+    """
+    This represents payment notification to staff
+    """
+
+    merchant = models.ForeignKey(
+        MerchantAccount,
+        on_delete=models.CASCADE,
+    )
+    staff = models.OneToOneField(
+        AccountMember,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    phone_number = models.CharField(max_length=10, blank=True)
+    phone_number_country = models.CharField(
+        max_length=2, blank=True, default="US"
+    )
+    email = models.EmailField(blank=True)
+    notification_type = ChoiceCharEnumField(
+        enum_type=PaymentNotificationTypes,
+        max_length=128,
+        default=PaymentNotificationTypes.ALL,
+    )
+    sms_enabled = models.BooleanField(default=False)
+    email_enabled = models.BooleanField(default=False)
+    app_enabled = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "staff_payment_notification_setting"
+
+    def disable(self, save=True):
+        self.is_active = False
+        if save:
+            self.save()

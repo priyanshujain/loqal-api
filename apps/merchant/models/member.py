@@ -6,7 +6,6 @@ from django.db import models
 from django.utils.timezone import now
 
 from apps.account.models import MerchantAccount
-from apps.user.models import User
 from db.models import AbstractBaseModel
 from utils.shortcuts import rand_str
 

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0049_auto_20210310_0749'),
+        ("payment", "0049_auto_20210310_0749"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='paymentregister',
-            name='daily_send_limit',
-            field=models.DecimalField(decimal_places=2, default=5000, max_digits=10),
+            model_name="paymentregister",
+            name="daily_send_limit",
+            field=models.DecimalField(
+                decimal_places=2, default=5000, max_digits=10
+            ),
         ),
     ]

@@ -1,7 +1,7 @@
 from django.urls import path
 
-from apps.notification.views import (SubscribePushNoticationAPI,
-                                     UnSubscribePushNoticationAPI)
+from apps.notification.views.device import (SubscribePushNoticationAPI,
+                                            UnSubscribePushNoticationAPI)
 
 urlpatterns = [
     path(
