@@ -7,6 +7,7 @@ from apps.payment.models import Transaction
 from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
+from .payment import RewardUsageResponse
 
 __all__ = (
     "MerchantTransactionHistoryResponse",
@@ -68,6 +69,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
         source="payment.order.total_return_amount", read_only=True
     )
     amount = serializers.CharField(read_only=True)
+    sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
         model = Transaction
@@ -84,6 +88,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "order_total_amount",
             "order_net_amount",
             "order_return_amount",
+            "sender_source_type",
+            "recipient_source_type",
+            "reward_usage",
         )
 
 

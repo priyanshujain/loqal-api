@@ -6,9 +6,10 @@ from apps.banking.models import BankAccount
 from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction,
-                                 transaction)
+                                 PaymentRequest, Refund, Transaction,)
 from apps.payment.options import PaymentProcess
+from apps.reward.models import RewardUsage
+
 
 __all__ = (
     "TransactionResponse",
@@ -35,6 +36,18 @@ class MerchantCategoryResponse(serializers.ModelSerializer):
             "category",
             "sub_categories",
             "is_primary",
+        )
+
+
+class RewardUsageResponse(serializers.ModelSerializer):
+    reward_value_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+
+    class Meta:
+        model = RewardUsage
+        fields = (
+            "reward_value_type",
+            "total_amount",
+            "is_credit",
         )
 
 
@@ -290,6 +303,9 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
     order_return_amount = serializers.CharField(
         source="payment.order.total_return_amount", read_only=True
     )
+    sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
         model = Transaction
@@ -307,15 +323,21 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
             "order_total_amount",
             "order_net_amount",
             "order_return_amount",
+            "sender_source_type",
+            "recipient_source_type",
+            "reward_usage",
         )
 
     def get_bank_logo(self, obj):
         self.refund = None
         try:
             self.refund = obj.refund
-            return obj.recipient_bank_account.bank_logo_base64
+            if obj.recipient_bank_account:
+                return obj.recipient_bank_account.bank_logo_base64
         except Refund.DoesNotExist:
-            return obj.sender_bank_account.bank_logo_base64
+            if obj.sender_bank_account:
+                return obj.sender_bank_account.bank_logo_base64
+        return None
 
     def is_credit_transaction(self, obj):
         if self.refund:
@@ -341,6 +363,9 @@ class CreateTransactionResponse(serializers.ModelSerializer):
     discount = TransactionDiscountResponse(
         source="payment.order", read_only=True
     )
+    sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
         model = Transaction
@@ -356,15 +381,21 @@ class CreateTransactionResponse(serializers.ModelSerializer):
             "is_credit",
             "merchant_id",
             "discount",
+            "sender_source_type",
+            "recipient_source_type",
+            "reward_usage",
         )
 
     def get_bank_logo(self, obj):
         self.refund = None
         try:
             self.refund = obj.refund
-            return obj.recipient_bank_account.bank_logo_base64
+            if obj.recipient_bank_account:
+                return obj.recipient_bank_account.bank_logo_base64
         except Refund.DoesNotExist:
-            return obj.sender_bank_account.bank_logo_base64
+            if obj.sender_bank_account:
+                return obj.sender_bank_account.bank_logo_base64
+        return None
 
     def is_credit_transaction(self, obj):
         if self.refund:
@@ -407,6 +438,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
     discount = TransactionDiscountResponse(
         source="payment.order", read_only=True
     )
+    sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
         model = Transaction
@@ -428,6 +462,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
             "failure_reason_message",
             "merchant_rating",
             "discount",
+            "sender_source_type",
+            "recipient_source_type",
+            "reward_usage",
         )
 
     def get_bank_details(self, obj):

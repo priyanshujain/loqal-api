@@ -1,6 +1,6 @@
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.serializers import *
-from django.utils.translation import gettext as _
 
 
 class BaseSerializer(Serializer):

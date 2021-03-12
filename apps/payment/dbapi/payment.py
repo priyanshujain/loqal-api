@@ -292,10 +292,7 @@ def get_transactions_to_merchant(account_id):
 
 
 def get_consumer_transactions(consumer_account):
-    return Transaction.objects.filter(
-        Q(sender_bank_account__account=consumer_account.account)
-        | Q(recipient_bank_account__account=consumer_account.account)
-    )
+    return Transaction.objects.filter(payment__order__consumer=consumer_account)
 
 
 def get_merchant_transactions(merchant_account):
