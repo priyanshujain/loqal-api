@@ -1,6 +1,5 @@
 from celery import shared_task
 
-from api.views import merchant
 from apps.notification.dbapi import get_staff_payment_notifications
 from apps.payment.dbapi import get_payment_by_id
 from apps.payment.notifications.email import SendPaymentCapturedEmail
