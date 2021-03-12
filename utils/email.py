@@ -23,7 +23,7 @@ def send_email(from_name, to_emails, subject, content, **kwargs):
         print("CONTENT: ", h.handle(content))
         print("###################### EMAIL END ##########################")
         return
-        
+
     DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
     SENDGRID_API_KEY = settings.SENDGRID_API_KEY
 

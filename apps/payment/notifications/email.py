@@ -1,4 +1,5 @@
 from celery import shared_task
+from django.conf import settings
 from django.template.loader import render_to_string
 
 from apps.payment.dbapi.transaction import get_dispute
@@ -130,7 +131,8 @@ class SendPaymentCapturedEmail(object):
         }
         email_html = render_to_string("payment_captured.html", render_data)
         send_email(
-            (self.email),
-            f"New payment captured #{payment.payment_tracking_id}",
-            email_html,
+            from_name=settings.DEFAULT_FROM_EMAIL,
+            to_emails=(self.email),
+            subject=f"New payment captured #{payment.payment_tracking_id}",
+            content=email_html,
         )
