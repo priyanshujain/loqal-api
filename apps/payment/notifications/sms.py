@@ -26,7 +26,7 @@ class SendPaymentCapturedSMS(object):
             f"A new Loqal payment captured from {first_name} "
             f"{last_name}({consumer.username}).\n\n"
             f"Amount: {amount}\n"
-            f"Time: {date_initiated}"
+            f"Payment ID: {payment.payment_tracking_id}"
         )
         send_sms(
             body=sms_body,
