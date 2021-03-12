@@ -131,7 +131,7 @@ class SendPaymentCapturedEmail(object):
         }
         email_html = render_to_string("payment_captured.html", render_data)
         send_email(
-            from_name=settings.DEFAULT_FROM_EMAIL,
+            from_name=settings.EMAIL_SENDER_NAME,
             to_emails=(self.email),
             subject=f"New payment captured #{payment.payment_tracking_id}",
             content=email_html,
