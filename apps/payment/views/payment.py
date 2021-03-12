@@ -46,7 +46,7 @@ class CreatePaymentAPI(ConsumerAPIView):
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
         )
-        create_staff_payment_notification(
+        create_staff_payment_notification.delay(
             payment_id=merchant_payment.payment.id
         )
         SendNewPaymentNotification(
@@ -117,7 +117,7 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         payment_notification_data["tip_amount"] = str(
             payment_request.tip_amount
         )
-        create_staff_payment_notification(
+        create_staff_payment_notification.delay(
             payment_id=payment_request.payment.id
         )
         SendNewPaymentNotification(
