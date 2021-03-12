@@ -8,11 +8,7 @@ from apps.payment.dbapi import (get_consumer_payment_reqeust,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
-<<<<<<< HEAD
                                 get_recent_store_orders)
-=======
-                                get_recent_store_orders, payment, transaction)
->>>>>>> 3906a1157615cc30c4a85e2b010b3a10e1148a93
 from apps.payment.notifications import (SendApproveRequestNotification,
                                         SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
@@ -33,11 +29,8 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
-<<<<<<< HEAD
-from apps.reward.services import AllocateRewards
-=======
 from apps.payment.tasks import create_staff_payment_notification
->>>>>>> 3906a1157615cc30c4a85e2b010b3a10e1148a93
+from apps.reward.services import AllocateRewards
 
 
 class CreatePaymentAPI(ConsumerAPIView):
@@ -58,18 +51,15 @@ class CreatePaymentAPI(ConsumerAPIView):
         payment_notification_data["tip_amount"] = str(
             merchant_payment.tip_amount
         )
-<<<<<<< HEAD
         try:
             reward = AllocateRewards(payment=merchant_payment.payment).handle()
             if reward:
                 transaction_data["reward"] = reward
         except Exception:
             pass
-=======
         create_staff_payment_notification(
             payment_id=merchant_payment.payment.id
         )
->>>>>>> 3906a1157615cc30c4a85e2b010b3a10e1148a93
         SendNewPaymentNotification(
             merchant_id=merchant_payment.payment.order.merchant.id,
             data=payment_notification_data,

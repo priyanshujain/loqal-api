@@ -1,8 +1,8 @@
+from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from apps.reward.models import RewardUsage, RewardUsageItem
 from apps.reward.options import RewardValueType
-from django.db.models import Q
 
 
 def create_debit_reward_usage(total_amount, reward_value_type, order_id):
@@ -85,7 +85,10 @@ def create_cash_refund_usage_item(usage_id, cash_reward_id, amount):
 
 def get_all_reward_usage(merchant_id, consumer_id):
     return RewardUsageItem.objects.filter(
-        Q(usage__order__merchant_id=merchant_id, usage__order__consumer_id=consumer_id)
+        Q(
+            usage__order__merchant_id=merchant_id,
+            usage__order__consumer_id=consumer_id,
+        )
         | Q(
             cash_reward__consumer_id=consumer_id,
             usage__is_credit=True,

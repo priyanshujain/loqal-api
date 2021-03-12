@@ -2,21 +2,20 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
-from django.db.models.base import ModelStateFieldsCacheDescriptor
 from django.utils.crypto import get_random_string
-from rest_framework.serializers import ModelSerializer
 
 from apps.account.models import Account
 from apps.banking.models import BankAccount
-from apps.payment.options import (FACILITATION_FEES_CURRENCY, ChargeStatus,
-                                  DisputeReasonType, DisputeStatus,
+from apps.payment.options import (DisputeReasonType, DisputeStatus,
                                   DisputeType, PaymentStatus,
                                   TransactionEventType,
                                   TransactionFailureReasonType,
                                   TransactionReceiverStatus,
-                                  TransactionSenderStatus, TransactionStatus,
+                                  TransactionSenderStatus,
+                                  TransactionSourceTypes, TransactionStatus,
                                   TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
+from apps.reward.models import RewardUsage
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
@@ -36,12 +35,28 @@ class Transaction(AbstractBaseModel):
         on_delete=models.DO_NOTHING,
         related_name="sender_transactions",
         db_index=True,
+        blank=True,
+        null=True,
     )
     recipient_bank_account = models.ForeignKey(
         BankAccount,
         on_delete=models.DO_NOTHING,
         related_name="recipient_transactions",
         db_index=True,
+        blank=True,
+        null=True,
+    )
+    sender_source_type = ChoiceCharEnumField(
+        enum_type=TransactionSourceTypes,
+        max_length=64,
+        blank=True,
+        default=TransactionSourceTypes.BANK_ACCOUNT,
+    )
+    recipient_source_type = ChoiceCharEnumField(
+        enum_type=TransactionSourceTypes,
+        max_length=64,
+        blank=True,
+        default=TransactionSourceTypes.BANK_ACCOUNT,
     )
     sender_balance_at_checkout = models.DecimalField(
         max_digits=12,
@@ -57,6 +72,34 @@ class Transaction(AbstractBaseModel):
     )
     payment = models.ForeignKey(
         Payment,
+        blank=True,
+        null=True,
+        related_name="transactions",
+        on_delete=models.SET_NULL,
+    )
+    direct_merchant_payment = models.ForeignKey(
+        "payment.DirectMerchantPayment",
+        blank=True,
+        null=True,
+        related_name="transactions",
+        on_delete=models.SET_NULL,
+    )
+    payment_request = models.ForeignKey(
+        "payment.PaymentRequest",
+        blank=True,
+        null=True,
+        related_name="transactions",
+        on_delete=models.SET_NULL,
+    )
+    refund_payment = models.ForeignKey(
+        "payment.Refund",
+        blank=True,
+        null=True,
+        related_name="transactions",
+        on_delete=models.SET_NULL,
+    )
+    reward_usage = models.ForeignKey(
+        RewardUsage,
         blank=True,
         null=True,
         related_name="transactions",

@@ -7,18 +7,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('merchant', '0050_storeimage'),
+        ("merchant", "0050_storeimage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='featureaccessrole',
-            name='loyalty_program',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, default=list, size=None),
+            model_name="featureaccessrole",
+            name="loyalty_program",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                default=list,
+                size=None,
+            ),
         ),
         migrations.AddField(
-            model_name='featureaccessrole',
-            name='top_customers',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, default=list, size=None),
+            model_name="featureaccessrole",
+            name="top_customers",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                default=list,
+                size=None,
+            ),
         ),
     ]

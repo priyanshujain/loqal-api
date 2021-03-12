@@ -18,7 +18,9 @@ __all__ = (
 
 
 class CustomerDetailsResponse(serializers.ModelSerializer):
-    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    first_name = serializers.CharField(
+        source="user.first_name", read_only=True
+    )
     last_name = serializers.SerializerMethodField("get_last_name")
     loqal_id = serializers.CharField(source="username", read_only=True)
 
@@ -50,8 +52,12 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
-    transaction_status = serializers.CharField(source="status.label", read_only=True)
-    customer = CustomerDetailsResponse(source="payment.order.consumer", read_only=True)
+    transaction_status = serializers.CharField(
+        source="status.label", read_only=True
+    )
+    customer = CustomerDetailsResponse(
+        source="payment.order.consumer", read_only=True
+    )
     order_total_amount = serializers.CharField(
         source="payment.order.total_amount", read_only=True
     )
@@ -133,7 +139,9 @@ class TransactionPaymentResponse(serializers.ModelSerializer):
 
 
 class RefundResponse(serializers.ModelSerializer):
-    refund_type = serializers.CharField(source="refund_type.label", read_only=True)
+    refund_type = serializers.CharField(
+        source="refund_type.label", read_only=True
+    )
     status = serializers.CharField(source="status.label", read_only=True)
 
     class Meta:
@@ -147,7 +155,9 @@ class RefundResponse(serializers.ModelSerializer):
 
 
 class PaymentEventResponse(serializers.ModelSerializer):
-    event_type = serializers.CharField(source="event_type.label", read_only=True)
+    event_type = serializers.CharField(
+        source="event_type.label", read_only=True
+    )
 
     class Meta:
         model = PaymentEvent
@@ -162,8 +172,12 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
     refunds = RefundResponse(many=True, read_only=True)
     events = PaymentEventResponse(many=True, read_only=True)
     customer = CustomerDetailsResponse(source="order.consumer", read_only=True)
-    charge_status = serializers.CharField(source="charge_status.label", read_only=True)
-    payment_status = serializers.CharField(source="status.label", read_only=True)
+    charge_status = serializers.CharField(
+        source="charge_status.label", read_only=True
+    )
+    payment_status = serializers.CharField(
+        source="status.label", read_only=True
+    )
     order_total_amount = serializers.CharField(
         source="order.total_amount", read_only=True
     )
@@ -228,7 +242,9 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
 
 
 class PaymentListResponse(serializers.ModelSerializer):
-    charge_status = serializers.CharField(source="charge_status.label", read_only=True)
+    charge_status = serializers.CharField(
+        source="charge_status.label", read_only=True
+    )
     status = serializers.CharField(source="status.label", read_only=True)
     payment_process = serializers.CharField(
         source="payment_process.label", read_only=True

@@ -17,7 +17,7 @@ from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   PAYMENT_FACILITATION_FEES_PERCENTAGE,
                                   REFUND_FACILITATION_FEES_FIXED,
                                   REFUND_FACILITATION_FEES_PERCENTAGE,
-                                  TransactionType)
+                                  TransactionSourceTypes, TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
@@ -40,6 +40,9 @@ class CreatePayment(ServiceBase):
         total_amount,
         fee_bearer_account,
         amount_towards_order,
+        refund_payment_id=None,
+        payment_request_id=None,
+        direct_merchant_payment_id=None,
         transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     ):
         self.account_id = account_id
@@ -51,6 +54,9 @@ class CreatePayment(ServiceBase):
         self.fee_bearer_account = fee_bearer_account
         self.transaction_type = transaction_type
         self.amount_towards_order = amount_towards_order
+        self.refund_payment_id = refund_payment_id
+        self.payment_request_id = payment_request_id
+        self.direct_merchant_payment_id = direct_merchant_payment_id
 
     def handle(self):
         transaction = self._factory_transaction()
@@ -162,6 +168,7 @@ class CreatePayment(ServiceBase):
         payment = self.order.payment
         amount = self.total_amount
         fee_amount = self._calculate_fee_amount(amount)
+
         return create_transaction(
             sender_bank_account_id=self.sender_bank_account.id,
             recipient_bank_account_id=self.receiver_bank_account.id,
@@ -173,6 +180,11 @@ class CreatePayment(ServiceBase):
             payment_id=payment.id,
             customer_ip_address=self.ip_address,
             transaction_type=self.transaction_type,
+            sender_source_type=TransactionSourceTypes.BANK_ACCOUNT,
+            recipient_source_type=TransactionSourceTypes.BANK_ACCOUNT,
+            direct_merchant_payment_id=self.direct_merchant_payment_id,
+            refund_payment_id=self.refund_payment_id,
+            payment_request_id=self.payment_request_id,
         )
 
     def _calculate_fee_amount(self, amount):

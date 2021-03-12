@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("reward", "0010_auto_20210304_1653"),
-        ("payment", "0048_auto_20210302_1210"),
+        ("payment", "0048_merchantreceivelimit"),
     ]
 
     operations = [

@@ -5,7 +5,8 @@ Payments relted db operations.
 from decimal import Decimal
 
 from django.conf import settings
-from django.db.models import Count, Q, Sum
+from django.core.exceptions import NON_FIELD_ERRORS
+from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from apps.order.models import Order
@@ -13,8 +14,8 @@ from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
 from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
-                                  TransactionType)
-from utils.types import to_float
+                                  TransactionSourceTypes, TransactionType)
+from apps.provider.options import DEFAULT_CURRENCY
 
 
 def create_payment_register(account_id):
@@ -45,15 +46,21 @@ def create_payment(
 
 
 def create_transaction(
-    sender_bank_account_id,
-    recipient_bank_account_id,
-    amount,
-    currency,
-    fee_bearer_account_id,
-    fee_amount,
-    fee_currency,
-    payment_id,
     customer_ip_address,
+    sender_bank_account_id=None,
+    recipient_bank_account_id=None,
+    amount=Decimal(0.0),
+    currency=DEFAULT_CURRENCY,
+    fee_bearer_account_id=None,
+    fee_amount=Decimal(0.0),
+    fee_currency=DEFAULT_CURRENCY,
+    payment_id=None,
+    sender_source_type=TransactionSourceTypes.NA,
+    recipient_source_type=TransactionSourceTypes.NA,
+    refund_payment_id=None,
+    direct_merchant_payment_id=None,
+    payment_request_id=None,
+    reward_usage_id=None,
     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     min_access_balance_required=Decimal(
         settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
@@ -75,6 +82,12 @@ def create_transaction(
             customer_ip_address=customer_ip_address,
             transaction_type=transaction_type,
             min_access_balance_required=min_access_balance_required,
+            sender_source_type=sender_source_type,
+            recipient_source_type=recipient_source_type,
+            refund_payment_id=refund_payment_id,
+            direct_merchant_payment_id=direct_merchant_payment_id,
+            payment_request_id=payment_request_id,
+            reward_usage_id=reward_usage_id,
         )
     except IntegrityError:
         return None

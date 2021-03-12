@@ -66,6 +66,7 @@ class DirectMerchantPayment(ServiceBase):
             amount_towards_order=order.total_net_amount,
             fee_bearer_account=merhcant_account.account,
             transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+            direct_merchant_payment_id=merchant_payment.id,
         ).handle()
         capture_payment_event(
             payment_id=transaction.payment.id,

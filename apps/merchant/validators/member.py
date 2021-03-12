@@ -9,6 +9,9 @@ __all__ = (
     "UpdateMemberRoleValidator",
     "DisableMemberValidator",
     "EditMemberProfileValidator",
+    "CreateFeatureAccessRoleValidator",
+    "UpdateFeatureAccessRoleValidator",
+    "DeleteFeatureAccessRoleValidator",
 )
 
 
@@ -146,3 +149,15 @@ class EditMemberProfileValidator(serializers.ValidationSerializer):
     last_name = serializers.CharField(max_length=64)
     position = serializers.CharField(max_length=64)
     phone_number = serializers.CharField(max_length=10)
+
+
+class CreateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
+    role_name = serializers.CharField(max_length=256)
+
+
+class UpdateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
+    role_id = serializers.IntegerField()
+
+
+class DeleteFeatureAccessRoleValidator(serializers.ValidationSerializer):
+    role_id = serializers.IntegerField()

@@ -54,7 +54,7 @@ class PaymentRequest(AbstractBaseModel):
         Transaction,
         blank=True,
         null=True,
-        related_name="payment_request",
+        related_name="related_payment_request",
         on_delete=models.CASCADE,
     )
 

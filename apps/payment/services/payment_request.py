@@ -13,11 +13,8 @@ from apps.order.dbapi import create_payment_request_order
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_payment, create_payment_request,
-<<<<<<< HEAD
                                 create_zero_transaction,
-=======
                                 get_merchant_receive_limit,
->>>>>>> 3906a1157615cc30c4a85e2b010b3a10e1148a93
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (cancelled_payment_event,
                                        capture_payment_event,
@@ -222,6 +219,7 @@ class ApprovePaymentRequest(ServiceBase):
                 amount_towards_order=order.total_net_amount,
                 fee_bearer_account=merchant_account.account,
                 transaction_type=TransactionType.PAYMENT_REQUEST,
+                payment_request_id=payment_request.id,
             ).handle()
         except Exception as error:
             is_save = False

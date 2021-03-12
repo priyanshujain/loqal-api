@@ -1,13 +1,9 @@
-from api import serializers
-from apps.reward.models import (
-    CashReward,
-    LoyaltyProgram,
-    RewardUsage,
-    RewardUsageItem,
-    VoucherReward,
-)
-from apps.payment.options import PaymentProcess
 from decimal import Decimal
+
+from api import serializers
+from apps.payment.options import PaymentProcess
+from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
+                                RewardUsageItem, VoucherReward)
 
 
 class CashRewardResponse(serializers.ModelSerializer):
@@ -42,7 +38,9 @@ class RewardUsageItemResponse(serializers.ModelSerializer):
         "get_transaction_tracking_id"
     )
     order_id = serializers.CharField(source="usage.order.u_id", read_only=True)
-    is_credit = serializers.BooleanField(source="usage.is_credit", read_only=True)
+    is_credit = serializers.BooleanField(
+        source="usage.is_credit", read_only=True
+    )
 
     class Meta:
         model = RewardUsageItem

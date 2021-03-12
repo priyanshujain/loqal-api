@@ -21,6 +21,13 @@ class TransactionType(ChoiceCharEnum):
     OTHER = "other", _("Other")
 
 
+class TransactionSourceTypes(ChoiceCharEnum):
+    CASH_WALLET = "cash_wallet", _("Cash Wallet")
+    REWARD_CASHBACK = "reward_cashback", _("Reward Cashback")
+    BANK_ACCOUNT = "bank_account", _("Bank Account")
+    NA = "na", _("NA")
+
+
 class TransactionFailureReasonType(ChoiceCharEnum):
     TRANSACTION_DAILY_LIMIT_EXCEEDED = "transaction_daily_limit_exceeded", _(
         "Transaction daily limit exceeded"

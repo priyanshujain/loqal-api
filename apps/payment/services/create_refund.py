@@ -60,6 +60,7 @@ class CreateRefund(ServiceBase):
                     amount_towards_order=refund_payment.amount,
                     fee_bearer_account=self.merchant_account.account,
                     transaction_type=TransactionType.REFUND_PAYMENT,
+                    refund_payment_id=refund_payment.id,
                 ).handle()
                 refund_payment.add_transaction(transaction=transaction)
             except ValidationError as error:
