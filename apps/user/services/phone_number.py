@@ -45,7 +45,11 @@ class AddPhoneNumber(ServiceBase):
         data = self._validate_data(data=data)
 
         phone_number = data["phone_number"]
-        self.user.add_phone_number(phone_number=phone_number)
+        phone_number_country = data.get("phone_number_country", "US")
+        self.user.add_phone_number(
+            phone_number=phone_number,
+            phone_number_country=phone_number_country,
+        )
         EnrollSmsAuthenticator(
             request=self.request, user=self.user, data=data
         ).send_otp()

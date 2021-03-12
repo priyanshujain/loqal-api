@@ -15,6 +15,15 @@ logger = logging.getLogger("")
 
 @shared_task
 def send_email(from_name, to_emails, subject, content, **kwargs):
+    if settings.APP_ENV == "local":
+        h = html2text.HTML2Text()
+        print("###################### EMAIL START ########################")
+        print("TO: ", to_emails)
+        print("SUBJECT: ", subject)
+        print("CONTENT: ", h.handle(content))
+        print("###################### EMAIL END ##########################")
+        return
+
     DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
     SENDGRID_API_KEY = settings.SENDGRID_API_KEY
 

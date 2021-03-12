@@ -1,15 +1,11 @@
-import uuid
-from re import I, T
-
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
-from rest_framework.fields import ModelField
 
 from apps.account.options import (AccountCerficationStatus,
                                   ConsumerAccountStatus, DwollaCustomerStatus,
                                   DwollaCustomerVerificationStatus)
 from apps.box.models import BoxFile
-from apps.user.models import User
 from db.models.abstract import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 from utils.shortcuts import generate_uuid_hex
@@ -114,7 +110,9 @@ class ConsumerAccount(AbstractBaseModel):
         Account, related_name="consumer", on_delete=models.CASCADE
     )
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="consumer_account"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="consumer_account",
     )
     username = models.CharField(
         max_length=32, default=None, null=True, unique=True
@@ -177,7 +175,9 @@ class PaymentAccountOpeningConsent(BaseModel):
     account = models.ForeignKey(
         Account, on_delete=models.DO_NOTHING, editable=False
     )
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, editable=False
+    )
     user_agent = models.TextField(editable=False)
     ip_address = models.GenericIPAddressField(editable=False)
     consent_timestamp = models.BigIntegerField(editable=False)

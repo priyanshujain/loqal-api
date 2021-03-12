@@ -119,8 +119,9 @@ class User(BaseModel, AbstractBaseUser):
         self.email_verification_token_expire_time = now() + timedelta(days=7)
         self.save()
 
-    def add_phone_number(self, phone_number):
+    def add_phone_number(self, phone_number, phone_number_country="US"):
         self.phone_number = phone_number
+        self.phone_number_country = phone_number_country
         self.save()
 
     def verify_phone_number(self):

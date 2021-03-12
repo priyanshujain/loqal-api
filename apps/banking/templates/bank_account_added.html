@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block message %}
+Hi,
+<p>
+    Your bank account has been linked to your Loqal account. <br /> <br />
+    
+    <b>Bank Name</b>: {{ source }} <br />
+    <b>Account Number Ending With</b>: {{ account_number }} <br />
+    <b>Date</b>: {{ date }}
+
+</p>
+
+{% endblock %}
