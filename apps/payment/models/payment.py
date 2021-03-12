@@ -5,9 +5,14 @@ from django.db import models
 from django.utils.crypto import get_random_string
 
 from apps.order.models import Order
-from apps.payment.options import (ChargeStatus, PaymentEventType,
-                                  PaymentMethodType, PaymentProcess,
-                                  PaymentStatus)
+from apps.payment.options import (
+    ChargeStatus,
+    PaymentEventType,
+    PaymentMethodType,
+    PaymentProcess,
+    PaymentStatus,
+    TransactionTransferTypes,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -142,6 +147,11 @@ class PaymentEvent(AbstractBaseModel):
         on_delete=models.CASCADE,
     )
     event_type = ChoiceEnumField(enum_type=PaymentEventType)
+    transfer_type = ChoiceCharEnumField(
+        enum_type=TransactionTransferTypes,
+        max_length=64,
+        default=TransactionTransferTypes.ACH_BANK_TRANSFER,
+    )
     parameters = models.JSONField(blank=True, default=dict)
 
     class Meta:

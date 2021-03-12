@@ -98,11 +98,11 @@ class Transaction(AbstractBaseModel):
         related_name="transactions",
         on_delete=models.SET_NULL,
     )
-    reward_usage = models.ForeignKey(
+    reward_usage = models.OneToOneField(
         RewardUsage,
         blank=True,
         null=True,
-        related_name="transactions",
+        related_name="transaction",
         on_delete=models.SET_NULL,
     )
     customer_ip_address = models.GenericIPAddressField(blank=True, null=True)

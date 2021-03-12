@@ -7,10 +7,11 @@ from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.order.services import CheckReturnRewardCreditAmount
 from apps.payment.dbapi import (create_refund_payment, create_zero_transaction,
+                                create_transaction,
                                 get_merchant_payment)
 from apps.payment.dbapi.events import (full_refund_payment_event,
                                        partial_refund_payment_event)
-from apps.payment.options import RefundType, TransactionType
+from apps.payment.options import (RefundType, TransactionTransferTypes, TransactionType, TransactionSourceTypes)
 from apps.payment.validators import CreateRefundValidator
 from apps.reward.services import ReturnRewards
 
@@ -33,11 +34,13 @@ class CreateRefund(ServiceBase):
         return_reward_credit = CheckReturnRewardCreditAmount(
             order=order, amount=amount
         ).handle()
+        reward_usage = None
         return_reward_value = Decimal(0.0)
         reclaim_reward_value = Decimal(0.0)
         if return_reward_credit:
             return_reward_value = return_reward_credit["return_reward_value"]
             reclaim_reward_value = return_reward_credit["reclaim_reward_value"]
+            reward_usage = return_reward_credit["reward_usage"]
         refund_payment = self._factory_refund_payment(
             order=order,
             amount=amount,
@@ -45,7 +48,7 @@ class CreateRefund(ServiceBase):
             reclaim_reward_value=reclaim_reward_value,
         )
 
-        transaction = None
+        bank_transaction = None
         if refund_payment.amount > Decimal(0.0):
             try:
                 transaction = CreatePayment(
@@ -62,7 +65,16 @@ class CreateRefund(ServiceBase):
                     transaction_type=TransactionType.REFUND_PAYMENT,
                     refund_payment_id=refund_payment.id,
                 ).handle()
-                refund_payment.add_transaction(transaction=transaction)
+                bank_transaction = transaction
+                if refund_payment.refund_type == RefundType.PARTIAL:
+                    partial_refund_payment_event(
+                        payment_id=refund_payment.payment.id,
+                        refund_tracking_id=refund_payment.refund_tracking_id,
+                        transaction_tracking_id=bank_transaction.transaction_tracking_id,
+                        amount=refund_payment.amount,
+                        transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
+                    )
+                
             except ValidationError as error:
                 try:
                     transaction = error.transaction
@@ -70,45 +82,52 @@ class CreateRefund(ServiceBase):
                 except AttributeError:
                     refund_payment.set_refund_failed()
                 raise error
-            else:
-                transaction = create_zero_transaction(
-                    customer_ip_address=self.ip_address,
-                    sender_bank_account=payment_data["sender_bank_account"],
-                    recipient_bank_account=payment_data[
-                        "receiver_bank_account"
+            
+            if return_reward_value > Decimal(0.0):
+                reward_credit = ReturnRewards(
+                    return_reward_value=return_reward_credit[
+                        "return_reward_value"
                     ],
-                    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
-                    payment_id=refund_payment.payment.id,
-                )
-                refund_payment.add_transaction(transaction=transaction)
+                    updated_reward_value=return_reward_credit[
+                        "updated_reward_value"
+                    ],
+                    reclaim_reward_value=return_reward_credit[
+                        "reclaim_reward_value"
+                    ],
+                    reward_usage=return_reward_credit["reward_usage"],
+                ).handle()
+                if reward_credit:
+                    refund_payment.add_reward_credit(reward_credit=reward_credit)
+                if reward_credit:
+                    transaction = create_transaction(
+                        transaction_type=TransactionType.REFUND_PAYMENT,
+                        payment_id=refund_payment.payment.id,
+                        amount=return_reward_value,
+                        fee_bearer_account_id=self.merchant_account.account.id,
+                        customer_ip_address=self.ip_address,
+                        recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
+                        sender_source_type=TransactionSourceTypes.NA,
+                        refund_payment_id=refund_payment.id,
+                        reward_usage_id=reward_credit.id,
+                        is_success=True,
+                    )
+                    partial_refund_payment_event(
+                        payment_id=refund_payment.payment.id,
+                        refund_tracking_id=refund_payment.refund_tracking_id,
+                        transaction_tracking_id=transaction.transaction_tracking_id,
+                        amount=return_reward_value,
+                        transfer_type=TransactionTransferTypes.CASHBACK,
+                    )
 
-        if refund_payment.refund_type == RefundType.PARTIAL:
-            partial_refund_payment_event(
-                payment_id=refund_payment.payment.id,
-                refund_tracking_id=refund_payment.refund_tracking_id,
-                amount=amount,
-            )
-        if refund_payment.refund_type == RefundType.FULL:
+        if refund_payment.refund_type == RefundType.FULL and bank_transaction != None:
             full_refund_payment_event(
                 payment_id=refund_payment.payment.id,
                 refund_tracking_id=refund_payment.refund_tracking_id,
+                transaction_tracking_id=bank_transaction.transaction_tracking_id,
+                amount=refund_payment.amount,
+                transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
             )
-
-        if return_reward_credit:
-            reward_credit = ReturnRewards(
-                return_reward_value=return_reward_credit[
-                    "return_reward_value"
-                ],
-                updated_reward_value=return_reward_credit[
-                    "updated_reward_value"
-                ],
-                reclaim_reward_value=return_reward_credit[
-                    "reclaim_reward_value"
-                ],
-                reward_usage=return_reward_credit["reward_usage"],
-            ).handle()
-            if reward_credit:
-                refund_payment.add_reward_credit(reward_credit=reward_credit)
+            
         return refund_payment
 
     def _validate_data(self):

@@ -65,6 +65,7 @@ def create_transaction(
     min_access_balance_required=Decimal(
         settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
     ),
+    is_success=False,
 ):
     """
     dbapi for creating new transaction.
@@ -88,6 +89,7 @@ def create_transaction(
             direct_merchant_payment_id=direct_merchant_payment_id,
             payment_request_id=payment_request_id,
             reward_usage_id=reward_usage_id,
+            is_success=is_success,
         )
     except IntegrityError:
         return None

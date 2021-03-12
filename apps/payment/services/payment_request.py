@@ -5,30 +5,46 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import (get_consumer_account_by_phone_number,
-                                get_consumer_account_by_username)
+from apps.account.dbapi import (
+    get_consumer_account_by_phone_number,
+    get_consumer_account_by_username,
+)
 from apps.banking.dbapi import get_bank_account
 from apps.merchant.services import InviteConsumerBySMS
-from apps.order.dbapi import create_payment_request_order
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
-from apps.payment.dbapi import (create_payment, create_payment_request,
-                                create_zero_transaction,
-                                get_merchant_receive_limit,
-                                get_payment_reqeust_by_uid)
-from apps.payment.dbapi.events import (cancelled_payment_event,
-                                       capture_payment_event,
-                                       failed_payment_event,
-                                       initiate_payment_event)
-from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
-                                  TransactionType)
-from apps.payment.validators import (ApprovePaymentRequestValidator,
-                                     CreatePaymentRequestValidator,
-                                     RejectPaymentRequestValidator)
+from apps.payment.dbapi import (
+    create_payment,
+    create_payment_request,
+    create_transaction,
+    get_merchant_receive_limit,
+    get_payment_reqeust_by_uid,
+)
+from apps.payment.dbapi.events import (
+    capture_payment_event,
+    failed_payment_event,
+    initiate_payment_event,
+    failure_partial_return_event,
+)
+from apps.payment.options import (
+    PaymentProcess,
+    PaymentRequestStatus,
+    TransactionTransferTypes,
+    TransactionType,
+    TransactionSourceTypes,
+)
+from apps.payment.validators import (
+    ApprovePaymentRequestValidator,
+    CreatePaymentRequestValidator,
+    RejectPaymentRequestValidator,
+)
 from apps.provider.options import DEFAULT_CURRENCY
 
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
+from apps.reward.options import RewardValueType
+from apps.reward.services import FullReturnRewards
+
 
 __all__ = (
     "CreatePaymentRequest",
@@ -58,9 +74,7 @@ class CreatePaymentRequest(ServiceBase):
                 phone_number=phone_number
             )
         else:
-            consumer_account = get_consumer_account_by_username(
-                username=loqal_id
-            )
+            consumer_account = get_consumer_account_by_username(username=loqal_id)
 
         bank_account = get_bank_account(account_id=self.account_id)
         if not bank_account:
@@ -76,9 +90,7 @@ class CreatePaymentRequest(ServiceBase):
         try:
             merchant_account = bank_account.account.merchant
         except AttributeError:
-            raise ValidationError(
-                {"detail": ErrorDetail(_("Invalid account."))}
-            )
+            raise ValidationError({"detail": ErrorDetail(_("Invalid account."))})
 
         if not consumer_account:
             if is_phone_number_based:
@@ -179,75 +191,95 @@ class ApprovePaymentRequest(ServiceBase):
             receiver_account_id=merchant_account.account.id,
         ).validate()
 
-        order = CreateOrder(
+        order, reward_usage = CreateOrder(
             consumer_id=consumer_account.id,
             merchant_id=merchant_account.id,
             amount=payment_request.amount,
             order_type=OrderType.ONLINE,
         ).handle()
-        total_amount = order.total_net_amount + data["tip_amount"]
+
+        applied_cashback_amount = Decimal(0.0)
+        if reward_usage:
+            if reward_usage.reward_value_type == RewardValueType.FIXED_AMOUNT:
+                applied_cashback_amount = reward_usage.total_amount
+
+        total_payable_amount = (
+            order.total_net_amount - applied_cashback_amount + data["tip_amount"]
+        )
         payment = create_payment(
             order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
         )
-        payment_request.add_payment(payment)
-        if total_amount == Decimal(0.0):
-            payment_request.payment.process_zero_payment()
-            capture_payment_event(
-                payment_id=payment_request.payment.id,
-                transaction_tracking_id=None,
-            )
-            transaction = create_zero_transaction(
-                customer_ip_address=self.ip_address,
-                sender_bank_account=banking_data["sender_bank_account"],
-                recipient_bank_account=banking_data["receiver_bank_account"],
-                transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
-                payment_id=payment_request.payment.id,
-            )
-            payment_request.add_transaction(
-                transaction=transaction, tip_amount=data["tip_amount"]
-            )
-            return payment_request
+        initiate_payment_event(payment_id=payment.id)
+        payment_request.add_payment(payment=payment, tip_amount=data["tip_amount"])
 
-        try:
-            transaction = CreatePayment(
-                account_id=self.account_id,
-                ip_address=self.ip_address,
-                sender_bank_account=banking_data["sender_bank_account"],
-                receiver_bank_account=banking_data["receiver_bank_account"],
-                order=payment_request.payment.order,
-                total_amount=total_amount,
-                amount_towards_order=order.total_net_amount,
-                fee_bearer_account=merchant_account.account,
-                transaction_type=TransactionType.PAYMENT_REQUEST,
-                payment_request_id=payment_request.id,
-            ).handle()
-        except Exception as error:
-            is_save = False
-            transaction_tracking_id = None
-            payment_request.set_failed(save=False)
+        if total_payable_amount > Decimal(0.0):
             try:
-                transaction = error.transaction
-                payment_request.add_transaction(
-                    transaction=transaction, tip_amount=data["tip_amount"]
+                transaction = CreatePayment(
+                    account_id=self.account_id,
+                    ip_address=self.ip_address,
+                    sender_bank_account=banking_data["sender_bank_account"],
+                    receiver_bank_account=banking_data["receiver_bank_account"],
+                    order=payment_request.payment.order,
+                    total_amount=total_payable_amount,
+                    amount_towards_order=(total_payable_amount - data["tip_amount"]),
+                    fee_bearer_account=merchant_account.account,
+                    transaction_type=TransactionType.PAYMENT_REQUEST,
+                    payment_request_id=payment_request.id,
+                ).handle()
+                capture_payment_event(
+                    payment_id=transaction.payment.id,
+                    transaction_tracking_id=transaction.transaction_tracking_id,
                 )
-                transaction_tracking_id = transaction.transaction_tracking_id
-                is_save = True
-            except AttributeError:
-                pass
-            if not is_save:
-                payment_request.save()
-            failed_payment_event(
-                payment_id=payment_request.payment.id,
-                transaction_tracking_id=transaction_tracking_id,
-            )
-            raise error
-        capture_payment_event(
-            payment_id=transaction.payment.id,
-            transaction_tracking_id=transaction.transaction_tracking_id,
-        )
-        payment_request.add_transaction(
-            transaction=transaction, tip_amount=data["tip_amount"]
-        )
+                payment_request.set_accepted()
+            except Exception as error:
+                transaction_tracking_id = None
+                payment_request.set_failed()
+                try:
+                    transaction = error.transaction
+                    transaction_tracking_id = transaction.transaction_tracking_id
+                except AttributeError:
+                    pass
+                failed_payment_event(
+                    payment_id=payment_request.payment.id,
+                    transaction_tracking_id=transaction_tracking_id,
+                    amount=total_payable_amount,
+                    transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
+                )
+                if reward_usage:
+                    FullReturnRewards(reward_usage=reward_usage).handle()
+                    if applied_cashback_amount:
+                        failure_partial_return_event(
+                            payment_id=payment_request.payment.id,
+                            transaction_tracking_id=None,
+                            amount=applied_cashback_amount,
+                            transfer_type=TransactionTransferTypes.CASHBACK,
+                        )
+                raise error
+
+            if applied_cashback_amount > Decimal(0.0):
+                transaction = create_transaction(
+                    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+                    payment_id=payment_request.payment.id,
+                    amount=applied_cashback_amount,
+                    fee_bearer_account_id=payment_request.account.id,
+                    customer_ip_address=self.ip_address,
+                    sender_source_type=TransactionSourceTypes.REWARD_CASHBACK,
+                    recipient_source_type=TransactionSourceTypes.NA,
+                    payment_request_id=payment_request.id,
+                    reward_usage_id=reward_usage.id,
+                    is_success=True,
+                )
+                payment_request.payment.capture_payment(
+                    amount=applied_cashback_amount,
+                    amount_towards_order=applied_cashback_amount,
+                )
+                capture_payment_event(
+                    payment_id=payment_request.payment.id,
+                    transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=applied_cashback_amount,
+                    transfer_type=TransactionTransferTypes.CASHBACK,
+                )
+
         return payment_request
 
     def _validate_data(self):
@@ -273,11 +305,7 @@ class ApprovePaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Given payment request is no longer valid.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
             )
         data["payment_request"] = payment_request
         return data
@@ -295,7 +323,6 @@ class RejectPaymentRequest(ServiceBase):
     def handle(self):
         payment_request = self._validate_data()
         payment_request.reject()
-        cancelled_payment_event(payment_id=payment_request.payment.id)
         return payment_request
 
     def _validate_data(self):
@@ -321,10 +348,6 @@ class RejectPaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {
-                    "detail": ErrorDetail(
-                        _("Given payment request is no longer valid.")
-                    )
-                }
+                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
             )
         return payment_request

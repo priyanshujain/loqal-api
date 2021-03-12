@@ -7,6 +7,8 @@ from db.models import AbstractBaseModel
 from .payment import Payment
 from .qrcode import PaymentQrCode
 from .transaction import Transaction
+from db.models.fields import ChoiceEnumField
+from apps.payment.options import DirectMerchantPaymentStatus
 
 __all__ = ("DirectMerchantPayment",)
 
@@ -45,11 +47,20 @@ class DirectMerchantPayment(AbstractBaseModel):
         related_name="direct_merchant_payments",
         on_delete=models.CASCADE,
     )
+    status = ChoiceEnumField(
+        enum_type=DirectMerchantPaymentStatus,
+        default=DirectMerchantPaymentStatus.SUCCESS,
+    )
 
     class Meta:
         db_table = "direct_merchant_payment"
 
     def add_transaction(self, transaction, save=True):
         self.transaction = transaction
+        if save:
+            self.save()
+
+    def set_failed(self, save=True):
+        self.status = DirectMerchantPaymentStatus.FAILED
         if save:
             self.save()

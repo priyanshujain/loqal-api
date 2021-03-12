@@ -16,6 +16,7 @@ __all__ = (
     "get_consumer_dispute_by_transaction",
     "get_sender_pending_total",
     "create_zero_transaction",
+    "create_empty_transactions",
 )
 
 
@@ -108,3 +109,11 @@ def create_zero_transaction(
         )
     except IntegrityError:
         return None
+
+
+def create_empty_transactions(
+):
+    """
+    dbapi for creating empty transaction qs.
+    """
+    return Transaction.objects.none()

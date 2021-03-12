@@ -17,7 +17,7 @@ from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   PAYMENT_FACILITATION_FEES_PERCENTAGE,
                                   REFUND_FACILITATION_FEES_FIXED,
                                   REFUND_FACILITATION_FEES_PERCENTAGE,
-                                  TransactionSourceTypes, TransactionType)
+                                  TransactionSourceTypes, TransactionTransferTypes, TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
@@ -135,7 +135,9 @@ class CreatePayment(ServiceBase):
         else:
             failed_refund_payment_event(
                 payment_id=transaction.payment.id,
+                amount=self.total_amount,
                 transaction_tracking_id=transaction.transaction_tracking_id,
+                transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
             )
         try:
             error.transaction = transaction

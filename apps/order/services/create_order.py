@@ -29,7 +29,7 @@ class CreateOrder(ServiceBase):
             consumer_id=self.consumer_id, merchant_id=self.merchant_id
         ).handle()
         if not reward:
-            return self._factory_order()
+            return self._factory_order(), None
 
         if reward["type"] == RewardValueType.FIXED_AMOUNT:
             redeemable_reward_amount = Decimal(0.0)
@@ -65,11 +65,6 @@ class CreateOrder(ServiceBase):
             reward_value_type=RewardValueType.FIXED_AMOUNT,
             order_id=order.id,
         )
-        order.update_discount(
-            amount=redeemable_reward_amount,
-            name=f"Rewards cashback",
-            discount_type=DiscountType.FIXED_AMOUNT,
-        )
         redeemed_amount = 0
         for cash_reward in cash_rewards:
             total_cash_available = cash_reward.available_value
@@ -99,7 +94,7 @@ class CreateOrder(ServiceBase):
             cash_reward.update_usage(used_amount=usage_item.amount)
             if redeemable_reward_amount != total_cash_available:
                 break
-        return order
+        return order, reward_usage
 
     def _factory_voucher_reward_order(self, redeemable_reward_amount, voucher):
         order = self._factory_order()
@@ -127,7 +122,7 @@ class CreateOrder(ServiceBase):
             voucher_reward=voucher,
         )
         voucher.update_usage()
-        return order
+        return order, reward_usage
 
     def _factory_order(self):
         return create_base_order(

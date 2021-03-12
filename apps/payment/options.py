@@ -28,6 +28,11 @@ class TransactionSourceTypes(ChoiceCharEnum):
     NA = "na", _("NA")
 
 
+class TransactionTransferTypes(ChoiceCharEnum):
+    CASHBACK = "cashback", _("Cashback")
+    ACH_BANK_TRANSFER = "ach_bank_transfer", _("ACH Bank Transfer")
+
+
 class TransactionFailureReasonType(ChoiceCharEnum):
     TRANSACTION_DAILY_LIMIT_EXCEEDED = "transaction_daily_limit_exceeded", _(
         "Transaction daily limit exceeded"
@@ -332,6 +337,7 @@ class PaymentEventType(ChoiceEnum):
     PAYMENT_DISPUTED = 5, _("Payment Disputed")
     REFUND_FAILED = 6, _("Refund Failed")
     PAYMENT_CANCELLED = 7, _("Payment Cancelled")
+    PARTIAL_FAILURE_RETURN = 8, _("Partial return due to failure")
 
 
 class PaymentRequestStatus(ChoiceEnum):
@@ -339,6 +345,11 @@ class PaymentRequestStatus(ChoiceEnum):
     ACCEPTED = 1, _("Request Accepted")
     REJECTED = 2, _("Request Rejected")
     FAILED = 3, _("Refund Failed")
+
+
+class DirectMerchantPaymentStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    FAILED = 1, _("Failed")
 
 
 class RefundType(ChoiceCharEnum):

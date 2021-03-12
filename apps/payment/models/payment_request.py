@@ -77,12 +77,18 @@ class PaymentRequest(AbstractBaseModel):
         if save:
             self.save()
 
-    def add_payment(self, payment, save=True):
+    def add_payment(self, payment, tip_amount, save=True):
         self.payment = payment
+        self.tip_amount = tip_amount
         if save:
             self.save()
 
     def set_failed(self, save=True):
         self.status = PaymentRequestStatus.FAILED
+        if save:
+            self.save()
+    
+    def set_accepted(self, save=True):
+        self.status = PaymentRequestStatus.ACCEPTED
         if save:
             self.save()
