@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase
+from api.views import merchant
 from apps.account.dbapi import (create_merchant_account,
                                 get_consumer_account_by_email)
 from apps.account.notifications import SendMerchantAccountVerifyEmail
@@ -9,7 +10,8 @@ from apps.merchant.constants import DEFAULT_ROLE
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
 from apps.merchant.models.member import FeatureAccessRole
-from apps.payment.dbapi import create_payment_register
+from apps.payment.dbapi import (create_merchant_receive_limit,
+                                create_payment_register)
 from apps.user.dbapi import create_user, get_merchant_user_by_email
 from apps.user.options import CustomerTypes
 
@@ -85,11 +87,15 @@ class CreateMerchantAccount(ServiceBase):
             sub_category=self._sub_category,
             phone_number=self._contact_number,
         )
-        self._factory_payment_register(account_id=merchant_account.account.id)
+        self._factory_payment_register(
+            account_id=merchant_account.account.id,
+            merchant_id=merchant_account.id,
+        )
         return merchant_account
 
-    def _factory_payment_register(self, account_id):
+    def _factory_payment_register(self, account_id, merchant_id):
         create_payment_register(account_id=account_id)
+        create_merchant_receive_limit(merchant_id=merchant_id)
 
     def _factory_user(self):
         return create_user(

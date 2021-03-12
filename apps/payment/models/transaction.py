@@ -252,22 +252,32 @@ class Transaction(AbstractBaseModel):
         if save:
             self.save()
 
-    def set_daily_limit_exceeded(self, save=True):
+    def set_daily_limit_exceeded(self, message, save=True):
         self.is_sender_failure = True
         self.failure_reason_type = (
             TransactionFailureReasonType.TRANSACTION_DAILY_LIMIT_EXCEEDED
         )
-        self.failure_reason_message = "You have reached the Loqal payment limit($5000/week). Please try again after 24 hours."
+        self.failure_reason_message = message
         self.set_payment_failed()
         if save:
             self.save()
 
-    def set_weekly_limit_exceeded(self, save=True):
+    def set_merchant_receive_limit_exceeded(self, message, save=True):
+        self.is_sender_failure = True
+        self.failure_reason_type = (
+            TransactionFailureReasonType.MERCHANT_RECEIVE_LIMIT_EXCEEDED
+        )
+        self.failure_reason_message = message
+        self.set_payment_failed()
+        if save:
+            self.save()
+
+    def set_weekly_limit_exceeded(self, message, save=True):
         self.is_sender_failure = True
         self.failure_reason_type = (
             TransactionFailureReasonType.TRANSACTION_WEEKLY_LIMIT_EXCEEDED
         )
-        self.failure_reason_message = "You have reached the Loqal payment limit($5000/week). Please try again after 24 hours."
+        self.failure_reason_message = message
         self.set_payment_failed()
         if save:
             self.save()

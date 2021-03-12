@@ -23,18 +23,21 @@ class TransactionType(ChoiceCharEnum):
 
 class TransactionFailureReasonType(ChoiceCharEnum):
     TRANSACTION_DAILY_LIMIT_EXCEEDED = "transaction_daily_limit_exceeded", _(
-        "Transaction daily limit exceeded."
+        "Transaction daily limit exceeded"
     )
     TRANSACTION_WEEKLY_LIMIT_EXCEEDED = "transaction_weekly_limit_exceeded", _(
-        "Transaction weekly limit exceeded."
+        "Transaction weekly limit exceeded"
+    )
+    MERCHANT_RECEIVE_LIMIT_EXCEEDED = "merchant_receive_limit_exceeded", _(
+        "Merchant transaction size limit exceeded"
     )
     BALANCE_CHECK_FAILED = "balance_check_failed", _("Balance check failed.")
     INSUFFICIENT_BALANCE = "insufficient_balance", _("Insufficient Balance.")
     PROVIDER_PAYMENT_SERVICE_FAILED = "provider_payment_service_failed", _(
-        "Provider payment service failed."
+        "Provider payment service failed"
     )
     INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
-        "Internal payment service failed."
+        "Internal payment service failed"
     )
     PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", (
         "Pre transfer ACH return on source bank."

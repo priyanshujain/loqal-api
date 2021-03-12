@@ -1,0 +1,6 @@
+from api import serializers
+
+
+class PhoneNumberValidator(serializers.ValidationSerializer):
+    # Add a phone_number validator
+    phone_number = serializers.CharField(max_length=10)

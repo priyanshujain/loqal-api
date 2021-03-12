@@ -1,8 +1,9 @@
 from celery import shared_task
+from django.conf import settings
 from django.template.loader import render_to_string
 
 from apps.payment.dbapi.transaction import get_dispute
-from utils.email import send_email_async
+from utils.email import send_email, send_email_async
 
 
 class SendPaymentInitiatedEmail(object):
@@ -100,3 +101,38 @@ class CreateDisputeConsumerEmail(object):
 def send_dispute_email(dispute_id):
     dispute = get_dispute(dispute_id=dispute_id)
     CreateDisputeConsumerEmail(dispute=dispute).send()
+
+
+class SendPaymentCapturedEmail(object):
+    def __init__(self, payment, email):
+        self.consumer = payment.order.consumer
+        self.payment = payment
+        self.email = email
+
+    def send(self):
+        self._send_email()
+
+    def _send_email(self):
+        consumer = self.consumer
+        payment = self.payment
+        first_name = consumer.user.first_name
+        last_name = consumer.user.last_name
+        if len(last_name) > 0:
+            last_name = last_name[0]
+        amount = f"${payment.captured_amount}"
+        date_initiated = payment.created_at.strftime(
+            "%X %p (%Z) %A, %b %d, %Y"
+        )
+        render_data = {
+            "sender_name": f"{first_name} {last_name}",
+            "loqal_id": consumer.username,
+            "amount": amount,
+            "date_initiated": date_initiated,
+        }
+        email_html = render_to_string("payment_captured.html", render_data)
+        send_email(
+            from_name=settings.EMAIL_SENDER_NAME,
+            to_emails=(self.email),
+            subject=f"New payment captured #{payment.payment_tracking_id}",
+            content=email_html,
+        )

@@ -25,7 +25,11 @@ def send_sms(
     )
     phone_to = format_phone(phone_number, phone_number_country)
 
-    if settings.APP_ENV == "local" or settings.APP_ENV == "development":
+    if (
+        settings.APP_ENV == "local"
+        or settings.APP_ENV == "development"
+        # or settings.APP_ENV == "staging"
+    ):
         print("###################### SMS START ########################")
         print("TO: ", phone_to)
         print("FROM: ", phone_from)
