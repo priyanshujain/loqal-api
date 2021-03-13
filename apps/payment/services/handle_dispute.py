@@ -29,7 +29,7 @@ class ChangeDisputeStatus(ServiceBase):
 
         if not dispute:
             raise ValidationError(
-                {"details": ErrorDetail(_("Given dispute does not exist."))}
+                {"detail": ErrorDetail(_("Given dispute does not exist."))}
             )
 
         data["dispute"] = dispute
