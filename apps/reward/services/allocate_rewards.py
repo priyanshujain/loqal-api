@@ -114,7 +114,7 @@ class AllocateRewards(ServiceBase):
                     amount=cash_reward.available_value,
                 )
                 transaction = create_transaction(
-                    transaction_type=TransactionType.CRDIT_REWARD_CASHBACK,
+                    transaction_type=TransactionType.CREDIT_REWARD_CASHBACK,
                     amount=cash_reward.available_value,
                     customer_ip_address=self.ip_address,
                     sender_source_type=TransactionSourceTypes.NA,

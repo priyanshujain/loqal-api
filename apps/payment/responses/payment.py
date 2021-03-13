@@ -7,7 +7,7 @@ from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
                                  PaymentRequest, Refund, Transaction)
-from apps.payment.options import PaymentProcess
+from apps.payment.options import PaymentProcess, TransactionType
 from apps.reward.models import RewardUsage
 
 __all__ = (
@@ -331,17 +331,22 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
 
     def get_bank_logo(self, obj):
         self.refund = None
+        self.bank_account = None
         try:
-            self.refund = obj.refund
+            self.refund = obj.refund_payment
             if obj.recipient_bank_account:
-                return obj.recipient_bank_account.bank_logo_base64
+                self.bank_account = obj.recipient_bank_account
         except Refund.DoesNotExist:
             if obj.sender_bank_account:
-                return obj.sender_bank_account.bank_logo_base64
+                self.bank_account = obj.sender_bank_account
+        if self.bank_account:
+            return self.bank_account.bank_logo_base64
         return None
 
     def is_credit_transaction(self, obj):
         if self.refund:
+            return True
+        if obj.transaction_type == TransactionType.CREDIT_REWARD_CASHBACK:
             return True
         return False
 
@@ -391,17 +396,22 @@ class CreateTransactionResponse(serializers.ModelSerializer):
 
     def get_bank_logo(self, obj):
         self.refund = None
+        self.bank_account = None
         try:
-            self.refund = obj.refund
+            self.refund = obj.refund_payment
             if obj.recipient_bank_account:
-                return obj.recipient_bank_account.bank_logo_base64
+                self.bank_account = obj.recipient_bank_account
         except Refund.DoesNotExist:
             if obj.sender_bank_account:
-                return obj.sender_bank_account.bank_logo_base64
+                self.bank_account = obj.sender_bank_account
+        if self.bank_account:
+            return self.bank_account.bank_logo_base64
         return None
 
     def is_credit_transaction(self, obj):
         if self.refund:
+            return True
+        if obj.transaction_type == TransactionType.CREDIT_REWARD_CASHBACK:
             return True
         return False
 
@@ -484,6 +494,8 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
 
     def is_credit_transaction(self, obj):
         if self.refund:
+            return True
+        if obj.transaction_type == TransactionType.CREDIT_REWARD_CASHBACK:
             return True
         return False
 

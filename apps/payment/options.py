@@ -18,7 +18,7 @@ class TransactionType(ChoiceCharEnum):
         "Direct Merchant Payment"
     )
     REFUND_PAYMENT = "refund_payment", _("Refund Payment")
-    CRDIT_REWARD_CASHBACK = "credit_reward_cashback", _(
+    CREDIT_REWARD_CASHBACK = "credit_reward_cashback", _(
         "Credit Reward Cashback"
     )
     OTHER = "other", _("Other")
