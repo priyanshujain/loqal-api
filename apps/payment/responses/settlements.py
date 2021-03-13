@@ -1,7 +1,8 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
 from apps.banking.models import BankAccount
-from apps.payment.models import Refund, Transaction, TransactionEvent
+from apps.payment.models import Transaction, TransactionEvent
+from apps.payment.options import TransactionType
 
 
 class BankAcconutResponse(serializers.ModelSerializer):
@@ -88,17 +89,18 @@ class SettlementDetailsResponse(serializers.ModelSerializer):
         )
 
     def get_bank_details(self, obj):
-        self.refund = None
         bank_account = None
-        try:
-            self.refund = obj.refund
+        self.refund = obj.refund_payment
+        if self.refund:
             bank_account = obj.recipient_bank_account
-        except Refund.DoesNotExist:
+        else:
             bank_account = obj.sender_bank_account
         return BankAcconutResponse(bank_account).data
 
     def is_credit_transaction(self, obj):
         if self.refund:
+            return True
+        if obj.transaction_type == TransactionType.CREDIT_REWARD_CASHBACK:
             return True
         return False
 
