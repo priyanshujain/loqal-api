@@ -114,6 +114,7 @@ def create_new_cash_usage(cash_reward_id, amount):
         RewardUsageItem.objects.create(
             cash_reward_id=cash_reward_id,
             usage=usage,
+            amount=amount,
         )
         return usage
     except IntegrityError:
