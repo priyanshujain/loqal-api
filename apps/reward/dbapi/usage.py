@@ -91,22 +91,24 @@ def get_all_reward_usage(merchant_id, consumer_id):
         )
         | Q(
             cash_reward__consumer_id=consumer_id,
+            cash_reward__loyalty_program__merchant_id=merchant_id,
             usage__is_credit=True,
             usage__order=None,
         )
         | Q(
             voucher_reward__consumer_id=consumer_id,
+            voucher_reward__loyalty_program__merchant_id=merchant_id,
             usage__is_credit=True,
             usage__order=None,
         )
     ).order_by("-created_at")
 
 
-def create_new_cash_usage(cash_reward_id):
+def create_new_cash_usage(cash_reward_id, amount):
     try:
         usage = RewardUsage.objects.create(
             is_credit=True,
-            total_amount=None,
+            total_amount=amount,
             reward_value_type=RewardValueType.FIXED_AMOUNT,
         )
         RewardUsageItem.objects.create(

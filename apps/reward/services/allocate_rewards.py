@@ -14,7 +14,11 @@ from apps.reward.dbapi import (
 )
 from apps.reward.options import LoyaltyParameters, RewardValueType
 from apps.payment.dbapi import create_transaction
-from apps.payment.options import TransactionType, TransactionSourceTypes
+from apps.payment.options import (
+    TransactionType,
+    TransactionSourceTypes,
+    TransactionStatus,
+)
 from apps.payment.responses import CreateTransactionResponse
 
 __all__ = ("AllocateRewards",)
@@ -111,7 +115,8 @@ class AllocateRewards(ServiceBase):
             if cash_reward:
                 orders.update(cash_reward=cash_reward, is_rewarded=True)
                 credit_reward_usage = create_new_cash_usage(
-                    cash_reward_id=cash_reward.id
+                    cash_reward_id=cash_reward.id,
+                    amount=cash_reward.available_value,
                 )
                 transaction = create_transaction(
                     transaction_type=TransactionType.CRDIT_REWARD_CASHBACK,
@@ -121,6 +126,7 @@ class AllocateRewards(ServiceBase):
                     recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
                     reward_usage_id=credit_reward_usage.id,
                     is_success=True,
+                    status=TransactionStatus.PROCESSED,
                 )
             return {
                 "reward_value_type": {
