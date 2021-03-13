@@ -1,12 +1,9 @@
 from api import serializers
 from apps.account.models import ConsumerAccount
-from apps.payment.models.payment import Payment
 from apps.order.models import Order
+from apps.payment.models.payment import Payment
 
-
-__all__ = (
-    "MerchantPaymentHistoryResponse",
-)
+__all__ = ("MerchantPaymentHistoryResponse",)
 
 
 class CustomerDetailsResponse(serializers.ModelSerializer):
@@ -44,26 +41,17 @@ class PaymentDiscountResponse(serializers.ModelSerializer):
         )
 
 
-
 class MerchantPaymentHistoryResponse(serializers.ModelSerializer):
-    payment_status = serializers.ChoiceCharEnumSerializer(read_only=True)
-    payment_tracking_id = serializers.CharField(
-        source="payment.payment_tracking_id", read_only=True
-    )
-    transaction_status = serializers.CharField(
-        source="status.label", read_only=True
-    )
-    customer = CustomerDetailsResponse(
-        source="payment.order.consumer", read_only=True
-    )
+    status = serializers.ChoiceEnumSerializer(read_only=True)
+    customer = CustomerDetailsResponse(source="order.consumer", read_only=True)
     order_total_amount = serializers.CharField(
-        source="payment.order.total_amount", read_only=True
+        source="order.total_amount", read_only=True
     )
     order_net_amount = serializers.CharField(
-        source="payment.order.total_net_amount", read_only=True
+        source="order.total_net_amount", read_only=True
     )
     order_return_amount = serializers.CharField(
-        source="payment.order.total_return_amount", read_only=True
+        source="order.total_return_amount", read_only=True
     )
     discount = PaymentDiscountResponse(source="order", read_only=True)
 
@@ -72,7 +60,7 @@ class MerchantPaymentHistoryResponse(serializers.ModelSerializer):
         fields = (
             "created_at",
             "payment_tracking_id",
-            "payment_status",
+            "status",
             "customer",
             "order_total_amount",
             "order_net_amount",

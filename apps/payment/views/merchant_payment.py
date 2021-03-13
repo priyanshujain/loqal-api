@@ -4,12 +4,12 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import MerchantAPIView
 from apps.payment.dbapi import (get_customer_details, get_merchant_customers,
-                                get_merchant_payment,
+                                get_merchant_payment, get_merchant_payments,
                                 get_merchant_transactions)
 from apps.payment.responses import (CustomerBasicDetailsResponse,
                                     DisputeListResponse,
-                                    MerchantTransactionHistoryResponse,
-                                    PaymentDetailsResponse,
+                                    MerchantPaymentDetailsResponse,
+                                    MerchantPaymentHistoryResponse,
                                     PaymentListResponse, RefundListResponse)
 
 __all__ = (
@@ -23,14 +23,12 @@ class MerchantPaymentHistoryAPI(MerchantAPIView):
     def get(self, request):
         merchant_account = request.merchant_account
         start, end = self.validate_params(params=self.request_data)
-        transactions = get_merchant_transactions(
-            merchant_account=merchant_account
-        )
+        payments = get_merchant_payments(merchant_account=merchant_account)
 
         if start and end:
-            transactions = transactions.filter(created_at__range=[start, end])
+            payments = payments.filter(created_at__range=[start, end])
         return self.response(
-            MerchantTransactionHistoryResponse(transactions, many=True).data
+            MerchantPaymentHistoryResponse(payments, many=True).data
         )
 
     def validate_params(self, params):
@@ -54,7 +52,7 @@ class MerchantPaymentDetailsAPI(MerchantAPIView):
                 {"detail": ErrorDetail(_("Invalid payment_id."))}
             )
 
-        return self.response(PaymentDetailsResponse(payment).data)
+        return self.response(MerchantPaymentDetailsResponse(payment).data)
 
 
 class MerchantCustomersAPI(MerchantAPIView):

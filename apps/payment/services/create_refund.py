@@ -6,12 +6,13 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.order.services import CheckReturnRewardCreditAmount
-from apps.payment.dbapi import (create_refund_payment, create_zero_transaction,
-                                create_transaction,
-                                get_merchant_payment)
+from apps.payment.dbapi import (create_refund_payment, create_transaction,
+                                create_zero_transaction, get_merchant_payment)
 from apps.payment.dbapi.events import (full_refund_payment_event,
                                        partial_refund_payment_event)
-from apps.payment.options import (RefundType, TransactionTransferTypes, TransactionType, TransactionSourceTypes)
+from apps.payment.options import (RefundType, TransactionSourceTypes,
+                                  TransactionStatus, TransactionTransferTypes,
+                                  TransactionType)
 from apps.payment.validators import CreateRefundValidator
 from apps.reward.services import ReturnRewards
 
@@ -44,6 +45,8 @@ class CreateRefund(ServiceBase):
         refund_payment = self._factory_refund_payment(
             order=order,
             amount=amount,
+            refund_reason=payment_data["refund_reason"],
+            refund_note=payment_data["refund_note"],
             return_reward_value=return_reward_value,
             reclaim_reward_value=reclaim_reward_value,
         )
@@ -74,7 +77,7 @@ class CreateRefund(ServiceBase):
                         amount=refund_payment.amount,
                         transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
                     )
-                
+
             except ValidationError as error:
                 try:
                     transaction = error.transaction
@@ -82,7 +85,7 @@ class CreateRefund(ServiceBase):
                 except AttributeError:
                     refund_payment.set_refund_failed()
                 raise error
-            
+
             if return_reward_value > Decimal(0.0):
                 reward_credit = ReturnRewards(
                     return_reward_value=return_reward_credit[
@@ -97,7 +100,9 @@ class CreateRefund(ServiceBase):
                     reward_usage=return_reward_credit["reward_usage"],
                 ).handle()
                 if reward_credit:
-                    refund_payment.add_reward_credit(reward_credit=reward_credit)
+                    refund_payment.add_reward_credit(
+                        reward_credit=reward_credit
+                    )
                 if reward_credit:
                     transaction = create_transaction(
                         transaction_type=TransactionType.REFUND_PAYMENT,
@@ -110,6 +115,7 @@ class CreateRefund(ServiceBase):
                         refund_payment_id=refund_payment.id,
                         reward_usage_id=reward_credit.id,
                         is_success=True,
+                        status=TransactionStatus.PROCESSED,
                     )
                     partial_refund_payment_event(
                         payment_id=refund_payment.payment.id,
@@ -119,7 +125,10 @@ class CreateRefund(ServiceBase):
                         transfer_type=TransactionTransferTypes.CASHBACK,
                     )
 
-        if refund_payment.refund_type == RefundType.FULL and bank_transaction != None:
+        if (
+            refund_payment.refund_type == RefundType.FULL
+            and bank_transaction != None
+        ):
             full_refund_payment_event(
                 payment_id=refund_payment.payment.id,
                 refund_tracking_id=refund_payment.refund_tracking_id,
@@ -127,7 +136,7 @@ class CreateRefund(ServiceBase):
                 amount=refund_payment.amount,
                 transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
             )
-            
+
         return refund_payment
 
     def _validate_data(self):
@@ -166,6 +175,8 @@ class CreateRefund(ServiceBase):
         ).validate()
 
         return {
+            "refund_note": data.get("refund_note", ""),
+            "refund_reason": data.get("refund_reason"),
             "order": order,
             "amount": data["amount"],
             "sender_bank_account": banking_data["sender_bank_account"],
@@ -173,7 +184,13 @@ class CreateRefund(ServiceBase):
         }
 
     def _factory_refund_payment(
-        self, order, amount, return_reward_value, reclaim_reward_value
+        self,
+        refund_note,
+        refund_reason,
+        order,
+        amount,
+        return_reward_value,
+        reclaim_reward_value,
     ):
         refund_type = RefundType.FULL
         requested_items_value = amount
@@ -190,4 +207,6 @@ class CreateRefund(ServiceBase):
             refund_type=refund_type,
             return_reward_value=return_reward_value,
             reclaim_reward_value=reclaim_reward_value,
+            refund_reason=refund_reason,
+            refund_note=refund_note,
         )

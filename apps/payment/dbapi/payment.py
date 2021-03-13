@@ -8,13 +8,15 @@ from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import Q
 from django.db.utils import IntegrityError
+from django.utils.crypto import salted_hmac
 
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
 from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
-                                  TransactionSourceTypes, TransactionType)
+                                  TransactionSourceTypes, TransactionStatus,
+                                  TransactionType)
 from apps.provider.options import DEFAULT_CURRENCY
 
 
@@ -66,6 +68,7 @@ def create_transaction(
         settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
     ),
     is_success=False,
+    status=TransactionStatus.NOT_SENT,
 ):
     """
     dbapi for creating new transaction.
@@ -90,6 +93,7 @@ def create_transaction(
             payment_request_id=payment_request_id,
             reward_usage_id=reward_usage_id,
             is_success=is_success,
+            status=status,
         )
     except IntegrityError:
         return None
@@ -239,6 +243,8 @@ def create_refund_payment(
     refund_type,
     return_reward_value,
     reclaim_reward_value,
+    refund_reason,
+    refund_note,
 ):
     """
     dbapi for creating new refund payment.
@@ -251,6 +257,8 @@ def create_refund_payment(
             refund_type=refund_type,
             return_reward_value=return_reward_value,
             reclaim_reward_value=reclaim_reward_value,
+            refund_reason=refund_reason,
+            refund_note=refund_note,
         )
     except IntegrityError:
         return None
@@ -292,13 +300,19 @@ def get_transactions_to_merchant(account_id):
 
 
 def get_consumer_transactions(consumer_account):
-    return Transaction.objects.filter(payment__order__consumer=consumer_account)
+    return Transaction.objects.filter(
+        payment__order__consumer=consumer_account
+    )
 
 
 def get_merchant_transactions(merchant_account):
     return Transaction.objects.filter(
         recipient_bank_account__account=merchant_account.account
     )
+
+
+def get_merchant_payments(merchant_account):
+    return Payment.objects.filter(order__merchant=merchant_account)
 
 
 def get_merchant_transaction(merchant_account, transaction_tracking_id):

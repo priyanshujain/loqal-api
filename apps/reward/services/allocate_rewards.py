@@ -4,22 +4,16 @@ from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
 from apps.order.dbapi import get_orders_in_period
-from apps.reward.dbapi import (
-    create_cash_reward,
-    create_new_cash_usage,
-    create_new_voucher_usage,
-    create_reward_credit_event,
-    create_voucher_reward,
-    get_current_loyalty_program,
-)
-from apps.reward.options import LoyaltyParameters, RewardValueType
 from apps.payment.dbapi import create_transaction
-from apps.payment.options import (
-    TransactionType,
-    TransactionSourceTypes,
-    TransactionStatus,
-)
+from apps.payment.options import (TransactionSourceTypes, TransactionStatus,
+                                  TransactionType)
 from apps.payment.responses import CreateTransactionResponse
+from apps.reward.dbapi import (create_cash_reward, create_new_cash_usage,
+                               create_new_voucher_usage,
+                               create_reward_credit_event,
+                               create_voucher_reward,
+                               get_current_loyalty_program)
+from apps.reward.options import LoyaltyParameters, RewardValueType
 
 __all__ = ("AllocateRewards",)
 
@@ -56,7 +50,8 @@ class AllocateRewards(ServiceBase):
                 total_return_amount=Sum("total_return_amount"),
             )
             total_net_spent = (
-                order_spent["total_net_amount"] - order_spent["total_return_amount"]
+                order_spent["total_net_amount"]
+                - order_spent["total_return_amount"]
             )
             if total_net_spent >= loyalty_program.min_total_purchase:
                 # Create reward

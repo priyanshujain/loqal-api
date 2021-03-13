@@ -35,8 +35,7 @@ class RewardUsageItemResponse(serializers.ModelSerializer):
         source="usage.order.payment.payment_tracking_id", read_only=True
     )
     transaction_tracking_id = serializers.CharField(
-        source="usage.transaction.transaction_tracking_id",
-        read_only=True
+        source="usage.transaction.transaction_tracking_id", read_only=True
     )
     order_id = serializers.CharField(source="usage.order.u_id", read_only=True)
     is_credit = serializers.BooleanField(

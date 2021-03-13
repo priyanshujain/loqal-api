@@ -2,13 +2,13 @@ from django.conf import settings
 from django.db import models
 
 from apps.merchant.models import AccountMember
+from apps.payment.options import DirectMerchantPaymentStatus
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceEnumField
 
 from .payment import Payment
 from .qrcode import PaymentQrCode
 from .transaction import Transaction
-from db.models.fields import ChoiceEnumField
-from apps.payment.options import DirectMerchantPaymentStatus
 
 __all__ = ("DirectMerchantPayment",)
 

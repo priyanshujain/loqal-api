@@ -6,10 +6,9 @@ from apps.banking.models import BankAccount
 from apps.merchant.models import MerchantCategory
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment,
-                                 PaymentRequest, Refund, Transaction,)
+                                 PaymentRequest, Refund, Transaction)
 from apps.payment.options import PaymentProcess
 from apps.reward.models import RewardUsage
-
 
 __all__ = (
     "TransactionResponse",
@@ -304,7 +303,9 @@ class TransactionHistoryResponse(serializers.ModelSerializer):
         source="payment.order.total_return_amount", read_only=True
     )
     sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
-    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
     reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
@@ -364,7 +365,9 @@ class CreateTransactionResponse(serializers.ModelSerializer):
         source="payment.order", read_only=True
     )
     sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
-    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
     reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:
@@ -439,7 +442,9 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
         source="payment.order", read_only=True
     )
     sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
-    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
     reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:

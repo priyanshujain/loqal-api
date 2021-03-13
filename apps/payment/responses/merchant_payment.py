@@ -7,6 +7,7 @@ from apps.payment.models import Transaction
 from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
+
 from .payment import RewardUsageResponse
 
 __all__ = (
@@ -70,7 +71,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     )
     amount = serializers.CharField(read_only=True)
     sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
-    recipient_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
     reward_usage = RewardUsageResponse(read_only=True)
 
     class Meta:

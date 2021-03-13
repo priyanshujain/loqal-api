@@ -17,7 +17,8 @@ from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   PAYMENT_FACILITATION_FEES_PERCENTAGE,
                                   REFUND_FACILITATION_FEES_FIXED,
                                   REFUND_FACILITATION_FEES_PERCENTAGE,
-                                  TransactionSourceTypes, TransactionTransferTypes, TransactionType)
+                                  TransactionSourceTypes,
+                                  TransactionTransferTypes, TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY

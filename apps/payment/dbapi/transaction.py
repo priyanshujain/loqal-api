@@ -111,8 +111,7 @@ def create_zero_transaction(
         return None
 
 
-def create_empty_transactions(
-):
+def create_empty_transactions():
     """
     dbapi for creating empty transaction qs.
     """

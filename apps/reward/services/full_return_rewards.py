@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from api.services import ServiceBase
 from apps.reward.options import RewardValueType
+
 from .return_rewards import ReturnRewards
 
 __all__ = ("FullReturnRewards",)

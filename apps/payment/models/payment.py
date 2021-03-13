@@ -5,14 +5,9 @@ from django.db import models
 from django.utils.crypto import get_random_string
 
 from apps.order.models import Order
-from apps.payment.options import (
-    ChargeStatus,
-    PaymentEventType,
-    PaymentMethodType,
-    PaymentProcess,
-    PaymentStatus,
-    TransactionTransferTypes,
-)
+from apps.payment.options import (ChargeStatus, PaymentEventType,
+                                  PaymentMethodType, PaymentProcess,
+                                  PaymentStatus, TransactionTransferTypes)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -103,10 +98,14 @@ class Payment(AbstractBaseModel):
         self.status = PaymentStatus.CAPTURED
         self.captured_amount += amount
         self.total_tip_amount += amount - amount_towards_order
-        if amount_towards_order < self.order.total_net_amount:
+
+        total_amount_towards_order = (
+            self.captured_amount - self.total_tip_amount
+        )
+        if total_amount_towards_order < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_CHARGED
             self.order.set_partially_fulfilled()
-        elif amount_towards_order == self.order.total_net_amount:
+        elif total_amount_towards_order == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_CHARGED
             self.order.mark_paid()
             self.order.set_fulfilled()

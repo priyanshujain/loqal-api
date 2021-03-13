@@ -9,28 +9,20 @@ from apps.account.dbapi import get_merchant_account_by_uid
 from apps.account.options import DwollaCustomerStatus
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
-from apps.payment.dbapi import (
-    create_direct_merchant_payment,
-    create_payment,
-    create_transaction,
-    get_payment_qrcode,
-)
-from apps.payment.dbapi.events import (
-    capture_payment_event,
-    initiate_payment_event,
-    failed_payment_event,
-    failure_partial_return_event,
-)
-from apps.payment.options import (
-    PaymentProcess,
-    TransactionType,
-    TransactionSourceTypes,
-    TransactionTransferTypes,
-)
+from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
+                                create_transaction, get_payment_qrcode)
+from apps.payment.dbapi.events import (capture_payment_event,
+                                       failed_payment_event,
+                                       failure_partial_return_event,
+                                       initiate_payment_event)
+from apps.payment.options import (PaymentProcess, TransactionSourceTypes,
+                                  TransactionStatus, TransactionTransferTypes,
+                                  TransactionType)
 from apps.payment.validators import CreateMerchantPaymentValidator
 from apps.provider.options import DEFAULT_CURRENCY
 from apps.reward.options import RewardValueType
 from apps.reward.services import FullReturnRewards
+
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
 
@@ -67,10 +59,14 @@ class DirectMerchantPayment(ServiceBase):
                     account_id=self.consumer_account.id,
                     ip_address=self.ip_address,
                     sender_bank_account=payment_data["sender_bank_account"],
-                    receiver_bank_account=payment_data["receiver_bank_account"],
+                    receiver_bank_account=payment_data[
+                        "receiver_bank_account"
+                    ],
                     order=order,
                     total_amount=total_payable_amount,
-                    amount_towards_order=(total_payable_amount - payment_data["tip_amount"]),
+                    amount_towards_order=(
+                        total_payable_amount - payment_data["tip_amount"]
+                    ),
                     fee_bearer_account=merhcant_account.account,
                     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
                     direct_merchant_payment_id=merchant_payment.id,
@@ -86,7 +82,9 @@ class DirectMerchantPayment(ServiceBase):
                 merchant_payment.set_failed()
                 try:
                     transaction = error.transaction
-                    transaction_tracking_id = transaction.transaction_tracking_id
+                    transaction_tracking_id = (
+                        transaction.transaction_tracking_id
+                    )
                 except AttributeError:
                     pass
                 failed_payment_event(
@@ -118,13 +116,14 @@ class DirectMerchantPayment(ServiceBase):
                 direct_merchant_payment_id=merchant_payment.id,
                 reward_usage_id=reward_usage.id,
                 is_success=True,
+                status=TransactionStatus.PROCESSED,
             )
-            merchant_payment.payment.capture_payment(
+            transaction.payment.capture_payment(
                 amount=applied_cashback_amount,
                 amount_towards_order=applied_cashback_amount,
             )
             capture_payment_event(
-                payment_id=merchant_payment.payment.id,
+                payment_id=transaction.payment.id,
                 transaction_tracking_id=transaction.transaction_tracking_id,
                 amount=applied_cashback_amount,
                 transfer_type=TransactionTransferTypes.CASHBACK,
@@ -136,15 +135,25 @@ class DirectMerchantPayment(ServiceBase):
         data = run_validator(CreateMerchantPaymentValidator, self.data)
         merchant_id = data["merchant_id"]
 
-        merchant_account = get_merchant_account_by_uid(merchant_uid=merchant_id)
+        merchant_account = get_merchant_account_by_uid(
+            merchant_uid=merchant_id
+        )
         if not merchant_account:
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Given merchant does not exist."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Given merchant does not exist.")
+                    )
+                }
             )
 
         if not merchant_account.account.is_active:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Given merchant is no longer available."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Given merchant is no longer available.")
+                    )
+                }
             )
 
         if (
@@ -152,7 +161,11 @@ class DirectMerchantPayment(ServiceBase):
             != DwollaCustomerStatus.VERIFIED
         ):
             raise ValidationError(
-                {"merchant_id": ErrorDetail(_("Merchant account is not active yet."))}
+                {
+                    "merchant_id": ErrorDetail(
+                        _("Merchant account is not active yet.")
+                    )
+                }
             )
 
         qrcode_id = data.get("qrcode_id")
@@ -207,7 +220,9 @@ class DirectMerchantPayment(ServiceBase):
         payment_process = PaymentProcess.DIRECT_APP
         if payment_qrcode_id:
             payment_process = PaymentProcess.QRCODE
-        payment = create_payment(order_id=order.id, payment_process=payment_process)
+        payment = create_payment(
+            order_id=order.id, payment_process=payment_process
+        )
         initiate_payment_event(payment_id=payment.id)
         return (
             create_direct_merchant_payment(

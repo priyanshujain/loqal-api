@@ -5,46 +5,31 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.account.dbapi import (
-    get_consumer_account_by_phone_number,
-    get_consumer_account_by_username,
-)
+from apps.account.dbapi import (get_consumer_account_by_phone_number,
+                                get_consumer_account_by_username)
 from apps.banking.dbapi import get_bank_account
 from apps.merchant.services import InviteConsumerBySMS
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
-from apps.payment.dbapi import (
-    create_payment,
-    create_payment_request,
-    create_transaction,
-    get_merchant_receive_limit,
-    get_payment_reqeust_by_uid,
-)
-from apps.payment.dbapi.events import (
-    capture_payment_event,
-    failed_payment_event,
-    initiate_payment_event,
-    failure_partial_return_event,
-)
-from apps.payment.options import (
-    PaymentProcess,
-    PaymentRequestStatus,
-    TransactionTransferTypes,
-    TransactionType,
-    TransactionSourceTypes,
-)
-from apps.payment.validators import (
-    ApprovePaymentRequestValidator,
-    CreatePaymentRequestValidator,
-    RejectPaymentRequestValidator,
-)
+from apps.payment.dbapi import (create_payment, create_payment_request,
+                                create_transaction, get_merchant_receive_limit,
+                                get_payment_reqeust_by_uid)
+from apps.payment.dbapi.events import (capture_payment_event,
+                                       failed_payment_event,
+                                       failure_partial_return_event,
+                                       initiate_payment_event)
+from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
+                                  TransactionSourceTypes, TransactionStatus,
+                                  TransactionTransferTypes, TransactionType)
+from apps.payment.validators import (ApprovePaymentRequestValidator,
+                                     CreatePaymentRequestValidator,
+                                     RejectPaymentRequestValidator)
 from apps.provider.options import DEFAULT_CURRENCY
-
-from .create_payment import CreatePayment
-from .validate_bank_account import ValidateBankAccount
 from apps.reward.options import RewardValueType
 from apps.reward.services import FullReturnRewards
 
+from .create_payment import CreatePayment
+from .validate_bank_account import ValidateBankAccount
 
 __all__ = (
     "CreatePaymentRequest",
@@ -74,7 +59,9 @@ class CreatePaymentRequest(ServiceBase):
                 phone_number=phone_number
             )
         else:
-            consumer_account = get_consumer_account_by_username(username=loqal_id)
+            consumer_account = get_consumer_account_by_username(
+                username=loqal_id
+            )
 
         bank_account = get_bank_account(account_id=self.account_id)
         if not bank_account:
@@ -90,7 +77,9 @@ class CreatePaymentRequest(ServiceBase):
         try:
             merchant_account = bank_account.account.merchant
         except AttributeError:
-            raise ValidationError({"detail": ErrorDetail(_("Invalid account."))})
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid account."))}
+            )
 
         if not consumer_account:
             if is_phone_number_based:
@@ -204,13 +193,17 @@ class ApprovePaymentRequest(ServiceBase):
                 applied_cashback_amount = reward_usage.total_amount
 
         total_payable_amount = (
-            order.total_net_amount - applied_cashback_amount + data["tip_amount"]
+            order.total_net_amount
+            - applied_cashback_amount
+            + data["tip_amount"]
         )
         payment = create_payment(
             order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
         )
         initiate_payment_event(payment_id=payment.id)
-        payment_request.add_payment(payment=payment, tip_amount=data["tip_amount"])
+        payment_request.add_payment(
+            payment=payment, tip_amount=data["tip_amount"]
+        )
 
         if total_payable_amount > Decimal(0.0):
             try:
@@ -218,10 +211,14 @@ class ApprovePaymentRequest(ServiceBase):
                     account_id=self.account_id,
                     ip_address=self.ip_address,
                     sender_bank_account=banking_data["sender_bank_account"],
-                    receiver_bank_account=banking_data["receiver_bank_account"],
+                    receiver_bank_account=banking_data[
+                        "receiver_bank_account"
+                    ],
                     order=payment_request.payment.order,
                     total_amount=total_payable_amount,
-                    amount_towards_order=(total_payable_amount - data["tip_amount"]),
+                    amount_towards_order=(
+                        total_payable_amount - data["tip_amount"]
+                    ),
                     fee_bearer_account=merchant_account.account,
                     transaction_type=TransactionType.PAYMENT_REQUEST,
                     payment_request_id=payment_request.id,
@@ -236,7 +233,9 @@ class ApprovePaymentRequest(ServiceBase):
                 payment_request.set_failed()
                 try:
                     transaction = error.transaction
-                    transaction_tracking_id = transaction.transaction_tracking_id
+                    transaction_tracking_id = (
+                        transaction.transaction_tracking_id
+                    )
                 except AttributeError:
                     pass
                 failed_payment_event(
@@ -268,6 +267,7 @@ class ApprovePaymentRequest(ServiceBase):
                     payment_request_id=payment_request.id,
                     reward_usage_id=reward_usage.id,
                     is_success=True,
+                    status=TransactionStatus.PROCESSED,
                 )
                 payment_request.payment.capture_payment(
                     amount=applied_cashback_amount,
@@ -305,7 +305,11 @@ class ApprovePaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Given payment request is no longer valid.")
+                    )
+                }
             )
         data["payment_request"] = payment_request
         return data
@@ -348,6 +352,10 @@ class RejectPaymentRequest(ServiceBase):
         receiver_account = payment_request.account_to
         if not receiver_account.is_active:
             raise ValidationError(
-                {"detail": ErrorDetail(_("Given payment request is no longer valid."))}
+                {
+                    "detail": ErrorDetail(
+                        _("Given payment request is no longer valid.")
+                    )
+                }
             )
         return payment_request
