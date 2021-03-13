@@ -226,6 +226,8 @@ class ApprovePaymentRequest(ServiceBase):
                 capture_payment_event(
                     payment_id=transaction.payment.id,
                     transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=total_payable_amount,
+                    transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
                 )
                 payment_request.set_accepted()
             except Exception as error:
