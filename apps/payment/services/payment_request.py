@@ -262,7 +262,7 @@ class ApprovePaymentRequest(ServiceBase):
                     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
                     payment_id=payment_request.payment.id,
                     amount=applied_cashback_amount,
-                    fee_bearer_account_id=payment_request.account.id,
+                    fee_bearer_account_id=None,
                     customer_ip_address=self.ip_address,
                     sender_source_type=TransactionSourceTypes.REWARD_CASHBACK,
                     recipient_source_type=TransactionSourceTypes.NA,
