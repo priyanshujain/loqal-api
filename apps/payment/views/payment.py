@@ -68,7 +68,9 @@ class CreatePaymentAPI(ConsumerAPIView):
         ).data
         payment_notification_data["tip_amount"] = str(merchant_payment.tip_amount)
         try:
-            reward = AllocateRewards(payment=merchant_payment.payment).handle()
+            reward = AllocateRewards(
+                payment=merchant_payment.payment, ip_address=request.ip
+            ).handle()
             if reward:
                 payment_response["reward"] = reward
         except Exception:
@@ -132,7 +134,9 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
         except Exception:
             pass
         payment_response = {}
-        payment_response["transactions"] = CreateTransactionResponse(transactions, many=True).data
+        payment_response["transactions"] = CreateTransactionResponse(
+            transactions, many=True
+        ).data
         payment_response["tip_amount"] = payment_request.tip_amount
         payment_notification_data = {}
         payment_notification_data["transactions"] = MerchantTransactionHistoryResponse(
@@ -146,7 +150,9 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             data=payment_notification_data,
         ).send()
         try:
-            reward = AllocateRewards(payment=payment_request.payment).handle()
+            reward = AllocateRewards(
+                payment=payment_request.payment, ip_address=request.ip
+            ).handle()
             if reward:
                 payment_response["reward"] = reward
         except Exception:

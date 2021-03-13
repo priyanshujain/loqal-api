@@ -4,19 +4,26 @@ from django.utils.translation import gettext as _
 
 from api.services import ServiceBase
 from apps.order.dbapi import get_orders_in_period
-from apps.reward.dbapi import (create_cash_reward, create_new_cash_usage,
-                               create_new_voucher_usage,
-                               create_reward_credit_event,
-                               create_voucher_reward,
-                               get_current_loyalty_program)
+from apps.reward.dbapi import (
+    create_cash_reward,
+    create_new_cash_usage,
+    create_new_voucher_usage,
+    create_reward_credit_event,
+    create_voucher_reward,
+    get_current_loyalty_program,
+)
 from apps.reward.options import LoyaltyParameters, RewardValueType
+from apps.payment.dbapi import create_transaction
+from apps.payment.options import TransactionType, TransactionSourceTypes
+from apps.payment.responses import CreateTransactionResponse
 
 __all__ = ("AllocateRewards",)
 
 
 class AllocateRewards(ServiceBase):
-    def __init__(self, payment):
+    def __init__(self, payment, ip_address):
         self.payment = payment
+        self.ip_address = ip_address
 
     def handle(self):
         payment = self.payment
@@ -45,8 +52,7 @@ class AllocateRewards(ServiceBase):
                 total_return_amount=Sum("total_return_amount"),
             )
             total_net_spent = (
-                order_spent["total_net_amount"]
-                - order_spent["total_return_amount"]
+                order_spent["total_net_amount"] - order_spent["total_return_amount"]
             )
             if total_net_spent >= loyalty_program.min_total_purchase:
                 # Create reward
@@ -104,13 +110,25 @@ class AllocateRewards(ServiceBase):
             )
             if cash_reward:
                 orders.update(cash_reward=cash_reward, is_rewarded=True)
-                create_new_cash_usage(cash_reward_id=cash_reward.id)
+                credit_reward_usage = create_new_cash_usage(
+                    cash_reward_id=cash_reward.id
+                )
+                transaction = create_transaction(
+                    transaction_type=TransactionType.CRDIT_REWARD_CASHBACK,
+                    amount=cash_reward.available_value,
+                    customer_ip_address=self.ip_address,
+                    sender_source_type=TransactionSourceTypes.NA,
+                    recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
+                    reward_usage_id=credit_reward_usage.id,
+                    is_success=True,
+                )
             return {
                 "reward_value_type": {
                     "label": RewardValueType.FIXED_AMOUNT.label,
                     "value": RewardValueType.FIXED_AMOUNT.value,
                 },
                 "value": cash_reward.available_value,
+                "transaction": CreateTransactionResponse(transaction).data,
             }
 
         else:
