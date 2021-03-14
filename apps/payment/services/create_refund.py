@@ -86,7 +86,7 @@ class CreateRefund(ServiceBase):
                     refund_payment.set_refund_failed()
                 raise error
 
-            if return_reward_value > Decimal(0.0):
+            if (return_reward_value + reclaim_reward_value) > Decimal(0.0):
                 reward_credit = ReturnRewards(
                     return_reward_value=return_reward_credit[
                         "return_reward_value"

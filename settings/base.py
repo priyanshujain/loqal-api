@@ -471,3 +471,6 @@ VERSATILEIMAGEFIELD_SETTINGS = {
     # "create_images_on_demand": env("CREATE_IMAGES_ON_DEMAND")
     "create_images_on_demand": False
 }
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 50

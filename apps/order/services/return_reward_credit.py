@@ -22,7 +22,6 @@ class CheckReturnRewardCreditAmount(ServiceBase):
         reward_usage = get_debit_reward_usage(order_id=order.id)
         if not reward_usage:
             return None
-
         if reward_usage.reward_value_type == RewardValueType.FIXED_AMOUNT:
             if reward_usage.total_amount < self.amount:
                 return_reward_value = reward_usage.total_amount

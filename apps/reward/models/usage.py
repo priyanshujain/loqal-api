@@ -37,10 +37,10 @@ class RewardUsage(AbstractBaseModel):
 
 
 class RewardUsageItem(AbstractBaseModel):
-    voucher_reward = models.OneToOneField(
+    voucher_reward = models.ForeignKey(
         VoucherReward,
         on_delete=models.CASCADE,
-        related_name="usage",
+        related_name="usages",
         blank=True,
         null=True,
     )
