@@ -226,6 +226,8 @@ class ApprovePaymentRequest(ServiceBase):
                 capture_payment_event(
                     payment_id=transaction.payment.id,
                     transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=total_payable_amount,
+                    transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
                 )
                 payment_request.set_accepted()
             except Exception as error:
@@ -260,7 +262,7 @@ class ApprovePaymentRequest(ServiceBase):
                     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
                     payment_id=payment_request.payment.id,
                     amount=applied_cashback_amount,
-                    fee_bearer_account_id=payment_request.account.id,
+                    fee_bearer_account_id=None,
                     customer_ip_address=self.ip_address,
                     sender_source_type=TransactionSourceTypes.REWARD_CASHBACK,
                     recipient_source_type=TransactionSourceTypes.NA,

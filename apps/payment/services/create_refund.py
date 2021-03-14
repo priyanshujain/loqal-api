@@ -108,7 +108,7 @@ class CreateRefund(ServiceBase):
                         transaction_type=TransactionType.REFUND_PAYMENT,
                         payment_id=refund_payment.payment.id,
                         amount=return_reward_value,
-                        fee_bearer_account_id=self.merchant_account.account.id,
+                        fee_bearer_account_id=None,
                         customer_ip_address=self.ip_address,
                         recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
                         sender_source_type=TransactionSourceTypes.NA,
