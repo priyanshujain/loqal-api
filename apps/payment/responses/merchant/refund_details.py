@@ -62,7 +62,6 @@ class RefundTransactionBasicInfoResponse(serializers.ModelSerializer):
             "sender_source_type",
             "recipient_source_type",
             "transaction_type",
-            "refund_tracking_id",
             "banks_details",
         )
 
