@@ -63,6 +63,7 @@ class RefundTransactionBasicInfoResponse(serializers.ModelSerializer):
             "recipient_source_type",
             "transaction_type",
             "refund_tracking_id",
+            "banks_details",
         )
 
     def get_bank_details(self, obj):
