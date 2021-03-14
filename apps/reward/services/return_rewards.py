@@ -83,8 +83,8 @@ class ReturnRewards(ServiceBase):
                     refunded_amount_item = Decimal(0.0)
                     cash_reward = reward_usage_item.cash_reward
                     if (
-                        refunded_amount + reward_usage_item
-                    ).amount < self.return_reward_value:
+                        refunded_amount + reward_usage_item.amount
+                    ) < self.return_reward_value:
                         refunded_amount_item = reward_usage_item.amount
                     else:
                         refunded_amount_item = (

@@ -86,44 +86,45 @@ class CreateRefund(ServiceBase):
                     refund_payment.set_refund_failed()
                 raise error
 
-            if (return_reward_value + reclaim_reward_value) > Decimal(0.0):
-                reward_credit = ReturnRewards(
-                    return_reward_value=return_reward_credit[
-                        "return_reward_value"
-                    ],
-                    updated_reward_value=return_reward_credit[
-                        "updated_reward_value"
-                    ],
-                    reclaim_reward_value=return_reward_credit[
-                        "reclaim_reward_value"
-                    ],
-                    reward_usage=return_reward_credit["reward_usage"],
-                ).handle()
-                if reward_credit:
-                    refund_payment.add_reward_credit(
-                        reward_credit=reward_credit
-                    )
-                if reward_credit:
-                    transaction = create_transaction(
-                        transaction_type=TransactionType.REFUND_PAYMENT,
-                        payment_id=refund_payment.payment.id,
-                        amount=return_reward_value,
-                        fee_bearer_account_id=None,
-                        customer_ip_address=self.ip_address,
-                        recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
-                        sender_source_type=TransactionSourceTypes.NA,
-                        refund_payment_id=refund_payment.id,
-                        reward_usage_id=reward_credit.id,
-                        is_success=True,
-                        status=TransactionStatus.PROCESSED,
-                    )
-                    partial_refund_payment_event(
-                        payment_id=refund_payment.payment.id,
-                        refund_tracking_id=refund_payment.refund_tracking_id,
-                        transaction_tracking_id=transaction.transaction_tracking_id,
-                        amount=return_reward_value,
-                        transfer_type=TransactionTransferTypes.CASHBACK,
-                    )
+        if (return_reward_value + reclaim_reward_value) > Decimal(0.0):
+            reward_credit = ReturnRewards(
+                return_reward_value=return_reward_credit[
+                    "return_reward_value"
+                ],
+                updated_reward_value=return_reward_credit[
+                    "updated_reward_value"
+                ],
+                reclaim_reward_value=return_reward_credit[
+                    "reclaim_reward_value"
+                ],
+                reward_usage=return_reward_credit["reward_usage"],
+            ).handle()
+            if reward_credit:
+                refund_payment.add_reward_credit(reward_credit=reward_credit)
+            if reward_credit:
+                transaction = create_transaction(
+                    transaction_type=TransactionType.REFUND_PAYMENT,
+                    payment_id=refund_payment.payment.id,
+                    amount=return_reward_value,
+                    fee_bearer_account_id=None,
+                    customer_ip_address=self.ip_address,
+                    recipient_source_type=TransactionSourceTypes.REWARD_CASHBACK,
+                    sender_source_type=TransactionSourceTypes.NA,
+                    refund_payment_id=refund_payment.id,
+                    reward_usage_id=reward_credit.id,
+                    is_success=True,
+                    status=TransactionStatus.PROCESSED,
+                )
+                transaction.payment.update_charge_status_by_refund(
+                    transaction.amount
+                )
+                partial_refund_payment_event(
+                    payment_id=refund_payment.payment.id,
+                    refund_tracking_id=refund_payment.refund_tracking_id,
+                    transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=return_reward_value,
+                    transfer_type=TransactionTransferTypes.CASHBACK,
+                )
 
         if (
             refund_payment.refund_type == RefundType.FULL
