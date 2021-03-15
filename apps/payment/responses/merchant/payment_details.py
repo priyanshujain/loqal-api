@@ -48,6 +48,24 @@ class PaymentDiscountResponse(serializers.ModelSerializer):
         )
 
 
+
+class RefundBasicDetailsResponse(serializers.ModelSerializer):
+    refund_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceEnumSerializer(read_only=True)
+
+    class Meta:
+        model = Refund
+        fields = (
+            "created_at",
+            "refund_type",
+            "refund_tracking_id",
+            "status",
+            "amount",
+            "return_reward_value",
+            "reclaim_reward_value",
+        )
+
+
 class MerchantTransactionBasicInfoResponse(serializers.ModelSerializer):
     status = serializers.ChoiceEnumSerializer(read_only=True)
     amount = serializers.CharField(read_only=True)
@@ -56,9 +74,7 @@ class MerchantTransactionBasicInfoResponse(serializers.ModelSerializer):
         read_only=True
     )
     transaction_type = serializers.ChoiceCharEnumSerializer(read_only=True)
-    refund_tracking_id = serializers.CharField(
-        source="refund_payment.refund_tracking_id", read_only=True
-    )
+    refund_payment = RefundBasicDetailsResponse(read_only=True)
 
     class Meta:
         model = Transaction
@@ -72,7 +88,7 @@ class MerchantTransactionBasicInfoResponse(serializers.ModelSerializer):
             "sender_source_type",
             "recipient_source_type",
             "transaction_type",
-            "refund_tracking_id",
+            "refund_payment",
         )
 
 
@@ -122,4 +138,5 @@ class MerchantPaymentDetailsResponse(serializers.ModelSerializer):
             "transactions",
             "events",
             "discount",
+            "total_tip_amount",
         )
