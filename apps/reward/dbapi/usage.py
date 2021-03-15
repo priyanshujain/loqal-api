@@ -72,6 +72,22 @@ def create_cash_refund_usage(order_id, amount):
         return None
 
 
+def get_cash_refund_usages(order_id):
+    return RewardUsage.objects.filter(
+        is_credit=True,
+        reward_value_type=RewardValueType.FIXED_AMOUNT,
+        order_id=order_id,
+    )
+
+
+def get_voucher_refund_usages(order_id):
+    return RewardUsage.objects.filter(
+        is_credit=True,
+        reward_value_type=RewardValueType.PERCENTAGE,
+        order_id=order_id,
+    )
+
+
 def create_cash_refund_usage_item(usage_id, cash_reward_id, amount):
     try:
         return RewardUsageItem.objects.create(

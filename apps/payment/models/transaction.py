@@ -220,7 +220,10 @@ class Transaction(AbstractBaseModel):
                     amount_towards_order=amount_towards_order,
                 )
             if self.transaction_type == TransactionType.REFUND_PAYMENT:
-                self.payment.update_charge_status_by_refund(self.amount)
+                reclaimed_amount = amount_towards_order - self.amount
+                self.payment.update_charge_status_by_refund(
+                    amount=self.amount, reclaimed_amount=reclaimed_amount
+                )
         if sender_balance_at_checkout != None:
             sender_balance_at_checkout = Decimal(sender_balance_at_checkout)
             sender_balance_at_checkout = round(

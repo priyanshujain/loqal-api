@@ -14,6 +14,7 @@ from apps.payment.options import (RefundType, TransactionSourceTypes,
                                   TransactionStatus, TransactionTransferTypes,
                                   TransactionType)
 from apps.payment.validators import CreateRefundValidator
+from apps.reward.options import RewardValueType
 from apps.reward.services import ReturnRewards
 
 from .create_payment import CreatePayment
@@ -101,7 +102,7 @@ class CreateRefund(ServiceBase):
             ).handle()
             if reward_credit:
                 refund_payment.add_reward_credit(reward_credit=reward_credit)
-            if reward_credit:
+            if reward_credit.reward_value_type == RewardValueType.FIXED_AMOUNT:
                 transaction = create_transaction(
                     transaction_type=TransactionType.REFUND_PAYMENT,
                     payment_id=refund_payment.payment.id,
@@ -116,7 +117,7 @@ class CreateRefund(ServiceBase):
                     status=TransactionStatus.PROCESSED,
                 )
                 transaction.payment.update_charge_status_by_refund(
-                    transaction.amount
+                    amount=transaction.amount
                 )
                 partial_refund_payment_event(
                     payment_id=refund_payment.payment.id,

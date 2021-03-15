@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -37,6 +39,11 @@ class Order(AbstractBaseModel):
         default=0,
     )
     total_return_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
+    total_reclaimed_discount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
@@ -117,15 +124,19 @@ class Order(AbstractBaseModel):
         if save:
             self.save()
 
-    def set_partially_returned(self, amount, save=True):
+    def set_partially_returned(
+        self, amount, reclaimed_discount=Decimal(0.0), save=True
+    ):
         self.status = OrderStatus.PARTIALLY_RETURNED
         self.total_return_amount += amount
+        self.total_reclaimed_discount += reclaimed_discount
         if save:
             self.save()
 
-    def set_returned(self, amount, save=True):
+    def set_returned(self, amount, reclaimed_discount=Decimal(0.0), save=True):
         self.status = OrderStatus.RETURNED
         self.total_return_amount += amount
+        self.total_reclaimed_discount += reclaimed_discount
         if save:
             self.save()
 

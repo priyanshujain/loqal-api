@@ -83,14 +83,20 @@ class Payment(AbstractBaseModel):
                 self.payment_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
-    def update_charge_status_by_refund(self, amount, save=True):
+    def update_charge_status_by_refund(
+        self, amount, reclaimed_amount=Decimal(0.0), save=True
+    ):
         self.refunded_amount += amount
         if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
-            self.order.set_partially_returned(amount)
+            self.order.set_partially_returned(
+                amount=amount, reclaimed_amount=reclaimed_amount
+            )
         elif self.refunded_amount == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_REFUNDED
-            self.order.set_returned(amount)
+            self.order.set_returned(
+                amount=amount, reclaimed_amount=reclaimed_amount
+            )
         if save:
             self.save()
 
