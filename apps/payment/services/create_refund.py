@@ -64,7 +64,9 @@ class CreateRefund(ServiceBase):
                     ],
                     order=order,
                     total_amount=refund_payment.amount,
-                    amount_towards_order=refund_payment.amount,
+                    amount_towards_order=(
+                        refund_payment.amount + reclaim_reward_value
+                    ),
                     fee_bearer_account=self.merchant_account.account,
                     transaction_type=TransactionType.REFUND_PAYMENT,
                     refund_payment_id=refund_payment.id,
