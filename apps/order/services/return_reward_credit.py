@@ -54,7 +54,7 @@ class CheckReturnRewardCreditAmount(ServiceBase):
                 remaing_sale_amount = (
                     order.total_amount
                     - order.total_return_amount
-                    - order.total_reclaimed_amount
+                    - order.total_reclaimed_discount
                     - self.amount
                 )
                 updated_reward_value = (
