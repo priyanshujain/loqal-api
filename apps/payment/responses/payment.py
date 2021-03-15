@@ -393,15 +393,12 @@ class CreateTransactionResponse(serializers.ModelSerializer):
         )
 
     def get_bank_logo(self, obj):
-        self.refund = None
         self.bank_account = None
-        try:
-            self.refund = obj.refund_payment
-            if obj.recipient_bank_account:
-                self.bank_account = obj.recipient_bank_account
-        except Refund.DoesNotExist:
-            if obj.sender_bank_account:
-                self.bank_account = obj.sender_bank_account
+        self.refund = obj.refund_payment
+        if self.refund:
+            self.bank_account = obj.recipient_bank_account
+        else:
+            self.bank_account = obj.sender_bank_account
         if self.bank_account:
             return self.bank_account.bank_logo_base64
         return None
