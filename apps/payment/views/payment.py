@@ -17,11 +17,13 @@ from apps.payment.notifications.email import (RefundReceivedEmail,
                                               SendPaymentInitiatedEmail)
 from apps.payment.options import TransactionSourceTypes
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
+                                    CreateRefundResponse,
                                     CreateTransactionResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
                                     RefundHistoryResponse,
+                                    RefundTransactionsResponse,
                                     TransactionDetailsResponse,
                                     TransactionHistoryResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
@@ -254,9 +256,11 @@ class CreateRefundPaymentAPI(MerchantAPIView):
             RefundReceivedEmail(
                 transaction=banking_transactions.first()
             ).send()
-        return self.response(
-            RefundHistoryResponse(refund_payment).data, status=201
-        )
+        refund_response = RefundHistoryResponse(refund_payment).data
+        refund_response["transactions"] = RefundTransactionsResponse(
+            transactions, many=True
+        ).data
+        return self.response(refund_response, status=201)
 
 
 class RecentStoresAPI(ConsumerAPIView):

@@ -481,12 +481,11 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
         )
 
     def get_bank_details(self, obj):
-        self.refund = None
         bank_account = None
-        try:
-            self.refund = obj.refund
+        self.refund = obj.refund_payment
+        if self.refund:
             bank_account = obj.recipient_bank_account
-        except Refund.DoesNotExist:
+        else:
             bank_account = obj.sender_bank_account
         return BankAcconutResponse(bank_account).data
 
