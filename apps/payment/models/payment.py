@@ -90,12 +90,12 @@ class Payment(AbstractBaseModel):
         if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
             self.order.set_partially_returned(
-                amount=amount, reclaimed_amount=reclaimed_amount
+                amount=amount, reclaimed_discount=reclaimed_amount
             )
         elif self.refunded_amount == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_REFUNDED
             self.order.set_returned(
-                amount=amount, reclaimed_amount=reclaimed_amount
+                amount=amount, reclaimed_discount=reclaimed_amount
             )
         if save:
             self.save()
