@@ -16,7 +16,7 @@ def migrate_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("merchant", "0051_auto_20210310_0347"),
+        ("merchant", "0052_auto_20210310_0349"),
     ]
 
     operations = [
