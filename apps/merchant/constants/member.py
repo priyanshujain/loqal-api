@@ -16,6 +16,8 @@ DEFAULT_ROLE = {
     "qr_codes": AllowedFeatureAcessTypes.QR_CODES,
     "store_profile": AllowedFeatureAcessTypes.STORE_PROFILE,
     "team_management": AllowedFeatureAcessTypes.TEAM_MANAGEMENT,
+    "loyalty_program": AllowedFeatureAcessTypes.LOYALTY_PROGRAM,
+    "merchant_settings": AllowedFeatureAcessTypes.MERCHANT_SETTINGS,
 }
 
 

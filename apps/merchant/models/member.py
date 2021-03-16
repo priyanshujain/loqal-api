@@ -47,6 +47,9 @@ class FeatureAccessRole(AbstractBaseModel):
     loyalty_program = ArrayField(
         models.CharField(max_length=255, blank=True), default=list, blank=True
     )
+    merchant_settings = ArrayField(
+        models.CharField(max_length=255, blank=True), default=list, blank=True
+    )
     is_full_access = models.BooleanField(default=False)
     is_super_admin = models.BooleanField(default=False)
     is_standard_user = models.BooleanField(default=False)

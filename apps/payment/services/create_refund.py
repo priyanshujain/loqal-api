@@ -6,13 +6,23 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.order.services import CheckReturnRewardCreditAmount
-from apps.payment.dbapi import (create_refund_payment, create_transaction,
-                                create_zero_transaction, get_merchant_payment)
-from apps.payment.dbapi.events import (full_refund_payment_event,
-                                       partial_refund_payment_event)
-from apps.payment.options import (RefundType, TransactionSourceTypes,
-                                  TransactionStatus, TransactionTransferTypes,
-                                  TransactionType)
+from apps.payment.dbapi import (
+    create_refund_payment,
+    create_transaction,
+    create_zero_transaction,
+    get_merchant_payment,
+)
+from apps.payment.dbapi.events import (
+    full_refund_payment_event,
+    partial_refund_payment_event,
+)
+from apps.payment.options import (
+    RefundType,
+    TransactionSourceTypes,
+    TransactionStatus,
+    TransactionTransferTypes,
+    TransactionType,
+)
 from apps.payment.validators import CreateRefundValidator
 from apps.reward.options import RewardValueType
 from apps.reward.services import ReturnRewards
@@ -59,14 +69,10 @@ class CreateRefund(ServiceBase):
                     account_id=self.merchant_account.id,
                     ip_address=self.ip_address,
                     sender_bank_account=payment_data["sender_bank_account"],
-                    receiver_bank_account=payment_data[
-                        "receiver_bank_account"
-                    ],
+                    receiver_bank_account=payment_data["receiver_bank_account"],
                     order=order,
                     total_amount=refund_payment.amount,
-                    amount_towards_order=(
-                        refund_payment.amount + reclaim_reward_value
-                    ),
+                    amount_towards_order=(refund_payment.amount + reclaim_reward_value),
                     fee_bearer_account=self.merchant_account.account,
                     transaction_type=TransactionType.REFUND_PAYMENT,
                     refund_payment_id=refund_payment.id,
@@ -91,15 +97,9 @@ class CreateRefund(ServiceBase):
 
         if (return_reward_value + reclaim_reward_value) > Decimal(0.0):
             reward_credit = ReturnRewards(
-                return_reward_value=return_reward_credit[
-                    "return_reward_value"
-                ],
-                updated_reward_value=return_reward_credit[
-                    "updated_reward_value"
-                ],
-                reclaim_reward_value=return_reward_credit[
-                    "reclaim_reward_value"
-                ],
+                return_reward_value=return_reward_credit["return_reward_value"],
+                updated_reward_value=return_reward_credit["updated_reward_value"],
+                reclaim_reward_value=return_reward_credit["reclaim_reward_value"],
                 reward_usage=return_reward_credit["reward_usage"],
             ).handle()
             if reward_credit:
@@ -129,10 +129,7 @@ class CreateRefund(ServiceBase):
                     transfer_type=TransactionTransferTypes.CASHBACK,
                 )
 
-        if (
-            refund_payment.refund_type == RefundType.FULL
-            and bank_transaction != None
-        ):
+        if refund_payment.refund_type == RefundType.FULL and bank_transaction != None:
             full_refund_payment_event(
                 payment_id=refund_payment.payment.id,
                 refund_tracking_id=refund_payment.refund_tracking_id,
@@ -159,7 +156,9 @@ class CreateRefund(ServiceBase):
 
         order = payment.order
         current_total_order_amount = (
-            order.total_amount - order.total_return_amount
+            order.total_amount
+            - order.total_return_amount
+            - order.total_reclaimed_discount
         )
         if amount > current_total_order_amount:
             raise ValidationError(

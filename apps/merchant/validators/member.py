@@ -97,6 +97,22 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         required=False,
         default=[],
     )
+    loyalty_program = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.LOYALTY_PROGRAM
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    merchant_settings = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=AllowedFeatureAcessTypes.MERCHANT_SETTINGS
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
 
 
 class MemberInviteValidator(serializers.ValidationSerializer):

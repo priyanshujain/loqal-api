@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('order', '0012_auto_20210308_1135'),
+        ("order", "0012_auto_20210308_1135"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='total_reclaimed_discount',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=6),
+            model_name="order",
+            name="total_reclaimed_discount",
+            field=models.DecimalField(
+                decimal_places=2, default=0, max_digits=6
+            ),
         ),
     ]

@@ -36,18 +36,49 @@ class FeatureAcessTypes(ChoiceEnum):
 
 
 class AllowedFeatureAcessTypes:
-    PAYMENT_REQUESTS = ["CREATE", "VIEW"]
-    PAYMENT_HISTORY = ["PARTIAL_VIEW", "VIEW"]
-    SETTLEMENTS = ["VIEW", "PARTIAL_VIEW"]
-    REFUNDS = ["CREATE", "VIEW", "PARTIAL_VIEW"]
-    DISPUTES = ["PARTIAL_VIEW", "VIEW"]
-    CUSTOMERS = ["PARTIAL_VIEW", "VIEW"]
-    BANK_ACCOUNTS = ["CREATE", "VIEW", "DELETE"]
-    QR_CODES = ["CREATE", "UPDATE", "VIEW"]
-    STORE_PROFILE = ["UPDATE", "VIEW"]
-    TEAM_MANAGEMENT = ["CREATE", "UPDATE", "VIEW", "DELETE"]
-    TOP_CUSTOMERS = ["VIEW"]
-    LOYALTY_PRGRAM = ["CREATE", "UPDATE", "VIEW", "DELETE"]
+    PAYMENT_REQUESTS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.PARTIAL_VIEW,
+    ]
+    PAYMENT_HISTORY = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    SETTLEMENTS = [FeatureAcessTypes.VIEW, FeatureAcessTypes.PARTIAL_VIEW]
+    REFUNDS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.PARTIAL_VIEW,
+    ]
+    DISPUTES = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    CUSTOMERS = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    BANK_ACCOUNTS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
+    ]
+    QR_CODES = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+    ]
+    STORE_PROFILE = [FeatureAcessTypes.UPDATE]
+    TEAM_MANAGEMENT = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
+    ]
+    TOP_CUSTOMERS = [FeatureAcessTypes.VIEW]
+    LOYALTY_PROGRAM = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.DELETE,
+    ]
+    MERCHANT_SETTINGS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
+    ]
 
 
 class BeneficialOwnerStatus(ChoiceCharEnum):

@@ -48,7 +48,6 @@ class PaymentDiscountResponse(serializers.ModelSerializer):
         )
 
 
-
 class RefundBasicDetailsResponse(serializers.ModelSerializer):
     refund_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     status = serializers.ChoiceEnumSerializer(read_only=True)
