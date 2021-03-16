@@ -8,7 +8,7 @@ from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
 
-from .payment import RewardUsageResponse
+from .payment import RewardUsageResponse, TransactionDiscountResponse
 
 __all__ = (
     "MerchantTransactionHistoryResponse",
@@ -48,14 +48,14 @@ class CustomerBasicDetailsResponse(CustomerDetailsResponse):
 
 
 class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
-    payment_status = serializers.CharField(
-        source="payment.status.label", read_only=True
+    payment_status = serializers.ChoiceEnumSerializer(
+        source="payment.status", read_only=True
     )
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
-    transaction_status = serializers.CharField(
-        source="status.label", read_only=True
+    transaction_status = serializers.ChoiceEnumSerializer(
+        source="status", read_only=True
     )
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
@@ -75,6 +75,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
         read_only=True
     )
     reward_usage = RewardUsageResponse(read_only=True)
+    discount = TransactionDiscountResponse(source="payment.order", read_only=True)
 
     class Meta:
         model = Transaction
@@ -94,6 +95,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "sender_source_type",
             "recipient_source_type",
             "reward_usage",
+            "discount",
         )
 
 
