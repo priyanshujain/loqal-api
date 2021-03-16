@@ -107,7 +107,9 @@ class CreateOrder(ServiceBase):
             amount=redeemable_reward_amount,
             name=f"{voucher.value}% off upto {voucher.value_maximum}",
             discount_type=DiscountType.PERCENTAGE,
+            save=False,
         )
+        order.set_applied_voucher(applied_voucher=voucher)
         usage_item = create_debit_reward_usage_item(
             amount=redeemable_reward_amount,
             usage_id=reward_usage.id,

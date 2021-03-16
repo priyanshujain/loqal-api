@@ -1,14 +1,10 @@
-from decimal import Decimal
-
 from api import serializers
 from apps.account.models import ConsumerAccount
-from apps.banking.models import BankAccount
 from apps.order.models import Order
-from apps.payment.dbapi import transaction
 from apps.payment.models import Transaction
 from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
-from apps.payment.options import PaymentProcess
+from apps.reward.models import VoucherReward
 
 __all__ = ("MerchantPaymentDetailsResponse",)
 
@@ -36,8 +32,20 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
         return ""
 
 
+class VoucherRewardResponse(serializers.ModelSerializer):
+    class Meta:
+        model = VoucherReward
+        fields = (
+            "created_at",
+            "value",
+            "value_maximum",
+            "is_used",
+        )
+
+
 class PaymentDiscountResponse(serializers.ModelSerializer):
     discount_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    applied_voucher = VoucherRewardResponse(read_only=True)
 
     class Meta:
         model = Order
@@ -45,6 +53,7 @@ class PaymentDiscountResponse(serializers.ModelSerializer):
             "discount_amount",
             "discount_name",
             "discount_type",
+            "applied_voucher",
         )
 
 

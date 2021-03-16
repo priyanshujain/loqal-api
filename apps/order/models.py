@@ -64,6 +64,13 @@ class Order(AbstractBaseModel):
         default=DiscountType.FIXED_AMOUNT,
         enum_type=DiscountType,
     )
+    applied_voucher = models.ForeignKey(
+        to="reward.VoucherReward",
+        on_delete=models.CASCADE,
+        related_name="applied_orders",
+        null=True,
+        blank=True,
+    )
     is_paid = models.BooleanField(default=False)
     is_rewarded = models.BooleanField(default=False)
 
@@ -121,6 +128,11 @@ class Order(AbstractBaseModel):
 
     def set_partially_fulfilled(self, save=True):
         self.status = OrderStatus.PARTIALLY_FULFILLED
+        if save:
+            self.save()
+
+    def set_applied_voucher(self, applied_voucher, save=True):
+        self.applied_voucher = applied_voucher
         if save:
             self.save()
 
