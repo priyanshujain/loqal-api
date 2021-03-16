@@ -487,7 +487,7 @@ class TransactionDetailsResponse(serializers.ModelSerializer):
         return BankAcconutResponse(bank_account).data
 
     def is_credit_transaction(self, obj):
-        if self.refund_payment:
+        if self.refund:
             return True
         if obj.transaction_type == TransactionType.CREDIT_REWARD_CASHBACK:
             return True
