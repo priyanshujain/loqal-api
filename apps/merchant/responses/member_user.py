@@ -19,6 +19,9 @@ class FeatureAccessRoleResponse(serializers.ModelSerializer):
             "store_profile",
             "team_management",
             "bank_accounts",
+            "loyalty_program",
+            "top_customers",
+            "merchant_settings",
         )
 
 

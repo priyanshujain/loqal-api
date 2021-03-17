@@ -67,7 +67,9 @@ class RewardedMerchantsAPI(ConsumerAPIView):
         merchants = []
         for order in rewarded_orders:
             merchant = MerchantBasicDetailsResponse(order.merchant).data
-            merchant["store_visits"] = order.merchant.orders.count()
+            merchant["store_visits"] = order.merchant.orders.filter(
+                consumer=consumer
+            ).count()
             cash_rewards = get_cash_rewards(
                 merchant_id=order.merchant.id, consumer_id=order.consumer.id
             )

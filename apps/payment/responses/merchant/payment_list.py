@@ -43,6 +43,7 @@ class PaymentDiscountResponse(serializers.ModelSerializer):
 
 class MerchantPaymentHistoryResponse(serializers.ModelSerializer):
     status = serializers.ChoiceEnumSerializer(read_only=True)
+    charge_status = serializers.ChoiceEnumSerializer(read_only=True)
     customer = CustomerDetailsResponse(source="order.consumer", read_only=True)
     order_total_amount = serializers.CharField(
         source="order.total_amount", read_only=True
@@ -61,6 +62,7 @@ class MerchantPaymentHistoryResponse(serializers.ModelSerializer):
             "created_at",
             "payment_tracking_id",
             "status",
+            "charge_status",
             "customer",
             "order_total_amount",
             "order_net_amount",
