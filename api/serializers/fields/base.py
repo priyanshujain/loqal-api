@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from rest_framework.fields import CharField
 
 from api.serializers.base import ChoiceField, DictField, UUIDField
 
@@ -7,6 +8,7 @@ __all__ = (
     "UUIDField",
     "DictField",
     "EnumChoiceField",
+    "EnumCharChoiceValueField",
 )
 
 
@@ -42,3 +44,11 @@ class EnumChoiceField(ChoiceField):
             return value
         value = self.choice_strings_to_values.get(str(value), value)
         return self.enum_choices.get(value, value)
+
+
+class EnumCharChoiceValueField(CharField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        return getattr(value, "value", "")
