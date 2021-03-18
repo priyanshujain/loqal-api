@@ -4,6 +4,7 @@ from apps.reward.models import (CashReward, LoyaltyProgram, RewardUsage,
 
 
 class LoyaltyProgramResponse(serializers.ModelSerializer):
+    loyalty_program_id = serializers.CharField(source="u_id", read_only=True)
     loyalty_parameter = serializers.ChoiceCharEnumSerializer(read_only=True)
     reward_value_type = serializers.ChoiceCharEnumSerializer(read_only=True)
     reward_type = serializers.ChoiceCharEnumSerializer(read_only=True)
@@ -11,6 +12,7 @@ class LoyaltyProgramResponse(serializers.ModelSerializer):
     class Meta:
         model = LoyaltyProgram
         fields = (
+            "loyalty_program_id",
             "created_at",
             "loyalty_parameter",
             "min_visits",
