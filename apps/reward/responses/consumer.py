@@ -41,10 +41,12 @@ class RewardUsageItemResponse(serializers.ModelSerializer):
     is_credit = serializers.BooleanField(
         source="usage.is_credit", read_only=True
     )
+    reward_usage_id = serializers.CharField(source="u_id", read_only=True)
 
     class Meta:
         model = RewardUsageItem
         fields = (
+            "reward_usage_id",
             "created_at",
             "amount",
             "cash_reward",
