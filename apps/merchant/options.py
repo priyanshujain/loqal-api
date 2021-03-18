@@ -27,7 +27,7 @@ class MemberType(ChoiceEnum):
     ADMINISTRATOR = "administrator", _("Administrator")
 
 
-class FeatureAcessTypes(ChoiceEnum):
+class FeatureAcessTypes(ChoiceCharEnum):
     CREATE = "CREATE", _("Create")
     UPDATE = "UPDATE", _("Update")
     VIEW = "VIEW", _("View")
