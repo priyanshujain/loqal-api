@@ -112,6 +112,7 @@ class AllocateRewards(ServiceBase):
                 credit_reward_usage = create_new_cash_usage(
                     cash_reward_id=cash_reward.id,
                     amount=cash_reward.available_value,
+                    consumer_id=consumer.id,
                 )
                 transaction = create_transaction(
                     transaction_type=TransactionType.CREDIT_REWARD_CASHBACK,
@@ -148,7 +149,10 @@ class AllocateRewards(ServiceBase):
             )
             if voucher_reward:
                 orders.update(voucher_reward=voucher_reward, is_rewarded=True)
-                create_new_voucher_usage(voucher_reward_id=voucher_reward.id)
+                create_new_voucher_usage(
+                    voucher_reward_id=voucher_reward.id,
+                    consumer_id=consumer.id,
+                )
             return {
                 "reward_value_type": {
                     "label": RewardValueType.PERCENTAGE.label,

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
 
+from apps.account.models import ConsumerAccount
 from apps.order.models import Order
 from apps.reward.options import RewardValueType
 from db.models import AbstractBaseModel
@@ -18,6 +19,9 @@ class RewardUsage(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
         null=True,
+    )
+    consumer = models.ForeignKey(
+        ConsumerAccount, on_delete=models.CASCADE, blank=True, null=True
     )
     is_credit = models.BooleanField(default=False)
     reward_value_type = ChoiceCharEnumField(

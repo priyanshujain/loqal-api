@@ -5,13 +5,16 @@ from apps.reward.models import RewardUsage, RewardUsageItem
 from apps.reward.options import RewardValueType
 
 
-def create_debit_reward_usage(total_amount, reward_value_type, order_id):
+def create_debit_reward_usage(
+    total_amount, reward_value_type, order_id, consumer_id=None
+):
     try:
         return RewardUsage.objects.create(
             total_amount=total_amount,
             is_credit=False,
             reward_value_type=reward_value_type,
             order_id=order_id,
+            consumer_id=consumer_id,
         )
     except IntegrityError:
         return None
@@ -41,13 +44,16 @@ def get_debit_reward_usage(order_id):
         return None
 
 
-def create_voucher_refund(order_id, voucher_reward_id, amount=None):
+def create_voucher_refund(
+    order_id, voucher_reward_id, amount=None, consumer_id=None
+):
     try:
         reward_usage = RewardUsage.objects.create(
             is_credit=True,
             total_amount=amount,
             reward_value_type=RewardValueType.PERCENTAGE,
             order_id=order_id,
+            consumer_id=consumer_id,
         )
         reward_usage_item = RewardUsageItem.objects.create(
             amount=amount,
@@ -60,13 +66,14 @@ def create_voucher_refund(order_id, voucher_reward_id, amount=None):
         return None, None
 
 
-def create_cash_refund_usage(order_id, amount):
+def create_cash_refund_usage(order_id, amount, consumer_id=None):
     try:
         return RewardUsage.objects.create(
             is_credit=True,
             total_amount=amount,
             reward_value_type=RewardValueType.FIXED_AMOUNT,
             order_id=order_id,
+            consumer_id=consumer_id,
         )
     except IntegrityError:
         return None
@@ -120,12 +127,13 @@ def get_all_reward_usage(merchant_id, consumer_id):
     ).order_by("-created_at")
 
 
-def create_new_cash_usage(cash_reward_id, amount):
+def create_new_cash_usage(cash_reward_id, amount, consumer_id=None):
     try:
         usage = RewardUsage.objects.create(
             is_credit=True,
             total_amount=amount,
             reward_value_type=RewardValueType.FIXED_AMOUNT,
+            consumer_id=consumer_id,
         )
         RewardUsageItem.objects.create(
             cash_reward_id=cash_reward_id,
@@ -137,12 +145,13 @@ def create_new_cash_usage(cash_reward_id, amount):
         return None
 
 
-def create_new_voucher_usage(voucher_reward_id):
+def create_new_voucher_usage(voucher_reward_id, consumer_id=None):
     try:
         usage = RewardUsage.objects.create(
             is_credit=True,
             total_amount=None,
             reward_value_type=RewardValueType.PERCENTAGE,
+            consumer_id=consumer_id,
         )
         RewardUsageItem.objects.create(
             voucher_reward_id=voucher_reward_id,

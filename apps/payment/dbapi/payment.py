@@ -5,10 +5,8 @@ Payments relted db operations.
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import Q
 from django.db.utils import IntegrityError
-from django.utils.crypto import salted_hmac
 
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
@@ -305,7 +303,8 @@ def get_transactions_to_merchant(account_id):
 
 def get_consumer_transactions(consumer_account):
     return Transaction.objects.filter(
-        payment__order__consumer=consumer_account
+        Q(payment__order__consumer=consumer_account)
+        | Q(reward_usage__consumer=consumer_account)
     )
 
 

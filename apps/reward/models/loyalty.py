@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from apps.account.models import MerchantAccount
@@ -52,5 +53,6 @@ class LoyaltyProgram(AbstractBaseModel):
 
     def de_activate(self, save=True):
         self.is_active = False
+        self.program_end_date = now()
         if save:
             self.save()
