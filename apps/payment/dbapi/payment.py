@@ -203,6 +203,7 @@ def create_payment_request(
     account_to_id,
     amount,
     currency,
+    cashier_id=None,
 ):
     """
     dbapi for creating new payment request.
@@ -213,6 +214,7 @@ def create_payment_request(
             account_to_id=account_to_id,
             amount=Decimal(amount),
             currency=currency,
+            cashier_id=cashier_id,
         )
     except IntegrityError:
         return None
@@ -245,6 +247,7 @@ def create_refund_payment(
     reclaim_reward_value,
     refund_reason,
     refund_note,
+    cashier_id=None,
 ):
     """
     dbapi for creating new refund payment.
@@ -259,6 +262,7 @@ def create_refund_payment(
             reclaim_reward_value=reclaim_reward_value,
             refund_reason=refund_reason,
             refund_note=refund_note,
+            cashier_id=cashier_id,
         )
     except IntegrityError:
         return None

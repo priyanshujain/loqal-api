@@ -33,7 +33,7 @@ class PaymentRequest(AbstractBaseModel):
         AccountMember,
         blank=True,
         null=True,
-        related_name="payment_requuests",
+        related_name="payment_requests",
         on_delete=models.SET_NULL,
     )
     amount = models.DecimalField(

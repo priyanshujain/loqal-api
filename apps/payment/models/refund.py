@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
 
+from apps.merchant.models import AccountMember
 from apps.payment.options import RefundReasonTypes, RefundStatus, RefundType
 from apps.reward.models import RewardUsage
 from db.models import AbstractBaseModel
@@ -34,6 +35,13 @@ class Refund(AbstractBaseModel):
     refund_note = models.CharField(
         max_length=256,
         blank=True,
+    )
+    cashier = models.ForeignKey(
+        AccountMember,
+        blank=True,
+        null=True,
+        related_name="refunds",
+        on_delete=models.SET_NULL,
     )
     payment = models.ForeignKey(
         Payment,

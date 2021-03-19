@@ -24,9 +24,10 @@ __all__ = ("CreateRefund",)
 
 
 class CreateRefund(ServiceBase):
-    def __init__(self, merchant_account, data, ip_address):
+    def __init__(self, merchant_account, account_member_id, data, ip_address):
         self.merchant_account = merchant_account
         self.data = data
+        self.account_member_id = account_member_id
         self.ip_address = ip_address
 
     def handle(self):
@@ -215,4 +216,5 @@ class CreateRefund(ServiceBase):
             reclaim_reward_value=reclaim_reward_value,
             refund_reason=refund_reason,
             refund_note=refund_note,
+            cashier_id=self.account_member_id,
         )

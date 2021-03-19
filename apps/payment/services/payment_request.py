@@ -39,9 +39,10 @@ __all__ = (
 
 
 class CreatePaymentRequest(ServiceBase):
-    def __init__(self, account_id, data):
+    def __init__(self, account_id, account_member_id, data):
         self.data = data
         self.account_id = account_id
+        self.account_member_id = account_member_id
 
     def handle(self):
         payment_data = self._validate_data()
@@ -143,6 +144,7 @@ class CreatePaymentRequest(ServiceBase):
             account_to_id=data["account_to_id"],
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
+            cashier_id=self.account_member_id,
         )
 
 
