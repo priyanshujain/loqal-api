@@ -9,6 +9,7 @@ __all__ = (
     "DictField",
     "EnumChoiceField",
     "EnumCharChoiceValueField",
+    "EnumCharChoiceField",
 )
 
 
@@ -52,3 +53,9 @@ class EnumCharChoiceValueField(CharField):
 
     def to_representation(self, value):
         return getattr(value, "value", "")
+
+
+class EnumCharChoiceField(ChoiceField):
+    def __init__(self, choices, **kwargs):
+        self.choices = [(k.value, k.label) for k in choices]
+        super().__init__(choices=self.choices, **kwargs)

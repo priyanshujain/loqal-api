@@ -75,7 +75,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
         read_only=True
     )
     reward_usage = RewardUsageResponse(read_only=True)
-    discount = TransactionDiscountResponse(source="payment.order", read_only=True)
+    discount = TransactionDiscountResponse(
+        source="payment.order", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -254,13 +256,9 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
 
 
 class PaymentListResponse(serializers.ModelSerializer):
-    charge_status = serializers.CharField(
-        source="charge_status.label", read_only=True
-    )
-    status = serializers.CharField(source="status.label", read_only=True)
-    payment_process = serializers.CharField(
-        source="payment_process.label", read_only=True
-    )
+    charge_status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    payment_process = serializers.ChoiceCharEnumSerializer(read_only=True)
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
 
     class Meta:

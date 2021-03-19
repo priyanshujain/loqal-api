@@ -34,10 +34,8 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
 
 
 class RefundHistoryResponse(serializers.ModelSerializer):
-    refund_type = serializers.CharField(
-        source="refund_type.label", read_only=True
-    )
-    status = serializers.CharField(source="status.label", read_only=True)
+    refund_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )

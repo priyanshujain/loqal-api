@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from apps.account.models import Account
+from apps.merchant.models import AccountMember
 from apps.payment.options import PaymentRequestStatus
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
@@ -27,6 +28,13 @@ class PaymentRequest(AbstractBaseModel):
         null=True,
         on_delete=models.SET_NULL,
         related_name="to_payment_requests",
+    )
+    cashier = models.ForeignKey(
+        AccountMember,
+        blank=True,
+        null=True,
+        related_name="payment_requuests",
+        on_delete=models.SET_NULL,
     )
     amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
