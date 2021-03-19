@@ -311,7 +311,7 @@ def get_consumer_transactions(consumer_account):
 
 def get_merchant_transactions(merchant_account):
     return Transaction.objects.filter(
-        recipient_bank_account__account=merchant_account.account
+        payment__order__merchant=merchant_account
     )
 
 
@@ -322,7 +322,7 @@ def get_merchant_payments(merchant_account):
 def get_merchant_transaction(merchant_account, transaction_tracking_id):
     try:
         return Transaction.objects.get(
-            recipient_bank_account__account=merchant_account.account,
+            payment__order__merchant=merchant_account,
             transaction_tracking_id=transaction_tracking_id,
         )
     except Transaction.DoesNotExist:
