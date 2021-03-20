@@ -113,6 +113,7 @@ class AllocateRewards(ServiceBase):
                     cash_reward_id=cash_reward.id,
                     amount=cash_reward.available_value,
                     consumer_id=consumer.id,
+                    merchant_id=loyalty_program.merchant.id,
                 )
                 transaction = create_transaction(
                     transaction_type=TransactionType.CREDIT_REWARD_CASHBACK,
@@ -152,6 +153,7 @@ class AllocateRewards(ServiceBase):
                 create_new_voucher_usage(
                     voucher_reward_id=voucher_reward.id,
                     consumer_id=consumer.id,
+                    merchant_id=loyalty_program.merchant.id,
                 )
             return {
                 "reward_value_type": {

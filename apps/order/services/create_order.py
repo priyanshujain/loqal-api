@@ -65,6 +65,7 @@ class CreateOrder(ServiceBase):
             reward_value_type=RewardValueType.FIXED_AMOUNT,
             order_id=order.id,
             consumer_id=self.consumer_id,
+            merchant_id=self.merchant_id,
         )
         redeemed_amount = 0
         for cash_reward in cash_rewards:
@@ -104,6 +105,7 @@ class CreateOrder(ServiceBase):
             reward_value_type=RewardValueType.PERCENTAGE,
             order_id=order.id,
             consumer_id=self.consumer_id,
+            merchant_id=self.merchant_id,
         )
         order.update_discount(
             amount=redeemable_reward_amount,

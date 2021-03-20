@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
 
-from apps.account.models import ConsumerAccount
+from apps.account.models import ConsumerAccount, MerchantAccount
 from apps.order.models import Order
 from apps.reward.options import RewardValueType
 from db.models import AbstractBaseModel
@@ -23,6 +23,10 @@ class RewardUsage(AbstractBaseModel):
     consumer = models.ForeignKey(
         ConsumerAccount, on_delete=models.CASCADE, blank=True, null=True
     )
+    merchant = models.ForeignKey(
+        MerchantAccount, on_delete=models.CASCADE, blank=True, null=True
+    )
+    is_first_time_credited = models.BooleanField(default=False)
     is_credit = models.BooleanField(default=False)
     reward_value_type = ChoiceCharEnumField(
         max_length=32,

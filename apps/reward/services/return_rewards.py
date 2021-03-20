@@ -39,6 +39,7 @@ class ReturnRewards(ServiceBase):
                         order_id=reward_usage.order.id,
                         voucher_reward_id=voucher_reward.id,
                         consumer_id=reward_usage.order.consumer.id,
+                        merchant_id=reward_usage.order.merchant.id,
                     )
                     voucher_reward.refund()
                     create_reward_credit_event(
@@ -60,6 +61,7 @@ class ReturnRewards(ServiceBase):
                         voucher_reward_id=voucher_reward.id,
                         amount=self.reclaim_reward_value,
                         consumer_id=reward_usage.order.consumer.id,
+                        merchant_id=reward_usage.order.merchant.id,
                     )
                     create_reward_reclaimed_event(
                         merchant_id=reward_usage.order.merchant.id,
@@ -81,6 +83,7 @@ class ReturnRewards(ServiceBase):
                     order_id=reward_usage.order.id,
                     amount=self.return_reward_value,
                     consumer_id=reward_usage.order.consumer.id,
+                    merchant_id=reward_usage.order.merchant.id,
                 )
                 for reward_usage_item in reward_usage_items:
                     refunded_amount_item = Decimal(0.0)
