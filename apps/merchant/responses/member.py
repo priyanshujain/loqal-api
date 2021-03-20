@@ -117,7 +117,7 @@ class AccountMemberResponse(serializers.ModelSerializer):
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.CharField(source="user.email", read_only=True)
-    is_disbled = serializers.BooleanField(
+    is_disabled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )
     role = FeatureAccessRoleResponse(read_only=True)
@@ -130,6 +130,6 @@ class AccountMemberResponse(serializers.ModelSerializer):
             "last_name",
             "email",
             "position",
-            "is_disbled",
+            "is_disabled",
             "role",
         )

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.timezone import now
+from django.utils.translation import TranslatorCommentWarning
 
 from apps.account.models import MerchantAccount
 from apps.merchant.options import FeatureAcessTypes
@@ -112,12 +113,12 @@ class AccountMember(AbstractBaseModel):
 
     def disable_member(self):
         user = self.user
-        user.is_disbled = True
+        user.is_disabled = True
         user.save()
 
     def enable_member(self):
         user = self.user
-        user.is_disbled = False
+        user.is_disabled = False
         user.save()
 
     def __str__(self):
