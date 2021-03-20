@@ -64,6 +64,7 @@ class RewardUsageResponse(serializers.ModelSerializer):
             "total_amount",
             "is_credit",
             "is_first_time_credited",
+            "merchant",
         )
 
 
