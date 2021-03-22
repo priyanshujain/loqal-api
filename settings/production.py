@@ -9,6 +9,13 @@ ALLOWED_HOSTS = ["*"]
 # vendor API env
 API_ENV = APIEnvironmentTypes.PRODUCTION
 
+CORS_ORIGIN_WHITELIST = [
+    "https://merchant.loqal.us",
+    "https://api.dwolla.com",
+    "https://loqal.us",
+    "https://staff.loqal.us",
+]
+
 CORS_ORIGIN_REGEX_WHITELIST += [
     "https://merchant.loqal.us",
     "https://api.dwolla.com",
