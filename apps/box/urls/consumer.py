@@ -1,14 +1,16 @@
-from django.conf.urls import url
+from django.urls import path
 
 from apps.box.views.consumer import CreateFileAPI, FetchFileUrlAPI
 
 urlpatterns = [
-    url(
-        r"^create/?$",
+    path(
+        "create/",
         CreateFileAPI.as_view(),
+        name="create_boxfile",
     ),
-    url(
-        r"^$",
+    path(
+        "",
         FetchFileUrlAPI.as_view(),
+        name="get_boxfile_url",
     ),
 ]
