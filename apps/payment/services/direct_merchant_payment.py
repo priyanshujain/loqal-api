@@ -56,7 +56,7 @@ class DirectMerchantPayment(ServiceBase):
         if total_payable_amount > Decimal(0.0):
             try:
                 transaction = CreatePayment(
-                    account_id=self.consumer_account.id,
+                    account_id=self.consumer_account.account.id,
                     ip_address=self.ip_address,
                     sender_bank_account=payment_data["sender_bank_account"],
                     receiver_bank_account=payment_data[

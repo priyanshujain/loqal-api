@@ -57,7 +57,7 @@ class CreateRefund(ServiceBase):
         if refund_payment.amount > Decimal(0.0):
             try:
                 transaction = CreatePayment(
-                    account_id=self.merchant_account.id,
+                    account_id=self.merchant_account.account.id,
                     ip_address=self.ip_address,
                     sender_bank_account=payment_data["sender_bank_account"],
                     receiver_bank_account=payment_data[
