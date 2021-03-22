@@ -18,7 +18,9 @@ def get_loqal_consumers():
 
 def get_loqal_consumer(consumer_id):
     try:
-        return ConsumerAccount.objects.get(u_id=consumer_id, account__isnull=False)
+        return ConsumerAccount.objects.get(
+            u_id=consumer_id, account__isnull=False
+        )
     except ConsumerAccount.DoesNotExist:
         return None
 

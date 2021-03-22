@@ -2,9 +2,9 @@ from django.urls import path
 
 from apps.account.views.staff import (CreateNonLoqalMerchantsAPI,
                                       DisableAccountAPI, EnableAccountAPI,
-                                      GetActiveMerchantsAPI, GetConsumersAPI,
-                                      GetNonLoqalMerchantsAPI,
-                                      GetConsumerDetailsAPI)
+                                      GetActiveMerchantsAPI,
+                                      GetConsumerDetailsAPI, GetConsumersAPI,
+                                      GetNonLoqalMerchantsAPI)
 
 urlpatterns = [
     path(

@@ -1,7 +1,7 @@
 from api.views import StaffAPIView
 from apps.account.dbapi.staff import (get_active_non_loqal_merchants,
-                                      get_loqal_consumers, get_loqal_merchants,
-                                      get_loqal_consumer,)
+                                      get_loqal_consumer, get_loqal_consumers,
+                                      get_loqal_merchants)
 from apps.account.responses.staff import (ConsumerAccountProfileResponse,
                                           MerchantAccountProfileResponse)
 from apps.account.services import (CreateNonLoqalMerchant, DisableAccount,
@@ -28,9 +28,7 @@ class GetConsumerDetailsAPI(StaffAPIView):
     def get(self, request, consumer_id):
         consumer = get_loqal_consumer(consumer_id=consumer_id)
         if consumer:
-            return self.response(
-                ConsumerAccountProfileResponse(consumer).data
-            )
+            return self.response(ConsumerAccountProfileResponse(consumer).data)
         else:
             return self.response(status=400)
 
@@ -41,6 +39,7 @@ class GetConsumersAPI(StaffAPIView):
         return self.response(
             ConsumerAccountProfileResponse(consumers, many=True).data
         )
+
 
 class CreateNonLoqalMerchantsAPI(StaffAPIView):
     def post(self, request):

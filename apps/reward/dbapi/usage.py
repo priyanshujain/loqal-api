@@ -6,7 +6,11 @@ from apps.reward.options import RewardValueType
 
 
 def create_debit_reward_usage(
-    total_amount, reward_value_type, order_id, consumer_id=None, merchant_id=None
+    total_amount,
+    reward_value_type,
+    order_id,
+    consumer_id=None,
+    merchant_id=None,
 ):
     try:
         return RewardUsage.objects.create(
@@ -46,7 +50,11 @@ def get_debit_reward_usage(order_id):
 
 
 def create_voucher_refund(
-    order_id, voucher_reward_id, amount=None, consumer_id=None, merchant_id=None
+    order_id,
+    voucher_reward_id,
+    amount=None,
+    consumer_id=None,
+    merchant_id=None,
 ):
     try:
         reward_usage = RewardUsage.objects.create(
@@ -68,7 +76,9 @@ def create_voucher_refund(
         return None, None
 
 
-def create_cash_refund_usage(order_id, amount, consumer_id=None, merchant_id=None):
+def create_cash_refund_usage(
+    order_id, amount, consumer_id=None, merchant_id=None
+):
     try:
         return RewardUsage.objects.create(
             is_credit=True,
@@ -130,7 +140,9 @@ def get_all_reward_usage(merchant_id, consumer_id):
     ).order_by("-created_at")
 
 
-def create_new_cash_usage(cash_reward_id, amount, consumer_id=None, merchant_id=None):
+def create_new_cash_usage(
+    cash_reward_id, amount, consumer_id=None, merchant_id=None
+):
     try:
         usage = RewardUsage.objects.create(
             is_credit=True,
@@ -150,7 +162,9 @@ def create_new_cash_usage(cash_reward_id, amount, consumer_id=None, merchant_id=
         return None
 
 
-def create_new_voucher_usage(voucher_reward_id, consumer_id=None, merchant_id=None):
+def create_new_voucher_usage(
+    voucher_reward_id, consumer_id=None, merchant_id=None
+):
     try:
         usage = RewardUsage.objects.create(
             is_credit=True,
