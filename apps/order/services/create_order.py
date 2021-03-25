@@ -94,7 +94,7 @@ class CreateOrder(ServiceBase):
             )
             redeemed_amount += usage_item.amount
             cash_reward.update_usage(used_amount=usage_item.amount)
-            if redeemable_reward_amount != total_cash_available:
+            if redeemable_reward_amount == redeemed_amount:
                 break
         return order, reward_usage
 
