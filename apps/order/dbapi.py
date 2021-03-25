@@ -51,3 +51,7 @@ def get_rewarded_merchant_orders(consumer_id):
         .order_by("merchant", "-created_at")
         .distinct("merchant")
     )
+
+
+def get_empty_orders():
+    return Order.objects.none()
