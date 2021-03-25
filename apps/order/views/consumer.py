@@ -86,7 +86,7 @@ class RewardedMerchantsAPI(ConsumerAPIView):
             merchant_obj = loyalty_program.merchant
             orders = get_empty_orders()
             try:
-                orders = merchant_obj.orders.all()
+                orders = merchant_obj.orders.all().filter(consumer_id=consumer.id)
             except Exception:
                 pass
 
