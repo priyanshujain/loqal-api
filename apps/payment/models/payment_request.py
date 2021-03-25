@@ -71,7 +71,6 @@ class PaymentRequest(AbstractBaseModel):
 
     def reject(self, save=True):
         self.status = PaymentRequestStatus.REJECTED
-        self.payment.cancelled_payment()
         if save:
             self.save()
 
