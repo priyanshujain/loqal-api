@@ -1,4 +1,4 @@
-from apps.reward.dbapi import LoyaltyProgram
+from apps.reward.models import LoyaltyProgram
 
 
 def get_all_loyalty_programs():
