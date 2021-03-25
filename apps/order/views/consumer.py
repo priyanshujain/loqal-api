@@ -83,11 +83,10 @@ class RewardedMerchantsAPI(ConsumerAPIView):
             merchant["vouchers"] = get_voucher_rewards(
                 merchant_id=loyalty_program.merchant.id, consumer_id=consumer.id
             ).count()
-            merchant = loyalty_program.merchant
-
+            merchant_obj = loyalty_program.merchant
             orders = get_empty_orders()
             try:
-                orders = merchant.orders.all()
+                orders = merchant_obj.orders.all()
             except Exception:
                 pass
 
