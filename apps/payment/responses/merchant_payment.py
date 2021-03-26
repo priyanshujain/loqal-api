@@ -51,6 +51,9 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
     payment_status = serializers.ChoiceEnumSerializer(
         source="payment.status", read_only=True
     )
+    payment_charge_status = serializers.ChoiceEnumSerializer(
+        source="payment.charge_status", read_only=True
+    )
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
@@ -98,6 +101,7 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "recipient_source_type",
             "reward_usage",
             "discount",
+            "payment_charge_status",
         )
 
 
