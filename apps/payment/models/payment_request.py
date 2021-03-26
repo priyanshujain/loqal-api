@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from apps.account.models import Account
+from apps.merchant.models import AccountMember
 from apps.payment.options import PaymentRequestStatus
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
@@ -27,6 +28,13 @@ class PaymentRequest(AbstractBaseModel):
         null=True,
         on_delete=models.SET_NULL,
         related_name="to_payment_requests",
+    )
+    cashier = models.ForeignKey(
+        AccountMember,
+        blank=True,
+        null=True,
+        related_name="payment_requests",
+        on_delete=models.SET_NULL,
     )
     amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -54,7 +62,7 @@ class PaymentRequest(AbstractBaseModel):
         Transaction,
         blank=True,
         null=True,
-        related_name="payment_request",
+        related_name="related_payment_request",
         on_delete=models.CASCADE,
     )
 
@@ -63,7 +71,6 @@ class PaymentRequest(AbstractBaseModel):
 
     def reject(self, save=True):
         self.status = PaymentRequestStatus.REJECTED
-        self.payment.cancelled_payment()
         if save:
             self.save()
 
@@ -77,7 +84,18 @@ class PaymentRequest(AbstractBaseModel):
         if save:
             self.save()
 
+    def add_payment(self, payment, tip_amount, save=True):
+        self.payment = payment
+        self.tip_amount = tip_amount
+        if save:
+            self.save()
+
     def set_failed(self, save=True):
         self.status = PaymentRequestStatus.FAILED
+        if save:
+            self.save()
+
+    def set_accepted(self, save=True):
+        self.status = PaymentRequestStatus.ACCEPTED
         if save:
             self.save()

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import calendar
 import re
 from datetime import datetime, timedelta
 
@@ -118,3 +119,11 @@ def datetime_format(dt):
     if value.endswith("+00:00"):
         value = value[:-6] + "Z"
     return value
+
+
+def dt_add_months(dt, months):
+    month = dt.month - 1 + months
+    year = dt.year + month // 12
+    month = month % 12 + 1
+    day = min(dt.day, calendar.monthrange(year, month)[1])
+    return dt.replace(year=year, month=month, day=day)

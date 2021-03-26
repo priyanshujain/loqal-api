@@ -27,38 +27,57 @@ class MemberType(ChoiceEnum):
     ADMINISTRATOR = "administrator", _("Administrator")
 
 
-class FeatureAcessTypes(ChoiceEnum):
-    CREATE = "create", _("Create")
-    UPDATE = "update", _("Update")
-    VIEW = "view", _("View")
-    APPROVE = "approve", _("Approve")
-    DELETE = "delete", _("Delete")
+class FeatureAcessTypes(ChoiceCharEnum):
+    CREATE = "CREATE", _("Create")
+    UPDATE = "UPDATE", _("Update")
+    VIEW = "VIEW", _("View")
+    PARTIAL_VIEW = "PARTIAL_VIEW", _("Partial View")
+    DELETE = "DELETE", _("Delete")
 
 
 class AllowedFeatureAcessTypes:
-    TEAM_AND_ROLES = ["CREATE", "UPDATE", "VIEW", "DELETE"]
-    BENEFICIARIES = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-        "APPROVE",
-        "DELETE",
+    PAYMENT_REQUESTS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.PARTIAL_VIEW,
     ]
-    TRANSACTIONS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
-        "APPROVE",
+    PAYMENT_HISTORY = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    SETTLEMENTS = [FeatureAcessTypes.VIEW, FeatureAcessTypes.PARTIAL_VIEW]
+    REFUNDS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.PARTIAL_VIEW,
     ]
-    DIRECT_DEBIT_ACCOUNTS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
+    DISPUTES = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    CUSTOMERS = [FeatureAcessTypes.PARTIAL_VIEW, FeatureAcessTypes.VIEW]
+    BANK_ACCOUNTS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
     ]
-    SETTINGS = [
-        "CREATE",
-        "UPDATE",
-        "VIEW",
+    QR_CODES = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+    ]
+    STORE_PROFILE = [FeatureAcessTypes.UPDATE]
+    TEAM_MANAGEMENT = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
+    ]
+    TOP_CUSTOMERS = [FeatureAcessTypes.VIEW]
+    LOYALTY_PROGRAM = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.DELETE,
+    ]
+    MERCHANT_SETTINGS = [
+        FeatureAcessTypes.CREATE,
+        FeatureAcessTypes.UPDATE,
+        FeatureAcessTypes.VIEW,
+        FeatureAcessTypes.DELETE,
     ]
 
 

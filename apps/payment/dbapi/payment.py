@@ -5,7 +5,7 @@ Payments relted db operations.
 from decimal import Decimal
 
 from django.conf import settings
-from django.db.models import Count, Q, Sum
+from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from apps.order.models import Order
@@ -13,8 +13,9 @@ from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
                                  PaymentRegister, PaymentRequest, Refund,
                                  Transaction)
 from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
+                                  TransactionSourceTypes, TransactionStatus,
                                   TransactionType)
-from utils.types import to_float
+from apps.provider.options import DEFAULT_CURRENCY
 
 
 def create_payment_register(account_id):
@@ -45,19 +46,27 @@ def create_payment(
 
 
 def create_transaction(
-    sender_bank_account_id,
-    recipient_bank_account_id,
-    amount,
-    currency,
-    fee_bearer_account_id,
-    fee_amount,
-    fee_currency,
-    payment_id,
     customer_ip_address,
+    sender_bank_account_id=None,
+    recipient_bank_account_id=None,
+    amount=Decimal(0.0),
+    currency=DEFAULT_CURRENCY,
+    fee_bearer_account_id=None,
+    fee_amount=Decimal(0.0),
+    fee_currency=DEFAULT_CURRENCY,
+    payment_id=None,
+    sender_source_type=TransactionSourceTypes.NA,
+    recipient_source_type=TransactionSourceTypes.NA,
+    refund_payment_id=None,
+    direct_merchant_payment_id=None,
+    payment_request_id=None,
+    reward_usage_id=None,
     transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     min_access_balance_required=Decimal(
         settings.MIN_BANK_ACCOUNT_BALANCE_REQUIRED
     ),
+    is_success=False,
+    status=TransactionStatus.NOT_SENT,
 ):
     """
     dbapi for creating new transaction.
@@ -75,6 +84,14 @@ def create_transaction(
             customer_ip_address=customer_ip_address,
             transaction_type=transaction_type,
             min_access_balance_required=min_access_balance_required,
+            sender_source_type=sender_source_type,
+            recipient_source_type=recipient_source_type,
+            refund_payment_id=refund_payment_id,
+            direct_merchant_payment_id=direct_merchant_payment_id,
+            payment_request_id=payment_request_id,
+            reward_usage_id=reward_usage_id,
+            is_success=is_success,
+            status=status,
         )
     except IntegrityError:
         return None
@@ -182,9 +199,9 @@ def get_empty_qrcodes():
 def create_payment_request(
     account_from_id,
     account_to_id,
-    payment_id,
     amount,
     currency,
+    cashier_id=None,
 ):
     """
     dbapi for creating new payment request.
@@ -193,9 +210,9 @@ def create_payment_request(
         return PaymentRequest.objects.create(
             account_from_id=account_from_id,
             account_to_id=account_to_id,
-            payment_id=payment_id,
             amount=Decimal(amount),
             currency=currency,
+            cashier_id=cashier_id,
         )
     except IntegrityError:
         return None
@@ -221,8 +238,14 @@ def create_direct_merchant_payment(
 
 def create_refund_payment(
     payment_id,
+    requested_items_value,
     amount,
     refund_type,
+    return_reward_value,
+    reclaim_reward_value,
+    refund_reason,
+    refund_note,
+    cashier_id=None,
 ):
     """
     dbapi for creating new refund payment.
@@ -230,8 +253,14 @@ def create_refund_payment(
     try:
         return Refund.objects.create(
             payment_id=payment_id,
+            requested_items_value=requested_items_value,
             amount=amount,
             refund_type=refund_type,
+            return_reward_value=return_reward_value,
+            reclaim_reward_value=reclaim_reward_value,
+            refund_reason=refund_reason,
+            refund_note=refund_note,
+            cashier_id=cashier_id,
         )
     except IntegrityError:
         return None
@@ -274,21 +303,25 @@ def get_transactions_to_merchant(account_id):
 
 def get_consumer_transactions(consumer_account):
     return Transaction.objects.filter(
-        Q(sender_bank_account__account=consumer_account.account)
-        | Q(recipient_bank_account__account=consumer_account.account)
+        Q(payment__order__consumer=consumer_account)
+        | Q(reward_usage__consumer=consumer_account)
     )
 
 
 def get_merchant_transactions(merchant_account):
     return Transaction.objects.filter(
-        recipient_bank_account__account=merchant_account.account
+        payment__order__merchant=merchant_account
     )
+
+
+def get_merchant_payments(merchant_account):
+    return Payment.objects.filter(order__merchant=merchant_account)
 
 
 def get_merchant_transaction(merchant_account, transaction_tracking_id):
     try:
         return Transaction.objects.get(
-            recipient_bank_account__account=merchant_account.account,
+            payment__order__merchant=merchant_account,
             transaction_tracking_id=transaction_tracking_id,
         )
     except Transaction.DoesNotExist:

@@ -19,7 +19,7 @@ def migrate_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("payment", "0048_merchantreceivelimit"),
+        ("payment", "0049_auto_20210305_1033"),
     ]
 
     operations = [

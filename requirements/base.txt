@@ -38,6 +38,7 @@ django-opentracing==1.1.0
 django-picklefield==3.0.1
 django-redis==4.12.1
 django-storages==1.11.1
+django-versatileimagefield==2.0
 djangorestframework==3.12.2
 entrypoints==0.3
 Envelopes==0.4

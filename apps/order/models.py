@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -7,7 +9,7 @@ from db.models import AbstractBaseModel, BaseModel
 from db.models.fields import ChoiceCharEnumField
 from db.models.fields.enum import ChoiceEnumField
 
-from .options import OrderEventType, OrderStatus, OrderType
+from .options import DiscountType, OrderEventType, OrderStatus, OrderType
 
 
 class Order(AbstractBaseModel):
@@ -36,6 +38,16 @@ class Order(AbstractBaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default=0,
     )
+    total_return_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
+    total_reclaimed_discount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
     total_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
@@ -47,6 +59,36 @@ class Order(AbstractBaseModel):
         default=0,
     )
     discount_name = models.CharField(max_length=255, blank=True, null=True)
+    discount_type = ChoiceCharEnumField(
+        max_length=32,
+        default=DiscountType.FIXED_AMOUNT,
+        enum_type=DiscountType,
+    )
+    applied_voucher = models.ForeignKey(
+        to="reward.VoucherReward",
+        on_delete=models.CASCADE,
+        related_name="applied_orders",
+        null=True,
+        blank=True,
+    )
+    is_paid = models.BooleanField(default=False)
+    is_rewarded = models.BooleanField(default=False)
+
+    # Reward given for the order
+    cash_reward = models.ForeignKey(
+        to="reward.CashReward",
+        on_delete=models.CASCADE,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
+    voucher_reward = models.ForeignKey(
+        to="reward.VoucherReward",
+        on_delete=models.CASCADE,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
     customer_note = models.TextField(blank=True, default="")
     order_tracking_id = models.CharField(
         max_length=10,
@@ -74,6 +116,11 @@ class Order(AbstractBaseModel):
                 self.order_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
+    def mark_paid(self, save=False):
+        self.is_paid = True
+        if save:
+            self.save()
+
     def set_fulfilled(self, save=True):
         self.status = OrderStatus.FULFILLED
         if save:
@@ -84,8 +131,43 @@ class Order(AbstractBaseModel):
         if save:
             self.save()
 
+    def set_applied_voucher(self, applied_voucher, save=True):
+        self.applied_voucher = applied_voucher
+        if save:
+            self.save()
+
+    def set_partially_returned(
+        self, amount, reclaimed_discount=Decimal(0.0), save=True
+    ):
+        self.status = OrderStatus.PARTIALLY_RETURNED
+        self.total_return_amount += amount
+        self.total_reclaimed_discount += reclaimed_discount
+        if save:
+            self.save()
+
+    def set_returned(self, amount, reclaimed_discount=Decimal(0.0), save=True):
+        self.status = OrderStatus.RETURNED
+        self.total_return_amount += amount
+        self.total_reclaimed_discount += reclaimed_discount
+        if save:
+            self.save()
+
     def set_cancelled(self, save=True):
         self.status = OrderStatus.CANCELLED
+        if save:
+            self.save()
+
+    def update_discount(
+        self,
+        amount,
+        name="",
+        discount_type=DiscountType.FIXED_AMOUNT,
+        save=True,
+    ):
+        self.discount_amount += amount
+        self.total_net_amount -= amount
+        self.discount_type = discount_type
+        self.discount_name = name
         if save:
             self.save()
 

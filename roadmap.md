@@ -32,6 +32,7 @@ list    causes:             A list of reasons explaining why the
                             error happened.
 ```
 - Add IP address logging (Ref. Sentry)
+- Move tip amount to order
 
 ## Long terms
 

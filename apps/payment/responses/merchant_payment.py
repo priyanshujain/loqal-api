@@ -8,11 +8,14 @@ from apps.payment.models.payment import Payment, PaymentEvent
 from apps.payment.models.refund import Refund
 from apps.payment.options import PaymentProcess
 
+from .payment import RewardUsageResponse, TransactionDiscountResponse
+
 __all__ = (
     "MerchantTransactionHistoryResponse",
     "PaymentDetailsResponse",
     "PaymentListResponse",
     "CustomerBasicDetailsResponse",
+    "DirectMerchantPaymentResponse",
 )
 
 
@@ -45,19 +48,39 @@ class CustomerBasicDetailsResponse(CustomerDetailsResponse):
 
 
 class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
-    payment_status = serializers.CharField(
-        source="payment.status.label", read_only=True
+    payment_status = serializers.ChoiceEnumSerializer(
+        source="payment.status", read_only=True
+    )
+    payment_charge_status = serializers.ChoiceEnumSerializer(
+        source="payment.charge_status", read_only=True
     )
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
-    transaction_status = serializers.CharField(
-        source="status.label", read_only=True
+    transaction_status = serializers.ChoiceEnumSerializer(
+        source="status", read_only=True
     )
     customer = CustomerDetailsResponse(
         source="payment.order.consumer", read_only=True
     )
+    order_total_amount = serializers.CharField(
+        source="payment.order.total_amount", read_only=True
+    )
+    order_net_amount = serializers.CharField(
+        source="payment.order.total_net_amount", read_only=True
+    )
+    order_return_amount = serializers.CharField(
+        source="payment.order.total_return_amount", read_only=True
+    )
     amount = serializers.CharField(read_only=True)
+    sender_source_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    recipient_source_type = serializers.ChoiceCharEnumSerializer(
+        read_only=True
+    )
+    reward_usage = RewardUsageResponse(read_only=True)
+    discount = TransactionDiscountResponse(
+        source="payment.order", read_only=True
+    )
 
     class Meta:
         model = Transaction
@@ -70,6 +93,32 @@ class MerchantTransactionHistoryResponse(serializers.ModelSerializer):
             "payment_status",
             "transaction_status",
             "is_success",
+            "customer",
+            "order_total_amount",
+            "order_net_amount",
+            "order_return_amount",
+            "sender_source_type",
+            "recipient_source_type",
+            "reward_usage",
+            "discount",
+            "payment_charge_status",
+        )
+
+
+class DirectMerchantPaymentResponse(serializers.ModelSerializer):
+    payment_status = serializers.ChoiceCharEnumSerializer(
+        source="status", read_only=True
+    )
+    customer = CustomerDetailsResponse(source="order.consumer", read_only=True)
+    amount = serializers.CharField(source="captured_amount", read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = (
+            "created_at",
+            "amount",
+            "payment_tracking_id",
+            "payment_status",
             "customer",
         )
 
@@ -147,8 +196,14 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
     payment_status = serializers.CharField(
         source="status.label", read_only=True
     )
-    order_amount = serializers.CharField(
+    order_total_amount = serializers.CharField(
+        source="order.total_amount", read_only=True
+    )
+    order_net_amount = serializers.CharField(
         source="order.total_net_amount", read_only=True
+    )
+    order_return_amount = serializers.CharField(
+        source="order.total_return_amount", read_only=True
     )
     transaction = serializers.SerializerMethodField("get_transaction_details")
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
@@ -166,7 +221,9 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
             "payment_status",
             "customer",
             "tip_amount",
-            "order_amount",
+            "order_total_amount",
+            "order_net_amount",
+            "order_return_amount",
         )
 
     def get_transaction_details(self, obj):
@@ -203,13 +260,9 @@ class PaymentDetailsResponse(serializers.ModelSerializer):
 
 
 class PaymentListResponse(serializers.ModelSerializer):
-    charge_status = serializers.CharField(
-        source="charge_status.label", read_only=True
-    )
-    status = serializers.CharField(source="status.label", read_only=True)
-    payment_process = serializers.CharField(
-        source="payment_process.label", read_only=True
-    )
+    charge_status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
+    payment_process = serializers.ChoiceCharEnumSerializer(read_only=True)
     tip_amount = serializers.SerializerMethodField("get_tip_amount")
 
     class Meta:

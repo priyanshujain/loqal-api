@@ -18,7 +18,22 @@ class TransactionType(ChoiceCharEnum):
         "Direct Merchant Payment"
     )
     REFUND_PAYMENT = "refund_payment", _("Refund Payment")
+    CREDIT_REWARD_CASHBACK = "credit_reward_cashback", _(
+        "Credit Reward Cashback"
+    )
     OTHER = "other", _("Other")
+
+
+class TransactionSourceTypes(ChoiceCharEnum):
+    CASH_WALLET = "cash_wallet", _("Cash Wallet")
+    REWARD_CASHBACK = "reward_cashback", _("Reward Cashback")
+    BANK_ACCOUNT = "bank_account", _("Bank Account")
+    NA = "na", _("NA")
+
+
+class TransactionTransferTypes(ChoiceCharEnum):
+    CASHBACK = "cashback", _("Cashback")
+    ACH_BANK_TRANSFER = "ach_bank_transfer", _("ACH Bank Transfer")
 
 
 class TransactionFailureReasonType(ChoiceCharEnum):
@@ -40,17 +55,17 @@ class TransactionFailureReasonType(ChoiceCharEnum):
         "Internal payment service failed"
     )
     PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", (
-        "Pre transfer ACH return on source bank"
+        "Pre transfer ACH return on source bank."
     )
     PRE_DESTINATION_ACH_FAILED = "pre_destination_ach_failed", (
-        "Pre transfer ACH return on destination bank"
+        "Pre transfer ACH return on destination bank."
     )
     PRE_SETTLEMENT_INSUFFICIENT_BALANCE_AT_DESTINATION = (
         "pre_settlement_insufficient_balance_at_destination",
-        ("Pre transfer ACH return on destination bank"),
+        ("Pre transfer ACH return on destination bank."),
     )
     PS_SOURCE_TRANSFER_FAILED = "ps_source_transfer_failed", _(
-        "Post settlement ACH return on source bank"
+        "Post settlement ACH return on source bank."
     )
     OTHER = "other", _("Other")
     NA = "na", _("NA")
@@ -71,54 +86,54 @@ class TransactionSenderStatus(ChoiceCharEnum):
     # UVC: unverified customer, VC: verified customer
     NOT_STARTED = "not_started", _("Not started")
     UVC_BANK_TRANSFER_CREATED = "uvc_bank_transfer_created", _(
-        "Transfer created from bank"
+        "A transfer has been created from sender bank."
     )
     UVC_BANK_TRANSFER_FAILED = "uvc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from sender bank account has failed."
     )
     UVC_BANK_TRANSFER_COMPLETED = "uvc_bank_transfer_completed", _(
-        "Sender Transfer Completed"
+        "The transfer from sender bank account has completed."
     )
     UVC_BANK_TRANSFER_CANCELLED = "uvc_bank_transfer_cancelled", _(
-        "Sender bank transfer Cancelled"
+        "The transfer from sender bank account has cancelled."
     )
     VC_BALANCE_TRANSFER_CREATED = "vc_bank_transfer_created", _(
-        "Transfer created from balance"
+        "A transfer has been created from sender's Loqal balance."
     )
     VC_BANK_TRANSFER_CREATED = "vc_bank_transfer_created", _(
-        "Sender bank transfer created"
+        "A transfer has been created from sender bank account."
     )
     VC_BANK_TRANSFER_CREATION_FAILED = "vc_bank_transfer_creation_failed", _(
-        "Bank transfer creation failed"
+        "The transfer creation from sender bank account has failed."
     )
     VC_BANK_TRANSFER_CANCELLED = "vc_bank_transfer_failed", _(
-        "Bank transfer cancelled"
+        "The transfer from sender bank account has cancelled."
     )
     VC_BANK_TRANSFER_FAILED = "vc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from sender bank account has failed."
     )
     VC_BANK_TRANSFER_COMPLETED = "vc_bank_transfer_completed", _(
-        "Sender Transfer Completed"
+        "The transfer from sender bank account has completed."
     )
     VC_FROM_BALANCE_TRANSFER_CREATED = "vc_from_balance_transfer_created", _(
-        "From Balance transfer created"
+        "A transfer has been created from sender's Loqal balance."
     )
     VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "vc_from_balance_transfer_cancelled",
-        _("From Balance transfer cancelled"),
+        _("The transfer from sender's Loqal balance has cancelled."),
     )
     VC_FROM_BALANCE_TRANSFER_FAILED = "vc_from_balance_transfer_failed", _(
-        "From Balance transfer failed"
+        "The transfer from sender's Loqal balance has failed."
     )
     VC_FROM_BALANCE_TRANSFER_COMPLETED = (
         "vc_from_balance_transfer_completed",
-        _("From Balance transfer completed"),
+        _("The transfer has completed to sender's Loqal balance."),
     )
     VC_TO_BALANCE_TRANSFER_CANCELLED = "vc_to_balance_transfer_cancelled", _(
-        "To Balance transfer cancelled"
+        "The transfer to sender's Loqal balance has cancelled."
     )
     VC_TO_BALANCE_TRANSFER_FAILED = "vc_to_balance_transfer_failed", _(
-        "To Balance transfer failed"
+        "The transfer to sender's Loqal balance has failed."
     )
 
 
@@ -126,53 +141,53 @@ class TransactionReceiverStatus(ChoiceCharEnum):
     # UVC: unverified customer, VC: verified customer
     NOT_STARTED = "not_started", _("Not started")
     VC_TO_BALANCE_TRANSFER_CREATED = "vc_to_balance_transfer_created", _(
-        "To Balance transfer created"
+        "A transfer has been created to receiver's Loqal balance."
     )
     VC_TO_BALANCE_TRANSFER_CANCELLED = "vc_to_balance_transfer_cancelled", _(
-        "To Balance transfer cancelled"
+        "The transfer to receiver's Loqal balance has cancelled."
     )
     VC_TO_BALANCE_TRANSFER_FAILED = "vc_to_balance_transfer_failed", _(
-        "To Balance transfer failed"
+        "The transfer to receiver's Loqal balance has failed."
     )
     VC_TO_BALANCE_TRANSFER_COMPLETED = "vc_to_balance_transfer_completed", _(
-        "Receiver Balance Received"
+        "The transfer to receiver's Loqal balance has completed."
     )
     VC_FROM_BALANCE_TRANSFER_CREATED = "vc_from_balance_transfer_created", _(
-        "From Balance transfer created"
+        "A transfer has been created from receiver's Loqal balance to bank account."
     )
     VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "vc_from_balance_transfer_cancelled",
-        _("From Balance transfer cancelled"),
+        _("A transfer from receiver's Loqal balance has cancelled."),
     )
     VC_FROM_BALANCE_TRANSFER_FAILED = "vc_from_balance_transfer_failed", _(
-        "From Balance transfer failed"
+        "The transfer from receiver's Loqal balance has failed."
     )
     VC_BANK_TRANSFER_CREATED = "vc_bank_transfer_created", _(
-        "Bank transfer created"
+        "The transfer has been created from receiver's Loqal balance to bank account."
     )
     VC_BANK_TRANSFER_CREATION_FAILED = "vc_bank_transfer_creation_failed", _(
-        "Bank transfer creation failed"
+        "The transfer from from receiver's Loqal balance to bank account has failed."
     )
     VC_BANK_TRANSFER_CANCELLED = "vc_bank_transfer_cancelled", _(
-        "Bank transfer Cancelled"
+        "The transfer from receiver's Loqal balance to bank account has cancelled."
     )
     VC_BANK_TRANSFER_FAILED = "vc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from receiver's Loqal balance to bank account has failed."
     )
     VC_BANK_TRANSFER_COMPLETED = "vc_bank_transfer_completed", _(
-        "Bank transfer completed"
+        "The transfer from receiver's Loqal balance to bank account has completed."
     )
     UVC_BANK_TRANSFER_CREATED = "uvc_bank_transfer_created", _(
-        "Bank transfer Created"
+        "The transfer has been created to receiver bank account."
     )
     UVC_BANK_TRANSFER_CANCELLED = "uvc_bank_transfer_cancelled", _(
-        "Bank transfer Cancelled"
+        "The transfer to receiver bank account has cancelled."
     )
     UVC_BANK_TRANSFER_FAILED = "uvc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer to receiver bank account has failed."
     )
     UVC_BANK_TRANSFER_COMPLETED = "uvc_bank_transfer_completed", _(
-        "Bank transfer completed"
+        "The transfer to receiver bank account has completed."
     )
 
 
@@ -180,124 +195,132 @@ class TransactionEventType(ChoiceCharEnum):
     # UVC: unverified customer, VC: verified customer
     SENDER_NOT_STARTED = "sender_not_started", _("Not started")
     SENDER_UVC_BANK_TRANSFER_CREATED = "sender_uvc_bank_transfer_created", _(
-        "Transfer created from bank"
+        "A transfer has been created from sender bank."
     )
     SENDER_UVC_BANK_TRANSFER_FAILED = "sender_uvc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from sender bank account has failed."
     )
     SENDER_UVC_BANK_TRANSFER_COMPLETED = (
         "sender_uvc_bank_transfer_completed",
-        _("Sender Transfer Completed"),
+        _("The transfer from sender bank account has completed."),
     )
     SENDER_UVC_BANK_TRANSFER_CANCELLED = (
         "sender_uvc_bank_transfer_cancelled",
-        _("Sender bank transfer Cancelled"),
+        _("The transfer from sender bank account has cancelled."),
     )
     SENDER_VC_BALANCE_TRANSFER_CREATED = "sender_vc_bank_transfer_created", _(
-        "Transfer created from balance"
+        "A transfer has been created from sender's Loqal balance."
     )
     SENDER_VC_BANK_TRANSFER_CREATED = "sender_vc_bank_transfer_created", _(
-        "Sender bank transfer created"
+        "A transfer has been created from sender bank account."
     )
     SENDER_VC_BANK_TRANSFER_CREATION_FAILED = (
         "sender_vc_bank_transfer_creation_failed",
-        _("Bank transfer creation failed"),
+        _("The transfer creation from sender bank account has failed."),
     )
     SENDER_VC_BANK_TRANSFER_CANCELLED = "sender_vc_bank_transfer_failed", _(
-        "Bank transfer cancelled"
+        "The transfer from sender bank account has cancelled."
     )
     SENDER_VC_BANK_TRANSFER_FAILED = "sender_vc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from sender bank account has failed."
     )
     SENDER_VC_BANK_TRANSFER_COMPLETED = "sender_vc_bank_transfer_completed", _(
-        "Sender Transfer Completed"
+        "The transfer from sender bank account has completed."
     )
     SENDER_VC_FROM_BALANCE_TRANSFER_CREATED = (
         "sender_vc_from_balance_transfer_created",
-        _("From Balance transfer created"),
+        _("A transfer has been created from sender's Loqal balance."),
     )
     SENDER_VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "sender_vc_from_balance_transfer_cancelled",
-        _("From Balance transfer cancelled"),
+        _("The transfer from sender's Loqal balance has cancelled."),
     )
     SENDER_VC_FROM_BALANCE_TRANSFER_FAILED = (
         "sender_vc_from_balance_transfer_failed",
-        _("From Balance transfer failed"),
+        _("The transfer from sender's Loqal balance has failed."),
     )
     SENDER_VC_FROM_BALANCE_TRANSFER_COMPLETED = (
         "sender_vc_from_balance_transfer_completed",
-        _("From Balance transfer completed"),
+        _("The transfer has completed to sender's Loqal balance."),
     )
     SENDER_VC_TO_BALANCE_TRANSFER_CANCELLED = (
         "sender_vc_to_balance_transfer_cancelled",
-        _("To Balance transfer cancelled"),
+        _("The transfer to sender's Loqal balance has cancelled."),
     )
     SENDER_VC_TO_BALANCE_TRANSFER_FAILED = (
         "sender_vc_to_balance_transfer_failed",
-        _("To Balance transfer failed"),
+        _("The transfer to sender's Loqal balance has failed."),
     )
     # UVC: unverified customer, VC: verified customer
     RECEIVER_NOT_STARTED = "receiver_not_started", _("Not started")
     RECEIVER_VC_TO_BALANCE_TRANSFER_CREATED = (
         "receiver_vc_to_balance_transfer_created",
-        _("To Balance transfer created"),
+        _("A transfer has been created to receiver's Loqal balance."),
     )
     RECEIVER_VC_TO_BALANCE_TRANSFER_CANCELLED = (
         "receiver_vc_to_balance_transfer_cancelled",
-        _("To Balance transfer cancelled"),
+        _("The transfer to receiver's Loqal balance has cancelled."),
     )
     RECEIVER_VC_TO_BALANCE_TRANSFER_FAILED = (
         "receiver_vc_to_balance_transfer_failed",
-        _("To Balance transfer failed"),
+        _("The transfer to receiver's Loqal balance has failed."),
     )
     RECEIVER_VC_TO_BALANCE_TRANSFER_COMPLETED = (
         "receiver_vc_to_balance_transfer_completed",
-        _("Receiver Balance Received"),
+        _("The transfer to receiver's Loqal balance has completed."),
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CREATED = (
         "receiver_vc_from_balance_transfer_created",
-        _("From Balance transfer created"),
+        _(
+            "A transfer has been created from receiver's Loqal balance to bank account."
+        ),
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "receiver_vc_from_balance_transfer_cancelled",
-        _("From Balance transfer cancelled"),
+        _("The transfer from receiver's Loqal balance has cancelled."),
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_FAILED = (
         "receiver_vc_from_balance_transfer_failed",
-        _("From Balance transfer failed"),
+        _("The transfer from receiver's Loqal balance has failed."),
     )
     RECEIVER_VC_BANK_TRANSFER_CREATED = "receiver_vc_bank_transfer_created", _(
-        "Bank transfer created"
+        "A transfer has been created from receiver's Loqal balance to bank account."
     )
     RECEIVER_VC_BANK_TRANSFER_CREATION_FAILED = (
         "vc_bank_transfer_creation_failed",
-        _("Bank transfer creation failed"),
+        _(
+            "The transfer from from receiver's Loqal balance to bank account has failed"
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_CANCELLED = (
         "receiver_vc_bank_transfer_cancelled",
-        _("Bank transfer Cancelled"),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has cancelled."
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_FAILED = "receiver_vc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer from receiver's Loqal balance to bank account has failed."
     )
     RECEIVER_VC_BANK_TRANSFER_COMPLETED = (
         "receiver_vc_bank_transfer_completed",
-        _("Bank transfer completed"),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has completed."
+        ),
     )
     RECEIVER_UVC_BANK_TRANSFER_CREATED = (
         "receiver_uvc_bank_transfer_created",
-        _("Bank transfer Created"),
+        _("A transfer has been created to receiver bank account."),
     )
     RECEIVER_UVC_BANK_TRANSFER_CANCELLED = (
         "receiver_uvc_bank_transfer_cancelled",
-        _("Bank transfer Cancelled"),
+        _("The transfer to receiver bank account has cancelled."),
     )
     RECEIVER_UVC_BANK_TRANSFER_FAILED = "receiver_uvc_bank_transfer_failed", _(
-        "Bank transfer failed"
+        "The transfer to receiver bank account has failed."
     )
     RECEIVER_UVC_BANK_TRANSFER_COMPLETED = (
         "receiver_uvc_bank_transfer_completed",
-        _("Bank transfer completed"),
+        _("The transfer to receiver bank account has completed."),
     )
 
 
@@ -317,6 +340,7 @@ class PaymentEventType(ChoiceEnum):
     PAYMENT_DISPUTED = 5, _("Payment Disputed")
     REFUND_FAILED = 6, _("Refund Failed")
     PAYMENT_CANCELLED = 7, _("Payment Cancelled")
+    PARTIAL_FAILURE_RETURN = 8, _("Partial return due to failure")
 
 
 class PaymentRequestStatus(ChoiceEnum):
@@ -326,9 +350,21 @@ class PaymentRequestStatus(ChoiceEnum):
     FAILED = 3, _("Refund Failed")
 
 
+class DirectMerchantPaymentStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    FAILED = 1, _("Failed")
+
+
 class RefundType(ChoiceCharEnum):
     PARTIAL = "partial", _("Partial Refund")
     FULL = "full", _("Full Refund")
+
+
+class RefundReasonTypes(ChoiceCharEnum):
+    RETURNS = "returns", _("Returns")
+    DUPLICATE_PAYMENT = "dumplicate_payment", _("Duplicate Payment")
+    FRAUD_RELATED = "fraud_related", _("Fraud Related")
+    OTHER = "other", _("Other")
 
 
 class RefundStatus(ChoiceEnum):

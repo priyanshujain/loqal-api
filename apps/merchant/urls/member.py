@@ -1,16 +1,10 @@
 from django.urls import path
 
-from apps.merchant.views.member import (CreateFeatureAccessRoleAPI,
-                                        CreateMemberInviteAPI,
-                                        DeleteFeatureAccessRoleAPI,
+from apps.merchant.views.member import (CreateMemberInviteAPI,
                                         DisableMemberAPI, EnableMemberAPI,
-                                        FeatureAccessRolesDetailsAPI,
-                                        GetMemberInvitesAPI,
-                                        ListFeatureAccessRolesAPI,
-                                        ListMembersAPI, MemberFeatureAcessAPI,
-                                        MemberSignupAPI,
+                                        GetMemberInvitesAPI, ListMembersAPI,
+                                        MemberFeatureAcessAPI, MemberSignupAPI,
                                         ResendMemberInviteEmailAPI,
-                                        UpdateFeatureAccessRoleAPI,
                                         UpdateMemberInviteAPI,
                                         UpdateMemberRoleAPI,
                                         VerifyMemberInviteAPI)
@@ -53,31 +47,6 @@ urlpatterns = [
     ),
     path(
         "member/signup/", MemberSignupAPI.as_view(), name="member_signup_api"
-    ),
-    path(
-        "member/roles/<int:role_id>/",
-        FeatureAccessRolesDetailsAPI.as_view(),
-        name="member_role_details_api",
-    ),
-    path(
-        "member/roles/create/",
-        CreateFeatureAccessRoleAPI.as_view(),
-        name="member_role_create_api",
-    ),
-    path(
-        "member/roles/update/",
-        UpdateFeatureAccessRoleAPI.as_view(),
-        name="member_role_update_api",
-    ),
-    path(
-        "member/oles/delete/",
-        DeleteFeatureAccessRoleAPI.as_view(),
-        name="member_role_delete_api",
-    ),
-    path(
-        "member/roles/",
-        ListFeatureAccessRolesAPI.as_view(),
-        name="member_roles_api",
     ),
     path(
         "member/feature-access/update/",

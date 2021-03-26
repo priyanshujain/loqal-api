@@ -6,9 +6,10 @@ from api.views import merchant
 from apps.account.dbapi import (create_merchant_account,
                                 get_consumer_account_by_email)
 from apps.account.notifications import SendMerchantAccountVerifyEmail
+from apps.merchant.constants import DEFAULT_ROLE
 from apps.merchant.dbapi import (create_account_member_on_reg,
                                  create_merchant_profile, get_super_admin_role)
-from apps.merchant.services import CreateDefaultRoles
+from apps.merchant.models.member import FeatureAccessRole
 from apps.payment.dbapi import (create_merchant_receive_limit,
                                 create_payment_register)
 from apps.user.dbapi import create_user, get_merchant_user_by_email
@@ -38,13 +39,11 @@ class CreateMerchantAccount(ServiceBase):
         self._validate_data()
         merchant_account = self._factory_merchant_account()
         user = self._factory_user()
-        self._factory_default_roles(merchant_id=merchant_account.id)
-
-        admin_role = get_super_admin_role(merchant_id=merchant_account.id)
+        role = self._factory_admin_role()
         account_member = create_account_member_on_reg(
             user_id=user.id,
             merchant_id=merchant_account.id,
-            member_role_id=admin_role.id,
+            member_role_id=role.id,
         )
         self._send_verification_email(user=user)
         self._send_accepted_terms(account=merchant_account.account, user=user)
@@ -108,9 +107,10 @@ class CreateMerchantAccount(ServiceBase):
             customer_type=CustomerTypes.MERCHANT,
         )
 
-    def _factory_default_roles(self, merchant_id):
-        service = CreateDefaultRoles(merchant_id=merchant_id)
-        service.handle()
+    def _factory_admin_role(self):
+        return FeatureAccessRole.objects.create(
+            is_full_access=True, is_super_admin=True, **DEFAULT_ROLE
+        )
 
     def _send_verification_email(self, user):
         SendMerchantAccountVerifyEmail(user=user).send()

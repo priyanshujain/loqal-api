@@ -6,7 +6,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.account.dbapi import (get_consumer_account_by_phone_number,
                                 get_consumer_account_by_username)
 from apps.payment.dbapi import get_payment_qrcode
-from apps.payment.options import DisputeReasonType, DisputeStatus
+from apps.payment.options import (DisputeReasonType, DisputeStatus,
+                                  RefundReasonTypes)
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
@@ -161,6 +162,8 @@ class CreateRefundValidator(serializers.ValidationSerializer):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         coerce_to_string=False,
     )
+    refund_reason = serializers.EnumChoiceField(enum_type=RefundReasonTypes)
+    refund_note = serializers.CharField(required=False)
 
 
 class CreateDisputeValidator(serializers.ValidationSerializer):

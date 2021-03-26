@@ -18,7 +18,7 @@ class FcmPlugin(object):
         self,
         title=None,
         body=None,
-        icon=None,
+        icon="https://res.cloudinary.com/dhqh3pewg/image/upload/v1614172092/favicon_1_hujfvh.png",
         data_message=None,
         sound=None,
         badge=None,

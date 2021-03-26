@@ -77,10 +77,12 @@ class ApplyBankingWebhook(object):
             financial institution can issue a correction to change the bank account
             type from checking to savings.
             """
-            bank_account.dwolla_funding_source_status = (
-                DwollaFundingSourceStatus.UPDATED
-            )
-            bank_account.save()
+            # FIX: look into this @pj
+            # bank_account.dwolla_funding_source_status = (
+            #     DwollaFundingSourceStatus.UPDATED
+            # )
+            # bank_account.save()
+            pass
 
         if topic == "customer_microdeposits_added":
             """

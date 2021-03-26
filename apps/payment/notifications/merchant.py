@@ -13,7 +13,7 @@ class SendSinglePaymentNotification(NotificationBase):
     def send_single_message(self, device):
         device.send_notification_message(
             title="New payment recieved",
-            body="Click to view payment details",
+            body=f"Click here to view details.",
             data_message={
                 "action": "NEW_PAYMENT",
                 "payload": self.data,
@@ -85,8 +85,8 @@ class SendApproveRequestNotification(object):
 class SendRefundNotification(NotificationBase):
     def send_single_message(self, device):
         device.send_notification_message(
-            title="New refund recieved",
-            body="Click to view refund details",
+            title="Refund recieved",
+            body=f"Click here to view details.",
             data_message={
                 "action": "REFUND_RECEIVED",
                 "payload": self.data,

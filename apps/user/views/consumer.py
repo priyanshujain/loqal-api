@@ -2,6 +2,7 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework.parsers import MultiPartParser
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
@@ -11,12 +12,12 @@ from apps.notification.tasks import SendEmailVerifiedNotification
 from apps.user.notifications import SendConsumerResetPasswordEmail
 from apps.user.options import CustomerTypes
 from apps.user.responses import UserProfileResponse
-from apps.user.services import (AddPhoneNumber, ApplyResetPassword,
-                                ChangePassword, EmailVerification,
-                                LoginRequest, RequestResetPassword,
-                                ResendPhoneNumberOtp, ResendSmsOtpAuth,
-                                SmsOtpAuth, StartSmsAuthEnrollment,
-                                VerifyPhoneNumber)
+from apps.user.services import (AddChangeUserAvatar, AddPhoneNumber,
+                                ApplyResetPassword, ChangePassword,
+                                EmailVerification, LoginRequest,
+                                RequestResetPassword, ResendPhoneNumberOtp,
+                                ResendSmsOtpAuth, SmsOtpAuth,
+                                StartSmsAuthEnrollment, VerifyPhoneNumber)
 from utils import auth
 
 
@@ -239,3 +240,11 @@ class UserChangePasswordAPI(LoggedInAPIView):
             customer_type=CustomerTypes.CONSUMER,
         )
         service.handle()
+
+
+class UploadAvatarFileAPI(ConsumerAPIView):
+    parser_classes = (MultiPartParser,)
+
+    def post(self, request):
+        AddChangeUserAvatar(request=request).handle()
+        return self.response()

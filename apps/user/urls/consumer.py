@@ -7,6 +7,7 @@ from apps.user.views.consumer import (AddPhoneNumberAPI, ApplyResetPasswordAPI,
                                       ResendPhoneNumberVerifyOtpAPI,
                                       ResendSmsOtpAuthAPI, SmsOtpAuthAPI,
                                       StartSmsAuthEnrollmentAPI,
+                                      UploadAvatarFileAPI,
                                       UserChangePasswordAPI, UserLoginAPI,
                                       VerifyEmailAPI, VerifyPhoneNumberAPI)
 
@@ -69,5 +70,10 @@ urlpatterns = [
         "consumer/email-verification/resend/",
         ResendEmailverificationAPI.as_view(),
         name="resend_email_verification",
+    ),
+    path(
+        "consumer/change-avatar/",
+        UploadAvatarFileAPI.as_view(),
+        name="change_consumer_avatar",
     ),
 ]

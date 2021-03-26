@@ -169,6 +169,14 @@ def get_feature_access_role_by_id(role_id, merchant_id):
         return None
 
 
+def create_member_role(data):
+    return FeatureAccessRole.objects.create(**data)
+
+
+def update_member_role(role_id, data):
+    return FeatureAccessRole.objects.filter(id=role_id).update(**data)
+
+
 def get_feature_access_roles_by_account(merchant_id):
     return FeatureAccessRole.objects.filter(merchant_id=merchant_id)
 
@@ -180,14 +188,11 @@ def get_member_invite_by_token(token):
         return None
 
 
-def update_member_invite(
-    invite, first_name, last_name, email, position, role_id
-):
+def update_member_invite(invite, first_name, last_name, email, position):
     invite.first_name = first_name
     invite.last_name = last_name
     invite.email = email
     invite.position = position
-    invite.role_id = role_id
     invite.save()
     return invite
 

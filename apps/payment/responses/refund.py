@@ -34,10 +34,8 @@ class CustomerDetailsResponse(serializers.ModelSerializer):
 
 
 class RefundHistoryResponse(serializers.ModelSerializer):
-    refund_type = serializers.CharField(
-        source="refund_type.label", read_only=True
-    )
-    status = serializers.CharField(source="status.label", read_only=True)
+    refund_type = serializers.ChoiceCharEnumSerializer(read_only=True)
+    status = serializers.ChoiceCharEnumSerializer(read_only=True)
     payment_tracking_id = serializers.CharField(
         source="payment.payment_tracking_id", read_only=True
     )
@@ -60,6 +58,8 @@ class RefundHistoryResponse(serializers.ModelSerializer):
             "status",
             "amount",
             "currency",
+            "return_reward_value",
+            "reclaim_reward_value",
         )
 
 
@@ -81,6 +81,8 @@ class RefundListResponse(serializers.ModelSerializer):
             "refund_tracking_id",
             "payment_tracking_id",
             "status",
+            "return_reward_value",
+            "reclaim_reward_value",
         )
 
 
@@ -143,4 +145,6 @@ class RefundDetailsResponse(serializers.ModelSerializer):
             "status",
             "amount",
             "customer",
+            "return_reward_value",
+            "reclaim_reward_value",
         )

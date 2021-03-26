@@ -1,5 +1,4 @@
 from django.utils.translation import gettext as _
-from rest_framework.utils.field_mapping import get_field_kwargs
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.services import ServiceBase

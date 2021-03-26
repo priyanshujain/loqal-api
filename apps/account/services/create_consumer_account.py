@@ -73,8 +73,9 @@ class CreateConsumerAccount(ServiceBase):
                     "detail": [
                         ErrorDetail(
                             _(
-                                "You already signed for a Loqal merchant account "
-                                "with this email. Please use a different email."
+                                "You already signed for a "
+                                "Loqal merchant account with this email. "
+                                "Please use a different email."
                             )
                         )
                     ]

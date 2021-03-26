@@ -4,7 +4,9 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.utils.dates import InvalidParams, get_date_range_from_params
 from api.views import MerchantAPIView
 from apps.payment.dbapi import get_merchant_refund, get_merchant_refunds
-from apps.payment.responses import RefundDetailsResponse, RefundHistoryResponse
+from apps.payment.responses import (MerchantRefundDetailsResponse,
+                                    RefundDetailsResponse,
+                                    RefundHistoryResponse)
 
 __all__ = (
     "RefundListAPI",
@@ -41,4 +43,4 @@ class RefundDetailsAPI(MerchantAPIView):
             raise ValidationError(
                 {"detail": ErrorDetail("refund_id is not valid.")}
             )
-        return self.response(RefundDetailsResponse(refund).data)
+        return self.response(MerchantRefundDetailsResponse(refund).data)

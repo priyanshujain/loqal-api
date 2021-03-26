@@ -1,47 +1,92 @@
 from datetime import timedelta
+from re import I
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.timezone import now
+from django.utils.translation import TranslatorCommentWarning
 
 from apps.account.models import MerchantAccount
+from apps.merchant.options import FeatureAcessTypes
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceCharEnumField
 from utils.shortcuts import rand_str
 
 
 class FeatureAccessRole(AbstractBaseModel):
-    merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
-    role_name = models.CharField(max_length=256)
-    description = models.CharField(max_length=1024, blank=True)
-    team_and_roles = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+    payment_requests = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
-    beneficiaries = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+    payment_history = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
-    transactions = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+    settlements = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
-    banking = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+    disputes = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
-    settings = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+    refunds = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
+    customers = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    bank_accounts = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    qr_codes = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    store_profile = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    team_management = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    top_customers = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    loyalty_program = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    merchant_settings = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    is_full_access = models.BooleanField(default=False)
     is_super_admin = models.BooleanField(default=False)
     is_standard_user = models.BooleanField(default=False)
     is_editable = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = (
-            "merchant",
-            "role_name",
-        )
         db_table = "merchant_account_role"
-
-    def __str__(self):
-        return self.role_name
 
 
 class AccountMember(AbstractBaseModel):
@@ -53,8 +98,12 @@ class AccountMember(AbstractBaseModel):
     )
     position = models.CharField(max_length=256, blank=True)
     account_active = models.BooleanField(default=False)
-    role = models.ForeignKey(
-        FeatureAccessRole, on_delete=models.CASCADE, blank=True, null=True
+    role = models.OneToOneField(
+        FeatureAccessRole,
+        related_name="account_member",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     is_primary_member = models.BooleanField(default=False)
 
@@ -64,17 +113,13 @@ class AccountMember(AbstractBaseModel):
 
     def disable_member(self):
         user = self.user
-        user.is_disbled = True
+        user.is_disabled = True
         user.save()
 
     def enable_member(self):
         user = self.user
-        user.is_disbled = False
+        user.is_disabled = False
         user.save()
-
-    def update_role(self, role_id):
-        self.role_id = role_id
-        self.save()
 
     def __str__(self):
         return self.user.first_name or "-"
@@ -89,7 +134,11 @@ class MemberInvite(AbstractBaseModel):
     last_name = models.CharField(max_length=255, blank=True)
     email = models.CharField(max_length=255, unique=True)
     position = models.CharField(max_length=256, blank=True)
-    role = models.ForeignKey(FeatureAccessRole, on_delete=models.CASCADE)
+    role = models.OneToOneField(
+        FeatureAccessRole,
+        related_name="member_invite",
+        on_delete=models.CASCADE,
+    )
     token = models.CharField(max_length=512, blank=True)
     token_expires_at = models.DateTimeField(default=None, null=True)
 
@@ -117,10 +166,6 @@ class MemberInvite(AbstractBaseModel):
 
     def expire_token(self):
         self.token_expires_at = now()
-        self.save()
-
-    def update_role(self, role_id):
-        self.role_id = role_id
         self.save()
 
     class Meta:

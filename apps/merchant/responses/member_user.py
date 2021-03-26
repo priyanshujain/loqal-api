@@ -1,7 +1,68 @@
 from api import serializers
-from apps.merchant.models import AccountMember
+from apps.merchant.models import AccountMember, FeatureAccessRole
 
 __all__ = ("MemberProfileResponse",)
+
+
+class FeatureAccessRoleResponse(serializers.ModelSerializer):
+    payment_requests = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    payment_history = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    settlements = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    disputes = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    refunds = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    customers = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    qr_codes = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    store_profile = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    team_management = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    bank_accounts = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    loyalty_program = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    top_customers = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    merchant_settings = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+
+    class Meta:
+        model = FeatureAccessRole
+        fields = (
+            "is_full_access",
+            "payment_requests",
+            "payment_history",
+            "settlements",
+            "disputes",
+            "refunds",
+            "customers",
+            "qr_codes",
+            "store_profile",
+            "team_management",
+            "bank_accounts",
+            "loyalty_program",
+            "top_customers",
+            "merchant_settings",
+        )
 
 
 class MemberProfileResponse(serializers.ModelSerializer):
@@ -19,7 +80,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
     two_factor_auth = serializers.BooleanField(
         source="user.two_factor_auth", read_only=True
     )
-    role_id = serializers.CharField(source="role.id", read_only=True)
+    role = FeatureAccessRoleResponse(read_only=True)
 
     class Meta:
         model = AccountMember
@@ -31,7 +92,7 @@ class MemberProfileResponse(serializers.ModelSerializer):
             "two_factor_auth",
             "position",
             "account_active",
-            "role_id",
+            "role",
             "is_primary_member",
             "phone_number",
         )
