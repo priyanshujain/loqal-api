@@ -8,19 +8,25 @@ from api.services import ServiceBase
 from apps.account.dbapi import (get_consumer_account_by_phone_number,
                                 get_consumer_account_by_username)
 from apps.banking.dbapi import get_bank_account
-from apps.order.dbapi import create_payment_request_order
+from apps.merchant.services import InviteConsumerBySMS
+from apps.order.options import OrderType
+from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_payment, create_payment_request,
+                                create_transaction, get_merchant_receive_limit,
                                 get_payment_reqeust_by_uid)
-from apps.payment.dbapi.events import (cancelled_payment_event,
-                                       capture_payment_event,
+from apps.payment.dbapi.events import (capture_payment_event,
                                        failed_payment_event,
+                                       failure_partial_return_event,
                                        initiate_payment_event)
 from apps.payment.options import (PaymentProcess, PaymentRequestStatus,
-                                  TransactionType)
+                                  TransactionSourceTypes, TransactionStatus,
+                                  TransactionTransferTypes, TransactionType)
 from apps.payment.validators import (ApprovePaymentRequestValidator,
                                      CreatePaymentRequestValidator,
                                      RejectPaymentRequestValidator)
 from apps.provider.options import DEFAULT_CURRENCY
+from apps.reward.options import RewardValueType
+from apps.reward.services import FullReturnRewards
 
 from .create_payment import CreatePayment
 from .validate_bank_account import ValidateBankAccount
@@ -33,9 +39,10 @@ __all__ = (
 
 
 class CreatePaymentRequest(ServiceBase):
-    def __init__(self, account_id, data):
+    def __init__(self, account_id, account_member_id, data):
         self.data = data
         self.account_id = account_id
+        self.account_member_id = account_member_id
 
     def handle(self):
         payment_data = self._validate_data()
@@ -74,27 +81,70 @@ class CreatePaymentRequest(ServiceBase):
             raise ValidationError(
                 {"detail": ErrorDetail(_("Invalid account."))}
             )
+
+        if not consumer_account:
+            if is_phone_number_based:
+                is_success = False
+                try:
+                    is_success = InviteConsumerBySMS(
+                        merchant=merchant_account,
+                        phone_number=phone_number,
+                        request_payment=True,
+                    ).handle()
+                except Exception:
+                    pass
+                if is_success:
+                    raise ValidationError(
+                        {
+                            "detail": [
+                                ErrorDetail(
+                                    "Given phone number is not registered "
+                                    "with Loqal. We have sent an SMS invite "
+                                    "to this number to download the Loqal App."
+                                )
+                            ]
+                        }
+                    )
+                raise ValidationError(
+                    {
+                        "detail": [
+                            ErrorDetail(
+                                "Given phone number/ Loqal ID is not vaild. Please check and try again."
+                            )
+                        ]
+                    }
+                )
+
+        amount = data["amount"]
+        merchant_receive_limit = get_merchant_receive_limit(
+            merchant_id=merchant_account.id
+        )
+        if merchant_receive_limit:
+            if amount > merchant_receive_limit.transaction_limit:
+                raise ValidationError(
+                    {
+                        "detail": [
+                            ErrorDetail(
+                                "Payment request amount limit exceeded. "
+                                "Your store is set to receive upto "
+                                f"${merchant_receive_limit.transaction_limit} per transaction."
+                                " If you want to increase your limit please email us at hello@loqal.us."
+                            )
+                        ]
+                    }
+                )
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id
         return data
 
     def _factory_payment_request(self, data):
-        order = create_payment_request_order(
-            merchant_id=data["merchant_id"],
-            consumer_id=data["consumer_id"],
-            amount=data["amount"],
-        )
-        payment = create_payment(
-            order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
-        )
-        initiate_payment_event(payment_id=payment.id)
         return create_payment_request(
             account_from_id=self.account_id,
             account_to_id=data["account_to_id"],
-            payment_id=payment.id,
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
+            cashier_id=self.account_member_id,
         )
 
 
@@ -120,51 +170,120 @@ class ApprovePaymentRequest(ServiceBase):
                 {"detail": ErrorDetail(_("Invalid payment request."))}
             )
 
-        total_amount = payment_request.amount + data["tip_amount"]
+        try:
+            consumer_account = payment_request.account_to.consumer
+        except AttributeError:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("Invalid payment request."))}
+            )
+
         banking_data = ValidateBankAccount(
             sender_account_id=self.account_id,
             receiver_account_id=merchant_account.account.id,
         ).validate()
 
-        try:
-            transaction = CreatePayment(
-                account_id=self.account_id,
-                ip_address=self.ip_address,
-                sender_bank_account=banking_data["sender_bank_account"],
-                receiver_bank_account=banking_data["receiver_bank_account"],
-                order=payment_request.payment.order,
-                total_amount=total_amount,
-                amount_towards_order=payment_request.amount,
-                fee_bearer_account=merchant_account.account,
-                transaction_type=TransactionType.PAYMENT_REQUEST,
-            ).handle()
-        except Exception as error:
-            is_save = False
-            transaction_tracking_id = None
-            payment_request.set_failed(save=False)
+        order, reward_usage = CreateOrder(
+            consumer_id=consumer_account.id,
+            merchant_id=merchant_account.id,
+            amount=payment_request.amount,
+            order_type=OrderType.ONLINE,
+        ).handle()
+
+        applied_cashback_amount = Decimal(0.0)
+        if reward_usage:
+            if reward_usage.reward_value_type == RewardValueType.FIXED_AMOUNT:
+                applied_cashback_amount = reward_usage.total_amount
+
+        total_payable_amount = (
+            order.total_net_amount
+            - applied_cashback_amount
+            + data["tip_amount"]
+        )
+        payment = create_payment(
+            order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
+        )
+        initiate_payment_event(payment_id=payment.id)
+        payment_request.add_payment(
+            payment=payment, tip_amount=data["tip_amount"]
+        )
+
+        if total_payable_amount > Decimal(0.0):
             try:
-                transaction = error.transaction
-                payment_request.add_transaction(
-                    transaction=transaction, tip_amount=data["tip_amount"]
+                transaction = CreatePayment(
+                    account_id=self.account_id,
+                    ip_address=self.ip_address,
+                    sender_bank_account=banking_data["sender_bank_account"],
+                    receiver_bank_account=banking_data[
+                        "receiver_bank_account"
+                    ],
+                    order=payment_request.payment.order,
+                    total_amount=total_payable_amount,
+                    amount_towards_order=(
+                        total_payable_amount - data["tip_amount"]
+                    ),
+                    fee_bearer_account=merchant_account.account,
+                    transaction_type=TransactionType.PAYMENT_REQUEST,
+                    payment_request_id=payment_request.id,
+                ).handle()
+                capture_payment_event(
+                    payment_id=transaction.payment.id,
+                    transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=total_payable_amount,
+                    transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
                 )
-                transaction_tracking_id = transaction.transaction_tracking_id
-                is_save = True
-            except AttributeError:
-                pass
-            if not is_save:
-                payment_request.save()
-            failed_payment_event(
-                payment_id=payment_request.payment.id,
-                transaction_tracking_id=transaction_tracking_id,
-            )
-            raise error
-        capture_payment_event(
-            payment_id=transaction.payment.id,
-            transaction_tracking_id=transaction.transaction_tracking_id,
-        )
-        payment_request.add_transaction(
-            transaction=transaction, tip_amount=data["tip_amount"]
-        )
+                payment_request.set_accepted()
+            except Exception as error:
+                transaction_tracking_id = None
+                payment_request.set_failed()
+                try:
+                    transaction = error.transaction
+                    transaction_tracking_id = (
+                        transaction.transaction_tracking_id
+                    )
+                except AttributeError:
+                    pass
+                failed_payment_event(
+                    payment_id=payment_request.payment.id,
+                    transaction_tracking_id=transaction_tracking_id,
+                    amount=total_payable_amount,
+                    transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
+                )
+                if reward_usage:
+                    FullReturnRewards(reward_usage=reward_usage).handle()
+                    if applied_cashback_amount:
+                        failure_partial_return_event(
+                            payment_id=payment_request.payment.id,
+                            transaction_tracking_id=None,
+                            amount=applied_cashback_amount,
+                            transfer_type=TransactionTransferTypes.CASHBACK,
+                        )
+                raise error
+
+            if applied_cashback_amount > Decimal(0.0):
+                transaction = create_transaction(
+                    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+                    payment_id=payment_request.payment.id,
+                    amount=applied_cashback_amount,
+                    fee_bearer_account_id=None,
+                    customer_ip_address=self.ip_address,
+                    sender_source_type=TransactionSourceTypes.REWARD_CASHBACK,
+                    recipient_source_type=TransactionSourceTypes.NA,
+                    payment_request_id=payment_request.id,
+                    reward_usage_id=reward_usage.id,
+                    is_success=True,
+                    status=TransactionStatus.PROCESSED,
+                )
+                payment_request.payment.capture_payment(
+                    amount=applied_cashback_amount,
+                    amount_towards_order=applied_cashback_amount,
+                )
+                capture_payment_event(
+                    payment_id=payment_request.payment.id,
+                    transaction_tracking_id=transaction.transaction_tracking_id,
+                    amount=applied_cashback_amount,
+                    transfer_type=TransactionTransferTypes.CASHBACK,
+                )
+
         return payment_request
 
     def _validate_data(self):
@@ -212,7 +331,6 @@ class RejectPaymentRequest(ServiceBase):
     def handle(self):
         payment_request = self._validate_data()
         payment_request.reject()
-        cancelled_payment_event(payment_id=payment_request.payment.id)
         return payment_request
 
     def _validate_data(self):

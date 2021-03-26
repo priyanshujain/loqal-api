@@ -1,15 +1,19 @@
+from versatileimagefield.serializers import VersatileImageFieldSerializer
+
 from api import serializers
 from apps.account.models import MerchantAccount
 from apps.merchant.constants import categories
 from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
                                   MerchantOperationHours, MerchantProfile,
-                                  ServiceAvailability)
+                                  ServiceAvailability, StoreImage)
 
 __all__ = (
     "MerchantProfileResponse",
     "MerchantOperationHoursResponse",
     "CodesAndProtocolsResponse",
     "ServiceAvailabilityResponse",
+    "StoreImageResponse",
+    "ListStoreImageResponse",
 )
 
 
@@ -72,4 +76,42 @@ class ServiceAvailabilityResponse(serializers.ModelSerializer):
             "delivery",
             "takeout",
             "sitting_dining",
+        )
+
+
+class StoreImageResponse(serializers.ModelSerializer):
+    image = VersatileImageFieldSerializer(
+        sizes=[
+            ("full_size", "url"),
+        ],
+        read_only=True,
+    )
+
+    class Meta:
+        model = StoreImage
+        fields = (
+            "image",
+            "id",
+            "created_at",
+            "alt",
+        )
+
+
+class ListStoreImageResponse(serializers.ModelSerializer):
+    image = VersatileImageFieldSerializer(
+        sizes=[
+            ("full_size", "url"),
+            ("store_gallery", "thumbnail__540x540"),
+        ],
+        read_only=True,
+    )
+    image_id = serializers.CharField(source="u_id")
+
+    class Meta:
+        model = StoreImage
+        fields = (
+            "image",
+            "image_id",
+            "created_at",
+            "alt",
         )

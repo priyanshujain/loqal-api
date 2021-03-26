@@ -51,13 +51,15 @@ class ChangeAccountUsername(object):
         ]
         if username == self.consumer_account.username:
             raise ValidationError(
-                {"detail": ErrorDetail(
+                {
+                    "detail": ErrorDetail(
                         _(
                             "This is your current loqal ID. "
                             "Please choose a different one to change"
                             " your current Loqal ID."
                         )
-                    )}
+                    )
+                }
             )
         if check_account_username(username=username):
             raise ValidationError(

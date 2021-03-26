@@ -6,7 +6,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from apps.account.dbapi import (get_consumer_account_by_phone_number,
                                 get_consumer_account_by_username)
 from apps.payment.dbapi import get_payment_qrcode
-from apps.payment.options import DisputeReasonType, DisputeStatus
+from apps.payment.options import (DisputeReasonType, DisputeStatus,
+                                  RefundReasonTypes)
 
 
 class PaymentValidatorBase(serializers.ValidationSerializer):
@@ -69,17 +70,17 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
                         ]
                     }
                 )
-            consumer_account = get_consumer_account_by_phone_number(
-                phone_number=phone_number
-            )
-            if not consumer_account:
-                raise ValidationError(
-                    {
-                        "detail": ErrorDetail(
-                            _("No user exists with given phone number.")
-                        )
-                    }
-                )
+            # consumer_account = get_consumer_account_by_phone_number(
+            #     phone_number=phone_number
+            # )
+            # if not consumer_account:
+            #     raise ValidationError(
+            #         {
+            #             "detail": ErrorDetail(
+            #                 _("No user exists with given phone number.")
+            #             )
+            #         }
+            #     )
         else:
             if not loqal_id:
                 raise ValidationError(
@@ -161,6 +162,8 @@ class CreateRefundValidator(serializers.ValidationSerializer):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         coerce_to_string=False,
     )
+    refund_reason = serializers.EnumChoiceField(enum_type=RefundReasonTypes)
+    refund_note = serializers.CharField(required=False)
 
 
 class CreateDisputeValidator(serializers.ValidationSerializer):
@@ -178,3 +181,21 @@ class CloseDisputeValidator(serializers.ValidationSerializer):
     resolution = serializers.CharField(max_length=2 * 1024)
     status = serializers.EnumChoiceField(enum_type=DisputeStatus)
     notes = serializers.CharField(max_length=2 * 1024)
+
+
+class PaymentRegisterValidator(serializers.ValidationSerializer):
+    daily_send_limit = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
+
+
+class MerchantReceiveLimitValidator(serializers.ValidationSerializer):
+    transaction_limit = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )

@@ -21,7 +21,7 @@ class MerchantSignupAPI(APIView):
     def post(self, request):
         if request.user.is_authenticated:
             raise ValidationError(
-                {"details": ErrorDetail(_("User has aleady logged in."))}
+                {"detail": ErrorDetail(_("User has aleady logged in."))}
             )
 
         data = run_validator(CreateMerchantAccountValidator, self.request_data)

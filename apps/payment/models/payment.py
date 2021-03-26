@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from apps.order.models import Order
 from apps.payment.options import (ChargeStatus, PaymentEventType,
                                   PaymentMethodType, PaymentProcess,
-                                  PaymentStatus)
+                                  PaymentStatus, TransactionTransferTypes)
 from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
@@ -83,12 +83,20 @@ class Payment(AbstractBaseModel):
                 self.payment_tracking_id = id_generator()
         return super().save(*args, **kwargs)
 
-    def update_charge_status_by_refund(self, amount, save=True):
+    def update_charge_status_by_refund(
+        self, amount, reclaimed_amount=Decimal(0.0), save=True
+    ):
         self.refunded_amount += amount
         if self.refunded_amount < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_REFUNDED
+            self.order.set_partially_returned(
+                amount=amount, reclaimed_discount=reclaimed_amount
+            )
         elif self.refunded_amount == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_REFUNDED
+            self.order.set_returned(
+                amount=amount, reclaimed_discount=reclaimed_amount
+            )
         if save:
             self.save()
 
@@ -96,11 +104,16 @@ class Payment(AbstractBaseModel):
         self.status = PaymentStatus.CAPTURED
         self.captured_amount += amount
         self.total_tip_amount += amount - amount_towards_order
-        if amount_towards_order < self.order.total_net_amount:
+
+        total_amount_towards_order = (
+            self.captured_amount - self.total_tip_amount
+        )
+        if total_amount_towards_order < self.order.total_net_amount:
             self.charge_status = ChargeStatus.PARTIALLY_CHARGED
             self.order.set_partially_fulfilled()
-        elif amount_towards_order == self.order.total_net_amount:
+        elif total_amount_towards_order == self.order.total_net_amount:
             self.charge_status = ChargeStatus.FULLY_CHARGED
+            self.order.mark_paid()
             self.order.set_fulfilled()
         else:
             self.charge_status = ChargeStatus.OTHER
@@ -121,6 +134,14 @@ class Payment(AbstractBaseModel):
             if save:
                 self.save()
 
+    def process_zero_payment(self, save=True):
+        self.status = PaymentStatus.CAPTURED
+        self.charge_status = ChargeStatus.FULLY_CHARGED
+        self.order.mark_paid()
+        self.order.set_fulfilled()
+        if save:
+            self.save()
+
 
 class PaymentEvent(AbstractBaseModel):
     payment = models.ForeignKey(
@@ -131,6 +152,11 @@ class PaymentEvent(AbstractBaseModel):
         on_delete=models.CASCADE,
     )
     event_type = ChoiceEnumField(enum_type=PaymentEventType)
+    transfer_type = ChoiceCharEnumField(
+        enum_type=TransactionTransferTypes,
+        max_length=64,
+        default=TransactionTransferTypes.ACH_BANK_TRANSFER,
+    )
     parameters = models.JSONField(blank=True, default=dict)
 
     class Meta:

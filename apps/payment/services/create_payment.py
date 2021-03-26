@@ -17,7 +17,8 @@ from apps.payment.options import (FACILITATION_FEES_CURRENCY,
                                   PAYMENT_FACILITATION_FEES_PERCENTAGE,
                                   REFUND_FACILITATION_FEES_FIXED,
                                   REFUND_FACILITATION_FEES_PERCENTAGE,
-                                  TransactionType)
+                                  TransactionSourceTypes,
+                                  TransactionTransferTypes, TransactionType)
 from apps.payment.responses import TransactionErrorDetailsResponse
 from apps.provider.lib.actions import ProviderAPIActionBase
 from apps.provider.options import DEFAULT_CURRENCY
@@ -40,6 +41,9 @@ class CreatePayment(ServiceBase):
         total_amount,
         fee_bearer_account,
         amount_towards_order,
+        refund_payment_id=None,
+        payment_request_id=None,
+        direct_merchant_payment_id=None,
         transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
     ):
         self.account_id = account_id
@@ -51,6 +55,9 @@ class CreatePayment(ServiceBase):
         self.fee_bearer_account = fee_bearer_account
         self.transaction_type = transaction_type
         self.amount_towards_order = amount_towards_order
+        self.refund_payment_id = refund_payment_id
+        self.payment_request_id = payment_request_id
+        self.direct_merchant_payment_id = direct_merchant_payment_id
 
     def handle(self):
         transaction = self._factory_transaction()
@@ -125,11 +132,14 @@ class CreatePayment(ServiceBase):
             failed_payment_event(
                 payment_id=transaction.payment.id,
                 transaction_tracking_id=transaction.transaction_tracking_id,
+                amount=self.total_amount
             )
         else:
             failed_refund_payment_event(
                 payment_id=transaction.payment.id,
+                amount=self.total_amount,
                 transaction_tracking_id=transaction.transaction_tracking_id,
+                transfer_type=TransactionTransferTypes.ACH_BANK_TRANSFER,
             )
         try:
             error.transaction = transaction
@@ -140,23 +150,29 @@ class CreatePayment(ServiceBase):
     def _check_transaction_limits(self, register, transaction):
         try:
             CheckTransferLimit(
+                merchant=transaction.payment.order.merchant,
                 register=register,
                 bank_account=self.sender_bank_account,
                 amount=self.total_amount,
             ).handle()
         except ValidationError as err:
             code = to_str(err.detail.get("code"))
+            message = to_str(err.detail.get("detail"))
             if code == "WEEKLY_LIMIT_EXCEEDED":
-                transaction.set_weekly_limit_exceeded()
+                transaction.set_weekly_limit_exceeded(message)
                 return err
             if code == "DAILY_LIMIT_EXCEEDED":
-                transaction.set_daily_limit_exceeded()
+                transaction.set_daily_limit_exceeded(message)
+                return err
+            if code == "MERCHANT_RECEIVE_LIMIT_EXCEEDED":
+                transaction.set_merchant_receive_limit_exceeded(message)
                 return err
 
     def _factory_transaction(self):
         payment = self.order.payment
         amount = self.total_amount
         fee_amount = self._calculate_fee_amount(amount)
+
         return create_transaction(
             sender_bank_account_id=self.sender_bank_account.id,
             recipient_bank_account_id=self.receiver_bank_account.id,
@@ -168,6 +184,11 @@ class CreatePayment(ServiceBase):
             payment_id=payment.id,
             customer_ip_address=self.ip_address,
             transaction_type=self.transaction_type,
+            sender_source_type=TransactionSourceTypes.BANK_ACCOUNT,
+            recipient_source_type=TransactionSourceTypes.BANK_ACCOUNT,
+            direct_merchant_payment_id=self.direct_merchant_payment_id,
+            refund_payment_id=self.refund_payment_id,
+            payment_request_id=self.payment_request_id,
         )
 
     def _calculate_fee_amount(self, amount):

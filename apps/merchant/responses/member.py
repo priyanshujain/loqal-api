@@ -10,6 +10,46 @@ __all__ = (
 
 
 class FeatureAccessRoleResponse(serializers.ModelSerializer):
+    payment_requests = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    payment_history = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    settlements = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    disputes = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    refunds = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    customers = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    qr_codes = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    store_profile = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    team_management = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    bank_accounts = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    loyalty_program = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    top_customers = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+    merchant_settings = serializers.ListField(
+        child=serializers.EnumCharChoiceValueField(read_only=True)
+    )
+
     class Meta:
         model = FeatureAccessRole
         fields = (
@@ -24,6 +64,9 @@ class FeatureAccessRoleResponse(serializers.ModelSerializer):
             "store_profile",
             "team_management",
             "bank_accounts",
+            "loyalty_program",
+            "top_customers",
+            "merchant_settings",
         )
 
 
@@ -74,7 +117,7 @@ class AccountMemberResponse(serializers.ModelSerializer):
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.CharField(source="user.email", read_only=True)
-    is_disbled = serializers.BooleanField(
+    is_disabled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )
     role = FeatureAccessRoleResponse(read_only=True)
@@ -87,6 +130,6 @@ class AccountMemberResponse(serializers.ModelSerializer):
             "last_name",
             "email",
             "position",
-            "is_disbled",
+            "is_disabled",
             "role",
         )

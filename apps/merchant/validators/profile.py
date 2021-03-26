@@ -6,7 +6,7 @@ from apps.box.dbapi import get_boxfile
 from apps.merchant import models
 from apps.merchant.models import (CodesAndProtocols, MerchantCategory,
                                   MerchantOperationHours, MerchantProfile,
-                                  ServiceAvailability)
+                                  ServiceAvailability, StoreImage)
 from apps.merchant.models.profile import MerchantCategory
 from apps.merchant.shortcuts import (validate_profile_image_type,
                                      validate_subcategory)
@@ -17,6 +17,7 @@ __all__ = (
     "CodesAndProtocolsValidator",
     "ServiceAvailabilityValidator",
     "StoreSearchValidator",
+    "StoreImageValidator",
 )
 
 
@@ -160,3 +161,21 @@ class StoreSearchValidator(serializers.ValidationSerializer):
     keyword = serializers.CharField(required=False)
     latitude = serializers.FloatField(required=False)
     longitude = serializers.FloatField(required=False)
+
+
+class StoreImageValidator(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
+    class Meta:
+        model = StoreImage
+        fields = (
+            "image",
+            "alt",
+        )
+
+    def validate(self, data):
+        if data.get("image") is None:
+            raise ValidationError(
+                {"detail": ErrorDetail(_("No store image were provided"))}
+            )
+        return data

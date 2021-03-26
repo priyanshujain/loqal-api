@@ -112,6 +112,7 @@ def get_customer_details(merchant_account, customer_id):
         payment__order__consumer=consumer_account,
     )
     disputes = DisputeTransaction.objects.filter(
+        transaction__payment__order__merchant=merchant_account,
         transaction__payment__order__consumer=consumer_account,
     )
     return {

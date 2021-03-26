@@ -188,14 +188,11 @@ def get_member_invite_by_token(token):
         return None
 
 
-def update_member_invite(
-    invite, first_name, last_name, email, position, role_id
-):
+def update_member_invite(invite, first_name, last_name, email, position):
     invite.first_name = first_name
     invite.last_name = last_name
     invite.email = email
     invite.position = position
-    invite.role_id = role_id
     invite.save()
     return invite
 

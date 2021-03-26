@@ -1,10 +1,14 @@
 from api import serializers
-from apps.notification.models import UserDevice
-from apps.notification.options import UserDeviceTypes
+from apps.notification.models import (StaffPaymentNotificationSetting,
+                                      UserDevice)
+from apps.notification.options import PaymentNotificationTypes, UserDeviceTypes
 
 __all__ = (
     "RegisterUserDeviceValidator",
     "UnSubscribeUserDeviceValidator",
+    "CreateStaffPaymentNotificationSettingValidator",
+    "DisableStaffPaymentNotificationSettingValidator",
+    "DeleteStaffPaymentNotificationSettingValidator",
 )
 
 
@@ -32,3 +36,30 @@ class UnSubscribeUserDeviceValidator(serializers.ModelSerializer):
     class Meta:
         model = UserDevice
         fields = ("device_id",)
+
+
+class CreateStaffPaymentNotificationSettingValidator(
+    serializers.ValidationSerializer
+):
+    notification_type = serializers.EnumChoiceField(
+        enum_type=PaymentNotificationTypes
+    )
+    staff_id = serializers.IntegerField()
+    sms_enabled = serializers.BooleanField()
+    email_enabled = serializers.BooleanField()
+
+
+class DisableStaffPaymentNotificationSettingValidator(
+    serializers.ModelSerializer
+):
+    class Meta:
+        model = StaffPaymentNotificationSetting
+        fields = ("setting_id",)
+
+
+class DeleteStaffPaymentNotificationSettingValidator(
+    serializers.ModelSerializer
+):
+    class Meta:
+        model = StaffPaymentNotificationSetting
+        fields = ("setting_id",)

@@ -9,12 +9,19 @@ class OrderStatus(ChoiceCharEnum):
     UNFULFILLED = "unfulfilled", _("Unfulfilled")
     PARTIALLY_FULFILLED = "partially_fulfilled", _("Partially Fulfilled")
     FULFILLED = "fulfilled", _("Fulfilled")
+    PARTIALLY_RETURNED = "partially_returned", _("Partially Returned")
+    RETURNED = "returned", _("Returned")
     CANCELLED = "cancelled", _("Cancelled")
 
 
 class OrderType(ChoiceCharEnum):
     IN_PERSON = "in_person", _("In Person")
     ONLINE = "online", _("Online")
+
+
+class DiscountType(ChoiceCharEnum):
+    FIXED_AMOUNT = "fixed_amount", _("Fixed Amount")
+    PERCENTAGE = "percentage", _("Percentage")
 
 
 class OrderEventType(ChoiceEnum):

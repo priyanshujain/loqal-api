@@ -2,7 +2,8 @@ from django.urls import path
 
 from apps.account.views.staff import (CreateNonLoqalMerchantsAPI,
                                       DisableAccountAPI, EnableAccountAPI,
-                                      GetActiveMerchantsAPI, GetConsumersAPI,
+                                      GetActiveMerchantsAPI,
+                                      GetConsumerDetailsAPI, GetConsumersAPI,
                                       GetNonLoqalMerchantsAPI)
 
 urlpatterns = [
@@ -30,6 +31,11 @@ urlpatterns = [
         "staff/merchants/",
         GetActiveMerchantsAPI.as_view(),
         name="view_active_merchants",
+    ),
+    path(
+        "staff/consumers/<uuid:consumer_id>/",
+        GetConsumerDetailsAPI.as_view(),
+        name="view_consumer_details",
     ),
     path(
         "staff/consumers/",

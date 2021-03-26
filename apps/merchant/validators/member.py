@@ -1,6 +1,6 @@
 from api import serializers
 from apps.account.validators import MerchantAccountSignupValidatorBase
-from apps.merchant.options import AllowedFeatureAcessTypes
+from apps.merchant.options import AllowedFeatureAcessTypes, FeatureAcessTypes
 
 __all__ = (
     "MemberInviteValidator",
@@ -9,13 +9,16 @@ __all__ = (
     "UpdateMemberRoleValidator",
     "DisableMemberValidator",
     "EditMemberProfileValidator",
+    "CreateFeatureAccessRoleValidator",
+    "UpdateFeatureAccessRoleValidator",
+    "DeleteFeatureAccessRoleValidator",
 )
 
 
 class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
     is_full_access = serializers.BooleanField()
     payment_requests = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.PAYMENT_REQUESTS
         ),
         allow_empty=True,
@@ -23,7 +26,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     payment_history = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.PAYMENT_HISTORY
         ),
         allow_empty=True,
@@ -31,7 +34,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     settlements = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.SETTLEMENTS
         ),
         allow_empty=True,
@@ -39,7 +42,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     refunds = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.REFUNDS
         ),
         allow_empty=True,
@@ -47,7 +50,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     disputes = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.DISPUTES
         ),
         allow_empty=True,
@@ -55,7 +58,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     customers = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.CUSTOMERS
         ),
         allow_empty=True,
@@ -63,7 +66,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     bank_accounts = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.BANK_ACCOUNTS
         ),
         allow_empty=True,
@@ -71,7 +74,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     qr_codes = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.QR_CODES
         ),
         allow_empty=True,
@@ -79,7 +82,7 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     store_profile = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.STORE_PROFILE
         ),
         allow_empty=True,
@@ -87,8 +90,24 @@ class FeatureAccessRoleValidatorBase(serializers.ValidationSerializer):
         default=[],
     )
     team_management = serializers.ListField(
-        child=serializers.ChoiceField(
+        child=serializers.EnumCharChoiceField(
             choices=AllowedFeatureAcessTypes.TEAM_MANAGEMENT
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    loyalty_program = serializers.ListField(
+        child=serializers.EnumCharChoiceField(
+            choices=AllowedFeatureAcessTypes.LOYALTY_PROGRAM
+        ),
+        allow_empty=True,
+        required=False,
+        default=[],
+    )
+    merchant_settings = serializers.ListField(
+        child=serializers.EnumCharChoiceField(
+            choices=AllowedFeatureAcessTypes.MERCHANT_SETTINGS
         ),
         allow_empty=True,
         required=False,
@@ -146,3 +165,15 @@ class EditMemberProfileValidator(serializers.ValidationSerializer):
     last_name = serializers.CharField(max_length=64)
     position = serializers.CharField(max_length=64)
     phone_number = serializers.CharField(max_length=10)
+
+
+class CreateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
+    role_name = serializers.CharField(max_length=256)
+
+
+class UpdateFeatureAccessRoleValidator(FeatureAccessRoleValidatorBase):
+    role_id = serializers.IntegerField()
+
+
+class DeleteFeatureAccessRoleValidator(serializers.ValidationSerializer):
+    role_id = serializers.IntegerField()

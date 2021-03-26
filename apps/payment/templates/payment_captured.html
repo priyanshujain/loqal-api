@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block message %}
+Hi,
+<p>
+    A new payment captured from {{ sender_name }}.
+</p>
+<b>Customer</b>: {{ sender_name }} <br />
+<b>Loqal ID</b>: {{ loqal_id }} <br />
+<b>Amount</b>: {{ amount }} <br />
+<b>Date Initiated</b>: {{ date_initiated }}
+
+<br />
+<br />
+If you wish to know more about this transaction,
+please check out its details in the sales -> payments tab of on Loqal merchant dashboard.
+
+{% endblock %}

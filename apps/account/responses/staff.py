@@ -46,6 +46,12 @@ class ConsumerAccountProfileResponse(serializers.ModelSerializer):
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.CharField(source="user.email", read_only=True)
+    phone_number = serializers.CharField(
+        source="user.phone_number", read_only=True
+    )
+    phone_number_country = serializers.CharField(
+        source="user.phone_number_country", read_only=True
+    )
     account_id = serializers.IntegerField(source="account.id", read_only=True)
     is_active = serializers.BooleanField(
         source="account.is_active", read_only=True
@@ -65,4 +71,6 @@ class ConsumerAccountProfileResponse(serializers.ModelSerializer):
             "consumer_id",
             "loqal_id",
             "is_active",
+            "phone_number",
+            "phone_number_country",
         )

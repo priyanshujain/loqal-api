@@ -1,19 +1,22 @@
 from django.utils.translation import gettext as _
+from rest_framework.parsers import MultiPartParser
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import MerchantAPIView
 from apps.merchant.dbapi import (get_merchant_code_protocols,
                                  get_merchant_operation_hours,
-                                 get_merchant_service_availability)
+                                 get_merchant_service_availability,
+                                 get_store_image)
 from apps.merchant.responses import (CodesAndProtocolsResponse,
+                                     ListStoreImageResponse,
                                      MerchantOperationHoursResponse,
                                      MerchantProfileResponse,
-                                     ServiceAvailabilityResponse)
-from apps.merchant.services import (UpdateCodesAndProtocols,
+                                     ServiceAvailabilityResponse,
+                                     StoreImageResponse)
+from apps.merchant.services import (AddStoreImage, UpdateCodesAndProtocols,
                                     UpdateMerchantProfile,
                                     UpdateOperationHours,
                                     UpdateServiceAvailability)
-from apps.merchant.services.profile import codes_and_protocols
 
 __all__ = (
     "UpdateMerchantProfileAPI",
@@ -24,6 +27,8 @@ __all__ = (
     "GetCodesAndProtocolsAPI",
     "GetServiceAvailabilityAPI",
     "UpdateServiceAvailabilityAPI",
+    "UploadStoreImageAPI",
+    "ListStoreImageAPI",
 )
 
 
@@ -111,3 +116,37 @@ class UpdateServiceAvailabilityAPI(MerchantAPIView):
             merchant_id=merchant_account.id, data=self.request_data
         ).handle()
         return self.response(status=204)
+
+
+class UploadStoreImageAPI(MerchantAPIView):
+    parser_classes = (MultiPartParser,)
+
+    def post(self, request):
+        store_image = AddStoreImage(
+            merchant=request.merchant_account, data=request.data
+        ).handle()
+        return self.response(StoreImageResponse(store_image).data)
+
+
+class ListStoreImageAPI(MerchantAPIView):
+    def get(self, request):
+        images = request.merchant_account.images
+        return self.response(ListStoreImageResponse(images, many=True).data)
+
+
+class DeleteStoreImageAPI(MerchantAPIView):
+    def delete(self, request, image_id):
+        store_image = get_store_image(
+            merchant_id=request.merchant_account.id, image_id=image_id
+        )
+        if not store_image:
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Image couldn't be deleted please try again.")
+                    ),
+                    "message": ErrorDetail(_("Invalid image_id.")),
+                }
+            )
+        store_image.delete()
+        return self.response()

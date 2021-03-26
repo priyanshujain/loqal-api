@@ -18,23 +18,41 @@ class TransactionType(ChoiceCharEnum):
         "Direct Merchant Payment"
     )
     REFUND_PAYMENT = "refund_payment", _("Refund Payment")
+    CREDIT_REWARD_CASHBACK = "credit_reward_cashback", _(
+        "Credit Reward Cashback"
+    )
     OTHER = "other", _("Other")
+
+
+class TransactionSourceTypes(ChoiceCharEnum):
+    CASH_WALLET = "cash_wallet", _("Cash Wallet")
+    REWARD_CASHBACK = "reward_cashback", _("Reward Cashback")
+    BANK_ACCOUNT = "bank_account", _("Bank Account")
+    NA = "na", _("NA")
+
+
+class TransactionTransferTypes(ChoiceCharEnum):
+    CASHBACK = "cashback", _("Cashback")
+    ACH_BANK_TRANSFER = "ach_bank_transfer", _("ACH Bank Transfer")
 
 
 class TransactionFailureReasonType(ChoiceCharEnum):
     TRANSACTION_DAILY_LIMIT_EXCEEDED = "transaction_daily_limit_exceeded", _(
-        "Transaction daily limit exceeded."
+        "Transaction daily limit exceeded"
     )
     TRANSACTION_WEEKLY_LIMIT_EXCEEDED = "transaction_weekly_limit_exceeded", _(
-        "Transaction weekly limit exceeded."
+        "Transaction weekly limit exceeded"
+    )
+    MERCHANT_RECEIVE_LIMIT_EXCEEDED = "merchant_receive_limit_exceeded", _(
+        "Merchant transaction size limit exceeded"
     )
     BALANCE_CHECK_FAILED = "balance_check_failed", _("Balance check failed.")
     INSUFFICIENT_BALANCE = "insufficient_balance", _("Insufficient Balance.")
     PROVIDER_PAYMENT_SERVICE_FAILED = "provider_payment_service_failed", _(
-        "Provider payment service failed."
+        "Provider payment service failed"
     )
     INTERNAL_PAYMENT_SERVICE_FAILED = "internal_payment_service_failed", _(
-        "Internal payment service failed."
+        "Internal payment service failed"
     )
     PRE_SOURCE_ACH_FAILED = "pre_source_ach_failed", (
         "Pre transfer ACH return on source bank."
@@ -253,7 +271,9 @@ class TransactionEventType(ChoiceCharEnum):
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CREATED = (
         "receiver_vc_from_balance_transfer_created",
-        _("A transfer has been created from receiver's Loqal balance to bank account."),
+        _(
+            "A transfer has been created from receiver's Loqal balance to bank account."
+        ),
     )
     RECEIVER_VC_FROM_BALANCE_TRANSFER_CANCELLED = (
         "receiver_vc_from_balance_transfer_cancelled",
@@ -268,18 +288,24 @@ class TransactionEventType(ChoiceCharEnum):
     )
     RECEIVER_VC_BANK_TRANSFER_CREATION_FAILED = (
         "vc_bank_transfer_creation_failed",
-        _("The transfer from from receiver's Loqal balance to bank account has failed"),
+        _(
+            "The transfer from from receiver's Loqal balance to bank account has failed"
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_CANCELLED = (
         "receiver_vc_bank_transfer_cancelled",
-        _("The transfer from receiver's Loqal balance to bank account has cancelled."),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has cancelled."
+        ),
     )
     RECEIVER_VC_BANK_TRANSFER_FAILED = "receiver_vc_bank_transfer_failed", _(
         "The transfer from receiver's Loqal balance to bank account has failed."
     )
     RECEIVER_VC_BANK_TRANSFER_COMPLETED = (
         "receiver_vc_bank_transfer_completed",
-        _("The transfer from receiver's Loqal balance to bank account has completed."),
+        _(
+            "The transfer from receiver's Loqal balance to bank account has completed."
+        ),
     )
     RECEIVER_UVC_BANK_TRANSFER_CREATED = (
         "receiver_uvc_bank_transfer_created",
@@ -314,6 +340,7 @@ class PaymentEventType(ChoiceEnum):
     PAYMENT_DISPUTED = 5, _("Payment Disputed")
     REFUND_FAILED = 6, _("Refund Failed")
     PAYMENT_CANCELLED = 7, _("Payment Cancelled")
+    PARTIAL_FAILURE_RETURN = 8, _("Partial return due to failure")
 
 
 class PaymentRequestStatus(ChoiceEnum):
@@ -323,9 +350,21 @@ class PaymentRequestStatus(ChoiceEnum):
     FAILED = 3, _("Refund Failed")
 
 
+class DirectMerchantPaymentStatus(ChoiceEnum):
+    SUCCESS = 0, _("Success")
+    FAILED = 1, _("Failed")
+
+
 class RefundType(ChoiceCharEnum):
     PARTIAL = "partial", _("Partial Refund")
     FULL = "full", _("Full Refund")
+
+
+class RefundReasonTypes(ChoiceCharEnum):
+    RETURNS = "returns", _("Returns")
+    DUPLICATE_PAYMENT = "dumplicate_payment", _("Duplicate Payment")
+    FRAUD_RELATED = "fraud_related", _("Fraud Related")
+    OTHER = "other", _("Other")
 
 
 class RefundStatus(ChoiceEnum):

@@ -1,9 +1,11 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db.models import Sum
 from django.db.utils import IntegrityError
 
 from apps.payment.models.transaction import DisputeTransaction, Transaction
+from apps.payment.options import TransactionType
 
 __all__ = (
     "create_dispute_transaction",
@@ -13,6 +15,8 @@ __all__ = (
     "get_dispute",
     "get_consumer_dispute_by_transaction",
     "get_sender_pending_total",
+    "create_zero_transaction",
+    "create_empty_transactions",
 )
 
 
@@ -82,3 +86,33 @@ def get_dispute(dispute_id):
         )
     except DisputeTransaction.DoesNotExist:
         return None
+
+
+def create_zero_transaction(
+    sender_bank_account,
+    recipient_bank_account,
+    payment_id,
+    customer_ip_address,
+    transaction_type=TransactionType.DIRECT_MERCHANT_PAYMENT,
+):
+    """
+    dbapi for creating empty transaction.
+    """
+    try:
+        return Transaction.objects.create(
+            sender_bank_account=sender_bank_account,
+            recipient_bank_account=recipient_bank_account,
+            payment_id=payment_id,
+            customer_ip_address=customer_ip_address,
+            transaction_type=transaction_type,
+            is_success=True,
+        )
+    except IntegrityError:
+        return None
+
+
+def create_empty_transactions():
+    """
+    dbapi for creating empty transaction qs.
+    """
+    return Transaction.objects.none()

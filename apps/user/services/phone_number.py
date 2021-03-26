@@ -45,7 +45,11 @@ class AddPhoneNumber(ServiceBase):
         data = self._validate_data(data=data)
 
         phone_number = data["phone_number"]
-        self.user.add_phone_number(phone_number=phone_number)
+        phone_number_country = data.get("phone_number_country", "US")
+        self.user.add_phone_number(
+            phone_number=phone_number,
+            phone_number_country=phone_number_country,
+        )
         EnrollSmsAuthenticator(
             request=self.request, user=self.user, data=data
         ).send_otp()
@@ -199,6 +203,13 @@ class EnrollSmsAuthenticator(object):
         # If dev environment validate otp by 222222
         if settings.APP_ENV == "development":
             if otp == "222222":
+                self._enroll_interface(interface=interface)
+                return True
+            else:
+                return False
+
+        if settings.APP_ENV == "staging":
+            if otp == "111111":
                 self._enroll_interface(interface=interface)
                 return True
             else:

@@ -1,3 +1,5 @@
+from django import forms
+
 from api import serializers
 from lib.auth import password_validation
 
@@ -50,6 +52,9 @@ class OtpAuthValidator(serializers.ValidationSerializer):
 class PhoneNumberValidator(serializers.ValidationSerializer):
     # Add a phone_number validator
     phone_number = serializers.CharField(max_length=10)
+    phone_number_country = serializers.CharField(
+        max_length=2, default="US", required=False
+    )
     secret = serializers.CharField()
 
 

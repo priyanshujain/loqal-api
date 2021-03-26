@@ -1,45 +1,84 @@
 from datetime import timedelta
+from re import I
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.timezone import now
+from django.utils.translation import TranslatorCommentWarning
 
 from apps.account.models import MerchantAccount
+from apps.merchant.options import FeatureAcessTypes
 from db.models import AbstractBaseModel
+from db.models.fields import ChoiceCharEnumField
 from utils.shortcuts import rand_str
 
 
 class FeatureAccessRole(AbstractBaseModel):
     payment_requests = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     payment_history = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     settlements = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     disputes = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     refunds = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     customers = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     bank_accounts = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     qr_codes = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     store_profile = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     team_management = ArrayField(
-        models.CharField(max_length=255, blank=True), default=list, blank=True
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    top_customers = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    loyalty_program = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
+    )
+    merchant_settings = ArrayField(
+        ChoiceCharEnumField(max_length=255, enum_type=FeatureAcessTypes),
+        default=list,
+        blank=True,
     )
     is_full_access = models.BooleanField(default=False)
     is_super_admin = models.BooleanField(default=False)
@@ -74,12 +113,12 @@ class AccountMember(AbstractBaseModel):
 
     def disable_member(self):
         user = self.user
-        user.is_disbled = True
+        user.is_disabled = True
         user.save()
 
     def enable_member(self):
         user = self.user
-        user.is_disbled = False
+        user.is_disabled = False
         user.save()
 
     def __str__(self):

@@ -1,16 +1,12 @@
-"""
-Email tasks for user APIs
-"""
-from django.conf import settings
-from django.template.loader import render_to_string
+from celery import shared_task
 
-from utils.email import send_email_async
+from apps.user.models import User
+from utils.thumbnails import create_thumbnails
 
 
-def send_forgot_password_email(user):
-    render_data = {
-        "website_name": settings.APP_BASE_URL,
-        "path": f"{settings.APP_BASE_URL}/user/forgot/key/{user.reset_password_token}",
-    }
-    email_html = render_to_string("reset_password_email.html", render_data)
-    send_email_async((user.email), "Reset your password", email_html)
+@shared_task
+def create_user_avatar_thumbnails(user_id):
+    """Create thumbnails for user avatar."""
+    create_thumbnails(
+        pk=user_id, model=User, size_set="user_avatars", image_attr="avatar"
+    )
