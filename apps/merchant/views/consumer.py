@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import ConsumerAPIView
+from api.views import ConsumerAPIView, LoggedInMobileAPIView
 from apps.account.dbapi import get_merchant_account_by_uid
 from apps.merchant.dbapi import get_merchant_qs_by_category
 from apps.merchant.responses import (CategoryMerchantListResponse,
@@ -63,7 +63,7 @@ class ListCategoryMerchantsAPI(ConsumerAPIView):
         )
 
 
-class StoreDetailsAPI(ConsumerAPIView):
+class StoreDetailsAPI(LoggedInMobileAPIView):
     def get(self, request, merchant_id):
         merchant_account = get_merchant_account_by_uid(
             merchant_uid=merchant_id
