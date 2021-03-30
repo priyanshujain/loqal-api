@@ -41,6 +41,8 @@ class GetCashierQrCodesAPI(MerchantAPIView):
             merchant_id=merchant_account_member.merchant.id,
             cashier_id=merchant_account_member.id,
         )
+        if not qrcode:
+            return self.response()
         response_data = MerchantQrCodeResponse(qrcode).data
         image = qrcodelib.make(
             f"loqalapp://loqal/pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}/"
