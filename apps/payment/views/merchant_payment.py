@@ -27,8 +27,11 @@ class MerchantPaymentHistoryAPI(MerchantAPIView):
 
         if start and end:
             payments = payments.filter(created_at__range=[start, end])
-        return self.response(
-            MerchantPaymentHistoryResponse(payments, many=True).data
+        return self.paginate(
+            request,
+            queryset=payments,
+            order_by="-created_at",
+            response_serializer=MerchantPaymentHistoryResponse,
         )
 
     def validate_params(self, params):

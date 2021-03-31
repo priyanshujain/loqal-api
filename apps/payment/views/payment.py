@@ -219,8 +219,11 @@ class ListMerchantPaymentRequestAPI(MerchantAPIView):
         payment_requests = get_merchant_payment_reqeust(
             account_id=account_id, is_pending=is_pending
         )
-        return self.response(
-            PaymentRequestResponse(payment_requests, many=True).data
+        return self.paginate(
+            request,
+            queryset=payment_requests,
+            order_by="-created_at",
+            response_serializer=PaymentRequestResponse,
         )
 
 

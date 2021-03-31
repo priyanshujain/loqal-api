@@ -16,8 +16,11 @@ class ListMerchantSettlementsAPI(MerchantAPIView):
         transactions = get_all_merchant_transanction(
             merchant_id=request.merchant_account.id
         )
-        return self.response(
-            SettlementListResponse(transactions, many=True).data
+        return self.paginate(
+            request,
+            queryset=transactions,
+            order_by="-created_at",
+            response_serializer=SettlementListResponse,
         )
 
 
