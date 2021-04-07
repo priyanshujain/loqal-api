@@ -132,7 +132,7 @@ class CreatePayment(ServiceBase):
             failed_payment_event(
                 payment_id=transaction.payment.id,
                 transaction_tracking_id=transaction.transaction_tracking_id,
-                amount=self.total_amount
+                amount=self.total_amount,
             )
         else:
             failed_refund_payment_event(
