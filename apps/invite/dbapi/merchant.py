@@ -22,7 +22,7 @@ def create_b2c_invite(
         return None
 
 
-def get_b2c_invite(
+def get_b2c_invites(
     merchant_id,
 ):
     return B2CInvite.objects.filter(
@@ -30,13 +30,15 @@ def get_b2c_invite(
     )
 
 
-def get_all_b2c_invite():
+def get_all_b2c_invites():
     return B2CInvite.objects.all()
+
 
 def get_b2c_invite_by_phone_number(phone_number, phone_number_country):
     try:
-        B2CInvite.objects.get(
-            phone_number=phone_number, phone_number_country=phone_number_country
+        return B2CInvite.objects.get(
+            phone_number=phone_number,
+            phone_number_country=phone_number_country,
         )
     except B2CInvite.DoesNotExist:
         return None
@@ -61,7 +63,7 @@ def create_b2b_invite(
         return None
 
 
-def get_b2b_invite(
+def get_b2b_invites(
     merchant_id,
 ):
     return B2BInvite.objects.filter(
@@ -69,5 +71,5 @@ def get_b2b_invite(
     )
 
 
-def get_all_b2b_invite():
+def get_all_b2b_invites():
     return B2BInvite.objects.all()

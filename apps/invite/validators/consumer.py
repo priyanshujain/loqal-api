@@ -1,4 +1,5 @@
 from logging import FATAL
+
 from api import serializers
 
 __all__ = (
