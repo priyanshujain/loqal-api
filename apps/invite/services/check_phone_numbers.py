@@ -14,11 +14,11 @@ class FilterNonLoqalConsumers(ServiceBase):
 
     def handle(self):
         phone_numbers = self._validate_data()
-        non_loqal_phone_numbers = []
+        loqal_phone_numbers = []
         for phone_number in phone_numbers:
-            if not self.check_user_exists(phone_number=phone_number):
-                non_loqal_phone_numbers.append(phone_number)
-        return non_loqal_phone_numbers
+            if self.check_user_exists(phone_number=phone_number):
+                loqal_phone_numbers.append(phone_number)
+        return loqal_phone_numbers
 
     def _validate_data(self):
         phone_numbers = self.phone_numbers
