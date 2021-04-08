@@ -10,6 +10,8 @@ class ConsumerInviteResponse(serializers.ModelSerializer):
     class Meta:
         model = C2CInvite
         fields = (
+            "created_at",
+            "updated_at",
             "invite_id",
             "phone_number",
             "phone_number_country",
