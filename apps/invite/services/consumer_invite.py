@@ -15,8 +15,11 @@ __all__ = ("InviteConsumer",)
 
 
 class InviteConsumer(ServiceBase):
-    def __init__(self, phone_number, consumer, resend=False):
-        self.phone_number = phone_number
+    def __init__(self, data, consumer, resend=False):
+        self.phone_number = data.get("phone_number")
+        self.phone_number_country = data.get("phone_number_country", "US")
+        self.consumer_name = data.get("consumer_name", "")
+        self.email = data.get("email", "")
         self.consumer = consumer
         self.resend = resend
 
@@ -60,7 +63,11 @@ class InviteConsumer(ServiceBase):
 
         if not self.resend:
             c2c_invite = create_c2c_invite(
-                phone_number=self.phone_number, consumer_id=consumer.id
+                phone_number=self.phone_number,
+                consumer_name=self.consumer_name,
+                email=self.email,
+                phone_number_country=self.phone_number_country,
+                consumer_id=consumer.id,
             )
         try:
             is_success = send_sms(body=text, phone_number=self.phone_number)

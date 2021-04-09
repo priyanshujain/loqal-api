@@ -36,11 +36,8 @@ class FilterNonLoqalConsumersAPI(ConsumerAPIView):
 class InviteConsumerAPI(ConsumerAPIView):
     def post(self, request):
         data = run_validator(C2CInviteValidator, self.request_data)
-        phone_number = data.get("phone_number")
         consumer = request.consumer_account
-        c2c_invite = InviteConsumer(
-            phone_number=phone_number, consumer=consumer
-        ).handle()
+        c2c_invite = InviteConsumer(data=data, consumer=consumer).handle()
         return self.response(
             ConsumerInviteResponse(c2c_invite).data, status=201
         )
@@ -49,11 +46,8 @@ class InviteConsumerAPI(ConsumerAPIView):
 class ResendConsumerInviteAPI(ConsumerAPIView):
     def post(self, request):
         data = run_validator(C2CInviteValidator, self.request_data)
-        phone_number = data.get("phone_number")
         consumer = request.consumer_account
-        InviteConsumer(
-            phone_number=phone_number, consumer=consumer, resend=True
-        ).handle()
+        InviteConsumer(data=data, consumer=consumer, resend=True).handle()
         return self.response()
 
 
