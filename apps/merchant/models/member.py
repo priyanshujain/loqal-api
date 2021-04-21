@@ -4,13 +4,13 @@ from re import I
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils.timezone import now
-from django.utils.translation import TranslatorCommentWarning
 
 from apps.account.models import MerchantAccount
 from apps.merchant.options import FeatureAcessTypes
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceCharEnumField
+from db.models.fields import ChoiceCharEnumField, EncryptedCharField
 from utils.shortcuts import rand_str
 
 
@@ -170,3 +170,74 @@ class MemberInvite(AbstractBaseModel):
 
     class Meta:
         db_table = "merchant_member_invite"
+
+
+class PosStaff(AbstractBaseModel):
+    merchant = models.ForeignKey(MerchantAccount, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="merchant_pos_staff",
+    )
+    account_active = models.BooleanField(default=False)
+    login_token = EncryptedCharField(max_length=254, default=rand_str)
+    login_pin = EncryptedCharField(max_length=6)
+    pin_last_updated = models.DateTimeField()
+    shift_start = models.DateTimeField(null=True)
+    shift_end = models.DateTimeField(null=True)
+    login_token_expire_time = models.DateTimeField(null=True)
+    staff_tracking_id = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
+        editable=False,
+    )
+
+    def save(self, *args, **kwargs):
+        def id_generator():
+            return get_random_string(
+                length=10, allowed_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            )
+
+        if not self.staff_tracking_id:
+            self.staff_tracking_id = id_generator()
+            while PosStaff.objects.filter(
+                staff_tracking_id=self.staff_tracking_id
+            ).exists():
+                self.staff_tracking_id = id_generator()
+        return super().save(*args, **kwargs)
+
+    def disable(self):
+        user = self.user
+        user.is_disabled = True
+        user.save()
+
+    def enable(self):
+        user = self.user
+        user.is_disabled = False
+        user.save()
+
+    def __str__(self):
+        return self.user.first_name or "-"
+
+    class Meta:
+        db_table = "pos_staff"
+
+
+class PosSession(AbstractBaseModel):
+    staff = models.ForeignKey(
+        PosStaff,
+        on_delete=models.CASCADE,
+        related_name="pos_session",
+    )
+    expires_at = models.DateTimeField(null=True)
+    login_session = models.ForeignKey(
+        "user.UserSession",
+        on_delete=models.CASCADE,
+        related_name="pos_session",
+    )
+
+    class Meta:
+        db_table = "pos_session"
