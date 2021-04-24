@@ -8,7 +8,7 @@ from apps.payment.dbapi import (get_cashier_qrcode, get_merchant_qrcodes,
 from apps.payment.responses import (MerchantQrCodeResponse,
                                     QrCodeMerchantDetailsResponse,
                                     QrCodeResponse)
-from apps.payment.services import AssignQrCode, CreateQrCode
+from apps.payment.services import AssignQrCode, CreateQrCode, UpdateQrCode
 from utils.shortcuts import img2base64
 
 
@@ -25,6 +25,15 @@ class AssignQrCodeAPI(MerchantAPIView):
             merchant_id=merchant_account.id, data=self.request_data
         ).handle()
         return self.response(status=200)
+
+
+class UpdateQrCodeAPI(MerchantAPIView):
+    def put(self, request):
+        merchant_account = request.merchant_account
+        UpdateQrCode(
+            merchant_id=merchant_account.id, data=self.request_data
+        ).handle()
+        return self.response(status=204)
 
 
 class GetAllMerchantQrCodesAPI(MerchantAPIView):

@@ -110,7 +110,8 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
 
 class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
     qrcode_id = serializers.CharField(max_length=6)
-    cashier_id = serializers.IntegerField()
+    register_name = serializers.CharField(max_length=255, required=False)
+    cashier_id = serializers.IntegerField(required=False)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

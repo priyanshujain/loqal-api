@@ -151,12 +151,25 @@ def get_single_qrcode_by_id(qrcode_id):
         return None
 
 
-def assign_payment_qrcode(qrcode_id, merchant_id, cashier_id):
+def assign_payment_qrcode(
+    qrcode_id, merchant_id, cashier_id=None, register_name=""
+):
     """
     Assign QR code to a merchant
     """
     PaymentQrCode.objects.filter(qrcode_id=qrcode_id).update(
-        merchant_id=merchant_id, cashier_id=cashier_id
+        merchant_id=merchant_id,
+        cashier_id=cashier_id,
+        register_name=register_name,
+    )
+
+
+def update_payment_qrcode(qrcode_id, merchant_id, register_name=""):
+    """
+    UPdate register name in QR code to a merchant
+    """
+    PaymentQrCode.objects.filter(qrcode_id=qrcode_id).update(
+        merchant_id=merchant_id, register_name=register_name
     )
 
 
@@ -184,6 +197,18 @@ def get_cashier_qrcode(merchant_id, cashier_id):
     try:
         return PaymentQrCode.objects.get(
             merchant_id=merchant_id, cashier_id=cashier_id
+        )
+    except PaymentQrCode.DoesNotExist:
+        return None
+
+
+def get_qrcode_by_register_name(merchant_id, register_name):
+    """
+    Get QR code for a register_name
+    """
+    try:
+        return PaymentQrCode.objects.get(
+            merchant_id=merchant_id, register_name=register_name
         )
     except PaymentQrCode.DoesNotExist:
         return None
