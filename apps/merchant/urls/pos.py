@@ -7,7 +7,8 @@ from apps.merchant.views.pos import (CreatePosStaffAPI,
 from apps.merchant.views.pos_member import (GetPosStaffProfileAPI,
                                             PosStaffLoginAPI,
                                             PosStaffValidateAccessTokenAPI,
-                                            UpdatePosStaffProfileAPI)
+                                            UpdatePosStaffProfileAPI,
+                                            PosStaffLogoutAPI)
 
 urlpatterns = [
     path(
@@ -39,6 +40,11 @@ urlpatterns = [
         "pos/member-staff/login/",
         PosStaffLoginAPI.as_view(),
         name="login_pos_staff",
+    ),
+    path(
+        "pos/member-staff/logout/",
+        PosStaffLogoutAPI.as_view(),
+        name="logout_pos_staff",
     ),
     path(
         "pos/member-staff/profile/",
