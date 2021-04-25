@@ -68,6 +68,7 @@ class MerchantQrCodeResponse(serializers.ModelSerializer):
             "cashier",
             "updated_at",
             "created_at",
+            "register_name",
         )
 
 
