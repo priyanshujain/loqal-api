@@ -17,9 +17,14 @@ def get_merchant_user(email, phone_number):
 
 
 def check_staff_exists(user_id, merchant_id):
-    return PosStaff.objects.filter(
-        merchant_id=merchant_id, user_id=user_id
-    ).exists()
+    return PosStaff.objects.filter(merchant_id=merchant_id, user_id=user_id).exists()
+
+
+def get_staff_from_access_token(access_token):
+    staff = PosStaff.objects.filter(login_token=access_token)
+    if staff.exists():
+        return staff
+    return None
 
 
 def get_pos_staff(pos_staff_id, merchant_id):

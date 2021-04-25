@@ -19,3 +19,12 @@ class UpdatePosStaffValidator(serializers.ValidationSerializer):
     shift_start = serializers.TimeField(required=False)
     shift_end = serializers.TimeField(required=False)
     register_id = serializers.CharField(max_length=10)
+
+
+class PosStaffAccessTokenValidator(serializers.ValidationSerializer):
+    access_token = serializers.CharField(max_length=2*1024)
+
+
+class PosStaffLoginValidator(serializers.ValidationSerializer):
+    access_token = serializers.CharField(max_length=2*1024)
+    login_pin = serializers.CharField(max_length=6)
