@@ -6,9 +6,9 @@ from apps.merchant.views.pos import (CreatePosStaffAPI,
                                      UpdatePosStaffAPI)
 from apps.merchant.views.pos_member import (GetPosStaffProfileAPI,
                                             PosStaffLoginAPI,
+                                            PosStaffLogoutAPI,
                                             PosStaffValidateAccessTokenAPI,
-                                            UpdatePosStaffProfileAPI,
-                                            PosStaffLogoutAPI)
+                                            UpdatePosStaffProfileAPI)
 
 urlpatterns = [
     path(
