@@ -88,7 +88,7 @@ class PosStaff(AbstractBaseModel):
         return self.login_token
 
     def get_login_token(self):
-        if self.login_token_expire_time < (now() - timedelta(seconds=30)):
+        if self.login_token_expire_time > now():
             return self.login_token
         return self.generate_login_token()
 

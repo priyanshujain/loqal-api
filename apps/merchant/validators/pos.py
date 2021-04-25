@@ -22,9 +22,11 @@ class UpdatePosStaffValidator(serializers.ValidationSerializer):
 
 
 class PosStaffAccessTokenValidator(serializers.ValidationSerializer):
-    access_token = serializers.CharField(max_length=2*1024)
+    access_token = serializers.CharField(max_length=2 * 1024)
+    username = serializers.CharField(max_length=512)
 
 
 class PosStaffLoginValidator(serializers.ValidationSerializer):
-    access_token = serializers.CharField(max_length=2*1024)
+    access_token = serializers.CharField(max_length=2 * 1024)
     login_pin = serializers.CharField(max_length=6)
+    username = serializers.CharField(max_length=512)

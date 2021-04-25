@@ -17,8 +17,9 @@ class GenerateLoginQrCodePosStaff(ServiceBase):
     def handle(self):
         pos_staff = self._validate_data()
         login_token = pos_staff.get_login_token()
+        print(login_token)
         image = qrcodelib.make(
-            f"loqalposapp://auth/pos_session?access_token={login_token}"
+            f"loqalposapp://auth/pos_session?username={pos_staff.user.username}&access_token={login_token}"
         )
         return {"image_base64": img2base64(image)}
 

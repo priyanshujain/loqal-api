@@ -1,16 +1,21 @@
-from utils import auth
+from datetime import timedelta
+
+from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import get_staff_from_access_token
-from apps.merchant.validators import (
-    PosStaffAccessTokenValidator,
-    PosStaffLoginValidator,
-)
+from apps.merchant.dbapi import create_pos_session, get_staff_from_username
+from apps.merchant.validators import (PosStaffAccessTokenValidator,
+                                      PosStaffLoginValidator)
+from apps.user.services.session import Session
+from utils import auth
 
-__all__ = ("ValidatePosStaffAccessToken",)
+__all__ = (
+    "ValidatePosStaffAccessToken",
+    "PosStaffLogin",
+)
 
 
 class ValidatePosStaffAccessToken(ServiceBase):
@@ -20,9 +25,11 @@ class ValidatePosStaffAccessToken(ServiceBase):
     def handle(self):
         data = self._validate_data()
         access_token = data["access_token"]
-        pos_staff = get_staff_from_access_token(access_token=access_token)
+        username = data["username"]
+        pos_staff = get_staff_from_username(username=username)
         if (
             (not pos_staff)
+            or (pos_staff.login_token != access_token)
             or (not pos_staff.account_active)
             or (pos_staff.user.is_disabled)
         ):
@@ -50,9 +57,11 @@ class PosStaffLogin(ServiceBase):
     def handle(self):
         data = self._validate_data()
         access_token = data["access_token"]
-        pos_staff = get_staff_from_access_token(access_token=access_token)
+        username = data["username"]
+        pos_staff = get_staff_from_username(username=username)
         if (
             (not pos_staff)
+            or (pos_staff.login_token != access_token)
             or (not pos_staff.account_active)
             or (pos_staff.user.is_disabled)
         ):
@@ -73,6 +82,22 @@ class PosStaffLogin(ServiceBase):
             )
         user = pos_staff.user
         auth.login(self.request, user)
+        session = self.request.session
+        # Assign the 4 hours expiration period
+        if session:
+            session.set_expiry(60 * 60 * 4)
+        user_session = Session(request=self.request).create_session(user=user)
+        return self._create_pos_session(
+            staff_id=pos_staff.id, user_session_id=user_session.id
+        )
 
     def _validate_data(self):
-        return run_validator(PosStaffAccessTokenValidator, self.data)
+        return run_validator(PosStaffLoginValidator, self.data)
+
+    def _create_pos_session(self, staff_id, user_session_id):
+        pos_session = create_pos_session(
+            staff_id=staff_id,
+            user_session_id=user_session_id,
+            expires_at=(now() + timedelta(hours=8)),
+        )
+        return pos_session

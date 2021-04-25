@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.db.utils import IntegrityError
+from django.utils.timezone import now
 
 from apps.merchant.models import PosSession, PosStaff
 from apps.user.dbapi import create_user
@@ -17,13 +18,15 @@ def get_merchant_user(email, phone_number):
 
 
 def check_staff_exists(user_id, merchant_id):
-    return PosStaff.objects.filter(merchant_id=merchant_id, user_id=user_id).exists()
+    return PosStaff.objects.filter(
+        merchant_id=merchant_id, user_id=user_id
+    ).exists()
 
 
-def get_staff_from_access_token(access_token):
-    staff = PosStaff.objects.filter(login_token=access_token)
+def get_staff_from_username(username):
+    staff = PosStaff.objects.filter(user__username=username)
     if staff.exists():
-        return staff
+        return staff.first()
     return None
 
 
@@ -116,3 +119,25 @@ def update_pos_staff(
     pos_staff.shift_start = shift_start
     pos_staff.shift_end = shift_end
     pos_staff.save()
+
+
+def create_pos_session(staff_id, user_session_id, expires_at):
+    try:
+        return PosSession.objects.create(
+            staff_id=staff_id,
+            expires_at=expires_at,
+            login_session_id=user_session_id,
+        )
+    except IntegrityError:
+        return None
+
+
+def get_active_pos_session(user_id, user_session_key):
+    sessions = PosSession.objects.filter(
+        staff__user_id=user_id,
+        login_session__session_key=user_session_key,
+        expires_at__lt=now(),
+    )
+    if sessions.exists():
+        return sessions.first()
+    return None

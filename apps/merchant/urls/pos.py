@@ -4,6 +4,8 @@ from apps.merchant.views.pos import (CreatePosStaffAPI,
                                      GeneratePosStaffLoginQrCodeAPI,
                                      GeneratePosStaffPinAPI, GetPosStaffAPI,
                                      UpdatePosStaffAPI)
+from apps.merchant.views.pos_member import (PosStaffLoginAPI,
+                                            PosStaffValidateAccessTokenAPI)
 
 urlpatterns = [
     path(
@@ -25,6 +27,16 @@ urlpatterns = [
         "pos/member-staff/<uuid:pos_staff_id>/login-qrcode/",
         GeneratePosStaffLoginQrCodeAPI.as_view(),
         name="pos_staff_login_qrcode",
+    ),
+    path(
+        "pos/member-staff/validate-access-token/",
+        PosStaffValidateAccessTokenAPI.as_view(),
+        name="validate_access_token_pos_staff",
+    ),
+    path(
+        "pos/member-staff/login/",
+        PosStaffLoginAPI.as_view(),
+        name="login_pos_staff",
     ),
     path(
         "pos/member-staff/",
