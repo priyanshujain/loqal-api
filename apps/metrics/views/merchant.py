@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db.models import Count, Max, Sum
 from django.utils.translation import gettext as _
 
-from api.views import MerchantAPIView
+from api.views import MerchantAPIView, PosStaffAPIView
 from apps.metrics.notifications import SendConsumerRatingNotification
 from apps.metrics.services import CreateConsumerRating
 from apps.payment.dbapi import get_30days_transactions_merchant
@@ -29,6 +29,10 @@ class CreateConsumerRatingAPI(MerchantAPIView):
             },
         ).send()
         return self.response()
+
+
+class CreatePosConsumerRatingAPI(PosStaffAPIView):
+    pass
 
 
 class MerchantMetricsAPI(MerchantAPIView):

@@ -124,3 +124,9 @@ class PosSession(AbstractBaseModel):
 
     class Meta:
         db_table = "pos_session"
+
+    def expire(self, save=True):
+        self.expires_at = now()
+        self.login_session.expire_session()
+        if save:
+            self.save()

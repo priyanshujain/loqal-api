@@ -47,8 +47,12 @@ class ListPosStaffResponse(serializers.ModelSerializer):
     is_disabled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )
-    register_name = serializers.CharField(source="register.register_name", read_only=True)
-    qrcode_id = serializers.CharField(source="register.qrcode_id", read_only=True)
+    register_name = serializers.CharField(
+        source="register.register_name", read_only=True
+    )
+    qrcode_id = serializers.CharField(
+        source="register.qrcode_id", read_only=True
+    )
 
     class Meta:
         model = PosStaff

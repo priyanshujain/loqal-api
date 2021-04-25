@@ -21,6 +21,13 @@ class UpdatePosStaffValidator(serializers.ValidationSerializer):
     register_id = serializers.CharField(max_length=10)
 
 
+class UpdatePosStaffMemberValidator(serializers.ValidationSerializer):
+    first_name = serializers.CharField(max_length=512)
+    last_name = serializers.CharField(max_length=512)
+    phone_number = serializers.CharField(max_length=10)
+    email = serializers.EmailField(max_length=254)
+
+
 class PosStaffAccessTokenValidator(serializers.ValidationSerializer):
     access_token = serializers.CharField(max_length=2 * 1024)
     username = serializers.CharField(max_length=512)

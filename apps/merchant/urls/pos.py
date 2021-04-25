@@ -4,8 +4,10 @@ from apps.merchant.views.pos import (CreatePosStaffAPI,
                                      GeneratePosStaffLoginQrCodeAPI,
                                      GeneratePosStaffPinAPI, GetPosStaffAPI,
                                      UpdatePosStaffAPI)
-from apps.merchant.views.pos_member import (PosStaffLoginAPI,
-                                            PosStaffValidateAccessTokenAPI)
+from apps.merchant.views.pos_member import (GetPosStaffProfileAPI,
+                                            PosStaffLoginAPI,
+                                            PosStaffValidateAccessTokenAPI,
+                                            UpdatePosStaffProfileAPI)
 
 urlpatterns = [
     path(
@@ -37,6 +39,16 @@ urlpatterns = [
         "pos/member-staff/login/",
         PosStaffLoginAPI.as_view(),
         name="login_pos_staff",
+    ),
+    path(
+        "pos/member-staff/profile/",
+        GetPosStaffProfileAPI.as_view(),
+        name="pos_staff_profile",
+    ),
+    path(
+        "pos/member-staff/profile/update/",
+        UpdatePosStaffProfileAPI.as_view(),
+        name="pos_staff_profile_update",
     ),
     path(
         "pos/member-staff/",

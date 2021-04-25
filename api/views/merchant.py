@@ -1,3 +1,5 @@
+from django.utils.timezone import now
+
 from api.exceptions import NotAuthenticated, PermissionDenied
 from apps.merchant.dbapi import (get_account_member_by_user_id,
                                  get_active_pos_session)
@@ -70,7 +72,9 @@ class PosStaffAPIView(APIAccessLogView):
             user_id=user.id, user_session_key=request.session.session_key
         )
         if not pos_session:
-            exception_message = "POS session is not valid"
+            exception_message = "POS session is not valid."
+        elif pos_session.expires_at <= now():
+            exception_message = "POS session has been expired."
         else:
             request.pos_session = pos_session
             request.pos_staff = pos_session.staff

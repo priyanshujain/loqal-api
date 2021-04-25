@@ -2,7 +2,8 @@ from django.urls import path
 
 from apps.payment.views.qrcode import (AssignQrCodeAPI, CreateQrCodeAPI,
                                        GetAllMerchantQrCodesAPI,
-                                       GetCashierQrCodesAPI, GetQrCodeImageAPI,
+                                       GetCashierQrCodesAPI, GetPosQrCodesAPI,
+                                       GetQrCodeImageAPI,
                                        GetQrCodeMerchantDetailsAPI,
                                        UpdateQrCodeAPI)
 
@@ -18,6 +19,11 @@ urlpatterns = [
     path(
         "cashier/qrcode/",
         GetCashierQrCodesAPI.as_view(),
+        name="cashier_qrcode",
+    ),
+    path(
+        "pos/qrcode/",
+        GetPosQrCodesAPI.as_view(),
         name="cashier_qrcode",
     ),
     path(

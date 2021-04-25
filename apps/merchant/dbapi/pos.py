@@ -136,7 +136,7 @@ def get_active_pos_session(user_id, user_session_key):
     sessions = PosSession.objects.filter(
         staff__user_id=user_id,
         login_session__session_key=user_session_key,
-        expires_at__lt=now(),
+        expires_at__gt=now(),
     )
     if sessions.exists():
         return sessions.first()

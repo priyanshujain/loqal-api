@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import ConsumerAPIView, MerchantAPIView
+from api.views import ConsumerAPIView, MerchantAPIView, PosStaffAPIView
 from apps.merchant.services.member import account_member
 from apps.payment.dbapi import (create_empty_transactions,
                                 get_consumer_payment_reqeust,
@@ -131,6 +131,10 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         return self.response(
             PaymentRequestResponse(payment_request).data, status=201
         )
+
+
+class CreatePosPaymentRequestAPI(PosStaffAPIView):
+    pass
 
 
 class ApprovePaymentRequestAPI(ConsumerAPIView):

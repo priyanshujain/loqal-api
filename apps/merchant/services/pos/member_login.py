@@ -6,7 +6,8 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import create_pos_session, get_staff_from_username
+from apps.merchant.dbapi import (create_pos_session, get_active_pos_session,
+                                 get_staff_from_username)
 from apps.merchant.validators import (PosStaffAccessTokenValidator,
                                       PosStaffLoginValidator)
 from apps.user.services.session import Session
@@ -15,6 +16,7 @@ from utils import auth
 __all__ = (
     "ValidatePosStaffAccessToken",
     "PosStaffLogin",
+    "PosStaffLogout",
 )
 
 
@@ -55,6 +57,10 @@ class PosStaffLogin(ServiceBase):
         self.request = request
 
     def handle(self):
+        if self._check_already_loggedin():
+            raise ValidationError(
+                {"detail": ErrorDetail(_("You are already logged in."))}
+            )
         data = self._validate_data()
         access_token = data["access_token"]
         username = data["username"]
@@ -91,6 +97,20 @@ class PosStaffLogin(ServiceBase):
             staff_id=pos_staff.id, user_session_id=user_session.id
         )
 
+    def _check_already_loggedin(self):
+        user = self.request.user
+        if user.is_authenticated:
+            pos_session = get_active_pos_session(
+                user_id=user.id,
+                user_session_key=self.request.session.session_key,
+            )
+            if pos_session.expires_at > now():
+                return True
+            else:
+                auth.logout(self.request)
+                pos_session.expire()
+        return False
+
     def _validate_data(self):
         return run_validator(PosStaffLoginValidator, self.data)
 
@@ -101,3 +121,34 @@ class PosStaffLogin(ServiceBase):
             expires_at=(now() + timedelta(hours=8)),
         )
         return pos_session
+
+
+class PosStaffLogout(ServiceBase):
+    pos_session = None
+
+    def __init__(self, request):
+        self.request = request
+
+    def handle(self):
+        if not self._check_already_loggedin():
+            raise ValidationError(
+                {"detail": ErrorDetail(_("You are already logged out."))}
+            )
+        auth.logout(self.request)
+        if self.pos_session:
+            self.pos_session.expire()
+
+    def _check_already_loggedin(self):
+        user = self.request.user
+        if user.is_authenticated:
+            pos_session = get_active_pos_session(
+                user_id=user.id,
+                user_session_key=self.request.session.session_key,
+            )
+            self.pos_session = pos_session
+            if pos_session.expires_at > now():
+                return True
+            else:
+                auth.logout(self.request)
+                pos_session.expire()
+        return False

@@ -2,13 +2,16 @@ import qrcode as qrcodelib
 from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
-from api.views import ConsumerAPIView, MerchantAPIView, StaffAPIView
+from api.helpers import run_validator
+from api.views import (ConsumerAPIView, MerchantAPIView, PosStaffAPIView,
+                       StaffAPIView)
 from apps.payment.dbapi import (get_cashier_qrcode, get_merchant_qrcodes,
                                 get_payment_qrcode, get_payment_qrcode_by_id)
 from apps.payment.responses import (MerchantQrCodeResponse,
                                     QrCodeMerchantDetailsResponse,
                                     QrCodeResponse)
 from apps.payment.services import AssignQrCode, CreateQrCode, UpdateQrCode
+from apps.payment.validators import PosAmountValidator
 from utils.shortcuts import img2base64
 
 
@@ -55,6 +58,20 @@ class GetCashierQrCodesAPI(MerchantAPIView):
         response_data = MerchantQrCodeResponse(qrcode).data
         image = qrcodelib.make(
             f"loqalapp://loqal/pay?qrcid={qrcode.qrcode_id}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}/"
+        )
+        response_data["image_base64"] = img2base64(image)
+        return self.response(response_data)
+
+
+class GetPosQrCodesAPI(PosStaffAPIView):
+    def post(self, request):
+        data = run_validator(PosAmountValidator, self.request_data)
+        amount = data["amount"]
+        pos_staff = request.pos_staff
+        qrcode = pos_staff.register
+        response_data = MerchantQrCodeResponse(qrcode).data
+        image = qrcodelib.make(
+            f"loqalapp://loqal/pay?qrcid={qrcode.qrcode_id}&amount={amount}&type=merchant&currency={qrcode.currency}&gen={qrcode.created_at}/"
         )
         response_data["image_base64"] = img2base64(image)
         return self.response(response_data)

@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
-from api.views import APIView, MerchantAPIView
+from api.views import APIView, MerchantAPIView, PosStaffAPIView
 from apps.account.responses import MerchantAccountProfileResponse
 from apps.account.services import CreateMerchantAccount
 from apps.account.validators import CreateMerchantAccountValidator
@@ -14,6 +14,7 @@ from utils.auth import login
 __all__ = (
     "MerchantSignupAPI",
     "MerchantProfileAPI",
+    "PosMerchantProfileAPI",
 )
 
 
@@ -45,3 +46,7 @@ class MerchantProfileAPI(MerchantAPIView):
             merchant=merchant_account
         )
         return self.response(data)
+
+
+class PosMerchantProfileAPI(PosStaffAPIView):
+    pass

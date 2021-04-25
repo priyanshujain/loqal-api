@@ -3,6 +3,7 @@ from django.urls import path
 from apps.metrics.views.consumer import (ConsumerMetricsAPI,
                                          CreateSocialShareAPI)
 from apps.metrics.views.merchant import (CreateConsumerRatingAPI,
+                                         CreatePosConsumerRatingAPI,
                                          MerchantMetricsAPI)
 
 urlpatterns = [
@@ -25,5 +26,10 @@ urlpatterns = [
         "merchant/transaction/consumer-rating/",
         CreateConsumerRatingAPI.as_view(),
         name="create_consumer_rating",
+    ),
+    path(
+        "merchant/pos/transaction/consumer-rating/",
+        CreatePosConsumerRatingAPI.as_view(),
+        name="create_pos_consumer_rating",
     ),
 ]

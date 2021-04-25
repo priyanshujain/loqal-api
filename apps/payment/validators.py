@@ -200,3 +200,12 @@ class MerchantReceiveLimitValidator(serializers.ValidationSerializer):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         coerce_to_string=False,
     )
+
+
+class PosAmountValidator(serializers.ValidationSerializer):
+    amount = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )

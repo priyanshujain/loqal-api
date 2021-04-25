@@ -1,7 +1,10 @@
 from django.utils.translation import gettext as _
 
-from api.views import APIAccessLogView
-from apps.merchant.services import PosStaffLogin, ValidatePosStaffAccessToken
+from api.views import APIAccessLogView, PosStaffAPIView
+from apps.merchant.responses import PosStaffResponse
+from apps.merchant.services import (PosStaffLogin, PosStaffLogout,
+                                    UpdatePosStaffMember,
+                                    ValidatePosStaffAccessToken)
 
 
 class PosStaffValidateAccessTokenAPI(APIAccessLogView):
@@ -24,3 +27,33 @@ class PosStaffLoginAPI(APIAccessLogView):
             request=request, data=self.request_data
         ).handle()
         return self.response()
+
+
+class PosStaffLogoutAPI(APIAccessLogView):
+    """
+    Create new pos staff api
+    """
+
+    def post(self, request):
+        PosStaffLogout(request=request).handle()
+        return self.response()
+
+
+class GetPosStaffProfileAPI(PosStaffAPIView):
+    """"""
+
+    def get(self, request):
+        pos_staff = request.pos_staff
+        return self.response(PosStaffResponse(pos_staff).data)
+
+
+class UpdatePosStaffProfileAPI(PosStaffAPIView):
+    """"""
+
+    def put(self, request):
+        UpdatePosStaffMember(
+            merchant=request.merchant_account,
+            pos_staff=request.pos_staff,
+            data=self.request_data,
+        ).handle()
+        return self.response(status=204)
