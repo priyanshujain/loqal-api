@@ -25,7 +25,7 @@ class UpdatePosStaffMember(ServiceBase):
             last_name=data["last_name"],
             email=data["email"],
             phone_number=data["phone_number"],
-            register_id=pos_staff.regsiter.id,
+            register_id=pos_staff.register.id,
             shift_start=pos_staff.shift_start,
             shift_end=pos_staff.shift_end,
         )

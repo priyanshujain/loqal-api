@@ -24,6 +24,8 @@ class CreatePosStaffResponse(serializers.ModelSerializer):
     class Meta:
         model = PosStaff
         fields = (
+            "created_at",
+            "updated_at",
             "first_name",
             "last_name",
             "pos_staff_id",
@@ -31,6 +33,8 @@ class CreatePosStaffResponse(serializers.ModelSerializer):
             "phone_number",
             "is_disabled",
             "login_pin",
+            "shift_start",
+            "shift_end",
         )
 
 
@@ -57,6 +61,8 @@ class ListPosStaffResponse(serializers.ModelSerializer):
     class Meta:
         model = PosStaff
         fields = (
+            "created_at",
+            "updated_at",
             "first_name",
             "last_name",
             "pos_staff_id",
@@ -65,4 +71,6 @@ class ListPosStaffResponse(serializers.ModelSerializer):
             "is_disabled",
             "qrcode_id",
             "register_name",
+            "shift_start",
+            "shift_end",
         )
