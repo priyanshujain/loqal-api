@@ -133,8 +133,22 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         )
 
 
-class CreatePosPaymentRequestAPI(CreatePaymentRequestAPI, PosStaffAPIView):
-    pass
+class CreatePosPaymentRequestAPI(PosStaffAPIView):
+    def post(self, request):
+        account_id = request.account.id
+        merchant_account_member = request.merchant_account_member
+        payment_request = CreatePaymentRequest(
+            account_id=account_id,
+            account_member_id=merchant_account_member.id,
+            data=self.request_data,
+        ).handle()
+        SendNewPaymentRequestNotification(
+            user_id=payment_request.account_to.consumer.user.id,
+            data=ConsumerPaymentRequestResponse(payment_request).data,
+        ).send()
+        return self.response(
+            PaymentRequestResponse(payment_request).data, status=201
+        )
 
 
 class ApprovePaymentRequestAPI(ConsumerAPIView):

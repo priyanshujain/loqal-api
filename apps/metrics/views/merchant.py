@@ -31,8 +31,25 @@ class CreateConsumerRatingAPI(MerchantAPIView):
         return self.response()
 
 
-class CreatePosConsumerRatingAPI(CreateConsumerRatingAPI, PosStaffAPIView):
-    pass
+class CreatePosConsumerRatingAPI(PosStaffAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        rating = CreateConsumerRating(
+            merchant=merchant_account, data=self.request_data
+        ).handle()
+        SendConsumerRatingNotification(
+            user_id=rating.consumer.user.id,
+            data={
+                "merchant_name": merchant_account.profile.full_name,
+                "created_at": datetime_format(rating.created_at),
+                "transaction": {
+                    "created_at": datetime_format(
+                        rating.transaction.created_at
+                    )
+                },
+            },
+        ).send()
+        return self.response()
 
 
 class MerchantMetricsAPI(MerchantAPIView):

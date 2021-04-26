@@ -22,5 +22,12 @@ class InviteConsumerAPI(MerchantAPIView):
         return self.response()
 
 
-class InvitePosConsumerAPI(InviteConsumerAPI, PosStaffAPIView):
-    pass
+class InvitePosConsumerAPI(PosStaffAPIView):
+    def post(self, request):
+        merchant = request.merchant_account
+        data = run_validator(PhoneNumberValidator, self.request_data)
+        phone_number = data["phone_number"]
+        InviteConsumerBySMS(
+            merchant=merchant, phone_number=phone_number
+        ).handle()
+        return self.response()

@@ -48,5 +48,11 @@ class MerchantProfileAPI(MerchantAPIView):
         return self.response(data)
 
 
-class PosMerchantProfileAPI(MerchantProfileAPI, PosStaffAPIView):
-    pass
+class PosMerchantProfileAPI(PosStaffAPIView):
+    def get(self, request):
+        merchant_account = request.merchant_account
+        data = MerchantAccountProfileResponse(merchant_account).data
+        data["is_merchant_account_ready"] = check_if_merchant_account_ready(
+            merchant=merchant_account
+        )
+        return self.response(data)
