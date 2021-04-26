@@ -22,5 +22,5 @@ class InviteConsumerAPI(MerchantAPIView):
         return self.response()
 
 
-class InvitePosConsumerAPI(PosStaffAPIView):
+class InvitePosConsumerAPI(InviteConsumerAPI, PosStaffAPIView):
     pass

@@ -133,7 +133,7 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         )
 
 
-class CreatePosPaymentRequestAPI(PosStaffAPIView):
+class CreatePosPaymentRequestAPI(CreatePaymentRequestAPI, PosStaffAPIView):
     pass
 
 

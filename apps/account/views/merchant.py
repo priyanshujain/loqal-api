@@ -48,5 +48,5 @@ class MerchantProfileAPI(MerchantAPIView):
         return self.response(data)
 
 
-class PosMerchantProfileAPI(PosStaffAPIView):
+class PosMerchantProfileAPI(MerchantProfileAPI, PosStaffAPIView):
     pass
