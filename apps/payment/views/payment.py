@@ -136,10 +136,9 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class CreatePosPaymentRequestAPI(PosStaffAPIView):
     def post(self, request):
         account_id = request.account.id
-        merchant_account_member = request.merchant_account_member
         payment_request = CreatePaymentRequest(
             account_id=account_id,
-            account_member_id=merchant_account_member.id,
+            account_member_id=None,
             data=self.request_data,
         ).handle()
         SendNewPaymentRequestNotification(
