@@ -31,7 +31,7 @@ class CreateConsumerRatingAPI(MerchantAPIView):
         return self.response()
 
 
-class CreatePosConsumerRatingAPI(PosStaffAPIView):
+class CreatePosConsumerRatingAPI(CreateConsumerRatingAPI, PosStaffAPIView):
     pass
 
 
