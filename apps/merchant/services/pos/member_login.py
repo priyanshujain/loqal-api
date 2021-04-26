@@ -6,10 +6,15 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (create_pos_session, get_active_pos_session,
-                                 get_staff_from_username)
-from apps.merchant.validators import (PosStaffAccessTokenValidator,
-                                      PosStaffLoginValidator)
+from apps.merchant.dbapi import (
+    create_pos_session,
+    get_active_pos_session,
+    get_staff_from_username,
+)
+from apps.merchant.validators import (
+    PosStaffAccessTokenValidator,
+    PosStaffLoginValidator,
+)
 from apps.user.services.session import Session
 from utils import auth
 
@@ -104,11 +109,12 @@ class PosStaffLogin(ServiceBase):
                 user_id=user.id,
                 user_session_key=self.request.session.session_key,
             )
-            if pos_session.expires_at > now():
+            if pos_session and pos_session.expires_at > now():
                 return True
             else:
                 auth.logout(self.request)
-                pos_session.expire()
+                if pos_session:
+                    pos_session.expire()
         return False
 
     def _validate_data(self):
@@ -146,9 +152,10 @@ class PosStaffLogout(ServiceBase):
                 user_session_key=self.request.session.session_key,
             )
             self.pos_session = pos_session
-            if pos_session.expires_at > now():
+            if pos_session and pos_session.expires_at > now():
                 return True
             else:
                 auth.logout(self.request)
-                pos_session.expire()
+                if pos_session:
+                    pos_session.expire()
         return False
