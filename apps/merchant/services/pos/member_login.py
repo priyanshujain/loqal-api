@@ -89,14 +89,17 @@ class PosStaffLogin(ServiceBase):
         login_pin = data["login_pin"]
         if login_pin != pos_staff.login_pin:
             raise ValidationError(
-                {"login_in": ErrorDetail(_("Login pin is incorrect."))}
+                {"login_pin": [ErrorDetail(_("Login pin is incorrect."))]}
             )
         user = pos_staff.user
         auth.login(self.request, user)
         session = self.request.session
         # Assign the 4 hours expiration period
-        if session:
-            session.set_expiry(60 * 60 * 4)
+        if not session:
+               raise ValidationError(
+                {"detail": ErrorDetail(_("Session could not be created, please try again."))}
+            ) 
+        session.set_expiry(60 * 60 * 4)
         user_session = Session(request=self.request).create_session(user=user)
         return self._create_pos_session(
             staff_id=pos_staff.id, user_session_id=user_session.id
