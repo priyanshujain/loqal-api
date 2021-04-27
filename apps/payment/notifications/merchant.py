@@ -1,4 +1,4 @@
-from apps.merchant.dbapi import get_members_by_account
+from apps.merchant.dbapi import get_members_by_account, all_active_pos_sessions
 from apps.notification.tasks import NotificationBase
 
 __all__ = (
@@ -29,8 +29,12 @@ class SendNewPaymentNotification(object):
     def send(self):
         members = get_members_by_account(merchant_id=self.merchant_id)
         for member in members:
+            SendSinglePaymentNotification(user_id=member.user.id, data=self.data).send()
+
+        pos_sessions = all_active_pos_sessions(merchant_id=self.merchant_id)
+        for pos_session in pos_sessions:
             SendSinglePaymentNotification(
-                user_id=member.user.id, data=self.data
+                user_id=pos_session.staff.user.id, data=self.data
             ).send()
 
 

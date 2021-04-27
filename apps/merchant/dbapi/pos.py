@@ -18,9 +18,7 @@ def get_merchant_user(email, phone_number):
 
 
 def check_staff_exists(user_id, merchant_id):
-    return PosStaff.objects.filter(
-        merchant_id=merchant_id, user_id=user_id
-    ).exists()
+    return PosStaff.objects.filter(merchant_id=merchant_id, user_id=user_id).exists()
 
 
 def get_staff_from_username(username):
@@ -141,3 +139,10 @@ def get_active_pos_session(user_id, user_session_key):
     if sessions.exists():
         return sessions.first()
     return None
+
+
+def all_active_pos_sessions(merchant_id):
+    return PosSession.objects.filter(
+        staff__merchant_id=merchant_id,
+        expires_at__gt=now(),
+    )
