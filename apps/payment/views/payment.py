@@ -8,7 +8,7 @@ from apps.payment.dbapi import (create_empty_transactions,
                                 get_consumer_transaction,
                                 get_consumer_transactions,
                                 get_merchant_payment_reqeust,
-                                get_recent_store_orders)
+                                get_recent_store_orders, register)
 from apps.payment.notifications import (SendApproveRequestNotification,
                                         SendNewPaymentNotification,
                                         SendNewPaymentRequestNotification,
@@ -122,6 +122,7 @@ class CreatePaymentRequestAPI(MerchantAPIView):
         payment_request = CreatePaymentRequest(
             account_id=account_id,
             account_member_id=merchant_account_member.id,
+            register_id=None,
             data=self.request_data,
         ).handle()
         SendNewPaymentRequestNotification(
@@ -136,9 +137,11 @@ class CreatePaymentRequestAPI(MerchantAPIView):
 class CreatePosPaymentRequestAPI(PosStaffAPIView):
     def post(self, request):
         account_id = request.account.id
+        pos_staff = request.pos_staff
         payment_request = CreatePaymentRequest(
             account_id=account_id,
             account_member_id=None,
+            register_id=pos_staff.register.id,
             data=self.request_data,
         ).handle()
         SendNewPaymentRequestNotification(

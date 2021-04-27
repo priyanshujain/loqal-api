@@ -12,6 +12,8 @@ from apps.provider.options import DEFAULT_CURRENCY
 from db.models import AbstractBaseModel
 from db.models.fields import ChoiceCharEnumField, ChoiceEnumField
 
+from .qrcode import PaymentQrCode
+
 __all__ = (
     "Payment",
     "PaymentEvent",
@@ -31,6 +33,13 @@ class Payment(AbstractBaseModel):
     )
     payment_process = ChoiceEnumField(
         enum_type=PaymentProcess, default=PaymentProcess.NOT_PROVIDED
+    )
+    register = models.ForeignKey(
+        PaymentQrCode,
+        blank=True,
+        null=True,
+        related_name="payments",
+        on_delete=models.SET_NULL,
     )
     captured_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,

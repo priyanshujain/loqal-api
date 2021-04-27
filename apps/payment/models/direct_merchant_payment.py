@@ -21,6 +21,8 @@ class DirectMerchantPayment(AbstractBaseModel):
         related_name="direct_merchant_payments",
         on_delete=models.SET_NULL,
     )
+
+    # TODO: delete this field
     cashier = models.ForeignKey(
         AccountMember,
         blank=True,
@@ -40,6 +42,8 @@ class DirectMerchantPayment(AbstractBaseModel):
         related_name="direct_merchant_payments",
         on_delete=models.SET_NULL,
     )
+
+    # TODO: delete this field
     transaction = models.OneToOneField(
         Transaction,
         blank=True,

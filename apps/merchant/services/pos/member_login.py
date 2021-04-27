@@ -6,15 +6,10 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (
-    create_pos_session,
-    get_active_pos_session,
-    get_staff_from_username,
-)
-from apps.merchant.validators import (
-    PosStaffAccessTokenValidator,
-    PosStaffLoginValidator,
-)
+from apps.merchant.dbapi import (create_pos_session, get_active_pos_session,
+                                 get_staff_from_username)
+from apps.merchant.validators import (PosStaffAccessTokenValidator,
+                                      PosStaffLoginValidator)
 from apps.user.services.session import Session
 from utils import auth
 
@@ -96,9 +91,13 @@ class PosStaffLogin(ServiceBase):
         session = self.request.session
         # Assign the 4 hours expiration period
         if not session:
-               raise ValidationError(
-                {"detail": ErrorDetail(_("Session could not be created, please try again."))}
-            ) 
+            raise ValidationError(
+                {
+                    "detail": ErrorDetail(
+                        _("Session could not be created, please try again.")
+                    )
+                }
+            )
         session.set_expiry(60 * 60 * 4)
         user_session = Session(request=self.request).create_session(user=user)
         return self._create_pos_session(

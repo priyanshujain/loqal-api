@@ -31,6 +31,7 @@ def create_payment_register(account_id):
 def create_payment(
     order_id,
     payment_process,
+    register_id=None,
 ):
     """
     dbapi for creating new transaction.
@@ -40,6 +41,7 @@ def create_payment(
             order_id=order_id,
             status=PaymentStatus.IN_PROGRESS,
             payment_process=payment_process,
+            register_id=register_id,
         )
     except IntegrityError:
         return None
@@ -227,6 +229,7 @@ def create_payment_request(
     amount,
     currency,
     cashier_id=None,
+    register_id=None,
 ):
     """
     dbapi for creating new payment request.
@@ -238,6 +241,7 @@ def create_payment_request(
             amount=Decimal(amount),
             currency=currency,
             cashier_id=cashier_id,
+            register_id=register_id,
         )
     except IntegrityError:
         return None
