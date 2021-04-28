@@ -4,6 +4,7 @@ from apps.merchant.models import PosStaff
 __all__ = (
     "CreatePosStaffResponse",
     "ListPosStaffResponse",
+    "ValidatePosStaffAccessTokenResponse",
 )
 
 
@@ -73,4 +74,21 @@ class ListPosStaffResponse(serializers.ModelSerializer):
             "register_name",
             "shift_start",
             "shift_end",
+        )
+
+
+class ValidatePosStaffAccessTokenResponse(serializers.ModelSerializer):
+    is_disabled = serializers.BooleanField(
+        source="user.is_disabled", read_only=True
+    )
+    username = serializers.CharField(
+        source="user.username", read_only=True
+    )
+
+    class Meta:
+        model = PosStaff
+        fields = (
+            "login_token_expire_time",
+            "username",
+            "is_disabled",
         )

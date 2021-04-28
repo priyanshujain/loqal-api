@@ -1,10 +1,16 @@
 from django.utils.translation import gettext as _
 
 from api.views import APIAccessLogView, PosStaffAPIView
-from apps.merchant.responses import PosStaffResponse
-from apps.merchant.services import (PosStaffLogin, PosStaffLogout,
-                                    UpdatePosStaffMember,
-                                    ValidatePosStaffAccessToken)
+from apps.merchant.responses import (
+    PosStaffResponse,
+    ValidatePosStaffAccessTokenResponse,
+)
+from apps.merchant.services import (
+    PosStaffLogin,
+    PosStaffLogout,
+    UpdatePosStaffMember,
+    ValidatePosStaffAccessToken,
+)
 
 
 class PosStaffValidateAccessTokenAPI(APIAccessLogView):
@@ -13,8 +19,8 @@ class PosStaffValidateAccessTokenAPI(APIAccessLogView):
     """
 
     def post(self, request):
-        is_valid = ValidatePosStaffAccessToken(data=self.request_data).handle()
-        return self.response({"is_valid": is_valid})
+        pos_staff = ValidatePosStaffAccessToken(data=self.request_data).handle()
+        return self.response(ValidatePosStaffAccessTokenResponse(pos_staff).data)
 
 
 class PosStaffLoginAPI(APIAccessLogView):
@@ -23,9 +29,7 @@ class PosStaffLoginAPI(APIAccessLogView):
     """
 
     def post(self, request):
-        pos_session = PosStaffLogin(
-            request=request, data=self.request_data
-        ).handle()
+        pos_session = PosStaffLogin(request=request, data=self.request_data).handle()
         return self.response()
 
 

@@ -45,7 +45,7 @@ class ValidatePosStaffAccessToken(ServiceBase):
                     )
                 }
             )
-        return True
+        return pos_staff
 
     def _validate_data(self):
         return run_validator(PosStaffAccessTokenValidator, self.data)
