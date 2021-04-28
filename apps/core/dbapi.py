@@ -54,12 +54,20 @@ def get_platform_app_metadata(platform):
 
 
 def create_merchant_metadata(
+    min_allowed_version,
+    new_version,
     platform,
+    store_url,
+    api_env,
     primary_banking_verification_provider=VerificationProvider.PLAID,
 ):
     try:
         return MerchantMetaData.objects.create(
+            min_allowed_version=min_allowed_version,
+            new_version=new_version,
             platform=platform,
+            store_url=store_url,
+            api_env=api_env,
             primary_banking_verification_provider=primary_banking_verification_provider,
         )
     except IntegrityError:
@@ -67,10 +75,18 @@ def create_merchant_metadata(
 
 
 def update_merchant_metadata(
+    min_allowed_version,
+    new_version,
     platform,
+    store_url,
+    api_env,
     primary_banking_verification_provider=VerificationProvider.PLAID,
 ):
     qs = MerchantMetaData.objects.filter(platform=platform).update(
+        min_allowed_version=min_allowed_version,
+        new_version=new_version,
+        store_url=store_url,
+        api_env=api_env,
         primary_banking_verification_provider=primary_banking_verification_provider,
     )
 
