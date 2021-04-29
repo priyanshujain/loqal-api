@@ -143,6 +143,13 @@ def get_active_pos_session(user_id, user_session_key):
     return None
 
 
+def expire_all_active_pos_session(user_id):
+    sessions = PosSession.objects.filter(
+        staff__user_id=user_id,
+        expires_at__gt=now(),
+    ).update(expires_at=now())
+
+
 def all_active_pos_sessions(merchant_id):
     return PosSession.objects.filter(
         staff__merchant_id=merchant_id,

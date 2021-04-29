@@ -7,7 +7,8 @@ from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
 from apps.merchant.dbapi import (create_pos_session, get_active_pos_session,
-                                 get_staff_from_username)
+                                 get_staff_from_username,
+                                 expire_all_active_pos_session)
 from apps.merchant.validators import (PosStaffAccessTokenValidator,
                                       PosStaffLoginValidator)
 from apps.user.services.session import Session
@@ -160,4 +161,5 @@ class PosStaffLogout(ServiceBase):
                 auth.logout(self.request)
                 if pos_session:
                     pos_session.expire()
+                expire_all_active_pos_session(user_id=user.id)
         return False
