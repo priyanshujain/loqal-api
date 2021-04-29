@@ -26,7 +26,8 @@ from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     RefundHistoryResponse,
                                     RefundTransactionsResponse,
                                     TransactionDetailsResponse,
-                                    TransactionHistoryResponse)
+                                    TransactionHistoryResponse,
+                                    MerchantPaymentHistoryResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
@@ -52,7 +53,7 @@ class CreatePaymentAPI(ConsumerAPIView):
             transactions, many=True
         ).data
         payment_response["tip_amount"] = merchant_payment.tip_amount
-        payment_notification_data = {}
+        payment_notification_data = MerchantPaymentHistoryResponse(merchant_payment.payment).data
         payment_notification_data[
             "transactions"
         ] = MerchantTransactionHistoryResponse(
@@ -171,7 +172,7 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             transactions, many=True
         ).data
         payment_response["tip_amount"] = payment_request.tip_amount
-        payment_notification_data = {}
+        payment_notification_data = MerchantPaymentHistoryResponse(payment_request.payment).data
         payment_notification_data[
             "transactions"
         ] = MerchantTransactionHistoryResponse(

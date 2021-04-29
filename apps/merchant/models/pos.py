@@ -49,7 +49,7 @@ class PosStaff(AbstractBaseModel):
 
     def generate_pin(self, merchant_id, login_pin=None, save=False):
         def pin_generator():
-            return get_random_string(length=6, allowed_chars="123456789")
+            return get_random_string(length=4, allowed_chars="123456789")
 
         if not login_pin:
             login_pin = pin_generator()

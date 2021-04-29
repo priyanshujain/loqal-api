@@ -35,5 +35,5 @@ class PosStaffAccessTokenValidator(serializers.ValidationSerializer):
 
 class PosStaffLoginValidator(serializers.ValidationSerializer):
     access_token = serializers.CharField(max_length=2 * 1024)
-    login_pin = serializers.CharField(max_length=6)
+    login_pin = serializers.CharField(max_length=4)
     username = serializers.CharField(max_length=512)
