@@ -2,6 +2,7 @@ from celery import shared_task
 
 from apps.account.options import AccountCerficationStatus, DwollaCustomerStatus
 from apps.banking.dbapi import get_bank_account
+from apps.merchant.dbapi import pos
 from apps.merchant.models import StoreImage
 from utils.thumbnails import create_thumbnails
 

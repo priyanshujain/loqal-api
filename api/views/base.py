@@ -8,7 +8,9 @@ import traceback
 from django.conf import settings
 from django.db import connection
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -418,3 +420,13 @@ def validate_serializer(serializer):
         return handle
 
     return validate
+
+
+class LoggedInMobileAPIView(LoggedInAPIView):
+    """
+    ConsumerAPIView
+    """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)

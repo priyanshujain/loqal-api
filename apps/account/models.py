@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext as _
+from timezone_field import TimeZoneField
 
 from apps.account.options import (AccountCerficationStatus,
                                   ConsumerAccountStatus, DwollaCustomerStatus,
@@ -122,6 +123,7 @@ class ConsumerAccount(AbstractBaseModel):
         default=ConsumerAccountStatus.UNVERIFIED,
         help_text=_("Status for the consumer account with dwolla."),
     )
+    tz = TimeZoneField(default="Europe/London")
 
     def change_username(self, username, save=True):
         self.username = username
@@ -146,6 +148,7 @@ class MerchantAccount(AbstractBaseModel):
     )
     company_email = models.EmailField(max_length=255, blank=True)
     notification_email = models.EmailField(max_length=255, blank=True)
+    tz = TimeZoneField(default="US/Eastern")
 
     class Meta:
         db_table = "merchant_account"

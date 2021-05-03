@@ -23,7 +23,12 @@ class DisputeListAPI(MerchantAPIView):
         disputes = get_merchant_disputes(merchant_account=merchant_account)
         if start and end:
             disputes = disputes.filter(created_at__range=[start, end])
-        return self.response(DisputeHistoryResponse(disputes, many=True).data)
+        return self.paginate(
+            request,
+            queryset=disputes,
+            order_by="-created_at",
+            response_serializer=DisputeHistoryResponse,
+        )
 
     def validate_params(self, params):
         try:

@@ -46,6 +46,7 @@ VENDOR_APPS = [
     "django_dbconn_retry",
     "corsheaders",
     "versatileimagefield",
+    "timezone_field",
 ]
 
 

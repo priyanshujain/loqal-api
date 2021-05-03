@@ -4,13 +4,13 @@ from re import I
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils.timezone import now
-from django.utils.translation import TranslatorCommentWarning
 
 from apps.account.models import MerchantAccount
 from apps.merchant.options import FeatureAcessTypes
 from db.models import AbstractBaseModel
-from db.models.fields import ChoiceCharEnumField
+from db.models.fields import ChoiceCharEnumField, EncryptedCharField
 from utils.shortcuts import rand_str
 
 

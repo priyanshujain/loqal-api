@@ -110,7 +110,8 @@ class CreatePaymentRequestValidator(PaymentValidatorBase):
 
 class AssignPaymentQrCodeValidator(serializers.ValidationSerializer):
     qrcode_id = serializers.CharField(max_length=6)
-    cashier_id = serializers.IntegerField()
+    register_name = serializers.CharField(max_length=255, required=False)
+    cashier_id = serializers.IntegerField(required=False)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -194,6 +195,15 @@ class PaymentRegisterValidator(serializers.ValidationSerializer):
 
 class MerchantReceiveLimitValidator(serializers.ValidationSerializer):
     transaction_limit = serializers.DecimalField(
+        min_value=1,
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        coerce_to_string=False,
+    )
+
+
+class PosAmountValidator(serializers.ValidationSerializer):
+    amount = serializers.DecimalField(
         min_value=1,
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,

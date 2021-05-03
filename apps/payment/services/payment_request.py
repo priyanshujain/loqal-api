@@ -12,7 +12,8 @@ from apps.merchant.services import InviteConsumerBySMS
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_payment, create_payment_request,
-                                create_transaction, get_merchant_receive_limit,
+                                create_transaction, get_cashier_qrcode,
+                                get_merchant_receive_limit,
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        failed_payment_event,
@@ -39,10 +40,11 @@ __all__ = (
 
 
 class CreatePaymentRequest(ServiceBase):
-    def __init__(self, account_id, account_member_id, data):
+    def __init__(self, register_id, account_id, account_member_id, data):
         self.data = data
         self.account_id = account_id
         self.account_member_id = account_member_id
+        self.register_id = register_id
 
     def handle(self):
         payment_data = self._validate_data()
@@ -136,6 +138,11 @@ class CreatePaymentRequest(ServiceBase):
         data["account_to_id"] = consumer_account.account.id
         data["consumer_id"] = consumer_account.id
         data["merchant_id"] = merchant_account.id
+        qrcode = get_cashier_qrcode(
+            merchant_id=merchant_account.id, cashier_id=self.account_member_id
+        )
+        if qrcode:
+            self.register_id = qrcode.id
         return data
 
     def _factory_payment_request(self, data):
@@ -145,6 +152,7 @@ class CreatePaymentRequest(ServiceBase):
             amount=data["amount"],
             currency=DEFAULT_CURRENCY,
             cashier_id=self.account_member_id,
+            register_id=self.register_id,
         )
 
 
@@ -200,7 +208,9 @@ class ApprovePaymentRequest(ServiceBase):
             + data["tip_amount"]
         )
         payment = create_payment(
-            order_id=order.id, payment_process=PaymentProcess.PAYMENT_REQUEST
+            order_id=order.id,
+            payment_process=PaymentProcess.PAYMENT_REQUEST,
+            register_id=payment_request.register.id,
         )
         initiate_payment_event(payment_id=payment.id)
         payment_request.add_payment(

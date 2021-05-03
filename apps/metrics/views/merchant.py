@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db.models import Count, Max, Sum
 from django.utils.translation import gettext as _
 
-from api.views import MerchantAPIView
+from api.views import MerchantAPIView, PosStaffAPIView
 from apps.metrics.notifications import SendConsumerRatingNotification
 from apps.metrics.services import CreateConsumerRating
 from apps.payment.dbapi import get_30days_transactions_merchant
@@ -11,6 +11,27 @@ from utils.dates import datetime_format
 
 
 class CreateConsumerRatingAPI(MerchantAPIView):
+    def post(self, request):
+        merchant_account = request.merchant_account
+        rating = CreateConsumerRating(
+            merchant=merchant_account, data=self.request_data
+        ).handle()
+        SendConsumerRatingNotification(
+            user_id=rating.consumer.user.id,
+            data={
+                "merchant_name": merchant_account.profile.full_name,
+                "created_at": datetime_format(rating.created_at),
+                "transaction": {
+                    "created_at": datetime_format(
+                        rating.transaction.created_at
+                    )
+                },
+            },
+        ).send()
+        return self.response()
+
+
+class CreatePosConsumerRatingAPI(PosStaffAPIView):
     def post(self, request):
         merchant_account = request.merchant_account
         rating = CreateConsumerRating(

@@ -292,6 +292,8 @@ class UserSession(BaseModel):
     def expire_session(self):
         self.last_activity = now()
         self.is_expired = True
+        if self.user_device:
+            self.user_device.inactivate_device()
         self.save()
 
     @property

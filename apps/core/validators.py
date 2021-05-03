@@ -31,6 +31,7 @@ class AppMetaDataValidator(serializers.ModelSerializer):
 
 class MerchantMetaDataValidator(serializers.ModelSerializer):
     platform = serializers.ChoiceField(choices=PlatformTypes.choices)
+    api_env = serializers.ChoiceField(choices=APIEnvironmentTypes.choices)
     primary_banking_verification_provider = serializers.ChoiceField(
         choices=VerificationProvider.choices
     )
@@ -39,5 +40,9 @@ class MerchantMetaDataValidator(serializers.ModelSerializer):
         model = MerchantMetaData
         fields = (
             "platform",
+            "api_env",
+            "min_allowed_version",
+            "new_version",
+            "store_url",
             "primary_banking_verification_provider",
         )
