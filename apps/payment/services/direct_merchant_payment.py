@@ -10,7 +10,8 @@ from apps.account.options import DwollaCustomerStatus
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_direct_merchant_payment, create_payment,
-                                create_transaction, get_payment_qrcode)
+                                create_transaction, get_payment_qrcode,
+                                register)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        failed_payment_event,
                                        failure_partial_return_event,
@@ -220,8 +221,12 @@ class DirectMerchantPayment(ServiceBase):
         payment_process = PaymentProcess.DIRECT_APP
         if payment_qrcode_id:
             payment_process = PaymentProcess.QRCODE
+
+        register_id = None
         payment = create_payment(
-            order_id=order.id, payment_process=payment_process
+            order_id=order.id,
+            payment_process=payment_process,
+            register_id=payment_qrcode_id,
         )
         initiate_payment_event(payment_id=payment.id)
         return (

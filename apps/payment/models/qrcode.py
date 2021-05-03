@@ -17,6 +17,7 @@ class PaymentQrCode(AbstractBaseModel):
     )
     currency = models.CharField(max_length=3, default=DEFAULT_CURRENCY)
     qrcode_id = models.CharField(max_length=10, unique=True)
+    register_name = models.CharField(max_length=255, blank=True)
     is_expired = models.BooleanField(default=False)
 
     class Meta:

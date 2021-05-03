@@ -130,8 +130,6 @@ class UserLogoutAPI(LoggedInAPIView):
         if self.user_session:
             user_session = self.user_session
             user_session.expire_session()
-            if user_session.user_device:
-                user_session.user_device.inactivate_device()
         return self.response()
 
 

@@ -1,7 +1,6 @@
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import LoggedInAPIView

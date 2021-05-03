@@ -4,6 +4,7 @@ from apps.payment.views.merchant_payment import MerchantPaymentHistoryAPI
 from apps.payment.views.payment import (ApprovePaymentRequestAPI,
                                         CreatePaymentAPI,
                                         CreatePaymentRequestAPI,
+                                        CreatePosPaymentRequestAPI,
                                         CreateRefundPaymentAPI,
                                         ListConsumerPaymentRequestAPI,
                                         ListMerchantPaymentRequestAPI,
@@ -19,6 +20,11 @@ urlpatterns = [
         "request/create/",
         CreatePaymentRequestAPI.as_view(),
         name="create_payment_request",
+    ),
+    path(
+        "pos/request/create/",
+        CreatePosPaymentRequestAPI.as_view(),
+        name="create_pos_payment_request",
     ),
     path(
         "request/approve/",

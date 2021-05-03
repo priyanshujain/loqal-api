@@ -9,6 +9,7 @@ from db.models import AbstractBaseModel
 from db.models.fields import ChoiceEnumField
 
 from .payment import Payment
+from .qrcode import PaymentQrCode
 from .transaction import Transaction
 
 __all__ = ("PaymentRequest",)
@@ -31,6 +32,13 @@ class PaymentRequest(AbstractBaseModel):
     )
     cashier = models.ForeignKey(
         AccountMember,
+        blank=True,
+        null=True,
+        related_name="payment_requests",
+        on_delete=models.SET_NULL,
+    )
+    register = models.ForeignKey(
+        PaymentQrCode,
         blank=True,
         null=True,
         related_name="payment_requests",

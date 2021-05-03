@@ -31,6 +31,7 @@ def create_payment_register(account_id):
 def create_payment(
     order_id,
     payment_process,
+    register_id=None,
 ):
     """
     dbapi for creating new transaction.
@@ -40,6 +41,7 @@ def create_payment(
             order_id=order_id,
             status=PaymentStatus.IN_PROGRESS,
             payment_process=payment_process,
+            register_id=register_id,
         )
     except IntegrityError:
         return None
@@ -151,12 +153,25 @@ def get_single_qrcode_by_id(qrcode_id):
         return None
 
 
-def assign_payment_qrcode(qrcode_id, merchant_id, cashier_id):
+def assign_payment_qrcode(
+    qrcode_id, merchant_id, cashier_id=None, register_name=""
+):
     """
     Assign QR code to a merchant
     """
     PaymentQrCode.objects.filter(qrcode_id=qrcode_id).update(
-        merchant_id=merchant_id, cashier_id=cashier_id
+        merchant_id=merchant_id,
+        cashier_id=cashier_id,
+        register_name=register_name,
+    )
+
+
+def update_payment_qrcode(qrcode_id, merchant_id, register_name=""):
+    """
+    UPdate register name in QR code to a merchant
+    """
+    PaymentQrCode.objects.filter(qrcode_id=qrcode_id).update(
+        merchant_id=merchant_id, register_name=register_name
     )
 
 
@@ -189,6 +204,18 @@ def get_cashier_qrcode(merchant_id, cashier_id):
         return None
 
 
+def get_qrcode_by_register_name(merchant_id, register_name):
+    """
+    Get QR code for a register_name
+    """
+    try:
+        return PaymentQrCode.objects.get(
+            merchant_id=merchant_id, register_name=register_name
+        )
+    except PaymentQrCode.DoesNotExist:
+        return None
+
+
 def get_empty_qrcodes():
     """
     Get QR code for a cashier
@@ -202,6 +229,7 @@ def create_payment_request(
     amount,
     currency,
     cashier_id=None,
+    register_id=None,
 ):
     """
     dbapi for creating new payment request.
@@ -213,6 +241,7 @@ def create_payment_request(
             amount=Decimal(amount),
             currency=currency,
             cashier_id=cashier_id,
+            register_id=register_id,
         )
     except IntegrityError:
         return None
