@@ -11,9 +11,7 @@ from apps.account.dbapi import (check_account_username,
                                 get_merchant_account_by_email)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.account.validators import CreateConsumerAccountValidator
-from apps.payment.dbapi import (create_payment_register,
-                                create_payment_request,
-                                get_pre_payment_request)
+from apps.payment.dbapi import create_payment_register
 from apps.user.dbapi import create_user, get_consumer_user_by_email
 from apps.user.options import CustomerTypes
 
@@ -109,22 +107,6 @@ class CreateConsumerAccount(ServiceBase):
 
     def _send_verfication_email(self, user):
         SendConsumerAccountVerifyEmail(user=user).send()
-
-    def _create_pending_payment_request(self, consumer_account):
-        pre_payment_requests = get_pre_payment_request(
-            phone_number=consumer_account.user.phone_number,
-            phone_number_country=consumer_account.user.phone_number_country,
-        )
-        for pre_payment_request in pre_payment_requests:
-            register_id = None
-            if pre_payment_request.register:
-                register_id = pre_payment_request.register.id
-            create_payment_request(
-                account_from_id=pre_payment_request.merchant.account.id,
-                account_to_id=consumer_account.account.id,
-                amount=pre_payment_request.amount,
-                register_id=register_id,
-            )
 
 
 class GenerateUsername(object):
