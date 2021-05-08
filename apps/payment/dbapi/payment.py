@@ -277,10 +277,11 @@ def get_pre_payment_request(
     """
     dbapi for get new pre payment request.
     """
+    current_datetime = now()
     return PrePaymentRequest.objects.filter(
         phone_number=phone_number,
         phone_number_country=phone_number_country,
-        expires_at__gte=now,
+        expires_at__gte=current_datetime,
     )
 
 
