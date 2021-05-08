@@ -6,9 +6,10 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
-from apps.merchant.dbapi import (create_pos_session, get_active_pos_session,
-                                 get_staff_from_username,
-                                 expire_all_active_pos_session)
+from apps.merchant.dbapi import (create_pos_session,
+                                 expire_all_active_pos_session,
+                                 get_active_pos_session,
+                                 get_staff_from_username)
 from apps.merchant.validators import (PosStaffAccessTokenValidator,
                                       PosStaffLoginValidator)
 from apps.user.services.session import Session

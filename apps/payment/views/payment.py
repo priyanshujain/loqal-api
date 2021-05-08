@@ -20,14 +20,14 @@ from apps.payment.options import TransactionSourceTypes
 from apps.payment.responses import (ConsumerPaymentRequestResponse,
                                     CreateRefundResponse,
                                     CreateTransactionResponse,
+                                    MerchantPaymentHistoryResponse,
                                     MerchantTransactionHistoryResponse,
                                     PaymentRequestResponse,
                                     RecentStoresResponse,
                                     RefundHistoryResponse,
                                     RefundTransactionsResponse,
                                     TransactionDetailsResponse,
-                                    TransactionHistoryResponse,
-                                    MerchantPaymentHistoryResponse)
+                                    TransactionHistoryResponse)
 from apps.payment.services import (ApprovePaymentRequest, CreatePaymentRequest,
                                    CreateRefund, DirectMerchantPayment,
                                    RejectPaymentRequest)
@@ -53,7 +53,9 @@ class CreatePaymentAPI(ConsumerAPIView):
             transactions, many=True
         ).data
         payment_response["tip_amount"] = merchant_payment.tip_amount
-        payment_notification_data = MerchantPaymentHistoryResponse(merchant_payment.payment).data
+        payment_notification_data = MerchantPaymentHistoryResponse(
+            merchant_payment.payment
+        ).data
         payment_notification_data[
             "transactions"
         ] = MerchantTransactionHistoryResponse(
@@ -172,7 +174,9 @@ class ApprovePaymentRequestAPI(ConsumerAPIView):
             transactions, many=True
         ).data
         payment_response["tip_amount"] = payment_request.tip_amount
-        payment_notification_data = MerchantPaymentHistoryResponse(payment_request.payment).data
+        payment_notification_data = MerchantPaymentHistoryResponse(
+            payment_request.payment
+        ).data
         payment_notification_data[
             "transactions"
         ] = MerchantTransactionHistoryResponse(

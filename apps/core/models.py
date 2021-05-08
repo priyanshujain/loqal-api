@@ -1,7 +1,8 @@
 from enum import unique
 
 from django.db import models
-from django.utils.translation import deactivate, gettext as _
+from django.utils.translation import deactivate
+from django.utils.translation import gettext as _
 
 from apps.banking.options import VerificationProvider
 from db.models import BaseModel

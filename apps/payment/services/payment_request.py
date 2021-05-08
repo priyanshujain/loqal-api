@@ -12,8 +12,8 @@ from apps.merchant.services import InviteConsumerBySMS
 from apps.order.options import OrderType
 from apps.order.services import CreateOrder
 from apps.payment.dbapi import (create_payment, create_payment_request,
-                                create_transaction, get_cashier_qrcode,
-                                get_merchant_receive_limit,
+                                create_pre_payment_request, create_transaction,
+                                get_cashier_qrcode, get_merchant_receive_limit,
                                 get_payment_reqeust_by_uid)
 from apps.payment.dbapi.events import (capture_payment_event,
                                        failed_payment_event,
@@ -95,6 +95,14 @@ class CreatePaymentRequest(ServiceBase):
                     ).handle()
                 except Exception:
                     pass
+
+                create_pre_payment_request(
+                    merchant_id=merchant_account.id,
+                    register_id=self.register_id,
+                    amount=data["amount"],
+                    phone_number=phone_number,
+                )
+
                 if is_success:
                     raise ValidationError(
                         {

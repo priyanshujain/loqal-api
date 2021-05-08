@@ -7,11 +7,12 @@ from decimal import Decimal
 from django.conf import settings
 from django.db.models import Q
 from django.db.utils import IntegrityError
+from django.utils.timezone import now
 
 from apps.order.models import Order
 from apps.payment.models import (DirectMerchantPayment, Payment, PaymentQrCode,
-                                 PaymentRegister, PaymentRequest, Refund,
-                                 Transaction)
+                                 PaymentRegister, PaymentRequest,
+                                 PrePaymentRequest, Refund, Transaction)
 from apps.payment.options import (PaymentRequestStatus, PaymentStatus,
                                   TransactionSourceTypes, TransactionStatus,
                                   TransactionType)
@@ -227,7 +228,7 @@ def create_payment_request(
     account_from_id,
     account_to_id,
     amount,
-    currency,
+    currency=DEFAULT_CURRENCY,
     cashier_id=None,
     register_id=None,
 ):
@@ -245,6 +246,42 @@ def create_payment_request(
         )
     except IntegrityError:
         return None
+
+
+def create_pre_payment_request(
+    merchant_id,
+    register_id,
+    phone_number,
+    amount,
+    phone_number_country="US",
+):
+    """
+    dbapi for creating new pre payment request.
+    """
+    try:
+        return PrePaymentRequest.objects.create(
+            merchant_id=merchant_id,
+            register_id=register_id,
+            amount=Decimal(amount),
+            phone_number=phone_number,
+            phone_number_country=phone_number_country,
+        )
+    except IntegrityError:
+        return None
+
+
+def get_pre_payment_request(
+    phone_number,
+    phone_number_country="US",
+):
+    """
+    dbapi for get new pre payment request.
+    """
+    return PrePaymentRequest.objects.filter(
+        phone_number=phone_number,
+        phone_number_country=phone_number_country,
+        expires_at__gte=now,
+    )
 
 
 def create_direct_merchant_payment(

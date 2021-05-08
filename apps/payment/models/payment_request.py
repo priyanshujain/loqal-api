@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
-from apps.account.models import Account
+from apps.account.models import Account, MerchantAccount
 from apps.merchant.models import AccountMember
 from apps.payment.options import PaymentRequestStatus
 from apps.provider.options import DEFAULT_CURRENCY
@@ -12,7 +15,10 @@ from .payment import Payment
 from .qrcode import PaymentQrCode
 from .transaction import Transaction
 
-__all__ = ("PaymentRequest",)
+__all__ = (
+    "PaymentRequest",
+    "PrePaymentRequest",
+)
 
 
 class PaymentRequest(AbstractBaseModel):
@@ -107,3 +113,37 @@ class PaymentRequest(AbstractBaseModel):
         self.status = PaymentRequestStatus.ACCEPTED
         if save:
             self.save()
+
+
+class PrePaymentRequest(AbstractBaseModel):
+    merchant = models.ForeignKey(
+        MerchantAccount,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="from_pre_payment_requests",
+    )
+    register = models.ForeignKey(
+        PaymentQrCode,
+        blank=True,
+        null=True,
+        related_name="pre_payment_requests",
+        on_delete=models.SET_NULL,
+    )
+    amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default=0,
+    )
+    phone_number = models.CharField(max_length=10, default=None, null=True)
+    phone_number_country = models.CharField(max_length=2, default="US")
+    expires_at = models.DateTimeField(default=now)
+
+    class Meta:
+        db_table = "pre_payment_request"
+
+    def set_expiration(self, save=True):
+        self.expires_at = now() + timedelta(hours=2)
+        if save:
+            self.save()
+        return self.expires_at
