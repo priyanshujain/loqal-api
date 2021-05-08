@@ -32,7 +32,6 @@ class CreateConsumerAccount(ServiceBase):
         data = self._validate_data()
         user = self._factory_user()
         consumer_account = self._factory_account(user=user)
-        self._create_pending_payment_request(consumer_account=consumer_account)
         AcceptTerms(
             request=self.request,
             account=consumer_account.account,

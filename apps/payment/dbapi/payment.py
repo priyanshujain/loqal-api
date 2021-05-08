@@ -259,13 +259,15 @@ def create_pre_payment_request(
     dbapi for creating new pre payment request.
     """
     try:
-        return PrePaymentRequest.objects.create(
+        pre_payment_request = PrePaymentRequest.objects.create(
             merchant_id=merchant_id,
             register_id=register_id,
             amount=Decimal(amount),
             phone_number=phone_number,
             phone_number_country=phone_number_country,
         )
+        pre_payment_request.set_expiration()
+        return pre_payment_request
     except IntegrityError:
         return None
 
