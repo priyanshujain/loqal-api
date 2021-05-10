@@ -81,9 +81,7 @@ class ValidatePosStaffAccessTokenResponse(serializers.ModelSerializer):
     is_disabled = serializers.BooleanField(
         source="user.is_disabled", read_only=True
     )
-    username = serializers.CharField(
-        source="user.username", read_only=True
-    )
+    username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = PosStaff

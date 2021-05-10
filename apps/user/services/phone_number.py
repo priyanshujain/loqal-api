@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from api.exceptions import ErrorDetail, ValidationError
 from api.helpers import run_validator
 from api.services import ServiceBase
+from apps.payment.dbapi import create_payment_request, get_pre_payment_request
 from apps.user.dbapi import get_user_by_phone
 from apps.user.models import Authenticator
 from apps.user.options import CustomerTypes
@@ -84,9 +85,10 @@ class AddPhoneNumber(ServiceBase):
 
 
 class VerifyPhoneNumber(ServiceBase):
-    def __init__(self, user, request, data):
+    def __init__(self, user, request, consumer_account, data):
         self.user = user
         self.request = request
+        self.consumer_account = consumer_account
         self.data = data
 
     def handle(self):
@@ -97,6 +99,7 @@ class VerifyPhoneNumber(ServiceBase):
             request=self.request, user=self.user, data=data
         ).validate_otp(otp):
             self.user.verify_phone_number()
+            self._create_pending_payment_request()
         else:
             raise ValidationError(
                 {"code": ErrorDetail(_("Provided otp code does not match."))}
@@ -114,6 +117,23 @@ class VerifyPhoneNumber(ServiceBase):
         return run_validator(
             validator=VerifyPhoneNumberOtpValidator, data=data
         )
+
+    def _create_pending_payment_request(self):
+        consumer_account = self.consumer_account
+        pre_payment_requests = get_pre_payment_request(
+            phone_number=consumer_account.user.phone_number,
+            phone_number_country=consumer_account.user.phone_number_country,
+        )
+        for pre_payment_request in pre_payment_requests:
+            register_id = None
+            if pre_payment_request.register:
+                register_id = pre_payment_request.register.id
+            create_payment_request(
+                account_from_id=pre_payment_request.merchant.account.id,
+                account_to_id=consumer_account.account.id,
+                amount=pre_payment_request.amount,
+                register_id=register_id,
+            )
 
 
 class ResendPhoneNumberOtp(object):

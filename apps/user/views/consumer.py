@@ -6,7 +6,7 @@ from rest_framework.parsers import MultiPartParser
 
 from api.exceptions import ErrorDetail, ValidationError
 from api.views import (APIView, ConsumerAPIView, ConsumerPre2FaAPIView,
-                       LoggedInAPIView)
+                       LoggedInAPIView, consumer)
 from apps.account.notifications import SendConsumerAccountVerifyEmail
 from apps.notification.tasks import SendEmailVerifiedNotification
 from apps.user.notifications import SendConsumerResetPasswordEmail
@@ -167,12 +167,18 @@ class StartSmsAuthEnrollmentAPI(ConsumerPre2FaAPIView):
 
 class VerifyPhoneNumberAPI(ConsumerPre2FaAPIView):
     def post(self, request):
-        self._run_services(user=request.user)
+        consumer_account = request.consumer_account
+        self._run_services(
+            user=request.user, consumer_account=consumer_account
+        )
         return self.response()
 
-    def _run_services(self, user):
+    def _run_services(self, user, consumer_account):
         service = VerifyPhoneNumber(
-            user=user, request=self.request, data=self.request_data
+            user=user,
+            request=self.request,
+            consumer_account=consumer_account,
+            data=self.request_data,
         )
         service.handle()
 
